@@ -1,0 +1,89 @@
+declare function require(name:string):any;
+import mongoose, {Schema} from 'mongoose';
+import * as passportLocalMongoose from 'passport-local-mongoose';
+import {UserSchema} from "./models/user.model";
+import {dbStore , SvcStore} from './common/customTypes/types.config.js';
+import { Svc } from './services/Svc.services';
+var Usersch = new Schema(UserSchema, {timestamps: true});
+Usersch.plugin(passportLocalMongoose.default);
+var User:any = mongoose.model('User',Usersch);
+dbStore['User'] = User;
+SvcStore['User'] = new Svc(User);
+import passport from 'passport';
+import {Strategy as LocalStrategy} from 'passport-local';
+
+//var User : any= dbStore['User'];
+import {Strategy as JwtStrategy} from 'passport-jwt';
+import {ExtractJwt as ExtractJwt} from 'passport-jwt';
+var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+
+import {config} from './bin/config.js';
+var FacebookTokenStrategy = require('passport-facebook-token');
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+export function getToken(user:any):any {
+    return jwt.sign(user, config.secretKey,
+        {expiresIn: 3600});
+};
+
+var opts:{jwtFromRequest:any,secretOrKey:any }={jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),secretOrKey:config.secretKey  };
+
+export var jwtPassport = passport.use(new JwtStrategy(opts,
+    (jwt_payload:any, done:any) => {
+        console.log("JWT payload: ", jwt_payload);
+        User.findOne({_id: jwt_payload._id}, (err:any, user:any) => {
+            if (err) {
+                return done(err, false);
+            }
+            else if (user) {
+                return done(null, user);
+            }
+            else {
+                return done(null, false);
+            }
+        });
+    }));
+
+
+export var verifyUser = passport.authenticate('jwt', {session: false});
+
+export function verifyAdmin(req:any, res:any, next:any){
+       if(req.user.admin){
+         next()
+        } else{
+            var err = new Error('You are not authorized !');
+            //err.status = 403;
+            next(err);
+       }   
+}
+
+// facebook
+export var facebookPassport = passport.use(new FacebookTokenStrategy({
+    clientID: config.facebook.clientId,
+    clientSecret: config.facebook.clientSecret
+}, (accessToken:any, refreshToken:any, profile:any, done:any) => {
+    User.findOne({facebookId: profile.id}, (err:any, user:any) => {
+        if (err) {
+            return done(err, false);
+        }
+        if (!err && user !== null) {
+            return done(null, user);
+        }
+        else {
+            user = new User({ username: profile.displayName });
+            user.facebookId = profile.id;
+            user.firstname = profile.name.givenName;
+            user.lastname = profile.name.familyName;
+            user.save((err:any, user:any) => {
+                if (err)
+                    return done(err, false);
+                else
+                    return done(null, user);
+            })
+        }
+    });
+}
+));

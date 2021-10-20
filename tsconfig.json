@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",
+      "outDir": "./dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "downlevelIteration": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "moduleResolution": "node",
+      "importHelpers": true,
+      "target": "es2016",
+      "module": "commonjs",
+      "resolveJsonModule": true,
+    "lib": [
+      "ES2016",
+      "DOM"
+    ],
+    "inlineSourceMap": true   
+    }
+  }
