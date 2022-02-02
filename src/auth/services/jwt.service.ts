@@ -13,7 +13,10 @@ export class JwtService{
   constructor(){
       
   }
-
+    static async createInstance(){
+        let jwt = new JwtService()
+        return await Promise.resolve(jwt)
+    }
     public static generateToken(user: any) {
         try {
             return jwt.sign(user, config.secretKey,{expiresIn: 3600});

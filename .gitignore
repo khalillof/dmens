@@ -2,6 +2,10 @@ node_modules
 bin/cert.csr
 bin/certificate.pem
 bin/private.key
+dist
+build
+.env
+src/bin
 # Logs
 logs
 *.log
@@ -10,7 +14,22 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .idea
+.cache/
+coverage/
+dist/*
+build
+!dist/index.html
+node_modules/
+*.log
 
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

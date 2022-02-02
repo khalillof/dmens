@@ -9,12 +9,14 @@ export class Svc implements ISvc {
     constructor(svc:Model<any,any>) {
         this.db = svc;
     }
-    static createInstance(data:Model<any,any>):ISvc{
-        return new this(data);
+   public static  async createInstance(data:Model<any,any>):Promise<ISvc>{
+      var result = new Svc(data);
+      return  await Promise.resolve(result);
       }
-
-async create(obj: any){
-  return this.db.create(obj);
+      
+ async create(obj: any):Promise<any>{
+  let res =this.db.create(obj)
+  return  await Promise.resolve(res);
 }
 
 async getById(objId: string) {

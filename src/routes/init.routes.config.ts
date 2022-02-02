@@ -3,21 +3,36 @@ import {IndexRoutes} from './index.routes.config';
 import {UsersRoutes} from './users.routes.config';
 import {AuthRoutes} from './auth.routes.config';
 
-import {DefaultController} from '../controllers/default.controller';
-import {routeStore} from '../common/customTypes/types.config';
 import {DefaultRoutesConfig} from './default.routes.config';
 
-  export function initializeRoutes(app: express.Application):void{
-    IndexRoutes(app);
-    AuthRoutes(app);
-    UsersRoutes(app);  
-    new DefaultRoutesConfig(app,'/dishes',new DefaultController());
-    new DefaultRoutesConfig(app,'/leaders',new DefaultController());
-    new DefaultRoutesConfig(app,'/favorites',new DefaultController());
-    new DefaultRoutesConfig(app,'/promotions',new DefaultController());
+  export async function initializeRoutes(app: express.Application){
+ 
+   await DefaultRoutesConfig.createInstancesWithDefault(app,['/dishes', '/leaders', '/favorites', '/promotions']);
+   await IndexRoutes(app);
+   await AuthRoutes(app);
+   await UsersRoutes(app);  
 
-    for(let d in routeStore){
-      if(routeStore[d])
-      console.log('Added to routeStore :'+d)
-    }
+  return await Promise.resolve(availableRoutesToString(app))
   } 
+
+  // helpers
+  function availableRoutesToString(app:express.Application) {
+    let result = app._router.stack
+      .filter((r:any) => r.route)
+      .map((r:any) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
+      .join("\n");
+      
+      console.log('================= All Routes avaliable ================ \n'+ result)
+  }
+  function availableRoutesToJson(app:express.Application) {
+    let result = app._router.stack
+        .filter((r:any) => r.route)
+        .map((r:any) => {
+        return {
+            method: Object.keys(r.route.methods)[0].toUpperCase(),
+            path: r.route.path
+        };
+    });
+    console.log('================= All Routes avaliable ================ \n'+ JSON.stringify(result, null, 2))
+    //console.log(JSON.stringify(result, null, 2));
+  }

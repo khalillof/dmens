@@ -8,7 +8,7 @@ export function returnJson (obj : any,status:number, res: any){
   res.setHeader('Content-Type', 'application/json');
   res.status(status).json(obj)
   };
-export interface IJsonModel  {name:string,schema?:Schema |any, model?:Model<any,any> | any};
+export interface JsonSchema  {name:string,schema?:Schema |any};
 export interface IConstructor<T> {
   new (...args: any[]): T;
 }
@@ -51,7 +51,7 @@ export function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) {
     return obj[key];
 }
 
-export  function createInstance<T>(constructor: new(...args: any[])=> T, ...args: any[]): T  {
+export function createInstance<T>(constructor: new(...args: any[])=> T, ...args: any[]): T  {
     return new constructor(...args);
   }
 

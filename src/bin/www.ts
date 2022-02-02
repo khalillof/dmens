@@ -5,7 +5,7 @@
  */
 
 import app from '../app';
-var debug = require('debug')('confusionserver:server');
+var debug = require('debug')('Express-Api-Server:server');
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
@@ -29,7 +29,7 @@ var server = http.createServer(app);
  */
 
 server.listen(port, () => {
-  console.log("Server listening on :"+ port);
+  console.log("Express-Api-Server is listening on :"+ port);
 });
 server.on('error', onError);
 server.on('listening', onListening);

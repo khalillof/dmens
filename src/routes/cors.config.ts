@@ -1,5 +1,3 @@
-import { model } from "mongoose";
-
 import  Cors  from 'cors';
 
 

@@ -1,44 +1,47 @@
 import path from 'path';
 //import fs from 'fs';
-import { readdir, readFile } from 'fs/promises';
-import mongoose, { Schema, Model, Types } from 'mongoose';
-import passport from 'passport';
-var passportLocalMongoose = require('passport-local-mongoose');
-import { Strategy as LocalStrategy } from 'passport-local';
-import { dbStore, SvcStore, createInstance, modelStore, IJsonModel } from '../common/customTypes/types.config';
+import fs from 'fs';
+import mongoose from 'mongoose';
+
+import { dbStore, SvcStore, JsonSchema } from '../common/customTypes/types.config';
+
+import { JsonModel } from './Json.model';
 import { Svc } from '../services/Svc.services';
 //import { JsonModel } from './json.model';
 
-export async function loadJsons(directoryPath?: string): Promise<Array<IJsonModel>> {
-    const result: Array<IJsonModel> | any = [];
-    const _directory = directoryPath ? directoryPath: path.join(__dirname, './schema/' );
+export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchema>> {
+    const result: Array<JsonSchema> | any = [];
+    const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
     try {
-        const fileNames = await readdir(_directory);
-        for await (const fileName of fileNames){
+        const fileNames = await fs.promises.readdir(_directory);
+        for await (const fileName of fileNames) {
             if (path.extname(fileName) === '.json') {
 
                 let _file = path.join(_directory, fileName);
-                let data = await readFile(_file, 'utf8');
+                let data = await fs.promises.readFile(_file, 'utf8');
                 let jsonobj = JSON.parse(data);
-                result.push(makeSchema(jsonobj));
+                if(! jsonobj.name){
+                    throw new Error(' jschema name is required property')
+                }
+                result.push(await makeSchema(jsonobj));
             }
-        }        
-      } catch (err) {
+        }
+    } catch (err) {
         console.error(err);
-      }
+    }
 
     return result;
 };
 
 
-function makeSchema(jIJsonModel: IJsonModel): IJsonModel {
-    Object.entries(jIJsonModel.schema).forEach((item) => {
+async function makeSchema(jschema: JsonSchema):Promise< JsonSchema> {
+
+    Object.entries(jschema.schema).forEach((item) => {
         recursiveSearch(item);
     })
-
-    return makeModel(jIJsonModel);
-    //return jIJsonModel;
+    
+    return await makeModel(jschema);
 }
 // search item in object
 function recursiveSearch(item: any) {
@@ -66,23 +69,12 @@ function recursiveSearch(item: any) {
     }
 }
 
-function makeModel(jsonModel: IJsonModel): IJsonModel {
-    jsonModel.schema = new Schema(jsonModel.schema, { timestamps: true });
-    if (jsonModel.name === 'User') {
-        
-        jsonModel.schema.plugin(passportLocalMongoose);
-        jsonModel.model = mongoose.model(jsonModel.name, jsonModel.schema);
-        passport.use(new LocalStrategy(jsonModel.model.authenticate()));
-        passport.serializeUser(jsonModel.model.serializeUser());
-        passport.deserializeUser(jsonModel.model.deserializeUser());
+async function makeModel(jsonSchema: JsonSchema):Promise<JsonModel> {
+    let jmodel= await JsonModel.createInstance(jsonSchema)
+    dbStore[jsonSchema.name] = jmodel.model;
+    SvcStore[jmodel.name] = await Svc.createInstance(jmodel.model);
 
-    } else {
-        jsonModel.model = mongoose.model(jsonModel.name, jsonModel.schema);
-    }
-     dbStore[jsonModel.name] = jsonModel.model;
-     SvcStore[jsonModel.name] = createInstance(Svc, jsonModel.model)
-    console.log("added Db & Svc to local stores :" + jsonModel.name)
-    return  jsonModel;
+    return  await Promise.resolve(jmodel);
     //return createInstance(JsonModel,jsonModel)
 }
 

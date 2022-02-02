@@ -1,10 +1,11 @@
-import express from 'express';
+/* import express from 'express';
 import {DefaultController} from '../controllers/default.controller';
 import {returnJson} from "../common/customTypes/types.config";
 import {DefaultRoutesConfig} from './default.routes.config'
+import { AuthController } from 'src/controllers/auth.controller';
 //app, '/auth',  AuthController
-export function AuthRoutes(app: express.Application):DefaultRoutesConfig{
-    return new DefaultRoutesConfig(app,'/auth', new DefaultController(), function(self:DefaultRoutesConfig):void{
+export async function AuthRoutes(app: express.Application){
+    return await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance(), function(self:DefaultRoutesConfig):void{
           self.defaultRoutes();
     
             self.app.route('/auth').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
@@ -35,3 +36,4 @@ export function AuthRoutes(app: express.Application):DefaultRoutesConfig{
             });
         });
 };
+*/

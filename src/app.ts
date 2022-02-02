@@ -1,3 +1,4 @@
+require('dotenv').config()
 declare function require(name: string): any;
 import express from 'express';
 //import * as http from 'http';
@@ -10,7 +11,7 @@ import { dbInit } from './common/services/mongoose.service';
 import { initializeRoutes } from './routes/init.routes.config';
 import passport from 'passport';
 ///////////////////////////////////////////
-const app: express.Application = express();
+const app = express();
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: false }));
 // view engine setup
@@ -21,9 +22,8 @@ app.use(passport.initialize());
 
 // connect to db and initialise db models then
 (async (_app:express.Application)=> {
-  await dbInit().then(()=>{
 
-
+return  await dbInit().then(()=> { 
 
 _app.use(helmet({
   contentSecurityPolicy: false
@@ -39,7 +39,7 @@ _app.use(expressWinston.logger({
   )
 }));
 
-initializeRoutes(_app)
+ initializeRoutes(_app)
 
 function staticUrl(url: Array<string>) {
   return url.map((e) => path.join(__dirname, e)).forEach((url: string) => _app.use(express.static(url)))
@@ -55,6 +55,7 @@ _app.use(function (req, res, next) {
 // error handler
 _app.use(function (err: any, req: any, res: any, next: any) {
   // set locals, only providing error in development
+ 
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
@@ -63,8 +64,9 @@ _app.use(function (err: any, req: any, res: any, next: any) {
   res.render('error');
 });
 
+}).catch((err)=>console.error(err));
 //end
-}).catch((err)=> console.error(err));
+
 })(app);
 
 export default app;

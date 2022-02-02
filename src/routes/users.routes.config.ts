@@ -1,72 +1,69 @@
 
-import UsersMiddleware from '../users/middleware/users.middleware';
 import express from 'express';
 import {UsersController}  from '../controllers/users.controller';
 import {DefaultRoutesConfig } from './default.routes.config'
 var passport = require('passport');
 
-export function UsersRoutes(app: express.Application):DefaultRoutesConfig{
-    return new  DefaultRoutesConfig(app,'/users', new UsersController(), function(self:DefaultRoutesConfig):void {
-
-            self.app.route('/users/signup').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-            .post(
+export async function UsersRoutes(app: express.Application){
+    return await DefaultRoutesConfig.instance(app,'/users', await UsersController.createInstance(), function(self:DefaultRoutesConfig){
+        //console.log('============ Users Routes Config =============')
+           // self.app.route('/users/signup').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.post('/users/signup',
                 self.corsWithOption,
-                UsersMiddleware.validateRequiredUserBodyFields,
-                UsersMiddleware.validateSameEmailDoesntExist,
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.UsersMWare.validateSameEmailDoesntExist,
                 self.controller.signup
                 );
             
-            self.app.route('/users/login').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-               .post(
+            //self.app.route('/users/login').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.post('/users/login',
                 self.corsWithOption,
-                UsersMiddleware.validateRequiredUserBodyFields,
-                UsersMiddleware.validateUserExists,
-                UsersMiddleware.verifyUserPassword,
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.UsersMWare.validateUserExists,
+                self.UsersMWare.verifyUserPassword,
                 self.controller.login
                 );
 
-            self.app.route('/users/logout').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-                .get(
+           // self.app.route('/users/logout').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.get('/users/logout',
                 self.corsWithOption,
-                UsersMiddleware.validateRequiredUserBodyFields,
-                UsersMiddleware.validateUserExists,
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.UsersMWare.validateUserExists,
                 self.controller.logout);
 
-            self.app.route('/facebook/token').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-                .get(
+           // self.app.route('/facebook/token').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.get('/facebook/token',
                     self.corsWithOption,
                     passport.authenticate('facebook-token'),
                     self.controller.facebook);
 
-            self.app.route('/users').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-                .get(
+            //self.app.route('/users').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.get('/users',
                    self.cors,self.corsWithOption, 
-                   UsersMiddleware.verifyUser,
-                   UsersMiddleware.verifyUserIsAdmin,
+                   self.UsersMWare.verifyUser,
+                   self.UsersMWare.verifyUserIsAdmin,
                 self.controller.ToList); 
-            self.app.route('/users/checkJWTtoken').get( self.corsWithOption,self.controller.checkJWTtoken );
 
-            self.app.param('id', UsersMiddleware.extractUserId);
+            self.app.get('/users/checkJWTtoken',self.corsWithOption,self.controller.checkJWTtoken );
+
+            self.app.param('id', self.UsersMWare.extractUserId);
            
-            self.app.route(`/users/id`).options(
-                self.corsWithOption, 
-                (req, res) => { res.sendStatus(200); } )
-                .all(UsersMiddleware.validateUserExists)
-                .get(
-                    self.corsWithOption, 
-                    self.controller.getById)
-                .delete(
+            //self.app.route('/users/id').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+            self.app.all('/users/id',self.UsersMWare.validateUserExists);
+            self.app.get('/users/id',self.corsWithOption, self.controller.getById);
+            self.app.delete('/users/id',self.corsWithOption,self.controller.remove);
+
+            self.app.put('/users/',
+                self.corsWithOption,
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.controller.create);
+
+            self.app.put('/users/',
                     self.corsWithOption,
-                    self.controller.remove)
-                .put(
-                    self.corsWithOption,
-                UsersMiddleware.validateRequiredUserBodyFields,
-                UsersMiddleware.validateSameEmailBelongToSameUser,
-                self.controller.put)
-                .patch(
-                    self.corsWithOption,
-                UsersMiddleware.validatePatchEmail,
-                self.controller.patch
-            );   
+                    self.UsersMWare.validateRequiredUserBodyFields,
+                    self.UsersMWare.validateSameEmailBelongToSameUser,
+                self.controller.put);
+
+            self.app.patch('/users',self.corsWithOption,self.UsersMWare.validatePatchEmail,self.controller.patch);   
     })
 }

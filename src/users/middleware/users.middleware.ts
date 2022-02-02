@@ -4,10 +4,12 @@ import {JwtService} from '../../auth/services/jwt.service'
 import argon2 from 'argon2';
 class UsersMiddleware {
  
-    constructor(){
-
+    static async createInstance(){
+        let usm = new UsersMiddleware()
+        return await Promise.resolve(usm)
     }
-    verifyUser: any = createInstance(JwtService).verifyUser;
+    verifyUser: any =  new JwtService().verifyUser;
+    
     async validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction) {
         if(req.body && req.body.email && req.body.password){
             next();
@@ -94,4 +96,4 @@ class UsersMiddleware {
     }
 }
 
-export default createInstance(UsersMiddleware);
+export default UsersMiddleware;

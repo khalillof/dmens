@@ -4,13 +4,18 @@ import argon2 from 'argon2';
 import {getSvc, returnJson, getCont} from '../common/customTypes/types.config'
 import passport from 'passport';
 import {JwtService} from '../auth/services/jwt.service'
+import { ISvc } from 'src/services/ISvc.services';
 
 export class UsersController extends DefaultController {
 
-  constructor(){
-    super()
-  }
-
+  constructor(svc:ISvc){
+    super(svc)
+}
+public static async createInstance(){
+    var result = new UsersController(getSvc('/users'));
+  return  await Promise.resolve(result);
+}
+  
     async signup(req: express.Request, res: express.Response, next: express.NextFunction){
         let db:any=getCont(req.url);
         req.body.password = await argon2.hash(req.body.password);

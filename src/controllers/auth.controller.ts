@@ -3,15 +3,22 @@ import express from 'express';
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 import {DefaultController} from './default.controller'
-import {returnJson} from '../common/customTypes/types.config'
+import {getSvc, returnJson} from '../common/customTypes/types.config'
+import { ISvc } from 'src/services/ISvc.services';
 // todo: move to a secure place
 const jwtSecret = 'My!@!Se3cr8tH4sh';
 const tokenExpirationInSeconds = 36000;
 
 export class AuthController extends DefaultController {
 
-    constructor(){
-        super()
+    constructor(svc:ISvc){
+        super(svc)
+    }
+    
+    public static async createInstance(){
+        let s = await getSvc('/users');
+        var result = new AuthController(s);
+      return  await Promise.resolve(result);
     }
     async createJWT(req: express.Request, res: express.Response) {
         try {

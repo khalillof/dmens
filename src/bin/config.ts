@@ -1,14 +1,17 @@
+//require('dotenv').config()
 
 export const config = {
-    'secretKey': '12345-67890-09876-54321', 
-      'mongoUrl':{
-       'dev': 'mongodb://localhost:27017/dev-db', 
-       'local': 'mongodb://localhost:27017/conFusion', 
-       'Prod': 'mongodb://apps:'+encodeURIComponent('Kh@198061')+'@192.168.1.6:27017/conFusion',
-       'admin': 'mongodb://mongo_root:'+encodeURIComponent('Kh@198061')+'@192.168.1.6:27017/conFusion?authSource=admin'
-      },
-    'facebook': {
-        'clientId': 'Your Client App ID',
-        'clientSecret': 'Your Client App Secret'
-    }
+  secretKey: process.env.SECRET_KEY || '',
+  mongoUrl: {
+    'dev': process.env.DB_CONNECTION_DEV || '',
+    'local': process.env.DB_CONNECTION_LOCAL || '',
+    'prod': process.env.DB_CONNECTION_PROD || '',
+    'admin': process.env.DB_CONNECTION_ADMIN || '',
+    'cluster': process.env.DB_CONNECTION_CLUSTER || ''
+  },
+  facebook: {
+    'clientId': process.env.FACEBOOK_CLIENT_ID || '',
+    'clientSecret': process.env.FACEBOOK_CLIENT_SECRET || ''
+  }
+
 }
