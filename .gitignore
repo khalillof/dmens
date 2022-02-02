@@ -2,6 +2,7 @@ node_modules
 bin/cert.csr
 bin/certificate.pem
 bin/private.key
+tsc-out
 dist
 build
 .env
