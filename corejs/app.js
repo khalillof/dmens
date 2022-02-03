@@ -1,15 +1,22 @@
+"use strict";
+//require('dotenv').config()
+Object.defineProperty(exports, "__esModule", { value: true });
+
 require('dotenv').config()
-declare function require(name: string): any;
-import express from 'express';
+
+const express = require("express");
 //import * as http from 'http';
-import createError from 'http-errors';
+const http_errors = require("http-errors");
 var path = require('path');
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
-import helmet from 'helmet';
-import { dbInit } from './common/services/mongoose.service';
-import { initializeRoutes } from './routes/init.routes.config';
-import passport from 'passport';
+const winston  = require('winston');
+const expressWinston =  require('express-winston');
+const  helmet = require('helmet');
+const  {dbInit} = require('./common/services/mongoose.service');
+const{ request} = require( 'http');
+const {initializeRoutes}  = require('./routes/init.routes.config');
+const passport = require('passport');
+
+
 ///////////////////////////////////////////
 const app = express();
 app.use(express.json({ limit: '5mb' }));
@@ -21,15 +28,15 @@ app.set('view engine', 'pug');
 app.use(passport.initialize());
 
 // connect to db and initialise db models then
-(async (_app:express.Application)=> {
+(async (app)=>{
 
-return  await dbInit().then(()=> { 
+await dbInit().then( async()=>{
 
-_app.use(helmet({
+app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-_app.use(expressWinston.logger({
+app.use(expressWinston.logger({
   transports: [
     new winston.transports.Console()
   ], 
@@ -39,21 +46,26 @@ _app.use(expressWinston.logger({
   )
 }));
 
- initializeRoutes(_app)
 
-function staticUrl(url: Array<string>) {
-  return url.map((e) => path.join(__dirname, e)).forEach((url: string) => _app.use(express.static(url)))
+await initializeRoutes(app)
+ 
+function staticUrl(url) {
+  return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
 }
 staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
 
+});
+})(app);
 
 // catch 404 and forward to error handler
-_app.use(function (req:any, res:any, next:any) {
-  next(createError[404]);
-});
+//app.use(function (req, res, next) {
+//  next(http_errors[404]);
+//});
 
+
+/*
 // error handler
-_app.use(function (err: any, req: any, res: any, next: any) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
  
   res.locals.message = err.message;
@@ -63,10 +75,8 @@ _app.use(function (err: any, req: any, res: any, next: any) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-}).catch((err)=>console.error(err));
+*/
 //end
 
-})(app);
 
-export default app;
+exports.app = app;

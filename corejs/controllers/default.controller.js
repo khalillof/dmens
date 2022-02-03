@@ -1,27 +1,34 @@
-import express from 'express';
-import {IController} from './Icontroller.controller'
-import {getSvc} from '../common/customTypes/types.config'
-import {returnJson} from '../common/customTypes/types.config'
-import { ISvc } from 'src/services/ISvc.services';
-//import { Svc } from 'src/services/Svc.services';
-export class DefaultController implements IController {
-    svc:ISvc;
-    public constructor(svs:ISvc){
-    this.svc = svs;
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+const {getSvc} =require('../common/customTypes/types.config');
+const {returnJson} =require('../common/customTypes/types.config');
+
+class DefaultController {
+   
+ constructor(sv){
+    this.svc = sv;
     }
-    public static async createInstance(svcName:string){
-        var result = new DefaultController(getSvc(svcName));
+    static async createInstance(svcName){
+      let sv = getSvc(svcName)
+        var result = new DefaultController(sv);
+
       return  await Promise.resolve(result);
     }
-    async  ToList(req: express.Request, res: express.Response, next:express.NextFunction) {
+    async  ToList(req, res, next) {
            //await getSvc(req.url).Tolist(100, 0)
-           res.sendStatus(200);
-           //this.svc.Tolist(100, 0)
+           if(!this.svc){
+           res.sendStatus(200); 
+           }else{
+            res.sendStatus(404);
+           }
+          // this.svc.Tolist(100, 0)
            //.then((items) => returnJson(items,200, res), (err) => next(err))
-          // .catch((err) => next(err));       
+          //.catch((err) => next(err));       
     }
 
-    async getById(req: express.Request, res: express.Response, next:express.NextFunction) {
+    async getById(req, res, next) {
        // await getSvc(req.url)
         this.svc.getById(req.params.id)
         .then((item) => returnJson(item,200, res), (err) => next(err))
@@ -29,7 +36,7 @@ export class DefaultController implements IController {
         
     }
 
-    async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+    async create(req, res, next) {
         // await getSvc(req.url)
          this.svc.create(req.body).then((item) => {
             console.log('document Created :', item);
@@ -38,7 +45,7 @@ export class DefaultController implements IController {
           .catch((err) => next(err));
     }
 
-    async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
+    async patch(req, res, next) {
        // await getSvc(req.url)
         this.svc.patchById(req.body)
         .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
@@ -46,14 +53,14 @@ export class DefaultController implements IController {
         
     }
 
-    async put(req: express.Request, res: express.Response, next:express.NextFunction) {
+    async put(req, res, next) {
        // await getSvc(req.url)
         this.svc.putById({_id: req.params.Id, ...req.body})
         .then(() =>  returnJson({"status":"OK"}, 204,res), (err) => next(err))
           .catch((err) => next(err));
     }
 
-    async remove(req: express.Request, res: express.Response, next:express.NextFunction) {
+    async remove(req, res, next) {
         //await getSvc(req.url)
         this.svc.deleteById(req.params.id)
         .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
@@ -61,10 +68,11 @@ export class DefaultController implements IController {
     }
 
     ////// helpers
-    async extractId(req: express.Request, res: express.Response, next: express.NextFunction) {
+    async extractId(req, res, next) {
         req.body.id = req.params.id;
         next();
     }
 
 }
 
+exports.DefaultController = DefaultController;

@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 
-import app from '../app';
-var debug = require('debug')('Express-Api-Server:server');
-import http from 'http';
-import https from 'https';
-import fs from 'fs';
+const {app} = require('../app');
+var debug = require('debug')('express-api-server:server');
+const http = require('http');
+const https = require('https');
+const { readFileSync} = require('fs');
 
 var server = configure_server(false);
 function configure_server(isHttps = false){
-  var server: any;
+  var server = {};
   var port = isHttps ? normalizePort(process.env.PORT || '443') : normalizePort(process.env.PORT || '3000');
   process.env.PORT = port;
+  
   if (isHttps){
  app.set('secPort',port); 
  var options = {
-  key: fs.readFileSync(__dirname+'/private.key'),
-  cert: fs.readFileSync(__dirname+'/certificate.pem')
+  key: readFileSync(__dirname+'/private.key'),
+  cert: readFileSync(__dirname+'/certificate.pem')
  };
   server = https.createServer(options,app);
 }else{
@@ -37,7 +38,7 @@ return server;
 };
 
 
-function normalizePort(val:any) {
+function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -54,11 +55,11 @@ function normalizePort(val:any) {
 }
 
 
-function onError(error:any) {
+function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
-  let port = process.env.PORT
+ let port = process.env.PORT;
   var bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;

@@ -1,15 +1,16 @@
-import express from 'express';
-import {AuthController} from '../controllers/auth.controller';
-import {AuthMiddleware} from '../auth/middlewares/auth.middleware';
-import {JwtMiddleware} from '../auth/middlewares/jwt.middleware';
-import {DefaultRoutesConfig} from './default.routes.config'
-//app, '/auth',  AuthController
-export async function AuthRoutes(app: express.Application){
-    
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+const {AuthController }= require('../controllers/auth.controller');
+const {AuthMiddleware} = require('../auth/middlewares/auth.middleware');
+const {JwtMiddleware} = require('../auth/middlewares/jwt.middleware');
+const {DefaultRoutesConfig} = require('./default.routes.config');
+
+async function AuthRoutes(app){
     const authMWare = await AuthMiddleware.getInstance();
     const jwtMWare = await JwtMiddleware.getInstance();
-    return await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance(), function(self:DefaultRoutesConfig):void{
 
+    return await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance(), function(self){
            // self.app.route('/auth').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
            self.app.post('/auth',
                 self.corsWithOption,
@@ -28,3 +29,5 @@ export async function AuthRoutes(app: express.Application){
             );
         });
 };
+
+exports.AuthRoutes = AuthRoutes;

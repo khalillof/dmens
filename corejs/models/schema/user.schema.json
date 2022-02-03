@@ -1,0 +1,56 @@
+{ 
+  "name":"User",
+  "schema":{
+    "username":{
+        "type": "String",
+          "unique": true,
+          "lowercase": true,
+          "required": true,
+          "minLength":3,
+          "maxLength":30
+      },
+      "firstname": {
+        "type": "String",
+        "default": "",
+        "maxLength":50
+      },
+      "lastname": {
+        "type": "String",
+        "default": "",
+        "maxLength":50
+      },
+      "email": {
+          "type": "String",
+          "required": true,
+          "maxLength":30
+        },
+      "descriptions" : {
+          "type": "String",
+          "default": "",
+          "maxLength":150
+        },
+      "password":{
+          "type": "String",
+          "required": true,
+          "minLength":3
+        },
+      "facebookId": {
+        "type": "String",
+        "default": ""
+      },
+      "admin": {
+        "type": "Boolean",
+        "default": false
+      },
+      "createdAt":{
+        "type": "String",
+        "default": "Date.now().toString()"
+    
+      },
+      "updatedAt":{
+        "type": "String",
+        "default": "Date.now().toString()"
+    
+      }
+},"model":{}
+}
