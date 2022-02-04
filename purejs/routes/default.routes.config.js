@@ -18,7 +18,7 @@ class DefaultRoutesConfig {
         typeof callback === 'function' ? callback(this) : this.configureRoutes();
         // add instance to routeStore
         routeStore[this.routeName] = this;
-        console.log('Added ('+this.routeName+') to routeStore');
+        console.log('Added ( '+this.routeName+' ) to routeStore');
     }
     static async instance(exp, rName, control, callback ){
         var result =  new DefaultRoutesConfig(exp,rName,control,callback);

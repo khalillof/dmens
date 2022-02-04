@@ -2,7 +2,7 @@ require('dotenv').config()
 declare function require(name: string): any;
 import express from 'express';
 //import * as http from 'http';
-import createError from 'http-errors';
+// import createError from 'http-errors';
 var path = require('path');
 import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
@@ -20,16 +20,11 @@ app.set('view engine', 'pug');
 
 app.use(passport.initialize());
 
-// connect to db and initialise db models then
-(async (_app:express.Application)=> {
-
-return  await dbInit().then(()=> { 
-
-_app.use(helmet({
+app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-_app.use(expressWinston.logger({
+app.use(expressWinston.logger({
   transports: [
     new winston.transports.Console()
   ], 
@@ -39,30 +34,19 @@ _app.use(expressWinston.logger({
   )
 }));
 
- initializeRoutes(_app)
-
+// static urls
 function staticUrl(url: Array<string>) {
-  return url.map((e) => path.join(__dirname, e)).forEach((url: string) => _app.use(express.static(url)))
+  return url.map((e) => path.join(__dirname, e)).forEach((url: string) => app.use(express.static(url)))
 }
 staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
 
 
-// catch 404 and forward to error handler
-_app.use(function (req:any, res:any, next:any) {
-  next(createError[404]);
-});
+// connect to db and initialise db models then
+(async (_app:express.Application)=> {
 
-// error handler
-_app.use(function (err: any, req: any, res: any, next: any) {
-  // set locals, only providing error in development
- 
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+ await dbInit().then( async ()=> { 
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+ await initializeRoutes(_app)
 
 }).catch((err)=>console.error(err));
 //end

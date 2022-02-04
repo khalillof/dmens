@@ -27,7 +27,7 @@ export class DefaultRoutesConfig {
            
         // add instance to routeStore
         routeStore[this.routeName]=this;
-        console.log('Added to routeStore :'+this.routeName)
+        console.log('Added ( '+this.routeName+' ) to routeStore');
 
     }
      

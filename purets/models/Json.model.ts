@@ -17,10 +17,10 @@ export class JsonModel implements JsonSchema{
             passport.serializeUser(vm.serializeUser);
             passport.deserializeUser(vm.deserializeUser());
             this.model = vm;
-        console.log("added Db & Svc to local stores :" + jsonMdl.name)
+           console.log("added ( "+jsonMdl.name+" ) to DbStore :" )
         } else {
             this.model = mongoose.model(this.name, this.schema);
-            console.log("added Db & Svc to local stores :" + jsonMdl.name)
+            console.log("added ( "+jsonMdl.name+" ) to DbStore :")
         }
     }
     name: string;
