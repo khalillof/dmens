@@ -30,6 +30,17 @@ function getSvc(url) {
     throw new Error('service not found for arg :' + url);
 }
 exports.getSvc = getSvc;
+
+function getDb(url) {
+
+    for (let d in exports.dbStore) {
+        if (d !== '/' && url.match(d.toLowerCase())) {
+            return exports.dbStore[d];
+        }
+    }
+    throw new Error('service not found for arg :' + url);
+}
+exports.getDb = getDb;
 function getCont(url) {
     for (let d in exports.routeStore) {
         if (d !== '/' && url.match(d) || d === '/' && url === d) {

@@ -1,16 +1,18 @@
-import path from 'path';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+const path = require('path');
 //import fs from 'fs';
-import fs from 'fs';
-import mongoose from 'mongoose';
+const fs = require('fs');
+const mongoose = require( 'mongoose');
 
-import { dbStore, SvcStore, JsonSchema } from '../common/customTypes/types.config';
+const { dbStore, SvcStore} = require('../common/customTypes/types.config');
 
-import { JsonModel } from './Json.model';
-import { Svc } from '../services/Svc.services';
-//import { JsonModel } from './json.model';
+const { JsonModel } = require('./Json.model');
+const { Svc } = require('../services/Svc.services');
 
-export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchema>> {
-    const result: Array<JsonSchema> | any = [];
+async function loadJsons(directoryPath) {
+    const result = [];
     const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
     try {
@@ -34,8 +36,9 @@ export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchem
     return result;
 };
 
+exports.loadJsons = loadJsons;
 
-async function makeSchema(jschema: JsonSchema):Promise< JsonSchema> {
+async function makeSchema(jschema){
 
     Object.entries(jschema.schema).forEach((item) => {
         recursiveSearch(item);
@@ -44,7 +47,7 @@ async function makeSchema(jschema: JsonSchema):Promise< JsonSchema> {
     return await makeModel(jschema);
 }
 // search item in object
-function recursiveSearch(item: any) {
+function recursiveSearch(item) {
     // types mapping
     const typeMappings = {
         "String": String,
@@ -69,9 +72,9 @@ function recursiveSearch(item: any) {
     }
 }
 
-async function makeModel(jsonSchema: JsonSchema):Promise<JsonModel> {
+async function makeModel(jsonSchema){
     let jmodel= await JsonModel.createInstance(jsonSchema)
-    dbStore[jsonSchema.name] = jmodel.model;
+    dbStore[jsonSchema.name] = jmodel;
     SvcStore[jmodel.name] = await Svc.createInstance(jmodel.model);
 
     return  await Promise.resolve(jmodel);

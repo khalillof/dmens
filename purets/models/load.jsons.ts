@@ -1,18 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-const path = require('path');
+import path from 'path';
 //import fs from 'fs';
-const fs = require('fs');
-const mongoose = require( 'mongoose');
+import fs from 'fs';
+import mongoose from 'mongoose';
 
-const { dbStore, SvcStore} = require('../common/customTypes/types.config');
+import { dbStore, SvcStore, JsonSchema } from '../common/customTypes/types.config';
 
-const { JsonModel } = require('./Json.model');
-const { Svc } = require('../services/Svc.services');
+import { JsonModel } from './Json.model';
+import { Svc } from '../services/Svc.services';
+//import { JsonModel } from './json.model';
 
-async function loadJsons(directoryPath) {
-    const result = [];
+export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchema>> {
+    const result: Array<JsonSchema> | any = [];
     const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
     try {
@@ -36,9 +34,8 @@ async function loadJsons(directoryPath) {
     return result;
 };
 
-exports.loadJsons = loadJsons;
 
-async function makeSchema(jschema){
+async function makeSchema(jschema: JsonSchema):Promise< JsonSchema> {
 
     Object.entries(jschema.schema).forEach((item) => {
         recursiveSearch(item);
@@ -47,7 +44,7 @@ async function makeSchema(jschema){
     return await makeModel(jschema);
 }
 // search item in object
-function recursiveSearch(item) {
+function recursiveSearch(item: any) {
     // types mapping
     const typeMappings = {
         "String": String,
@@ -72,9 +69,9 @@ function recursiveSearch(item) {
     }
 }
 
-async function makeModel(jsonSchema){
+async function makeModel(jsonSchema: JsonSchema):Promise<JsonModel> {
     let jmodel= await JsonModel.createInstance(jsonSchema)
-    dbStore[jsonSchema.name] = jmodel.model;
+    dbStore[jsonSchema.name] = jmodel;
     SvcStore[jmodel.name] = await Svc.createInstance(jmodel.model);
 
     return  await Promise.resolve(jmodel);

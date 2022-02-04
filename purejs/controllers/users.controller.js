@@ -13,7 +13,7 @@ const {JwtService} = require('../auth/services/jwt.service');
     super(svc)
 }
  static async createInstance(){
-    var result = new UsersController(getSvc('/users'));
+    var result = new UsersController('/users');
   return  await Promise.resolve(result);
 }
   

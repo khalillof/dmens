@@ -4,15 +4,17 @@ import argon2 from 'argon2';
 import {getSvc, returnJson, getCont} from '../common/customTypes/types.config'
 import passport from 'passport';
 import {JwtService} from '../auth/services/jwt.service'
-import { ISvc } from 'src/services/ISvc.services';
 
 export class UsersController extends DefaultController {
 
-  constructor(svc:ISvc){
-    super(svc)
+  constructor(){
+    super('user')
 }
 public static async createInstance(){
-    var result = new UsersController(getSvc('/users'));
+    var result = new UsersController();
+    if(!result.svc){
+      result.setDb('user')
+    }
   return  await Promise.resolve(result);
 }
   

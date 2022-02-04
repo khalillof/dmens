@@ -5,7 +5,8 @@ const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
 const { Strategy} = require('passport-local');
 
-class JsonModel{
+
+class JsonModel {
 
     constructor(jsonMdl) {
         this.name = jsonMdl.name || "";
@@ -42,8 +43,8 @@ class JsonModel{
     }
 
 
-    async create(ob){
-        return this.model.create(obj);
+    async create(obj){
+        return await this.model.create(obj);
       }
       
       async getById(objId) {
@@ -51,7 +52,7 @@ class JsonModel{
       }
       
       async putById(objFields){
-         return await this.model.findByIdAndUpdate(objFields._id, objFields);
+        return await this.model.findByIdAndUpdate(objFields._id, objFields);
       }
       
       async deleteById(objId) {
@@ -59,7 +60,7 @@ class JsonModel{
       }
       
       async Tolist(limit = 25, page= 0) {
-          return  this.model.find()
+          return await this.model.find()
               .limit(limit)
               .skip(limit * page)
               .exec();

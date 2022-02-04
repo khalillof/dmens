@@ -5,14 +5,18 @@ bin/private.key
 
 tsc-output
 
-corejs/bin/cert.csr
-corejs/bin/private.key
-corejs/bin/certificate.pem
+purejs/bin/cert.csr
+purejs/bin/private.key
+purejs/bin/certificate.pem
+
+purets/bin/cert.csr
+purets/bin/private.key
+purets/bin/certificate.pem
 
 dist
 build
 .env
-src/bin
+purets/bin
 # Logs
 logs
 *.log
@@ -24,7 +28,6 @@ lerna-debug.log*
 .cache/
 coverage/
 dist/*
-build
 !dist/index.html
 node_modules/
 *.log

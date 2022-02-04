@@ -7,7 +7,7 @@
     "test": "karma start",
     "clean": "rm ./buildc",
     "dev": "node ./build/bin/www.js",
-    "core": "node ./corejs/bin/www.js",
+    "core": "node ./purejs/bin/www.js",
     "start": "tsc && webpack --mode development && node ./build/bin/www.js",
     "trace": "tsc --traceResolution",
     "build": "tsc && webpack --mode production",

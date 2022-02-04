@@ -1,8 +1,10 @@
 
 "use strict";
+//const {JsonModel} = require('../models/Json.model');
+
 Object.defineProperty(exports, "__esModule", { value: true });
 
- class Svc  {
+ class Svc {
 
 
     constructor(svc) {

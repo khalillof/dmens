@@ -1,37 +1,42 @@
 import express from 'express';
 import {IController} from './Icontroller.controller'
-import {getSvc} from '../common/customTypes/types.config'
+import {getDb} from '../common/customTypes/types.config'
 import {returnJson} from '../common/customTypes/types.config'
-import { ISvc } from 'src/services/ISvc.services';
-//import { Svc } from 'src/services/Svc.services';
+import { ISvc } from '../services/ISvc.services';
 export class DefaultController implements IController {
-    svc:ISvc;
-    public constructor(svs:ISvc){
-    this.svc = svs;
+    svc:ISvc | any;
+    public constructor(name:string){
+    this.setDb(name);
     }
+
+    setDb(url:string){
+      this.svc = getDb(url);
+      
+  }
     public static async createInstance(svcName:string){
-        var result = new DefaultController(getSvc(svcName));
+      var result = new DefaultController(svcName);
+      if (!result.svc){
+          result.setDb(svcName);
+      }
       return  await Promise.resolve(result);
     }
     async  ToList(req: express.Request, res: express.Response, next:express.NextFunction) {
-           //await getSvc(req.url).Tolist(100, 0)
-           res.sendStatus(200);
-           //this.svc.Tolist(100, 0)
-           //.then((items) => returnJson(items,200, res), (err) => next(err))
-          // .catch((err) => next(err));       
+          await getDb(req.url).Tolist(100, 0)
+           .then((items) => returnJson(items,200, res), (err) => next(err))
+           .catch((err) => next(err));       
     }
 
     async getById(req: express.Request, res: express.Response, next:express.NextFunction) {
-       // await getSvc(req.url)
-        this.svc.getById(req.params.id)
+
+       await getDb(req.url).getById(req.params.id)
         .then((item) => returnJson(item,200, res), (err) => next(err))
         .catch((err) => next(err));
         
     }
 
     async create(req: express.Request, res: express.Response, next: express.NextFunction) {
-        // await getSvc(req.url)
-         this.svc.create(req.body).then((item) => {
+
+      await  getDb(req.url).create(req.body).then((item) => {
             console.log('document Created :', item);
             returnJson({id: item.id},201, res)
           }, (err) => next(err))
@@ -39,23 +44,21 @@ export class DefaultController implements IController {
     }
 
     async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-       // await getSvc(req.url)
-        this.svc.patchById(req.body)
+
+      await getDb(req.url).patchById(req.body)
         .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
         .catch((err) => next(err));
         
     }
 
     async put(req: express.Request, res: express.Response, next:express.NextFunction) {
-       // await getSvc(req.url)
-        this.svc.putById({_id: req.params.Id, ...req.body})
+      await getDb(req.url).putById({_id: req.params.Id, ...req.body})
         .then(() =>  returnJson({"status":"OK"}, 204,res), (err) => next(err))
           .catch((err) => next(err));
     }
 
     async remove(req: express.Request, res: express.Response, next:express.NextFunction) {
-        //await getSvc(req.url)
-        this.svc.deleteById(req.params.id)
+       await getDb(req.url).deleteById(req.params.id)
         .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
           .catch((err) => next(err));
     }

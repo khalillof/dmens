@@ -17,8 +17,7 @@ class AuthController extends DefaultController {
     }
     
      static async createInstance(){
-        let s = await getSvc('/users');
-        var result = new AuthController(s);
+        var result = new AuthController('/users');
       return  await Promise.resolve(result);
     }
     async createJWT(req, res) {

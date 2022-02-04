@@ -3,7 +3,7 @@ import {corss, corsWithOptions} from './cors.config';
 import {routeStore} from '../common/customTypes/types.config'
 import UsersMiddleware from '../users/middleware/users.middleware';
 import { DefaultController } from '../controllers/default.controller';
-import { IController } from 'src/controllers/Icontroller.controller';
+import { IController } from '../controllers/Icontroller.controller';
 
 export class DefaultRoutesConfig {
     app:express.Application;

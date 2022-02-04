@@ -66,10 +66,10 @@ const config = {
         { from: "./tsc-output/", to: "./" },
         { from: "./public", to: "./public" },
         { from: "./views", to: "./views" },
-        { from: "./src/models/schema", to: "./models/schema" },
-        { from: "./src/bin/cert.csr", to: "./bin/" },
-        { from: "./src/bin/certificate.pem", to: "./bin/" },
-        { from: "./src/bin/private.key", to: "./bin/" },
+        { from: "./purets/models/schema", to: "./models/schema" },
+        { from: "./purets/bin/cert.csr", to: "./bin/" },
+        { from: "./purets/bin/certificate.pem", to: "./bin/" },
+        { from: "./purets/bin/private.key", to: "./bin/" },
       ]
     }),
     new HtmlWebpackPlugin({

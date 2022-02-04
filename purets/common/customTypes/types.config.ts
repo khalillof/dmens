@@ -36,7 +36,14 @@ export function  getSvc(url:string):ISvc{
   }
   throw new Error('service not found for arg :'+ name);
 }  
-
+export function  getDb(url:string):ISvc{
+  for(let d in dbStore){
+   if(d !== '/' && url.match(d.toLowerCase())){
+   return dbStore[d];
+ }
+}
+throw new Error('service not found for arg :'+ name);
+}
 export function  getCont(url:string):IController{
     for(let d in routeStore){     
       if(d !== '/' && url.match(d) || d === '/' && url === d){
