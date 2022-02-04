@@ -2,11 +2,11 @@
 //require('dotenv').config()
 Object.defineProperty(exports, "__esModule", { value: true });
 const { verify } =require("argon2");
-const { getSvc, returnJson } = require("../../common/customTypes/types.config");
+const { getCont, returnJson } = require("../../common/customTypes/types.config");
 
 class AuthMiddleware {
    static async  getInstance() {
-        return Promise.resolve(new AuthMiddleware());
+        return await Promise.resolve(new AuthMiddleware());
     }
     async validateBodyRequest(req, res, next) {
         if(req.body && req.body.email && req.body.password){
@@ -17,8 +17,7 @@ class AuthMiddleware {
     }
 
     async verifyUserPassword(req, res, next) {
-       let db = getSvc('/users');
-        await db.getUserByEmail(req.body.email).then(async (user)=>{
+        await getCont('/users').getUserByEmail(req.body.email).then(async (user)=>{
         if (user) {
             let passwordHash = user.password;
             if (await verify(passwordHash, req.body.password)) {

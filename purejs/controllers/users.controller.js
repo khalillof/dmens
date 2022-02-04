@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 const {DefaultController} = require( './default.controller')
 const {hash} = require( 'argon2');
-const {getSvc, returnJson} = require( '../common/customTypes/types.config');
+const {returnJson} = require( '../common/customTypes/types.config');
 const passport= require('passport');
 const {JwtService} = require('../auth/services/jwt.service');
 

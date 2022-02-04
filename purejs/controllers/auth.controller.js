@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const {sign} =require('jsonwebtoken');
 const { randomBytes, createHmac } =require('crypto');
 const {DefaultController} =require('./default.controller');
-const {getSvc, returnJson} =require('../common/customTypes/types.config');
+const {returnJson} =require('../common/customTypes/types.config');
 // todo: move to a secure place
 const jwtSecret = 'My!@!Se3cr8tH4sh';
 const tokenExpirationInSeconds = 36000;

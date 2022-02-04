@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-const {returnJson, getSvc} = require('../../common/customTypes/types.config');
+const {returnJson} = require('../../common/customTypes/types.config');
 const {JwtService} = require('../../auth/services/jwt.service');
 const { UsersController} = require('../../controllers/users.controller');
 const argon2 = require('argon2');
@@ -9,7 +9,7 @@ const argon2 = require('argon2');
 class UsersMiddleware {
  
     constructor(){
-        this.Controller = UsersController.createInstance(getSvc('/users'));
+        this.Controller = UsersController.createInstance('/users');
     }
     static async createInstance(){
         let usm = new UsersMiddleware()

@@ -1,6 +1,6 @@
 import express from 'express';
 import argon2 from 'argon2';
-import {getSvc, returnJson} from '../../common/customTypes/types.config'
+import {getCont, returnJson} from '../../common/customTypes/types.config'
 
 export class AuthMiddleware {
     private static instance: AuthMiddleware;
@@ -20,7 +20,7 @@ export class AuthMiddleware {
     }
 
     async verifyUserPassword(req: express.Request, res: express.Response, next: express.NextFunction) {
-       let db:any = getSvc('/users');
+       let db:any = getCont('/users');
         await db.getUserByEmail(req.body.email).then(async (user:any)=>{
         if (user) {
             let passwordHash = user.password;

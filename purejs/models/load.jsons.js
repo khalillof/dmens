@@ -6,10 +6,9 @@ const path = require('path');
 const fs = require('fs');
 const mongoose = require( 'mongoose');
 
-const { dbStore, SvcStore} = require('../common/customTypes/types.config');
+const { dbStore} = require('../common/customTypes/types.config');
 
 const { JsonModel } = require('./Json.model');
-const { Svc } = require('../services/Svc.services');
 
 async function loadJsons(directoryPath) {
     const result = [];
@@ -75,7 +74,6 @@ function recursiveSearch(item) {
 async function makeModel(jsonSchema){
     let jmodel= await JsonModel.createInstance(jsonSchema)
     dbStore[jsonSchema.name] = jmodel;
-    SvcStore[jmodel.name] = await Svc.createInstance(jmodel.model);
 
     return  await Promise.resolve(jmodel);
     //return createInstance(JsonModel,jsonModel)

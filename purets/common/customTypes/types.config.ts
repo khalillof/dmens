@@ -1,4 +1,4 @@
-import mongoose, {Model, Schema} from 'mongoose';
+import {Model, Schema} from 'mongoose';
 import {ISvc} from '../../services/ISvc.services'
 import {IController} from '../../controllers/Icontroller.controller'
 import {DefaultRoutesConfig} from '../../routes/default.routes.config'
@@ -8,7 +8,9 @@ export function returnJson (obj : any,status:number, res: any){
   res.setHeader('Content-Type', 'application/json');
   res.status(status).json(obj)
   };
+
 export interface JsonSchema  {name:string,schema?:Schema |any};
+
 export interface IConstructor<T> {
   new (...args: any[]): T;
 }
@@ -18,9 +20,7 @@ export type routData = {routeName :string, controller :any,Service:any};
 
 // db object
 export const dbStore : Dic<Model<any,any> | any> = {};
-// model object
-export const SvcStore : Dic<ISvc> = {};
-export var modelStore : Dic<Schema> = {};
+
 // routesDb
 export const routeStore : Dic<DefaultRoutesConfig> = {};
 
@@ -28,14 +28,6 @@ export function extendedInstance<A extends DefaultController>(arg:any[], c: new(
   return new c(...arg);
 }
 
-export function  getSvc(url:string):ISvc{
-     for(let d in SvcStore){
-      if(d !== '/' && url.match(d.toLowerCase())){
-      return SvcStore[d];
-    }
-  }
-  throw new Error('service not found for arg :'+ name);
-}  
 export function  getDb(url:string):ISvc{
   for(let d in dbStore){
    if(d !== '/' && url.match(d.toLowerCase())){
@@ -76,3 +68,13 @@ export interface IGenericModel<T> extends IConstructor<T> {
 //(data model is the class name of your model)
 type  modelType = <T>({}) => T;
 type modelTypee<T> = {arg:any[] ,new(...args: any[]):T}
+
+async function activator<T extends any>(type: IConstructor<T>, ...arg:any[]){
+  // if(arg)
+   return await Promise.resolve(new type(...arg));
+   // usage:
+  // const classcc = activator(ClassA);
+  //const classee = activator(ClassA, ['']);
+}
+
+

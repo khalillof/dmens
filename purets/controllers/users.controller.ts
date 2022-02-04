@@ -1,7 +1,7 @@
 import express from 'express';
 import {DefaultController} from './default.controller'
 import argon2 from 'argon2';
-import {getSvc, returnJson, getCont} from '../common/customTypes/types.config'
+import {returnJson, getCont, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
 import {JwtService} from '../auth/services/jwt.service'
 
@@ -117,7 +117,7 @@ public static async createInstance(){
     };
     // helper
     async getUserByEmail(email: string) {
-        return await getSvc('/users').db.findOne({email: email});
+        return await dbStore['User'].findOne({email: email});
     }
 }
 

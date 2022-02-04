@@ -1,5 +1,5 @@
 import express from 'express';
-import {getCont, returnJson, createInstance} from '../../common/customTypes/types.config'
+import {getCont, returnJson} from '../../common/customTypes/types.config'
 import {JwtService} from '../../auth/services/jwt.service'
 import argon2 from 'argon2';
 class UsersMiddleware {

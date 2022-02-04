@@ -1,5 +1,4 @@
 import express from 'express'
-import { ISvc} from '../services/ISvc.services';
 
 export interface IController {
 

@@ -2,12 +2,9 @@ import path from 'path';
 //import fs from 'fs';
 import fs from 'fs';
 import mongoose from 'mongoose';
-
-import { dbStore, SvcStore, JsonSchema } from '../common/customTypes/types.config';
-
+import { dbStore, JsonSchema } from '../common/customTypes/types.config';
 import { JsonModel } from './Json.model';
-import { Svc } from '../services/Svc.services';
-//import { JsonModel } from './json.model';
+
 
 export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchema>> {
     const result: Array<JsonSchema> | any = [];
@@ -72,8 +69,6 @@ function recursiveSearch(item: any) {
 async function makeModel(jsonSchema: JsonSchema):Promise<JsonModel> {
     let jmodel= await JsonModel.createInstance(jsonSchema)
     dbStore[jsonSchema.name] = jmodel;
-    SvcStore[jmodel.name] = await Svc.createInstance(jmodel.model);
-
     return  await Promise.resolve(jmodel);
     //return createInstance(JsonModel,jsonModel)
 }

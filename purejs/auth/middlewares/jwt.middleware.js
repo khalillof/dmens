@@ -10,7 +10,7 @@ const {createHmac} = require('crypto');
 const jwtSecret = 'My!@!Se3cr8tH4sh';
 class JwtMiddleware {
    static async getInstance() {
-        return Promise.resolve(new JwtMiddleware());
+        return await Promise.resolve(new JwtMiddleware());
     }
     verifyRefreshBodyField(req, res, next) {
         if (req.body && req.body.refreshToken) {

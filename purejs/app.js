@@ -12,7 +12,6 @@ const winston  = require('winston');
 const expressWinston =  require('express-winston');
 const  helmet = require('helmet');
 const  {dbInit} = require('./common/services/mongoose.service');
-const{ request} = require( 'http');
 const {initializeRoutes}  = require('./routes/init.routes.config');
 const passport = require('passport');
 

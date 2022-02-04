@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express from 'express';
 import {corss, corsWithOptions} from './cors.config';
 import {routeStore} from '../common/customTypes/types.config'
 import UsersMiddleware from '../users/middleware/users.middleware';

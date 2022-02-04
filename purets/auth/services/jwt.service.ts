@@ -4,7 +4,7 @@ import {Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt} from 'passport-jwt';
 import * as jwt from 'jsonwebtoken'; // used to create, sign, and verify tokens
 import {config} from "../../bin/config";
-import {dbStore, SvcStore} from '../../common/customTypes/types.config'
+import {dbStore} from '../../common/customTypes/types.config'
 
 
 ////////////////////////
