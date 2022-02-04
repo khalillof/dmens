@@ -3,7 +3,7 @@ bin/cert.csr
 bin/certificate.pem
 bin/private.key
 
-tsc-output
+ts-output
 
 purejs/bin/cert.csr
 purejs/bin/private.key

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
-        "outDir": "./tsc-output",
+        "outDir": "./ts-output",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,

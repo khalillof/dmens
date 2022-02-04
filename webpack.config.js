@@ -63,7 +63,7 @@ const config = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: "./tsc-output/", to: "./" },
+        { from: "./ts-output/", to: "./" },
         { from: "./public", to: "./public" },
         { from: "./views", to: "./views" },
         { from: "./purets/models/schema", to: "./models/schema" },
