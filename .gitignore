@@ -2,10 +2,13 @@ node_modules
 bin/cert.csr
 bin/certificate.pem
 bin/private.key
-tsc-output/
-corejs/bin/cert.key
+
+tsc-output
+
+corejs/bin/cert.csr
 corejs/bin/private.key
 corejs/bin/certificate.pem
+
 dist
 build
 .env
