@@ -16,7 +16,7 @@ purets/bin/certificate.pem
 dist
 build
 .env
-purets/bin
+#purets/bin
 # Logs
 logs
 *.log
