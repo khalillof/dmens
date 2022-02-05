@@ -2,7 +2,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-const { getDb,returnJson} =require('../common/customTypes/types.config');
+const { getDb,dbStore, returnJson} =require('../common/customTypes/types.config');
 
 class DefaultController {
   svc;
@@ -10,8 +10,8 @@ class DefaultController {
     this.svc = getDb(name);
     }
 
-  setDb(url){
-    this.svc = getDb(url);
+  setDb(name){
+    this.svc = getDb(name);
     }
     
     static async createInstance(svcName){

@@ -4,12 +4,13 @@ const mongoose = require("mongoose");
 const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
 const { Strategy} = require('passport-local');
-
+const { dbStore} = require('../common/customTypes/types.config');
 
 class JsonModel {
 
     constructor(jsonMdl) {
-        this.name = jsonMdl.name || "";
+
+        this.name = jsonMdl.name.toLowerCase() || "";
         this.schema = new mongoose.Schema(jsonMdl.schema, { timestamps: true }); 
 
         if (jsonMdl.name === 'User') {
@@ -24,6 +25,9 @@ class JsonModel {
             this.model = mongoose.model(this.name, this.schema);
             console.log("added ( "+jsonMdl.name+" ) to DbStore :")
         }
+
+        // add to db store
+       dbStore[this.name] = this;
     }
 
     static async createInstance(jsonModel){

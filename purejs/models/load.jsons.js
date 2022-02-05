@@ -5,9 +5,6 @@ const path = require('path');
 //import fs from 'fs';
 const fs = require('fs');
 const mongoose = require( 'mongoose');
-
-const { dbStore} = require('../common/customTypes/types.config');
-
 const { JsonModel } = require('./Json.model');
 
 async function loadJsons(directoryPath) {
@@ -21,11 +18,11 @@ async function loadJsons(directoryPath) {
 
                 let _file = path.join(_directory, fileName);
                 let data = await fs.promises.readFile(_file, 'utf8');
-                let jsonobj = JSON.parse(data);
-                if(! jsonobj.name){
+                let jsobj = JSON.parse(data);
+                if(! jsobj.name){
                     throw new Error(' jschema name is required property')
                 }
-                result.push(await makeSchema(jsonobj));
+                result.push(await makeSchema(jsobj));
             }
         }
     } catch (err) {
@@ -38,14 +35,14 @@ async function loadJsons(directoryPath) {
 exports.loadJsons = loadJsons;
 
 async function makeSchema(jschema){
-
+    // convert json type to mongoose schema type
     Object.entries(jschema.schema).forEach((item) => {
         recursiveSearch(item);
     })
-    
-    return await makeModel(jschema);
+    // finally return new jsonModel
+    return await JsonModel.createInstance(jschema);
 }
-// search item in object
+// search item in object and map to mongoose schema
 function recursiveSearch(item) {
     // types mapping
     const typeMappings = {
@@ -71,12 +68,5 @@ function recursiveSearch(item) {
     }
 }
 
-async function makeModel(jsonSchema){
-    let jmodel= await JsonModel.createInstance(jsonSchema)
-    dbStore[jsonSchema.name] = jmodel;
-
-    return  await Promise.resolve(jmodel);
-    //return createInstance(JsonModel,jsonModel)
-}
 
 

@@ -2,18 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 
 const {corss, corsWithOptions} = require('./cors.config');
-const {routeStore} = require('../common/customTypes/types.config');
+const {routeStore, pluralizeRoute} = require('../common/customTypes/types.config');
 const {UsersMiddleware} = require('../users/middleware/users.middleware');
 const { DefaultController } = require('../controllers/default.controller');
 
 class DefaultRoutesConfig {
     constructor(exp, rName, control, callback) {
         this.app = exp;
-        this.routeName = rName;
+        this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName + '/:id';
         this.cors = corss;
         this.corsWithOption = corsWithOptions;
-        this.UsersMWare = new UsersMiddleware();
+        this.UsersMWare = typeof control === 'undefined' ? null : new UsersMiddleware(); 
         this.controller = typeof control === 'undefined' ? null : control;
         typeof callback === 'function' ? callback(this) : this.configureRoutes();
         // add instance to routeStore
@@ -25,12 +25,22 @@ class DefaultRoutesConfig {
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(exp, routeNames){
-        if(routeNames && routeNames?.length > 0){
+        if(routeNames && routeNames.length > 0){
           routeNames.forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)) )
         }else{
             throw new Error('at least one route name expected')
         }
     }
+    /*
+    pluralizeRoute(){ 
+        this.routeName = this.routeName.toLowerCase();
+        if (routeName !== '/' &&  routeName !== '/auth'){
+           this.routeName = path.join('/',pluralize(routeName));
+        }else{
+            this.routeName = path.join('/',routeName);
+        } 
+    }
+    */
     getName(){
         return this.routeName;
     }

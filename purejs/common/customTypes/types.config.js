@@ -1,38 +1,44 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extendController = exports.createInstance = exports.getProperty = exports.getCont =  exports.extendedInstance = exports.routeStore  = exports.dbStore = exports.returnJson = exports.activator = void 0;
+const pluralize = require('pluralize');
 
-function returnJson(obj, status, res) {
+
+exports.returnJson = (obj, status, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(status).json(obj);
 }
-exports.returnJson = returnJson;
 
 
-function extendedInstance(arg, c) {
+exports.pluralizeRoute =(routeName)=> { 
+    routeName = routeName.toLowerCase();
+    if (routeName.indexOf('/') == -1){
+       return ('/'+ pluralize(routeName));
+    }else{
+        return routeName;
+    } 
+}
+
+exports.extendedInstance = (c, arg)=> {
     return new c(...arg);
 }
-exports.extendedInstance = extendedInstance;
-
 
 // db object
 exports.dbStore = {};
 
-function getDb(url) {
+exports.getDb =(url) =>{
 
     for (let d in exports.dbStore) {
-        if (d !== '/' && url.match(d.toLowerCase())) {
+        if (url !== '/' && url.match(d.toLowerCase())) {
             return exports.dbStore[d];
         }
     }
     throw new Error('service not found for arg :' + url);
 }
-exports.getDb = getDb;
 
 // routesStore
 exports.routeStore = {};
 
-function getCont(url) {
+exports.getCont = (url)=> {
     for (let d in exports.routeStore) {
         if (d !== '/' && url.match(d) || d === '/' && url === d) {
             // console.log('from getcon : '+url +' - '+d)
@@ -41,28 +47,15 @@ function getCont(url) {
     }
     throw new Error('controller not found for the url :' + url);
 }
-exports.getCont = getCont;
 
-function getProperty(obj, key) {
+exports.getProperty = (obj, key)=> {
     return obj[key];
 }
-exports.getProperty = getProperty;
 
-function createInstance(constructor, ...args) {
-    return new constructor(...args);
+exports.createInstance = (type, ...args)=> {
+    return new type(...args);
 }
-exports.createInstance = createInstance;
+exports.createInstance = async (type, ...args)=> {
+    return await Promise.resolve(new type(...args));
+}
 
-function extendController(type, ...arg) {
-    return new type(...arg);
-}
-exports.extendController = extendController;
-
-async function activator(type, ...arg) {
-    // if(arg)
-  return await Promise.resolve(new type(...arg));
-  // usage:
-  //const classcc = activator(ClassA);
- //const classee = activator(ClassA, ['']);
-}
-exports.activator = activator
