@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const {returnJson} = require('../../common/customTypes/types.config');
 const {JwtService} = require('../../auth/services/jwt.service');
 const { UsersController} = require('../../controllers/users.controller');

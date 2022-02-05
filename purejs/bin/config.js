@@ -1,6 +1,4 @@
 "use strict";
-//require('dotenv').config()
-Object.defineProperty(exports, "__esModule", { value: true });
 
 exports.config = {
     secretKey: process.env.SECRET_KEY || '',

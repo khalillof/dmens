@@ -1,6 +1,4 @@
 "use strict";
-//require('dotenv').config()
-Object.defineProperty(exports, "__esModule", { value: true });
 
 const {returnJson} = require('../../common/customTypes/types.config')
 const {verify} = require( 'jsonwebtoken');

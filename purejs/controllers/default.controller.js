@@ -1,8 +1,6 @@
-
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 
-const { getDb,dbStore, returnJson} =require('../common/customTypes/types.config');
+const { getDb,returnJson} =require('../common/customTypes/types.config');
 
 class DefaultController {
   svc;

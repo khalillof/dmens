@@ -1,8 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const Cors = require('cors');
-
 
 const whitelist = ['http://localhost:3000', 'https://localhost:3443', 'http://localhost:4200', 
 'http://tuban.me', 'http://static.tuban.me', 'http://test.tuban.me', 'http://mobile.tuban.me',

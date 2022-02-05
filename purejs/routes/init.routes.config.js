@@ -1,16 +1,12 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const {IndexRoutes} =require('./index.routes.config');
 const {UsersRoutes} = require('./users.routes.config');
 const {AuthRoutes} = require('./auth.routes.config');
 const {DefaultRoutesConfig} = require('./default.routes.config');
-const {dbStore} =require('../common/customTypes/types.config');
 
 async function initializeRoutes(app){
 
-   //await DefaultRoutesConfig.createInstancesWithDefault(app,['/dishes', '/leaders', '/favorites', '/promotions']);
-   await DefaultRoutesConfig.createInstancesWithDefault(app,Object.keys(dbStore));
+   await DefaultRoutesConfig.createInstancesWithDefault(app);
    await IndexRoutes(app);
    await AuthRoutes(app);
    await UsersRoutes(app);  

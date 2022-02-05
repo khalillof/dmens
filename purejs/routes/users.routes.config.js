@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const {UsersController} = require('../controllers/users.controller');
 const {DefaultRoutesConfig } = require('./default.routes.config');
 var passport = require('passport');

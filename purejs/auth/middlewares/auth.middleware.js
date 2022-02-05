@@ -1,6 +1,5 @@
 "use strict";
-//require('dotenv').config()
-Object.defineProperty(exports, "__esModule", { value: true });
+
 const { verify } =require("argon2");
 const { getCont, returnJson } = require("../../common/customTypes/types.config");
 

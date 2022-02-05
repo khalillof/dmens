@@ -1,12 +1,9 @@
 "use strict";
-//require('dotenv').config()
-Object.defineProperty(exports, "__esModule", { value: true });
-
 require('dotenv').config()
 
 const express = require("express");
 //import * as http from 'http';
-const http_errors = require("http-errors");
+//const http_errors = require("http-errors");
 var path = require('path');
 const winston  = require('winston');
 const expressWinston =  require('express-winston');

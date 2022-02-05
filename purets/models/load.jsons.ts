@@ -2,7 +2,7 @@ import path from 'path';
 //import fs from 'fs';
 import fs from 'fs';
 import mongoose from 'mongoose';
-import { dbStore, JsonSchema } from '../common/customTypes/types.config';
+import { JsonSchema } from '../common/customTypes/types.config';
 import { JsonModel } from './Json.model';
 
 
@@ -11,8 +11,7 @@ export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchem
     const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
     try {
-        const fileNames = await fs.promises.readdir(_directory);
-        for await (const fileName of fileNames) {
+        for await (const fileName of await fs.promises.readdir(_directory)) {
             if (path.extname(fileName) === '.json') {
 
                 let _file = path.join(_directory, fileName);
@@ -34,11 +33,13 @@ export async function loadJsons(directoryPath?: string): Promise<Array<JsonSchem
 
 async function makeSchema(jschema: JsonSchema):Promise< JsonSchema> {
 
+    // map json schema to mongoose schema types
     Object.entries(jschema.schema).forEach((item) => {
         recursiveSearch(item);
     })
     
-    return await makeModel(jschema);
+    // retun full modeldb
+    return await JsonModel.createInstance(jschema);
 }
 // search item in object
 function recursiveSearch(item: any) {
@@ -66,11 +67,6 @@ function recursiveSearch(item: any) {
     }
 }
 
-async function makeModel(jsonSchema: JsonSchema):Promise<JsonModel> {
-    let jmodel= await JsonModel.createInstance(jsonSchema)
-    dbStore[jsonSchema.name] = jmodel;
-    return  await Promise.resolve(jmodel);
-    //return createInstance(JsonModel,jsonModel)
-}
+
 
 

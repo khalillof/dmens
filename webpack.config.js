@@ -11,7 +11,7 @@ const config = {
   // mode: "production", // "production" | "development" | "none"
   // Chosen mode tells webpack to use its built-in optimizations accordingly.
   entry: {
-    //app: './dist/bin/www.js',  // string | object | array
+    //app: './build/bin/www.js',  // string | object | array
   }, 
   output: {
     path: path.resolve(__dirname, "build"), // string

@@ -1,8 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const path = require('path');
-//import fs from 'fs';
 const fs = require('fs');
 const mongoose = require( 'mongoose');
 const { JsonModel } = require('./Json.model');
@@ -12,8 +9,7 @@ async function loadJsons(directoryPath) {
     const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
     try {
-        const fileNames = await fs.promises.readdir(_directory);
-        for await (const fileName of fileNames) {
+        for (const fileName of await fs.promises.readdir(_directory)) {
             if (path.extname(fileName) === '.json') {
 
                 let _file = path.join(_directory, fileName);

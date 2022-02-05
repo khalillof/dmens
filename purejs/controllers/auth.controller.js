@@ -1,7 +1,4 @@
-
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const {sign} =require('jsonwebtoken');
 const { randomBytes, createHmac } =require('crypto');
 const {DefaultController} =require('./default.controller');

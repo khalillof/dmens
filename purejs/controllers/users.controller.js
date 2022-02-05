@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const {DefaultController} = require( './default.controller')
 const {hash} = require( 'argon2');
 const {returnJson} = require( '../common/customTypes/types.config');

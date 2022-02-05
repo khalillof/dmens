@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+
 const passport = require( 'passport');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const {Strategy , ExtractJwt } = require( 'passport-jwt');

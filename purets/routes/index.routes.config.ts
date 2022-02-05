@@ -1,7 +1,7 @@
 
 import express from 'express';
 import path from 'path';
-import {returnJson} from "../common/customTypes/types.config";
+//import {returnJson} from "../common/customTypes/types.config";
 
 import {DefaultRoutesConfig} from './default.routes.config';
 

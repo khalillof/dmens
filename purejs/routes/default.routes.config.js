@@ -1,8 +1,7 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 
 const {corss, corsWithOptions} = require('./cors.config');
-const {routeStore, pluralizeRoute} = require('../common/customTypes/types.config');
+const {routeStore, dbStore, pluralizeRoute} = require('../common/customTypes/types.config');
 const {UsersMiddleware} = require('../users/middleware/users.middleware');
 const { DefaultController } = require('../controllers/default.controller');
 
@@ -24,12 +23,8 @@ class DefaultRoutesConfig {
         var result =  new DefaultRoutesConfig(exp,rName,control,callback);
       return  await Promise.resolve(result);
     }
-    static async createInstancesWithDefault(exp, routeNames){
-        if(routeNames && routeNames.length > 0){
-          routeNames.forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)) )
-        }else{
-            throw new Error('at least one route name expected')
-        }
+    static async createInstancesWithDefault(exp){
+            Object.keys(dbStore).forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)))
     }
     /*
     pluralizeRoute(){ 

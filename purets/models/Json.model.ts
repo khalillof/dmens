@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model} from 'mongoose';
-import {JsonSchema} from '../common/customTypes/types.config'
+import {JsonSchema, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
 var passportLocalMongoose = require('passport-local-mongoose');
 import { Strategy as LocalStrategy } from 'passport-local';
@@ -7,7 +7,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 export class JsonModel implements JsonSchema{
 
     constructor(jsonMdl:JsonSchema) {
-        this.name = jsonMdl.name || "";
+        this.name = jsonMdl.name.toLowerCase() || "";
         this.schema = new Schema(jsonMdl.schema, { timestamps: true }); 
 
         if (jsonMdl.name === 'User') {
@@ -22,6 +22,9 @@ export class JsonModel implements JsonSchema{
             this.model = mongoose.model(this.name, this.schema);
             console.log("added ( "+jsonMdl.name+" ) to DbStore :")
         }
+
+        // add to dbStore
+        dbStore[this.name] = this;
     }
     name: string;
     schema:mongoose.Schema | any ;

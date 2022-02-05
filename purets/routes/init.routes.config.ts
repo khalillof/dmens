@@ -2,12 +2,11 @@ import express from "express";
 import {IndexRoutes} from './index.routes.config';
 import {UsersRoutes} from './users.routes.config';
 import {AuthRoutes} from './auth.routes.config';
-
 import {DefaultRoutesConfig} from './default.routes.config';
 
   export async function initializeRoutes(app: express.Application){
  
-   await DefaultRoutesConfig.createInstancesWithDefault(app,['/dishes', '/leaders', '/favorites', '/promotions']);
+   await DefaultRoutesConfig.createInstancesWithDefault(app);
    await IndexRoutes(app);
    await AuthRoutes(app);
    await UsersRoutes(app);  

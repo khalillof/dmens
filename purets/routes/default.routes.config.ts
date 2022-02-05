@@ -1,6 +1,6 @@
 import express from 'express';
 import {corss, corsWithOptions} from './cors.config';
-import {routeStore} from '../common/customTypes/types.config'
+import {routeStore, dbStore, pluralizeRoute} from '../common/customTypes/types.config'
 import UsersMiddleware from '../users/middleware/users.middleware';
 import { DefaultController } from '../controllers/default.controller';
 import { IController } from '../controllers/Icontroller.controller';
@@ -12,15 +12,15 @@ export class DefaultRoutesConfig {
     controller:IController | any;
     cors:any;
     corsWithOption:any;
-    UsersMWare:UsersMiddleware
+    UsersMWare:UsersMiddleware | any
 
     constructor(exp: express.Application, rName: string, control:IController|any, callback?:any) { 
         this.app = exp;
-        this.routeName = rName; 
+        this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName+'/:id';
         this.cors = corss;
         this.corsWithOption = corsWithOptions;
-        this.UsersMWare =  new UsersMiddleware();
+        this.UsersMWare =  typeof control === 'undefined' ? null : new UsersMiddleware();
         this.controller = typeof control === 'undefined' ? null : control;
 
         typeof callback === 'function' ? callback(this): this.configureRoutes();
@@ -35,22 +35,14 @@ export class DefaultRoutesConfig {
         var result =  new DefaultRoutesConfig(exp,rName,control,callback);
       return  await Promise.resolve(result);
     }
-    static async createInstancesWithDefault(exp: express.Application, routeNames?:Array<string>){
-        if(routeNames && routeNames?.length > 0){
-          routeNames.forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)) )
-        }else{
-            throw new Error('at least one route name expected')
-        }
+    static async createInstancesWithDefault(exp: express.Application){
+          Object.keys(dbStore).forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)) )
     }
     getName(): string {
         return this.routeName;
     }
 
     configureRoutes(){  
-   
- 
-            //this.app.route(item).options(this.corsWithOption, (req, res) => { res.sendStatus(200); } )
-        //this.app.route(item)
            this.app.get(this.routeName,this.cors,this.controller.ToList)
            this.app.get(this.routeParam,this.cors,this.controller.getById)
            this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.create)  

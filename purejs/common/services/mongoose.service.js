@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const mongoose =require('mongoose');
 const { config } =require('../../bin/config');
 const { loadJsons }=require('../../models/load.jsons');

@@ -3,12 +3,21 @@ import {ISvc} from '../../services/ISvc.services'
 import {IController} from '../../controllers/Icontroller.controller'
 import {DefaultRoutesConfig} from '../../routes/default.routes.config'
 import {DefaultController} from '../../controllers/default.controller'
+const pluralize = require('pluralize');
 
 export function returnJson (obj : any,status:number, res: any){
   res.setHeader('Content-Type', 'application/json');
   res.status(status).json(obj)
   };
-
+  
+export function pluralizeRoute(routeName:string){ 
+  routeName = routeName.toLowerCase();
+  if (routeName.indexOf('/') == -1){
+     return ('/'+ pluralize(routeName));
+  }else{
+      return routeName;
+  } 
+}
 export interface JsonSchema  {name:string,schema?:Schema |any};
 
 export interface IConstructor<T> {
@@ -30,7 +39,7 @@ export function extendedInstance<A extends DefaultController>(arg:any[], c: new(
 
 export function  getDb(url:string):ISvc{
   for(let d in dbStore){
-   if(d !== '/' && url.match(d.toLowerCase())){
+   if(url !== '/' && url.match(d.toLowerCase())){
    return dbStore[d];
  }
 }
@@ -50,26 +59,11 @@ export function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) {
     return obj[key];
 }
 
-export function createInstance<T>(constructor: new(...args: any[])=> T, ...args: any[]): T  {
-    return new constructor(...args);
+export async function createInstance<T>(constructor: new(...args: any[])=> T, ...args: any[]):Promise<T>  {
+    return Promise.resolve(new constructor(...args));
   }
 
-export function extendController<T extends IController>(type: IConstructor<T>, ...arg:any[]): T {
-     return new type(...arg);
- }
-////////////////////////////////
-
-// Generic Model Parameter
-export interface IGenericModel<T> extends IConstructor<T> {
-  tableName: string;
-  displayProp: string;
-}
-
-//(data model is the class name of your model)
-type  modelType = <T>({}) => T;
-type modelTypee<T> = {arg:any[] ,new(...args: any[]):T}
-
-async function activator<T extends any>(type: IConstructor<T>, ...arg:any[]){
+export async function activator(type: any, ...arg:any[]){
   // if(arg)
    return await Promise.resolve(new type(...arg));
    // usage:
