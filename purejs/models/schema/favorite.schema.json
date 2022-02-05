@@ -2,12 +2,12 @@
     "name":"Favorite",
     "schema":{  
     "user": {
-        "type": "mongoose.Schema.Types.ObjectId",
+        "type": "ObjectId",
         "ref": "User"
     },
     "dishes": [
         {
-            "type": "mongoose.Schema.Types.ObjectId",
+            "type": "ObjectId",
             "ref": "Dish"
         }
     ]

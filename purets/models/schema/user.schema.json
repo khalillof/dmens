@@ -44,12 +44,12 @@
       },
       "createdAt":{
         "type": "String",
-        "default": "Date.now().toString()"
+        "default": "Date"
     
       },
       "updatedAt":{
         "type": "String",
-        "default": "Date.now().toString()"
+        "default": "Date"
     
       }
 },"model":{}

@@ -1,28 +1,33 @@
 "use strict";
 
-const { getDb,returnJson} =require('../common/customTypes/types.config');
+const { getDb,returnJson, dbStore} =require('../common/customTypes/types.config');
 
 class DefaultController {
-  svc;
+  
  constructor(name){
-    this.svc = getDb(name);
+    this.svc = dbStore[name];
     }
 
   setDb(name){
-    this.svc = getDb(name);
+    return getDb(name);
     }
+
     
     static async createInstance(svcName){
         var result = new DefaultController(svcName);
-        if (!result.svc){
-            result.setDb(svcName);
-        }
       return  await Promise.resolve(result);
     }
-    async  ToList(req, res, next) {
+    async ToList(req, res, next) {
          await getDb(req.url).Tolist(20, 0)
            .then((items) => returnJson(items,200, res), (err) => next(err))
           .catch((err) => next(err));       
+    }
+   async create(req, res, next) {
+        await getDb(req.url).create(req.body).then((item) => {
+            console.log('document Created :', item);
+            returnJson({id: item.id},201, res)
+          }, (err) => next(err))
+          .catch((err) => next(err));
     }
 
     async getById(req, res, next) {
@@ -31,15 +36,6 @@ class DefaultController {
         .then((item) => returnJson(item,200, res), (err) => next(err))
         .catch((err) => next(err));
         
-    }
-
-    async create(req, res, next) {
-
-        await getDb(req.url).create(req.body).then((item) => {
-            console.log('document Created :', item);
-            returnJson({id: item.id},201, res)
-          }, (err) => next(err))
-          .catch((err) => next(err));
     }
 
     async patch(req, res, next) {

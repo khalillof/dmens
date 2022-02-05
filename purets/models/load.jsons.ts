@@ -48,10 +48,15 @@ function recursiveSearch(item: any) {
         "String": String,
         "string": String,
         "Number": Number,
+        "number": Number,
         "Boolean": Boolean,
+        "boolean": Boolean,
         "_id": mongoose.Schema.Types.ObjectId,
-        "mongoose.Schema.Types.ObjectId": mongoose.Schema.Types.ObjectId,
-        "Date.now().toString()": Date.now().toString()
+        "id": mongoose.Schema.Types.ObjectId,
+        "ObjectId": mongoose.Schema.Types.ObjectId,
+        "objectId": mongoose.Schema.Types.ObjectId,
+        "Date": Date.now().toString(),
+        "date": Date.now().toString(),
     }
     for (let [itemKey, itemValue] of Object.entries(item)) {
         if (typeof itemValue === "object") {

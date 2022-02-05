@@ -7,59 +7,47 @@ const { dbStore} = require('../common/customTypes/types.config');
 
 class JsonModel {
 
-    constructor(jsonMdl) {
+    constructor(jsonSchema) {
 
-        this.name = jsonMdl.name.toLowerCase() || "";
-        this.schema = new mongoose.Schema(jsonMdl.schema, { timestamps: true }); 
+        this.name = jsonSchema.name.toLowerCase() || "";
+        this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true }); 
 
-        if (jsonMdl.name === 'User') {
+        if (this.name === 'user') {
             this.schema.plugin(passportLocalMongoose);
             const vm = mongoose.model(this.name, this.schema);
             passport.use(new Strategy(vm.authenticate()));
             passport.serializeUser(vm.serializeUser);
             passport.deserializeUser(vm.deserializeUser());
             this.model = vm;
-        console.log("added ( "+jsonMdl.name+" ) to DbStore :")
         } else {
             this.model = mongoose.model(this.name, this.schema);
-            console.log("added ( "+jsonMdl.name+" ) to DbStore :")
+            
         }
 
         // add to db store
        dbStore[this.name] = this;
+       console.log("added ( "+jsonSchema.name+" ) to DbStore :");
     }
 
     static async createInstance(jsonModel){
       let dbb =  new JsonModel(jsonModel);
       return await Promise.resolve(dbb);
     }
-    getModelName(){       
-        return this.name;
-    }
-
-    getSchema(){
-        return this.schema;       
-    };
-
-    getModel(){
-        return this.model;
-    }
-
 
     async create(obj){
         return await this.model.create(obj);
       }
       
-      async getById(objId) {
-          return await this.model.findOne({_id: objId});
+      async getById(id) {
+          return await this.model.findOne({_id: id});
       }
       
       async putById(objFields){
         return await this.model.findByIdAndUpdate(objFields._id, objFields);
       }
       
-      async deleteById(objId) {
-        return await this.model.deleteOne({_id: objId});
+      async deleteById(id) {
+        return await this.model.deleteOne({_id: id});
       }
       
       async Tolist(limit = 25, page= 0) {

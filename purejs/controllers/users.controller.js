@@ -11,7 +11,7 @@ const {JwtService} = require('../auth/services/jwt.service');
     super(svc)
 }
  static async createInstance(){
-    var result = new UsersController('/users');
+    var result = new UsersController('user');
   return  await Promise.resolve(result);
 }
   
@@ -114,7 +114,7 @@ const {JwtService} = require('../auth/services/jwt.service');
     };
     // helper
     async getUserByEmail(email) {
-        return await getSvc('/users').db.findOne({email: email});
+        return await this.setDb('user').findOne({email: email});
     }
 }
 
