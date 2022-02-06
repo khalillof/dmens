@@ -7,13 +7,8 @@ const  {sign} = require('jsonwebtoken'); // used to create, sign, and verify tok
 const {config} = require( "../../bin/config");
 const {dbStore} = require('../../common/customTypes/types.config');
 
-
-////////////////////////
 class JwtService{
-  //readonly db: Model;
-  constructor(){
-      
-  }
+
     static async createInstance(){
         return await Promise.resolve(new JwtService())
     }
@@ -30,7 +25,7 @@ class JwtService{
         secretOrKey : config.secretKey
     },
         (jwt_payload, done) => {
-            let db =dbStore['User'];
+            let db =dbStore['user'];
             console.log("JWT payload: ", jwt_payload);
             db.findOne({_id: jwt_payload._id}, (err, user) => {
                 console.log
@@ -53,7 +48,7 @@ class JwtService{
         clientID: config.facebook.clientId,
         clientSecret: config.facebook.clientSecret
     }, (accessToken, refreshToken, profile, done) => {
-        let db =dbStore['User'];
+        let db =dbStore['user'];
         db.findOne({facebookId: profile.id}, (err, user) => {
             if (err) {
                 return done(err, false);

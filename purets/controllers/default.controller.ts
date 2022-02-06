@@ -1,73 +1,80 @@
 import express from 'express';
-import {IController} from './Icontroller.controller'
-import {getDb} from '../common/customTypes/types.config'
-import {returnJson} from '../common/customTypes/types.config'
-import { ISvc } from '../services/ISvc.services';
-export class DefaultController implements IController {
-    svc:ISvc | any;
+const { dbStore } = require('../common/customTypes/types.config');
+
+export class DefaultController{
+    db:any;
     public constructor(name:string){
-    this.setDb(name);
+      this.db = dbStore[name];
     }
 
-    setDb(url:string){
-      this.svc = getDb(url);
-      
+
+    static async createInstance(svcName:string) {
+      return await Promise.resolve(new DefaultController(svcName));
+    }
+
+  ToList(self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
+          self.db.Tolist(100, 0)
+           .then((items:any) => self.sendJson(items,200, res), (err:any) => next(err))
+           .catch((err:any) => next(err));       
+    }
   }
-    public static async createInstance(svcName:string){
-      var result = new DefaultController(svcName);
-      if (!result.svc){
-          result.setDb(svcName);
+
+    getById(self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
+       self.db.getById(req.params.id)
+        .then((item:any) => self.sendJson(item,200, res), (err:any) => next(err))
+        .catch((err:any) => next(err));
       }
-      return  await Promise.resolve(result);
-    }
-    async  ToList(req: express.Request, res: express.Response, next:express.NextFunction) {
-          await getDb(req.url).Tolist(100, 0)
-           .then((items) => returnJson(items,200, res), (err) => next(err))
-           .catch((err) => next(err));       
     }
 
-    async getById(req: express.Request, res: express.Response, next:express.NextFunction) {
+    create (self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=>{
 
-       await getDb(req.url).getById(req.params.id)
-        .then((item) => returnJson(item,200, res), (err) => next(err))
-        .catch((err) => next(err));
-        
-    }
-
-    async create(req: express.Request, res: express.Response, next: express.NextFunction) {
-
-      await  getDb(req.url).create(req.body).then((item) => {
+      self.db.create(req.body).then((item:any) => {
             console.log('document Created :', item);
-            returnJson({id: item.id},201, res)
-          }, (err) => next(err))
-          .catch((err) => next(err));
+            self.sendJson({id: item.id},201, res)
+          }, (err:any) => next(err))
+          .catch((err:any) => next(err));
+    }}
+
+    patch(self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
+
+      self.db.patchById(req.body)
+        .then(() => self.sendJson({"status":"OK"}, 204,res), (err:any) => next(err))
+        .catch((err:any) => next(err));
+      }
     }
 
-    async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-
-      await getDb(req.url).patchById(req.body)
-        .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
-        .catch((err) => next(err));
-        
+    put(self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
+      self.db.putById({_id: req.params.Id, ...req.body})
+        .then(() =>  self.sendJson({"status":"OK"}, 204,res), (err:any) => next(err))
+          .catch((err:any) => next(err));
     }
-
-    async put(req: express.Request, res: express.Response, next:express.NextFunction) {
-      await getDb(req.url).putById({_id: req.params.Id, ...req.body})
-        .then(() =>  returnJson({"status":"OK"}, 204,res), (err) => next(err))
-          .catch((err) => next(err));
+  }
+    remove(self:any) {
+      return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
+       self.db.deleteById(req.params.id)
+        .then(() => self.sendJson({"status":"OK"}, 204,res), (err:any) => next(err))
+          .catch((err:any) => next(err));
     }
-
-    async remove(req: express.Request, res: express.Response, next:express.NextFunction) {
-       await getDb(req.url).deleteById(req.params.id)
-        .then(() => returnJson({"status":"OK"}, 204,res), (err) => next(err))
-          .catch((err) => next(err));
-    }
-
+  }
     ////// helpers
-    async extractId(req: express.Request, res: express.Response, next: express.NextFunction) {
+    extractId(req: express.Request, res: express.Response, next: express.NextFunction) {
         req.body.id = req.params.id;
         next();
     }
+    sendJson(obj:any, status:any, res:express.Response) {
+      res.setHeader('Content-Type', 'application/json');
+      res.status(status).json(obj);
+    }
+  
+    First(obj:any, self:any) {
+      return self.db.findOne(obj);
+    }
+
 
 }
 

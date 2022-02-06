@@ -5,65 +5,59 @@ var passport = require('passport');
 
  async function UsersRoutes(app){
     return await DefaultRoutesConfig.instance(app,'/users', await UsersController.createInstance(), function(self){
-        //console.log('============ Users Routes Config =============')
-           // self.app.route('/users/signup').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
+
             self.app.post('/users/signup',
                 self.corsWithOption,
-                self.UsersMWare.validateRequiredUserBodyFields,
-                self.UsersMWare.validateSameEmailDoesntExist,
-                self.controller.signup
+                self.UsersMWare.validateRequiredUserBodyFields(self.UsersMWare),
+                self.UsersMWare.validateSameEmailDoesntExist(self.UsersMWare),
+                self.controller.signup(self.controller)
                 );
             
-            //self.app.route('/users/login').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
             self.app.post('/users/login',
                 self.corsWithOption,
-                self.UsersMWare.validateRequiredUserBodyFields,
-                self.UsersMWare.validateUserExists,
-                self.UsersMWare.verifyUserPassword,
-                self.controller.login
+                self.UsersMWare.validateRequiredUserBodyFields(self.UsersMWare),
+                self.UsersMWare.validateUserExists(self.UsersMWare),
+                self.UsersMWare.verifyUserPassword(self.UsersMWare),
+                self.controller.login(self.controller)
                 );
 
-           // self.app.route('/users/logout').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
             self.app.get('/users/logout',
                 self.corsWithOption,
-                self.UsersMWare.validateRequiredUserBodyFields,
-                self.UsersMWare.validateUserExists,
-                self.controller.logout);
+                self.UsersMWare.validateRequiredUserBodyFields(self.UsersMWare),
+                self.UsersMWare.validateUserExists(self.UsersMWare),
+                self.controller.logout(self.controller));
 
-           // self.app.route('/facebook/token').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
             self.app.get('/facebook/token',
                     self.corsWithOption,
                     passport.authenticate('facebook-token'),
-                    self.controller.facebook);
+                    self.controller.facebook(self.controller));
 
-            //self.app.route('/users').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
             self.app.get('/users',
                    self.cors,self.corsWithOption, 
                    self.UsersMWare.verifyUser,
-                   self.UsersMWare.verifyUserIsAdmin,
-                self.controller.ToList); 
+                   self.UsersMWare.verifyUserIsAdmin(self.UsersMWare),
+                self.controller.ToList(self.controller)); 
 
-            self.app.get('/users/checkJWTtoken',self.corsWithOption,self.controller.checkJWTtoken );
+            self.app.get('/users/checkJWTtoken',self.corsWithOption,self.controller.checkJWTtoken(self.controller) );
 
             self.app.param('id', self.UsersMWare.extractUserId);
            
-            //self.app.route('/users/id').options(self.corsWithOption, (req, res) => { res.sendStatus(200); } )
-            self.app.all('/users/id',self.UsersMWare.validateUserExists);
-            self.app.get('/users/id',self.corsWithOption, self.controller.getById);
-            self.app.delete('/users/id',self.corsWithOption,self.controller.remove);
+            self.app.all('/users/id',self.UsersMWare.validateUserExists(self.UsersMWare));
+            self.app.get('/users/id',self.corsWithOption, self.controller.getById(self.controller));
+            self.app.delete('/users/id',self.corsWithOption,self.controller.remove(self.controller));
 
-            self.app.put('/users/',
+            self.app.post('/users/',
                 self.corsWithOption,
-                self.UsersMWare.validateRequiredUserBodyFields,
-                self.controller.create);
+                self.UsersMWare.validateRequiredUserBodyFields(self.UsersMWare),
+                self.controller.create(self.controller));
 
             self.app.put('/users/',
                     self.corsWithOption,
-                    self.UsersMWare.validateRequiredUserBodyFields,
-                    self.UsersMWare.validateSameEmailBelongToSameUser,
-                self.controller.put);
+                    self.UsersMWare.validateRequiredUserBodyFields(self.UsersMWare),
+                    self.UsersMWare.validateSameEmailBelongToSameUser(self.UsersMWare),
+                self.controller.put(self.controller));
 
-            self.app.patch('/users',self.corsWithOption,self.UsersMWare.validatePatchEmail,self.controller.patch);   
+            self.app.patch('/users',self.corsWithOption,self.UsersMWare.validatePatchEmail(self.UsersMWare),self.controller.patch(self.controller));   
     })
 }
 

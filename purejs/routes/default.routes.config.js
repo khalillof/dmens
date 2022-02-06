@@ -1,11 +1,11 @@
 "use strict";
-
 const {corss, corsWithOptions} = require('./cors.config');
 const {routeStore, dbStore, pluralizeRoute} = require('../common/customTypes/types.config');
 const {UsersMiddleware} = require('../users/middleware/users.middleware');
 const { DefaultController } = require('../controllers/default.controller');
 
 class DefaultRoutesConfig {
+    
     constructor(exp, rName, control, callback) {
         this.app = exp;
         this.routeName = pluralizeRoute(rName);
@@ -19,41 +19,23 @@ class DefaultRoutesConfig {
         routeStore[this.routeName] = this;
         console.log('Added ( '+this.routeName+' ) to routeStore');
     }
+
     static async instance(exp, rName, control, callback ){
         var result =  new DefaultRoutesConfig(exp,rName,control,callback);
       return  await Promise.resolve(result);
     }
+
     static async createInstancesWithDefault(exp){
             Object.keys(dbStore).forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)))
     }
-    /*
-    pluralizeRoute(){ 
-        this.routeName = this.routeName.toLowerCase();
-        if (routeName !== '/' &&  routeName !== '/auth'){
-           this.routeName = path.join('/',pluralize(routeName));
-        }else{
-            this.routeName = path.join('/',routeName);
-        } 
-    }
-    */
-    getName(){
-        return this.routeName;
-    }
 
     configureRoutes(){  
-   
- 
-            //this.app.route(item).options(this.corsWithOption, (req, res) => { res.sendStatus(200); } )
-        //this.app.route(item)
-           this.app.get(this.routeName,this.cors,this.controller.ToList)
-           this.app.get(this.routeParam,this.cors,this.controller.getById)
-           this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.create)  
-           this.app.put(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.put)
-           this.app.patch(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.patch) 
-           this.app.delete(this.routeParam,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.remove);
-
-            
-        //this.app.route(this.routename +'/id').get(this.corsWithOption,this.controller.getById);
+           this.app.get(this.routeName,this.cors,this.controller.ToList(this.controller))
+           this.app.get(this.routeParam,this.cors,this.controller.getById(this.controller))
+           this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.create(this.controller))  
+           this.app.put(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.put(this.controller))
+           this.app.patch(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.patch(this.controller)) 
+           this.app.delete(this.routeParam,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.remove(this.controller));
     }     
      
 }

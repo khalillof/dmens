@@ -1,30 +1,27 @@
 import express from 'express';
-import argon2 from 'argon2';
-import {getCont, returnJson} from '../../common/customTypes/types.config'
+import {verify} from 'argon2';
+
 
 export class AuthMiddleware {
-    private static instance: AuthMiddleware;
-    static getInstance() {
-        if (!AuthMiddleware.instance) {
-            AuthMiddleware.instance = new AuthMiddleware();
-        }
-        return AuthMiddleware.instance;
+    static async  getInstance() {
+        return await Promise.resolve(new AuthMiddleware());
     }
 
-    async validateBodyRequest(req: express.Request, res: express.Response, next: express.NextFunction) {
+    validateBodyRequest(userCotroller:any){
+        return(req: express.Request, res: express.Response, next: express.NextFunction) =>{
         if(req.body && req.body.email && req.body.password){
             next();
         }else{
-            returnJson({error: 'Missing body fields: email, password'}, 400,res);
+            userCotroller.sendJson({error: 'Missing body fields: email, password'}, 400,res);
         }
-    }
+    }}
 
-    async verifyUserPassword(req: express.Request, res: express.Response, next: express.NextFunction) {
-       let db:any = getCont('/users');
-        await db.getUserByEmail(req.body.email).then(async (user:any)=>{
+    verifyUserPassword(userCotroller:any){
+        return (req: express.Request, res: express.Response, next: express.NextFunction)=> {
+        userCotroller.getUserByEmail(req.body.email).then(async (user:any)=>{
         if (user) {
             let passwordHash = user.password;
-            if (await argon2.verify(passwordHash, req.body.password)) {
+            if (await verify(passwordHash, req.body.password)) {
                 req.body = {
                     userId: user._id,
                     email: user.email,
@@ -34,11 +31,12 @@ export class AuthMiddleware {
                 };
                 next();
             } else {
-                returnJson({error: 'Invalid e-mail and/or password'}, 400,res);
+                userCotroller.sendJson({error: 'Invalid e-mail and/or password'}, 400,res);
             }
         } else {
-            returnJson({error: 'Invalid e-mail and/or password'}, 400,res);
+            userCotroller.sendJson({error: 'Invalid e-mail and/or password'}, 400,res);
         }
     }).catch((err:any)=> next(err));
     }
+}
 }

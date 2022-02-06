@@ -6,16 +6,10 @@ import * as jwt from 'jsonwebtoken'; // used to create, sign, and verify tokens
 import {config} from "../../bin/config";
 import {dbStore} from '../../common/customTypes/types.config'
 
-
-////////////////////////
 export class JwtService{
-  //readonly db: Model;
-  constructor(){
-      
-  }
+
     static async createInstance(){
-        let jwt = new JwtService()
-        return await Promise.resolve(jwt)
+        return await Promise.resolve(new JwtService())
     }
     public static generateToken(user: any) {
         try {
@@ -30,7 +24,7 @@ export class JwtService{
         secretOrKey : config.secretKey
     },
         (jwt_payload: any, done: any) => {
-            let db =dbStore['User'];
+            let db =dbStore['user'];
             console.log("JWT payload: ", jwt_payload);
             db.findOne({_id: jwt_payload._id}, (err: any, user: any) => {
                 console.log
@@ -53,7 +47,7 @@ export class JwtService{
         clientID: config.facebook.clientId,
         clientSecret: config.facebook.clientSecret
     }, (accessToken : any, refreshToken: any, profile: any, done:any) => {
-        let db =dbStore['User'];
+        let db =dbStore['user'];
         db.findOne({facebookId: profile.id}, (err:any, user:any) => {
             if (err) {
                 return done(err, false);

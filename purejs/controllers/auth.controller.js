@@ -1,34 +1,36 @@
 "use strict";
-const {sign} =require('jsonwebtoken');
-const { randomBytes, createHmac } =require('crypto');
-const {DefaultController} =require('./default.controller');
-const {returnJson} =require('../common/customTypes/types.config');
-// todo: move to a secure place
-const jwtSecret = 'My!@!Se3cr8tH4sh';
-const tokenExpirationInSeconds = 36000;
-
+const { sign } = require('jsonwebtoken');
+const { randomBytes, createHmac } = require('crypto');
+const { DefaultController } = require('./default.controller');
+const { AuthMiddleware } = require('../auth/middlewares/auth.middleware');
+const { JwtMiddleware } = require('../auth/middlewares/jwt.middleware');
+const { config } = require('../bin/config');
 class AuthController extends DefaultController {
 
-    constructor(svc){
+    constructor(svc) {
         super(svc)
+        this.authMWare = new AuthMiddleware();
+        this.jwtMWare = new JwtMiddleware();
     }
-    
-     static async createInstance(){
-        var result = new AuthController('user');
-      return  await Promise.resolve(result);
+
+    static async createInstance() {
+        return await Promise.resolve(new AuthController('user'));
     }
-    async createJWT(req, res) {
-        try {
-            let refreshId = req.body._id + jwtSecret;
-            let salt = randomBytes(16).toString('base64');
-            let hash = createHmac('sha512', salt).update(refreshId).digest("base64");
-            req.body.refreshKey = salt;
-            let token = sign(req.body, jwtSecret, {expiresIn: tokenExpirationInSeconds});
-            let b = Buffer.from(hash);
-            let refreshToken = b.toString('base64');
-            return returnJson({accessToken: token, refreshToken: refreshToken},201,res);
-        } catch (err) {
-            return returnJson(err,500, res);
+
+    createJWT(self) {
+        return (req, res, next) => {
+            try {
+                let refreshId = req.body._id + config.jwtSecret;
+                let salt = randomBytes(16).toString('base64');
+                let hash = createHmac('sha512', salt).update(refreshId).digest("base64");
+                req.body.refreshKey = salt;
+                let token = sign(req.body,config.jwtSecret, { expiresIn: 36000 });
+                let b = Buffer.from(hash);
+                let refreshToken = b.toString('base64');
+                return self.sendJson({ accessToken: token, refreshToken: refreshToken }, 201, res);
+            } catch (err) {
+                return self.sendJson(err, 500, res);
+            }
         }
     }
 }

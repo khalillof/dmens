@@ -43,16 +43,13 @@ export class DefaultRoutesConfig {
     }
 
     configureRoutes(){  
-           this.app.get(this.routeName,this.cors,this.controller.ToList)
-           this.app.get(this.routeParam,this.cors,this.controller.getById)
-           this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.create)  
-           this.app.put(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.put)
-           this.app.patch(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.patch) 
-           this.app.delete(this.routeParam,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.remove);
-
-            
-        //this.app.route(this.routename +'/id').get(this.corsWithOption,this.controller.getById);
-    }     
+        this.app.get(this.routeName,this.cors,this.controller.ToList(this.controller))
+        this.app.get(this.routeParam,this.cors,this.controller.getById(this.controller))
+        this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.create(this.controller))  
+        this.app.put(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.put(this.controller))
+        this.app.patch(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.patch(this.controller)) 
+        this.app.delete(this.routeParam,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin(this.UsersMWare.controller),this.controller.remove(this.controller));
+ }    
      
 }
 

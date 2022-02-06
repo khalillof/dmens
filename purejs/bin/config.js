@@ -2,6 +2,7 @@
 
 exports.config = {
     secretKey: process.env.SECRET_KEY || '',
+    jwtSecret:process.env.SECRET_KEY || '',
     mongoUrl: {
         'dev': process.env.DB_CONNECTION_DEV || '',
         'local': process.env.DB_CONNECTION_LOCAL || '',

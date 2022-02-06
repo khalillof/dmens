@@ -1,40 +1,40 @@
 import express from 'express';
 
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-import {DefaultController} from './default.controller'
-import {returnJson} from '../common/customTypes/types.config'
-// todo: move to a secure place
-const jwtSecret = 'My!@!Se3cr8tH4sh';
-const tokenExpirationInSeconds = 36000;
+import {randomBytes, createHmac} from 'crypto';
+import { sign } from 'jsonwebtoken';
+import { DefaultController } from './default.controller';
+import { AuthMiddleware } from '../auth/middlewares/auth.middleware';
+import { JwtMiddleware } from '../auth/middlewares/jwt.middleware';
+import { config } from '../bin/config';
 
 export class AuthController extends DefaultController {
+    authMWare: AuthMiddleware;
+    jwtMWare: JwtMiddleware;
+    constructor(svc:string) {
+        super(svc)
+        this.authMWare = new AuthMiddleware();
+        this.jwtMWare = new JwtMiddleware();
+    }
 
-    constructor(){
-        super('user')
+    static async createInstance() {
+        return await Promise.resolve(new AuthController('user'));
     }
-    
-    public static async createInstance(){
-        var result = new AuthController();
-        if(!result.svc){
-            result.setDb('user');
-        }
-      return  await Promise.resolve(result);
-    }
-    async createJWT(req: express.Request, res: express.Response) {
+
+    createJWT(self:any) {
+        return (req: express.Request, res: express.Response)=> {
         try {
-            let refreshId = req.body._id + jwtSecret;
-            let salt = crypto.randomBytes(16).toString('base64');
-            let hash = crypto.createHmac('sha512', salt).update(refreshId).digest("base64");
+            let refreshId = req.body._id + config.jwtSecret;
+            let salt = randomBytes(16).toString('base64');
+            let hash = createHmac('sha512', salt).update(refreshId).digest("base64");
             req.body.refreshKey = salt;
-            let token = jwt.sign(req.body, jwtSecret, {expiresIn: tokenExpirationInSeconds});
+            let token = sign(req.body, config.jwtSecret, {expiresIn: 36000});
             let b = Buffer.from(hash);
             let refreshToken = b.toString('base64');
-            return returnJson({accessToken: token, refreshToken: refreshToken},201,res);
+            return self.sendJson({accessToken: token, refreshToken: refreshToken},201,res);
         } catch (err) {
-            return returnJson(err,500, res);
+            return self.sendJson(err,500, res);
         }
     }
 }
+}
 
-//export default new AuthController();

@@ -1,7 +1,6 @@
 
 import express from 'express';
 import path from 'path';
-//import {returnJson} from "../common/customTypes/types.config";
 
 import {DefaultRoutesConfig} from './default.routes.config';
 
@@ -25,12 +24,6 @@ export async function IndexRoutes(app: express.Application){
         .post(self.corsWithOption, (req, res, next) => {
             returnJson({message:'operation not supported '},403,res);
         })
-        .put(self.corsWithOption,(req, res, next) => {
-            returnJson({message:'operation not supported '},403,res);
-        })
-        .delete(self.corsWithOption, (req, res, next) => {
-            returnJson({message:'operation not supported '},403,res);
-        });
         */
     });
 }
