@@ -12,7 +12,7 @@ class UsersMiddleware {
         return await Promise.resolve(new UsersMiddleware())
     }
 
-    verifyUser = new JwtService().verifyUser;
+    verifyUser = JwtService.verifyUser;
 
     validateRequiredUserBodyFields(self) {
         return (req, res, next) => {

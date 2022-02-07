@@ -26,7 +26,7 @@ class DefaultRoutesConfig {
     }
 
     static async createInstancesWithDefault(exp){
-            Object.keys(dbStore).forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)))
+        Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name))})
     }
 
     configureRoutes(){  

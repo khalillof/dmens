@@ -5,6 +5,7 @@ const { DefaultController } = require('./default.controller');
 const { AuthMiddleware } = require('../auth/middlewares/auth.middleware');
 const { JwtMiddleware } = require('../auth/middlewares/jwt.middleware');
 const { config } = require('../bin/config');
+
 class AuthController extends DefaultController {
 
     constructor(svc) {

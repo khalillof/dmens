@@ -9,9 +9,10 @@ const {dbStore} = require('../../common/customTypes/types.config');
 
 class JwtService{
 
-    static async createInstance(){
-        return await Promise.resolve(new JwtService())
-    }
+    //static async createInstance(){
+    //    return await Promise.resolve(new JwtService())
+    //}
+
     static generateToken(user) {
         try {
             return sign(user, config.secretKey,{expiresIn: 3600});
@@ -20,7 +21,7 @@ class JwtService{
         }
     }
 
-    jwtPassport  = passport.use(new Strategy({
+   static jwtPassport  = passport.use(new Strategy({
         jwtFromRequest :ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey : config.secretKey
     },
@@ -42,9 +43,9 @@ class JwtService{
     }));
     
 
-    verifyUser = passport.authenticate('jwt', {session: false});
+   static verifyUser = passport.authenticate('jwt', {session: false});
     // facebook
-    facebookPassport = passport.use(new FacebookTokenStrategy({
+   static facebookPassport = passport.use(new FacebookTokenStrategy({
         clientID: config.facebook.clientId,
         clientSecret: config.facebook.clientSecret
     }, (accessToken, refreshToken, profile, done) => {

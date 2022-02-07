@@ -11,7 +11,7 @@ class UsersMiddleware {
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())
     }
-    verifyUser: any = new JwtService().verifyUser;
+    verifyUser: any = JwtService.verifyUser;
 
 
     validateRequiredUserBodyFields(self: any) {
@@ -92,6 +92,7 @@ class UsersMiddleware {
             }).catch((err: any) => next(err));
         }
     }
+    
     verifyUserIsAdmin(self: any) {
         return (req: any, res: any, next: any) => {
 

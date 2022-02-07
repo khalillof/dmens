@@ -36,10 +36,7 @@ export class DefaultRoutesConfig {
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(exp: express.Application){
-          Object.keys(dbStore).forEach(async name => await  DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)) )
-    }
-    getName(): string {
-        return this.routeName;
+          Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name))})
     }
 
     configureRoutes(){  

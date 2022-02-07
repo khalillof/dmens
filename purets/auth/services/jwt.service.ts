@@ -8,9 +8,6 @@ import {dbStore} from '../../common/customTypes/types.config'
 
 export class JwtService{
 
-    static async createInstance(){
-        return await Promise.resolve(new JwtService())
-    }
     public static generateToken(user: any) {
         try {
             return jwt.sign(user, config.secretKey,{expiresIn: 3600});
@@ -19,7 +16,7 @@ export class JwtService{
         }
     }
 
-    jwtPassport : passport.PassportStatic = passport.use(new JwtStrategy({
+    public static jwtPassport : passport.PassportStatic = passport.use(new JwtStrategy({
         jwtFromRequest :ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey : config.secretKey
     },
@@ -39,11 +36,11 @@ export class JwtService{
                 }
             });
     }));
-    
 
-    verifyUser: any = passport.authenticate('jwt', {session: false});
+    public static verifyUser: any = passport.authenticate('jwt', {session: false});
+
     // facebook
-    facebookPassport = passport.use(new FacebookTokenStrategy.default({
+    public static facebookPassport = passport.use(new FacebookTokenStrategy.default({
         clientID: config.facebook.clientId,
         clientSecret: config.facebook.clientSecret
     }, (accessToken : any, refreshToken: any, profile: any, done:any) => {

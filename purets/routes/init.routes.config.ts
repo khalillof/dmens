@@ -5,14 +5,14 @@ import {AuthRoutes} from './auth.routes.config';
 import {DefaultRoutesConfig} from './default.routes.config';
 
   export async function initializeRoutes(app: express.Application){
- 
-   await DefaultRoutesConfig.createInstancesWithDefault(app);
-   await IndexRoutes(app);
-   await AuthRoutes(app);
-   await UsersRoutes(app);  
-
+   
+  await DefaultRoutesConfig.createInstancesWithDefault(app);
+  await AuthRoutes(app);
+  await UsersRoutes(app);
+  await IndexRoutes(app);
+     
   return await Promise.resolve(availableRoutesToString(app))
-  } 
+  }
 
   // helpers
   function availableRoutesToString(app:express.Application) {
