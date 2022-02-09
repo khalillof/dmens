@@ -1,4 +1,4 @@
-This is dynamic nodejs api server, base on express js and mongodb.
-It does exactly what the name reflect, dynamiclly construct mongodb schemas, models and Create Read Write and update operations as well as routes all through just json files.
+This is dynamic api server, based on nodejs expressjs and mongodb.
+It does exactly what the name imply, dynamiclly construct mongodb schemas and models, Create routes and  Read Write update and delete operations just though json files.
 
-to used it as fully functional api servers just need to create your json files which will be mapped to mongoose schema then to db model the used the model names to create routes populated with prebuild function to create the basic read write update and delete operations.
+Fully functional api server just need to create your json files which will be mapped to mongoose schema then to db model then we  use the model names to create routes populated with prebuild functions to create the basic read write update and delete operations.
