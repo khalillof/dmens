@@ -1,9 +1,7 @@
 import express from 'express';
 import {DefaultController} from './default.controller'
-import {hash} from 'argon2';
-import {returnJson, getCont, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
-import {JwtService} from '../auth/services/jwt.service'
+import {AuthService} from '../auth/services/auth.service'
 
 export class UsersController extends DefaultController {
 
@@ -16,84 +14,75 @@ export class UsersController extends DefaultController {
   
     signup(self:any) {
       return (req: express.Request, res: express.Response, next: express.NextFunction)=>{
-        let db:any=getCont(req.url);
-        req.body.password = (async ()=> await hash(req.body.password));
-
-       db.register({ username: req.body.username ,email: req.body.email, password:req.body.password},
-       req.body.password, (err:any, user:any) => {
-     
-        if (err) {
-          self.sendJson({ err: err }, 500,res)
-        }
-        else {
-          if (req.body.firstname)
-            user.firstname = req.body.firstname;
-          if (req.body.lastname)
-            user.lastname = req.body.lastname;
-          user.save((err:any, user:any) => {
-            if (err) {
-             self.sendJson({ err: err }, 500,res)
-            }
-            passport.authenticate('local')(req, res, () => {
-              self.sendJson({ success: true, status: 'Registration Successful!' }, 204, res);
-            });
-          });
-        }
-      });;
+        var _user: any = { username: req.body.username, email: req.body.email};
+        if (req.body.firstname)
+            _user['firstname'] = req.body.firstname;
+        if (req.body.lastname)
+            _user['lastname'] = req.body.lastname;
+  
+        self.db.model.register(_user, req.body.password, (err:string, user:any) => {
+              if (err){
+                res.json({ success: false, message: 'Registration Unsuccessful!', err: err })
+              }else{
+                res.json({success: true, message: 'Registration Successful!'})
+              }
+          })
     }}
     
     login(self:any) {
       return (req: express.Request, res: express.Response, next: express.NextFunction)=>{
-        // let ddd :any =getCont('/users');
-      
-      passport.authenticate('local', (err:any, user:any, info:any) => {
-        
-        if (err)
-           next(err);
-
-        if (!user) 
-          self.sendJson({success: false, status: 'Login Unsuccessful!', err: info},401,res)  
-               
-        req.logIn(user, (err) => {
-          
-          if (err) {
-            self.sendJson({success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!'},401,res)        
-          }
-    
-         // var token = authenticate.getToken({_id: user._id});
-         var token = JwtService.generateToken({_id: user._id});
-
-          self.sendJson(({success: true, status: 'Login Successful!', token: token}), 200, res);
-        }); 
-      }) (req, res, next);
+     
+        passport.authenticate('local', (err, user, info) => {
+          if(err){
+            res.json({success: false, message: err || info})
+          } 
+  
+          if (! user) {
+             res.json({success: false, message: 'username or password incorrect'})
+           }else{
+            req.login(user, function(err){
+              if(err){
+                res.json({success: false, message: err})
+              }else{
+                const token =  AuthService.generateToken({ _id: user._id });
+                res.json({success:true, message:"Authentication successful", token: token });
+              }
+            })
+          }     
+      })(req, res);
     }
   }
+    profile(self:any){
+      return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        res.json({
+          message: 'You made it to the secure route',
+          user: req.user,
+          token: req.query.secret_token
+        })
+      }
+    }
 
-    logout(self:any) {
-      return (req: any, res: express.Response, next: express.NextFunction)=>{
+    logout(req: any, res: express.Response, next: express.NextFunction){
       if (req.session) {
         req.session.destroy();
         res.clearCookie('session-id');
         res.redirect('/');
       }else {
-        self.sendJson({err:"You are not logged in!"}, 403, res)
+        res.json({success:true, message:"You are not logged in!" });
       }
     }
-    }
-    
-    facebook(self:any) {
-      return (req: any, res: express.Response, next: express.NextFunction)=>{
+       
+    facebook(req: any, res: express.Response, next: express.NextFunction){
         
-        if (req.user) {
-            var token = JwtService.generateToken({_id: req.user._id});
-            self.sendJson({success: true, token: token, status: 'You are successfully logged in!'}, 204, res);
-        }
+      if (req.user) {
+        var token = AuthService.generateToken({ _id: req.user._id });
+        res.json({ success: true, token: token, status: 'You are successfully logged in!' });
       }
     }
     
     create(self:any) {
       return (req: express.Request, res: express.Response, next: express.NextFunction)=> {
-        req.body.password = (async ()=> await hash(req.body.password));
+        //req.body.password = (async ()=> await hash(req.body.password));
        self.super.create(req,res,next)
     }
   }
@@ -101,7 +90,7 @@ export class UsersController extends DefaultController {
     patch(self:any) {
       return (req: express.Request, res: express.Response, next: express.NextFunction)=> {
         if(req.body.password){
-            req.body.password = ( async ()=> await hash(req.body.password));
+          //  req.body.password = ( async ()=> await hash(req.body.password));
         }
        self.super.patch(req,res,next);
     }
@@ -109,30 +98,55 @@ export class UsersController extends DefaultController {
 
   put(self:any) {
     return (req: express.Request, res: express.Response, next: express.NextFunction)=> {
-        req.body.password = (async()=> await hash(req.body.password));
+        //req.body.password = (async()=> await hash(req.body.password));
        self.super.put(req,res,next);
     }
   }
 
-    checkJWTtoken(self:any){
-      return (req:any, res:any, next:any)=>{
+    checkJWTtoken(req: express.Request, res: express.Response, next: express.NextFunction){
       passport.authenticate('jwt', {session: false}, (err:any, user:any, info:any) => {
         if (err)
            next(err);
         
         if (!user) {
-          self.sendJson({status: 'JWT invalid!', success: false, err: info}, 401,res);
+          res.json({status: 'JWT invalid!', success: false, err: info});
         }
         else {
-          self.sendJson({status: 'JWT valid!', success: true, user: user}, 200, res);
+          res.json({status: 'JWT valid!', success: true, user: user});
     
         }
       }) (req, res, next);
-    }
     };
+
+    setPassword(self:any ) {
+      return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  
+        self.db.model.setPassword(req.body.password,(err:string, user:any) => {
+              if (err)
+                res.json({ success: false, message: 'set password Unsuccessful!', err: err })
+              if(user)
+                res.json({success: true, message: 'password set Successful!'})
+          }).catch((err:string)=> next(err))
+      }
+    }
+    
+    changePassword(self:any) {
+      return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  
+        self.db.model.changePassword(req.body.oldpassword, req.body.newpassword,(err:string, user:any) => {
+  
+              if (err)
+                res.json({ success: false, message: 'change password Unsuccessful!', err: err })
+              if(user){
+                res.json({success: true, message: 'password change Successful!'})
+              }
+          }).catch((err:string)=> next(err))
+      }
+    }
+
     // helper
-    async getUserByEmail(email: string, self:any) {
-        return self.First({email: email});
+    getUserByEmail(email:string) {
+      return this.db.First({ email: email });
     }
 }
 

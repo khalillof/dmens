@@ -1,7 +1,10 @@
 "use strict";
-require('dotenv').config()
+// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
+require('dotenv').config();
+
 var compression = require('compression')
 const express = require("express");
+const session = require('express-session');
 //import * as http from 'http';
 //const http_errors = require("http-errors");
 var path = require('path');
@@ -14,10 +17,10 @@ const {initializeRoutes}  = require('./routes/init.routes.config');
 const passport = require('passport');
 
 
-///////////////////////////////////////////
+// Create the Express application
 const app = express();
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // compress all responses
 app.use(compression())
@@ -26,9 +29,36 @@ app.use(compression())
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(require('express-session')({ secret: config.secretKey, resave: true, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
+
+// connect to db and initialise db models then
+(async (app)=>{
+
+  await dbInit().then( async()=>{
+
+  app.use(session({ 
+    secret: config.secretKey, 
+    resave: true, 
+    saveUninitialized: true,
+    cookie:{
+      maxAge: 1000 *30
+    }}));    
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+   
+  await initializeRoutes(app)
+  
+  });
+  })(app);
+
+
+
+// static urls
+function staticUrl(url) {
+  return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
+}
+staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
+
 
 app.use(helmet({
   contentSecurityPolicy: false
@@ -44,22 +74,10 @@ app.use(expressWinston.logger({
   )
 }));
 
-// static urls
-function staticUrl(url) {
-  return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
-}
-staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
-
-
-// connect to db and initialise db models then
-(async (app)=>{
-
-await dbInit().then( async()=>{
-
-await initializeRoutes(app)
-
+// Handle errors.
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({ error: err });
 });
-})(app);
-
 
 exports.app = app;

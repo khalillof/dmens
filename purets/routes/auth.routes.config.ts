@@ -8,17 +8,16 @@ export async function AuthRoutes(app: express.Application){
 
         self.app.post('/auth',
         self.corsWithOption,
-        self.controller.authMWare.validateBodyRequest(self.controller),
-        self.controller.authMWare.verifyUserPassword(self.controller),
-        self.controller.createJWT(self.controller)
+        self.UsersMWare.validateRequiredUserBodyFields,
+        self.controller.createJWT
     );
 
     self.app.post('/auth/refresh-token',
         self.corsWithOption,
-        self.controller.jwtMWare.validJWTNeeded(self.controller),
-        self.controller.jwtMWare.verifyRefreshBodyField(self.controller),
-        self.controller.jwtMWare.validRefreshNeeded(self.controller),
-        self.controller.createJWT(self.controller)
+        self.controller.jwtMWare.validJWTNeeded,
+        self.controller.jwtMWare.verifyRefreshBodyField,
+        self.controller.jwtMWare.validRefreshNeeded,
+        self.controller.createJWT
     );
-        });
+});
 };

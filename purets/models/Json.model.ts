@@ -1,8 +1,8 @@
 import mongoose, { Schema, Model} from 'mongoose';
 import {JsonSchema, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
-var passportLocalMongoose = require('passport-local-mongoose');
-import { Strategy as LocalStrategy } from 'passport-local';
+import passportLocalMongoose = require('passport-local-mongoose');
+import {PassportStrategies} from '../auth/services/strategies' ;
 
 export class JsonModel implements JsonSchema{
 
@@ -12,11 +12,17 @@ export class JsonModel implements JsonSchema{
 
         if (this.name === 'user') {
             this.schema.plugin(passportLocalMongoose);
-            const vm = mongoose.model(this.name, this.schema);
-            passport.use(new LocalStrategy(vm.authenticate()));
-            passport.serializeUser(vm.serializeUser);
-            passport.deserializeUser(vm.deserializeUser());
-            this.model = vm;
+            const User = mongoose.model(this.name, this.schema);         
+            //passport.use(new LocalStrategy(User.authenticate()));
+            passport.use(User.createStrategy());
+            passport.serializeUser(User.serializeUser);
+             passport.deserializeUser(User.deserializeUser());
+             // extras
+            passport.use(PassportStrategies.Facebook());
+            passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+            //passport.use(PassportStrategies.JwtQueryParameterStrategy());
+            // assign
+            this.model = User;
         } else {
             this.model = mongoose.model(this.name, this.schema);
         }
@@ -34,7 +40,7 @@ export class JsonModel implements JsonSchema{
       return await Promise.resolve(dbb);
     }
 
-    ///////////////////////////////////////////////////////
+   
     async create(obj: any){
         return await this.model.create(obj);
       }
@@ -42,7 +48,9 @@ export class JsonModel implements JsonSchema{
       async getById(id: string) {
           return await this.model.findOne({_id: id});
       }
-      
+      async First(obj:any) {
+        return await this.model.findOne(obj);
+      }
       async putById(objFields: any){
          return await this.model.findByIdAndUpdate(objFields._id, objFields);
       }

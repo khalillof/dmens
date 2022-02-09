@@ -30,8 +30,11 @@ export async function dbInit():Promise<any>{
 async function dbConnect (dbURL:string, options:{}){
   await mongoose.connect(dbURL,options); 
   mongoose.connection
-  .on('error', () => console.error.bind(console, 'connection error:'))
+  .on('error', error => console.log(error) )
   .on('open', () => console.log("Successfully Connected to db!"));
+   mongoose.Promise = global.Promise;
+   
+   return await Promise.resolve(console.log('db connection established'))
 }
 
 //=================================================================

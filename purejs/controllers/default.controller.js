@@ -71,9 +71,6 @@ class DefaultController {
     res.status(status).json(obj);
   }
 
-  First(obj, self) {
-    return self.db.findOne(obj);
-  }
 
 }
 

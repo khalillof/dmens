@@ -1,7 +1,8 @@
 require('dotenv').config()
 declare function require(name: string): any;
 var compression = require('compression');
-import express from 'express';
+import  express from 'express';
+const session = require('express-session');
 //import * as http from 'http';
 // import createError from 'http-errors';
 var path = require('path');
@@ -12,10 +13,12 @@ import {config} from './bin/config';
 import { dbInit } from './common/services/mongoose.service';
 import { initializeRoutes } from './routes/init.routes.config';
 import passport from 'passport';
-///////////////////////////////////////////
+
+
+// Create the Express application
 const app = express();
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // compress all responses
 app.use(compression())
@@ -24,9 +27,36 @@ app.use(compression())
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(require('express-session')({ secret: config.secretKey, resave: true, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
+
+// connect to db and initialise db models then
+(async (app)=>{
+
+  await dbInit().then( async()=>{
+
+  app.use(session({ 
+    secret: config.secretKey, 
+    resave: true, 
+    saveUninitialized: true,
+    cookie:{
+      maxAge: 1000 *30
+    }}));    
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+   
+  await initializeRoutes(app)
+  
+  });
+  })(app);
+
+
+
+// static urls
+function staticUrl(url:string[]) {
+  return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
+}
+staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
+
 
 app.use(helmet({
   contentSecurityPolicy: false
@@ -42,23 +72,13 @@ app.use(expressWinston.logger({
   )
 }));
 
-// static urls
-function staticUrl(url: Array<string>) {
-  return url.map((e) => path.join(__dirname, e)).forEach((url: string) => app.use(express.static(url)))
-}
-staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
+// Handle errors.
+app.use(function(err:any, req:any, res:any, next:any) {
+  res.status(err.status || 500);
+  res.json({ error: err });
+});
 
+exports.app = app;
 
-// connect to db and initialise db models then
-(async (_app:express.Application)=> {
-
- await dbInit().then( async ()=> { 
-
- await initializeRoutes(_app)
-
-}).catch((err)=>console.error(err));
-//end
-
-})(app);
 
 export default app;

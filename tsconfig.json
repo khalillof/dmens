@@ -20,6 +20,6 @@
         ],
         "inlineSourceMap": true
     },
-    "include": ["purets/**/*.ts", "./tests/**/*.ts"],
-    "exclude": ["node_modules", ".vscode", "purejs"]
+    "include": ["purets/**/*.ts", "purets/**/*.json", "./tests/**/*.ts"],
+    "exclude": ["node_modules", ".vscode", "un_wanted", "purejs"]
 }

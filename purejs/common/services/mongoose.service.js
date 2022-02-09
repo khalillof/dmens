@@ -29,9 +29,11 @@ const dbOptions ={
 async function dbConnect (dbURL, options){
   mongoose.connect(dbURL, options); 
   mongoose.connection
-  .on('error', () => console.error.bind(console, 'connection error:'))
+  .on('error', error => console.log(error) )
   .on('open', () => console.log("Successfully Connected to db!"));
-  return Promise.resolve(console.log('db connection established'))
+   mongoose.Promise = global.Promise;
+
+  return await Promise.resolve(console.log('db connection established'))
 }
 
 //=================================================================

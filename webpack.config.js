@@ -66,7 +66,7 @@ const config = {
         { from: "./ts-output/", to: "./" },
         { from: "./public", to: "./public" },
         { from: "./views", to: "./views" },
-        { from: "./purets/models/schema", to: "./models/schema" },
+        //{ from: "./purets/models/schema", to: "./models/schema" },
         { from: "./purets/bin/cert.csr", to: "./bin/" },
         { from: "./purets/bin/certificate.pem", to: "./bin/" },
         { from: "./purets/bin/private.key", to: "./bin/" },

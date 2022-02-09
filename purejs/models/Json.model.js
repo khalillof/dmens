@@ -2,8 +2,8 @@
 const mongoose = require("mongoose");
 const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
-const { Strategy} = require('passport-local');
 const { dbStore} = require('../common/customTypes/types.config');
+const {PassportStrategies} = require('../auth/services/strategies');
 
 class JsonModel {
 
@@ -13,12 +13,19 @@ class JsonModel {
         this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true }); 
 
         if (this.name === 'user') {
+          
             this.schema.plugin(passportLocalMongoose);
-            const vm = mongoose.model(this.name, this.schema);
-            passport.use(new Strategy(vm.authenticate()));
-            passport.serializeUser(vm.serializeUser);
-            passport.deserializeUser(vm.deserializeUser());
-            this.model = vm;
+            const User = mongoose.model(this.name, this.schema);         
+            //passport.use(new Strategy(User.authenticate()));
+            passport.use(User.createStrategy());
+            passport.serializeUser(User.serializeUser());
+             passport.deserializeUser(User.deserializeUser());
+             // extras
+            passport.use(PassportStrategies.Facebook());
+            passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+            //passport.use(PassportStrategies.JwtQueryParameterStrategy());
+            // assign
+            this.model = User;
         } else {
             this.model = mongoose.model(this.name, this.schema);
             
@@ -40,6 +47,9 @@ class JsonModel {
       
       async getById(id) {
           return await this.model.findOne({_id: id});
+      }
+      async First(obj) {
+        return await this.model.findOne(obj);
       }
       
       async putById(objFields){

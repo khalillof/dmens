@@ -1,7 +1,6 @@
 import express from 'express';
 import { UsersController } from '../../controllers/users.controller';
-import { JwtService } from '../../auth/services/jwt.service'
-import { verify } from 'argon2';
+import { AuthService } from '../../auth/services/auth.service'
 
 class UsersMiddleware {
     Controller: any
@@ -11,44 +10,15 @@ class UsersMiddleware {
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())
     }
-    verifyUser: any = JwtService.verifyUser;
+    verifyUser: any = AuthService.authenticateUser;
 
 
-    validateRequiredUserBodyFields(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
             if (req.body && req.body.email && req.body.password) {
                 next();
             } else {
-                self.sendJson({ error: 'Missing body fields: email, password' }, 400, res);
+                res.json({success:false, error: 'Missing body fields: email, password' });
             }
-        }
-    }
-
-    verifyUserPassword(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            self.getUserByEmail(req.body.email, self.controller).then(async (user: any) => {
-                if (user) {
-                    let passwordHash = user.password;
-                    if (await verify(passwordHash, req.body.password)) {
-                        req.body.password = passwordHash;
-                        req.body._id = user._d;
-                        //req.user = user;
-                        //req.body = {
-                        //    userId: user._id,
-                        //    email: user.email,
-                        //    provider: 'email',
-                        //    password: passwordHash
-                        //permissionLevel: user.permissionLevel,
-                        //};
-                        next();
-                    } else {
-                        self.sendJson({ error: 'Invalid e-mail and/or password' }, 400, res);
-                    }
-                } else {
-                    self.sendJson({ error: 'Invalid e-mail and/or password' }, 400, res);
-                }
-            }).catch((err: any) => next(err));
-        }
     }
 
     validateSameEmailDoesntExist(self: any) {
@@ -93,15 +63,14 @@ class UsersMiddleware {
         }
     }
     
-    verifyUserIsAdmin(self: any) {
-        return (req: any, res: any, next: any) => {
+    verifyUserIsAdmin(req: any, res: express.Response, next: express.NextFunction){
 
-            if (req.user.admin || req.body.comment) {
+            if (req.user && req.user.admin) {
                 next()
             } else {
-                self.sendJson({ error: 'you are not authorized' }, 401, res);
+                res.json({success:false, error: 'you are not authorized' });
             }
-        }
+        
     }
 
     extractUserId(req: express.Request, res: express.Response, next: express.NextFunction) {

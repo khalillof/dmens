@@ -9,6 +9,13 @@
           "minLength":3,
           "maxLength":30
       },
+      "email": {
+        "type": "String",
+        "unique": true,
+        "lowercase": true,
+        "required": true,
+        "maxLength":30
+      },
       "firstname": {
         "type": "String",
         "default": "",
@@ -19,20 +26,10 @@
         "default": "",
         "maxLength":50
       },
-      "email": {
-          "type": "String",
-          "required": true,
-          "maxLength":30
-        },
       "descriptions" : {
           "type": "String",
           "default": "",
           "maxLength":150
-        },
-      "password":{
-          "type": "String",
-          "required": true,
-          "minLength":3
         },
       "facebookId": {
         "type": "String",

@@ -3,24 +3,20 @@ const {verify} = require( 'jsonwebtoken');
 const {createHmac} = require('crypto');
 const {config} = require('../../bin/config')
 
-
 class JwtMiddleware {
 
    static async getInstance() {
         return await Promise.resolve(new JwtMiddleware());
     }
-    verifyRefreshBodyField(self){
-        return (req, res, next) =>{
+    verifyRefreshBodyField(req, res, next){
         if (req.body && req.body.refreshToken) {
             next();
         }
         else {
-            self.sendJson({ error: 'need body field: refreshToken' }, 400, res);
+            res.json({ success:false, error: 'some missing body field' });
         }
     }
-}
-    validRefreshNeeded(self){
-        return (req, res, next) => {
+    validRefreshNeeded(req, res, next){
         let b = Buffer.from(req.body.refreshToken, 'base64');
         let refreshToken = b.toString();
         let hash = createHmac('sha512', req.jwt.refreshKey).update(req.jwt.userId + config.jwtSecret).digest("base64");
@@ -31,17 +27,16 @@ class JwtMiddleware {
             return next();
         }
         else {
-            self.sendJson({ error: 'Invalid refresh token' }, 400, res);
+            res.json({success:false, error: 'Invalid token' });
         }
     }
-}
-    validJWTNeeded(self){
-        return (req, res, next) =>{
+
+    validJWTNeeded(req, res, next){
         if (req.headers['authorization']) {
             try {
                 let authorization = req.headers['authorization'].split(' ');
                 if (authorization[0] !== 'Bearer') {
-                    self.sendJson({ error: 'need: refreshToken' }, 401, res);
+                    res.json({ success:false, error: 'need: refreshToken' });
                 }
                 else {
                     req.jwt = verify(authorization[1], config.jwtSecret);
@@ -49,13 +44,12 @@ class JwtMiddleware {
                 }
             }
             catch (err) {
-                self.sendJson({ error: 'error' }, 403, res);
+                res.json({ success:false,error: err });
             }
         }
         else {
-            self.sendJson({ error: 'need body field: refreshToken' }, 401, res);
+            res.json({ success:false, error: 'need body field: refreshToken' });
         }
-    }
     }
 }
 exports.JwtMiddleware = JwtMiddleware;
