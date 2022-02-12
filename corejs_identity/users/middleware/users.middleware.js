@@ -14,10 +14,10 @@ class UsersMiddleware {
     verifyUser = AuthService.authenticateUser;
 
     validateRequiredUserBodyFields(req, res, next){
-        if(req.body && req.body.email && req.body.password){
+        if(req.body && req.body.email || req.body.username && req.body.password){
             next();
         }else{
-            res.json({success: false, error: 'Missing body fields'});
+            res.json({success: false, error: 'Missing required body fields'});
         }
     }
 

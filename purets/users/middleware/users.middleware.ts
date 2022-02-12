@@ -14,10 +14,10 @@ class UsersMiddleware {
 
 
     validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
-            if (req.body && req.body.email && req.body.password) {
+            if (req.body && req.body.email || req.body.username && req.body.password) {
                 next();
             } else {
-                res.json({success:false, error: 'Missing body fields: email, password' });
+                res.json({success:false, error: 'Missing required body fields' });
             }
     }
 

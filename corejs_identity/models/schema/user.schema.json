@@ -1,0 +1,53 @@
+{ 
+  "name":"User",
+  "schema":{
+    "username":{
+        "type": "String",
+          "unique": true,
+          "lowercase": true,
+          "required": true,
+          "minLength":3,
+          "maxLength":30
+      },
+      "email": {
+        "type": "String",
+        "unique": true,
+        "lowercase": true,
+        "required": true,
+        "maxLength":30
+      },
+      "firstname": {
+        "type": "String",
+        "default": "",
+        "maxLength":50
+      },
+      "lastname": {
+        "type": "String",
+        "default": "",
+        "maxLength":50
+      },
+      "descriptions" : {
+          "type": "String",
+          "default": "",
+          "maxLength":150
+        },
+      "facebookId": {
+        "type": "String",
+        "default": ""
+      },
+      "admin": {
+        "type": "Boolean",
+        "default": false
+      },
+      "createdAt":{
+        "type": "String",
+        "default": "Date"
+    
+      },
+      "updatedAt":{
+        "type": "String",
+        "default": "Date"
+    
+      }
+},"model":{}
+}

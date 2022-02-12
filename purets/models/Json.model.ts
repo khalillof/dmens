@@ -12,10 +12,9 @@ export class JsonModel implements JsonSchema{
 
         if (this.name === 'user') {
             this.schema.plugin(passportLocalMongoose);
-            const User = mongoose.model(this.name, this.schema);         
-            //passport.use(new LocalStrategy(User.authenticate()));
+            const User : any = mongoose.model(this.name, this.schema);         
             passport.use(User.createStrategy());
-            passport.serializeUser(User.serializeUser);
+            passport.serializeUser(User.serializeUser());
              passport.deserializeUser(User.deserializeUser());
              // extras
             passport.use(PassportStrategies.Facebook());
@@ -44,19 +43,21 @@ export class JsonModel implements JsonSchema{
     async create(obj: any){
         return await this.model.create(obj);
       }
-      
+      async query(obj_query:{}) {
+        return await this.model.find(obj_query);
+    } 
       async getById(id: string) {
           return await this.model.findOne({_id: id});
       }
       async First(obj:any) {
         return await this.model.findOne(obj);
       }
-      async putById(objFields: any){
-         return await this.model.findByIdAndUpdate(objFields._id, objFields);
+      async putById(id:string, objFields: {}){
+         return await this.model.findByIdAndUpdate(id, objFields);
       }
       
       async deleteById(id: string) {
-        return await this.model.deleteOne({_id: id});
+        return await this.model.findByIdAndDelete(id);
       }
       
       async Tolist(limit: number = 25, page: number = 0) {

@@ -21,5 +21,5 @@
         "inlineSourceMap": true
     },
     "include": ["purets/**/*.ts", "purets/**/*.json", "./tests/**/*.ts"],
-    "exclude": ["node_modules", ".vscode", "un_wanted", "purejs"]
+    "exclude": ["node_modules", ".vscode", "un_wanted", "corejs_identity"]
 }

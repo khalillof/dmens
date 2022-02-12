@@ -1,0 +1,16 @@
+{
+    "name":"Favorite",
+    "schema":{  
+    "user": {
+        "type": "ObjectId",
+        "ref": "User"
+    },
+    "dishes": [
+        {
+            "type": "ObjectId",
+            "ref": "Dish"
+        }
+    ]
+},
+"model":{}
+}

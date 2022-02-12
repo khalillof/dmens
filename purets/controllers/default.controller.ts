@@ -31,7 +31,7 @@ export class DefaultController{
     create (self:any) {
       return(req: express.Request, res: express.Response, next:express.NextFunction)=>{
 
-      self.db.create(req.body).then((item:any) => {
+      self.db.create(...req.body).then((item:any) => {
             console.log('document Created :', item);
             self.sendJson({id: item.id},201, res)
           }, (err:any) => next(err))
@@ -41,7 +41,7 @@ export class DefaultController{
     patch(self:any) {
       return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
 
-      self.db.patchById(req.body)
+      self.db.patchById(req.params.Id, ...req.body)
         .then(() => self.sendJson({"status":"OK"}, 204,res), (err:any) => next(err))
         .catch((err:any) => next(err));
       }
@@ -49,7 +49,7 @@ export class DefaultController{
 
     put(self:any) {
       return(req: express.Request, res: express.Response, next:express.NextFunction)=> {
-      self.db.putById({_id: req.params.Id, ...req.body})
+      self.db.putById(req.params.Id, ...req.body)
         .then(() =>  self.sendJson({"status":"OK"}, 204,res), (err:any) => next(err))
           .catch((err:any) => next(err));
     }
@@ -74,6 +74,22 @@ export class DefaultController{
     First(obj:any, self:any) {
       return self.db.findOne(obj);
     }
+
+    resultCb ={
+      res:(res:express.Response, callback?:any)=>{
+         return {
+           cb:(err:any, obj:any, info:any)=> {
+              if (err)
+                res.json({ success: false, message: 'operation Unsuccessful!', err: info || err })
+              else if (obj) {
+                typeof callback ==='function' ? callback(obj) : res.json({ success: true, message: 'operation Successful!' })
+              }
+              else if(!err && !obj) {
+                res.json({ success: false, message: 'operation Unsuccessful!', err: info || err || 'error' })
+              }   
+            }    
+         }
+    }}
 
 
 }

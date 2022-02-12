@@ -1,18 +1,20 @@
-require('dotenv').config()
-declare function require(name: string): any;
-var compression = require('compression');
-import  express from 'express';
+"use strict";
+// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
+require('dotenv').config();
+
+var compression = require('compression')
+const express = require("express");
 const session = require('express-session');
 //import * as http from 'http';
-// import createError from 'http-errors';
+//const http_errors = require("http-errors");
 var path = require('path');
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
-import helmet from 'helmet';
-import {config} from './bin/config';
-import { dbInit } from './common/services/mongoose.service';
-import { initializeRoutes } from './routes/init.routes.config';
-import passport from 'passport';
+const winston  = require('winston');
+const expressWinston =  require('express-winston');
+const  helmet = require('helmet');
+const {config} = require('./bin/config');
+const  {dbInit} = require('./common/services/mongoose.service');
+const {initializeRoutes}  = require('./routes/init.routes.config');
+const passport = require('passport');
 
 
 // Create the Express application
@@ -52,7 +54,7 @@ app.set('view engine', 'pug');
 
 
 // static urls
-function staticUrl(url:string[]) {
+function staticUrl(url) {
   return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
 }
 staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
@@ -72,12 +74,14 @@ app.use(expressWinston.logger({
   )
 }));
 */
+
+
 // error handlers
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err:any, req:any, res:any, next:any) {
+  app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.json({ error: err });
   });
@@ -85,12 +89,8 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err:any, req:any, res:any, next:any) {
+app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.json({ error: err.message });
 });
-
 exports.app = app;
-
-
-export default app;

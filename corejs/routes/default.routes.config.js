@@ -1,7 +1,6 @@
 "use strict";
 const {corss, corsWithOptions} = require('./cors.config');
 const {routeStore, dbStore, pluralizeRoute} = require('../common/customTypes/types.config');
-const {UsersMiddleware} = require('../users/middleware/users.middleware');
 const { DefaultController } = require('../controllers/default.controller');
 
 class DefaultRoutesConfig {
@@ -15,10 +14,8 @@ class DefaultRoutesConfig {
         
         if (!control){
             this.controller = null;
-            this.UsersMWare = null;
           }else{
             this.controller = control;
-            this.UsersMWare = new UsersMiddleware();
           } 
 
         typeof callback === 'function' ? callback(this) : this.configureRoutes();
@@ -33,16 +30,28 @@ class DefaultRoutesConfig {
     }
 
     static async createInstancesWithDefault(exp){
-        Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name))})
+        Object.keys(dbStore).forEach(async name =>  await DefaultRoutesConfig.instance(exp, name, await DefaultController.createInstance(name)))
     }
-
+    
+  custumMiddleWare(rName){
+    if(rName){
+      this.routeName = rName;
+      this.routeParam = this.routeName + '/:id';
+    }
+  return {
+  getList:(...callback)=> this.app.get(this.routeName,this.cors,...callback,this.controller.ToList(this.controller)) ,
+  getId:(...callback)=> this.app.get(this.routeParam,this.cors,...callback,this.controller.getById(this.controller)),
+  post:(...callback)=> this.app.post(this.routeName,this.cors,this.corsWithOption,...callback,this.controller.create(this.controller)),
+  put:(...callback)=> this.app.put(this.routeParam,this.cors,this.corsWithOption,...callback,this.controller.put(this.controller)),
+  delete:(...callback)=> this.app.delete(this.routeParam,this.cors,this.corsWithOption,...callback,this.controller.remove(this.controller))
+}
+}
     configureRoutes(){  
            this.app.get(this.routeName,this.cors,this.controller.ToList(this.controller))
            this.app.get(this.routeParam,this.cors,this.controller.getById(this.controller))
-           this.app.post(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.create(this.controller))  
-           this.app.put(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.put(this.controller))
-           this.app.patch(this.routeName,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.patch(this.controller)) 
-           this.app.delete(this.routeParam,this.corsWithOption,this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin,this.controller.remove(this.controller));
+           this.app.post(this.routeName,this.corsWithOption,this.controller.create(this.controller))  
+           this.app.put(this.routeParam,this.corsWithOption,this.controller.put(this.controller))
+           this.app.delete(this.routeParam,this.corsWithOption,this.controller.remove(this.controller));
     }     
      
 }

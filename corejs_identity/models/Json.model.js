@@ -44,7 +44,9 @@ class JsonModel {
     async create(obj){
         return await this.model.create(obj);
       }
-      
+    async query(obj_query) {
+        return await this.model.find(obj_query);
+    }
       async getById(id) {
           return await this.model.findOne({_id: id});
       }
@@ -52,12 +54,12 @@ class JsonModel {
         return await this.model.findOne(obj);
       }
       
-      async putById(objFields){
-        return await this.model.findByIdAndUpdate(objFields._id, objFields);
+      async putById(id, objFields){
+        return await this.model.findByIdAndUpdate(id, objFields);
       }
       
       async deleteById(id) {
-        return await this.model.deleteOne({_id: id});
+        return await this.model.findByIdAndDelete(id);
       }
       
       async Tolist(limit = 25, page= 0) {
@@ -67,8 +69,8 @@ class JsonModel {
               .exec();
       }
       
-      async patchById(objFields) {
-       return await this.model.findOneAndUpdate(objFields._id, objFields);
+      async patchById(id,objFields) {
+       return await this.model.findOneAndUpdate(id, objFields);
       }
 }
 

@@ -19,7 +19,7 @@ class DefaultController {
   }
   create(self) {
     return (req, res, next) => {
-      self.db.create(req.body).then((item) => {
+      self.db.create(...req.body).then((item) => {
         console.log('document Created :', item);
         self.sendJson({ id: item.id }, 201, res)
       }, (err) => next(err))
@@ -38,7 +38,7 @@ class DefaultController {
 
   patch(self) {
     return (req, res, next) => {
-      self.db.patchById(req.body)
+      self.db.patchById(req.params.Id, ...req.body)
         .then(() => self.sendJson({ "status": "OK" }, 204, res), (err) => next(err))
         .catch((err) => next(err));
 
@@ -47,7 +47,7 @@ class DefaultController {
 
   put(self) {
     return (req, res, next) => {
-      self.putById({ _id: req.params.Id, ...req.body })
+      self.putById(req.params.Id, ...req.body)
         .then(() => self.sendJson({ "status": "OK" }, 204, res), (err) => next(err))
         .catch((err) => next(err));
     }

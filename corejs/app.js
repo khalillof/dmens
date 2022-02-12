@@ -4,17 +4,12 @@ require('dotenv').config();
 
 var compression = require('compression')
 const express = require("express");
-const session = require('express-session');
-//import * as http from 'http';
-//const http_errors = require("http-errors");
 var path = require('path');
 const winston  = require('winston');
 const expressWinston =  require('express-winston');
 const  helmet = require('helmet');
-const {config} = require('./bin/config');
 const  {dbInit} = require('./common/services/mongoose.service');
 const {initializeRoutes}  = require('./routes/init.routes.config');
-const passport = require('passport');
 
 
 // Create the Express application
@@ -33,18 +28,7 @@ app.set('view engine', 'pug');
 // connect to db and initialise db models then
 (async (app)=>{
 
-  await dbInit().then( async()=>{
-
-  app.use(session({ 
-    secret: config.secretKey, 
-    resave: true, 
-    saveUninitialized: true,
-    cookie:{
-      maxAge: 1000 *30
-    }}));    
-
-  app.use(passport.initialize());
-  app.use(passport.session());
+  await dbInit().then( async()=>{    
    
   await initializeRoutes(app)
   
