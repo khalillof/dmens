@@ -10,8 +10,9 @@ import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
 import helmet from 'helmet';
 import {config} from './bin/config';
-import { dbInit } from './common/services/mongoose.service';
-import { initializeRoutes } from './routes/init.routes.config';
+import {dbInit} from './common/services/mongoose.service';
+import {appRouter} from './common/customTypes/types.config'
+import { initCustomRoutes } from './routes/init.routes.config';
 import passport from 'passport';
 
 
@@ -44,8 +45,6 @@ app.set('view engine', 'pug');
   app.use(passport.initialize());
   app.use(passport.session());
    
-  await initializeRoutes(app)
-  
   });
   })(app);
 
@@ -72,7 +71,13 @@ app.use(expressWinston.logger({
   )
 }));
 */
-// error handlers
+setTimeout(async()=>{
+  // register routes
+  app.use('/', appRouter);
+  
+  // print routes
+ await initCustomRoutes()
+  }, 500)
 
 // development error handler
 // will print stacktrace

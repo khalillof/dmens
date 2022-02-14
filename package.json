@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "debug": "export DEBUG=* && npm dev",
+    "debug": "export DEBUG=* && npm  dev",
     "test": "karma start",
     "clean": "rm ./build",
     "dev": "node ./build/bin/www.js",

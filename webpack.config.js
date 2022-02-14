@@ -67,9 +67,9 @@ const config = {
         { from: "./public", to: "./public" },
         { from: "./views", to: "./views" },
         //{ from: "./purets/models/schema", to: "./models/schema" },
-        { from: "./purets/bin/cert.csr", to: "./bin/" },
-        { from: "./purets/bin/certificate.pem", to: "./bin/" },
-        { from: "./purets/bin/private.key", to: "./bin/" },
+        { from: "./corets/bin/cert.csr", to: "./bin/" },
+        { from: "./corets/bin/certificate.pem", to: "./bin/" },
+        { from: "./corets/bin/private.key", to: "./bin/" },
       ]
     }),
     new HtmlWebpackPlugin({

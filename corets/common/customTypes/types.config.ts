@@ -4,7 +4,31 @@ import {IController} from '../../controllers/Icontroller.controller'
 import {DefaultRoutesConfig} from '../../routes/default.routes.config'
 import {DefaultController} from '../../controllers/default.controller'
 const pluralize = require('pluralize');
+import {Router} from 'express'
 
+
+export const appRouter = Router();
+  
+export function printRoutesToString(){
+    let result = exports.appRouter.stack
+      .filter((r:any) => r.route)
+      .map((r:any) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
+      .join("\n");
+      
+      console.log('================= All Routes avaliable ================ \n'+ result)
+  }
+export function printRoutesToJson(){
+    let result = exports.appRouter.stack
+        .filter((r:any) => r.route)
+        .map((r:any) => {
+        return {
+            method: Object.keys(r.route.methods)[0].toUpperCase(),
+            path: r.route.path
+        };
+    });
+    console.log('================= All Routes avaliable ================ \n'+ JSON.stringify(result, null, 2))
+    //console.log(JSON.stringify(result, null, 2));
+  }
 export function returnJson (obj : any,status:number, res: any){
   res.setHeader('Content-Type', 'application/json');
   res.status(status).json(obj)

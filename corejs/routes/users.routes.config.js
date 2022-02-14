@@ -1,6 +1,6 @@
 "use strict";
 const {UsersController} = require('../controllers/users.controller');
-const {DefaultRoutesConfig } = require('../../corejs/routes/default.routes.config');
+const {DefaultRoutesConfig } = require('./default.routes.config');
 const {AuthService} = require('../auth/services/auth.service')
 
  async function UsersRoutes(){

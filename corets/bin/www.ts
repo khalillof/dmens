@@ -6,8 +6,8 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 
-var server = configure_server(false);
-function configure_server(isHttps = false){
+const server = configure_server(false);
+export function configure_server(isHttps = false){
   var server: any;
   var port = isHttps ? normalizePort(process.env.PORT || '443') : normalizePort(process.env.PORT || '3000');
   process.env.PORT = port;
