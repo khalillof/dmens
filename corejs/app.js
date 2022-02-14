@@ -4,12 +4,18 @@ require('dotenv').config();
 
 var compression = require('compression')
 const express = require("express");
+const session = require('express-session');
+//import * as http from 'http';
+//const http_errors = require("http-errors");
 var path = require('path');
 const winston  = require('winston');
 const expressWinston =  require('express-winston');
 const  helmet = require('helmet');
+const {config} = require('./bin/config');
 const  {dbInit} = require('./common/services/mongoose.service');
-const {initializeRoutes}  = require('./routes/init.routes.config');
+const {appRouter}  = require('./common/customTypes/types.config');
+const  {initCustomRoutes} = require('./routes/init.routes.config');
+const passport = require('passport');
 
 
 // Create the Express application
@@ -26,14 +32,24 @@ app.set('view engine', 'pug');
 
 
 // connect to db and initialise db models then
-(async (app)=>{
+(async (app)=> {
+  await dbInit().then(()=>{
 
-  await dbInit().then( async()=>{    
-   
-  await initializeRoutes(app)
+    app.use(session({ 
+      secret: config.secretKey, 
+      resave: true, 
+      saveUninitialized: true,
+      cookie:{
+        maxAge: 1000 *30
+      }}));    
   
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+  //===========================================end
   });
-  })(app);
+
+})(app);
 
 
 
@@ -48,6 +64,7 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
+/*
 app.use(expressWinston.logger({
   transports: [
     new winston.transports.Console()
@@ -57,11 +74,33 @@ app.use(expressWinston.logger({
     winston.format.json()
   )
 }));
+*/
 
-// Handle errors.
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: err });
-});
+setTimeout(async()=>{
+  // register routes
+  app.use('/', appRouter);
+  
+  // print routes
+ await initCustomRoutes()
+  }, 500)
+  
+  
+  // development error handler
+  // will print stacktrace
+  if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      console.error(err.stack)
+      res.json({ error: err });
+    });
+  }
+  
+  // production error handler
+  // no stacktraces leaked to user
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    console.error(err.stack)
+    res.json({ error: 'Something broke!' });
+  });
 
 exports.app = app;

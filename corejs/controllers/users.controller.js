@@ -16,7 +16,7 @@ class UsersController extends DefaultController {
 
   signup(self) {
     return (req, res, next) => {
-      self.db.model.register(req.body, req.body.password,self.resultCb.res(res).cb)
+      self.db.model.register(req.body, req.body.password,self.resultCb.res(res,next).cb)
     }
   }
 
@@ -43,7 +43,7 @@ updateUser(self=this) {
       let User = await self.db.model.findById(req.user._id);
       if (req.user.password !== req.body.password)
         await User.setPassword(req.body.password)
-      await User.save(req.body, self.resultCb.res(res).cb)
+      await User.save(req.body, self.resultCb.res(res, next).cb)
     }
   }
 }
@@ -75,7 +75,7 @@ updateUser(self=this) {
 
   checkJWTtoken(self=this){
     return(req, res, next)=>{
-      passport.authenticate('jwt', self.resultCb.res(res).cb)(req, res, next);
+      passport.authenticate('jwt', self.resultCb.res(res,next).cb)(req, res, next);
     }
   };
 
@@ -86,7 +86,7 @@ updateUser(self=this) {
 
   authenticateUser(self=this, callback) {
     return (req, res, next) => {
-     passport.authenticate('local', self.resultCb.res(res, callback).cb)(req, res, next);
+     passport.authenticate('local', self.resultCb.res(res,next,callback).cb)(req, res, next);
     }
   }
   

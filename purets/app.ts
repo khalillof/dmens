@@ -79,6 +79,7 @@ app.use(expressWinston.logger({
 if (app.get('env') === 'development') {
   app.use(function(err:any, req:any, res:any, next:any) {
     res.status(err.status || 500);
+    console.error(err.stack);
     res.json({ error: err });
   });
 }
@@ -87,7 +88,8 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err:any, req:any, res:any, next:any) {
   res.status(err.status || 500);
-  res.json({ error: err.message });
+  console.error(err.stack);
+  res.json({ error: 'Something broke!' });
 });
 
 exports.app = app;

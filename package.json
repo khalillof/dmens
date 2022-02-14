@@ -8,7 +8,7 @@
     "clean": "rm ./build",
     "dev": "node ./build/bin/www.js",
     "core": "node ./corejs/bin/www.js",
-    "id": "node ./corejs_identity/bin/www.js",
+    "client": "node ./client/index.js",
     "bu": "node ./build/bin/www.js",
     "start": "tsc && webpack --mode production && node ./build/bin/www.js",
     "trace": "tsc --traceResolution",

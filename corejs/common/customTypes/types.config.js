@@ -1,7 +1,30 @@
 "use strict";
 
 const pluralize = require('pluralize');
+const router = require('express').Router();
 
+exports.appRouter = router;
+  
+exports.printRoutesToString = ()=>{
+    let result = exports.appRouter.stack
+      .filter((r) => r.route)
+      .map((r) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
+      .join("\n");
+      
+      console.log('================= All Routes avaliable ================ \n'+ result)
+  }
+exports.printRoutesToJson = ()=>{
+    let result = exports.appRouter.stack
+        .filter((r) => r.route)
+        .map((r) => {
+        return {
+            method: Object.keys(r.route.methods)[0].toUpperCase(),
+            path: r.route.path
+        };
+    });
+    console.log('================= All Routes avaliable ================ \n'+ JSON.stringify(result, null, 2))
+    //console.log(JSON.stringify(result, null, 2));
+  }
 
 exports.returnJson = (obj, status, res) => {
     res.setHeader('Content-Type', 'application/json');

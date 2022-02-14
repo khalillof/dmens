@@ -1,6 +1,7 @@
 //require('dotenv').config()
 
 export const config = {
+  auth:process.env.AUTH || true,
   secretKey: process.env.SECRET_KEY || '',
   jwtSecret:process.env.SECRET_KEY || '',
   mongoUrl: {

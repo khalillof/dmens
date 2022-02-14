@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+"use strict";
 
 const {app} = require('../app');
 var debug = require('debug')('express-api-server:server');
@@ -37,7 +38,10 @@ server.on('listening', onListening);
 return server;
 };
 
+//====================
+exports.server = server;
 
+//===================
 function normalizePort(val) {
   var port = parseInt(val, 10);
 

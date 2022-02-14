@@ -1,26 +1,28 @@
 "use strict";
-const {AuthController }= require('../controllers/auth.controller');
-const {DefaultController}= require('../controllers/default.controller');
-const {DefaultRoutesConfig} = require('./default.routes.config');
+const { AuthController } = require('../controllers/auth.controller');
+const { DefaultRoutesConfig } = require('./default.routes.config');
 
-async function AuthRoutes(app){
+async function AuthRoutes() {
 
-    return await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance(), function(self){
+    // add routes
+    return await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(),
+        function (self) {
 
-           self.app.post('/auth',
+            self.router.post('/auth',
                 self.corsWithOption,
                 self.UsersMWare.validateRequiredUserBodyFields,
                 self.controller.createJWT
             );
-    
-            self.app.post('/auth/refresh-token',
+
+            self.router.post('/auth/refresh-token',
                 self.corsWithOption,
                 self.controller.jwtMWare.validJWTNeeded,
                 self.controller.jwtMWare.verifyRefreshBodyField,
                 self.controller.jwtMWare.validRefreshNeeded,
                 self.controller.createJWT
             );
-        });
+        })
+
 };
 
 exports.AuthRoutes = AuthRoutes;

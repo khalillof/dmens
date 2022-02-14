@@ -13,15 +13,15 @@ export class UsersController extends DefaultController {
   }
 
   signup(self: any) {
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      self.db.model.register(req.body, req.body.password, self.resultCb.res(res).cb)
+    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+     await self.db.model.register(req.body, req.body.password, self.resultCb.res(res, next).cb)
     }
   }
 
   login(self: any) {
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
-      self.authenticateUser(self, (user:any)=>{
+    await  self.authenticateUser(self, (user:any)=>{
         req.login(user, function(err){
           if(err){
             res.json({success: false, message: err})
@@ -52,7 +52,7 @@ export class UsersController extends DefaultController {
         let User = await self.db.model.findById(req.user._id);
         if (req.user.password !== req.body.password)
           await User.setPassword(req.body.password)
-        await User.save(req.body, self.resultCb.res(res).cb)
+        await User.save(req.body, self.resultCb.res(res,next).cb)
       }
     }
   }
@@ -75,14 +75,14 @@ export class UsersController extends DefaultController {
   }
 
   checkJWTtoken(self:this){
-    return(req: express.Request, res: express.Response, next: express.NextFunction)=> {
-    passport.authenticate('jwt', { session: false }, self.resultCb.res(res).cb)(req, res, next);
+    return async (req: express.Request, res: express.Response, next: express.NextFunction)=> {
+    await  passport.authenticate('jwt', { session: false }, self.resultCb.res(res,next ).cb)(req, res, next);
   };
 }
 
   authenticateUser(self: this, callback?: any) {
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      passport.authenticate('local', self.resultCb.res(res, callback).cb)(req, res, next);
+    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+     await passport.authenticate('local', self.resultCb.res(res,next,callback).cb)(req, res, next);
     }
   }
   // helper

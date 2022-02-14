@@ -10,54 +10,46 @@ class DefaultController {
   static async createInstance(svcName) {
     return await Promise.resolve(new DefaultController(svcName));
   }
-  ToList(self) {
-    return (req, res, next) => {
-      self.db.Tolist(20, 0)
-        .then((items) => self.sendJson(items, 200, res), (err) => next(err))
-        .catch((err) => next(err));
+  ToList(self=this) {
+    return async (req, res, next)=>{
+      let items =  await self.db.Tolist(20, 0);
+      res.json({success:true, items:items})
     }
   }
   create(self) {
-    return (req, res, next) => {
-      self.db.create(...req.body).then((item) => {
+    return async (req, res, next) => {
+     let item = await self.db.create(...req.body);
         console.log('document Created :', item);
-        self.sendJson({ id: item.id }, 201, res)
-      }, (err) => next(err))
-        .catch((err) => next(err));
+        res.json({ success:true, id: item.id });
     }
   }
 
 
   getById(self) {
-    return (req, res, next) => {
-      self.db.getById(req.params.id)
-        .then((item) => self.sendJson(item, 200, res), (err) => next(err))
-        .catch((err) => next(err));
+    return async (req, res, next) => {
+     let item = await self.db.getById(req.params.id);
+        res.json({success:true,item:item})
     }
   }
 
   patch(self) {
-    return (req, res, next) => {
-      self.db.patchById(req.params.Id, ...req.body)
-        .then(() => self.sendJson({ "status": "OK" }, 204, res), (err) => next(err))
-        .catch((err) => next(err));
-
+    return async (req, res, next) => {
+     await self.db.patchById(req.params.Id, ...req.body);
+        self.sendJson({ "status": "OK" }, 204, res);
     }
   }
 
   put(self) {
-    return (req, res, next) => {
-      self.putById(req.params.Id, ...req.body)
-        .then(() => self.sendJson({ "status": "OK" }, 204, res), (err) => next(err))
-        .catch((err) => next(err));
+    return async (req, res, next) => {
+      await self.putById(req.params.Id, ...req.body);
+        self.sendJson({ "status": "OK" }, 204, res);
     }
   }
 
   remove(self) {
-    return (req, res, next) => {
-      self.db.deleteById(req.params.id)
-        .then(() => self.sendJson({ "status": "OK" }, 204, res), (err) => next(err))
-        .catch((err) => next(err));
+    return async (req, res, next) => {
+      await self.db.deleteById(req.params.id);
+        self.sendJson({ "status": "OK" }, 204, res);
     }
   }
 
@@ -71,7 +63,22 @@ class DefaultController {
     res.status(status).json(obj);
   }
 
-
+  resultCb ={
+    res:(res,next,callback)=>{
+       return {
+         cb:(err, obj)=> {
+            if (err)
+              //res.json({ success: false, message: 'operation Unsuccessful!', err: err })
+              next(err)
+            else if (obj) {
+              typeof callback ==='function'? callback(obj) : res.json({ success: true, message: 'operation Successful!' })
+            }
+            else if(!err && !obj) {
+              res.json({ success: false, message: 'operation Unsuccessful!', err: 'error' })
+            }   
+          }    
+       }
+  }}
 }
 
 exports.DefaultController = DefaultController;
