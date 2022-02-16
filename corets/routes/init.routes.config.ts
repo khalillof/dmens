@@ -3,8 +3,8 @@ import {printRoutesToString } from '../common/customTypes/types.config';
 import { AuthRoutes } from './auth.routes.config';
 import { UsersRoutes } from './users.routes.config';
 const path = require('path');
-const { appRouter} = require('../../corejs/common/customTypes/types.config');
-
+import { appRouter} from '../common/customTypes/types.config';
+import { DefaultRoutesConfig} from '../routes/default.routes.config';
 
 function IndexRoutes() {
   let index = {
@@ -20,7 +20,7 @@ function IndexRoutes() {
 export async function initCustomRoutes(callback?:any){
     // index routes
     IndexRoutes();
-
+    await DefaultRoutesConfig.createInstancesWithDefault().then(async ()=>{
     await UsersRoutes().then(async () => {
         await AuthRoutes().then(()=>{
             if (typeof callback === 'function') {
@@ -29,5 +29,6 @@ export async function initCustomRoutes(callback?:any){
             // print routes 
             printRoutesToString()
         });
-    })
+    });
+  });
 }

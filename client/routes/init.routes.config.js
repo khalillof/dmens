@@ -1,5 +1,5 @@
 "use strict";
-const  {initCustomRoutes} = require('../../corejs/routes/init.routes.config');
+const  {initCustomRoutes} = require('../../corejs/routes');
 const path = require('path');
 const { appRouter} = require('../../corejs/common/customTypes/types.config');
 

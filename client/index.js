@@ -7,4 +7,3 @@ setTimeout(async()=>{
  await initClientRoutes()
   }, 500)
   
-require('../corejs/bin/www').server

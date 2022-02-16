@@ -4,8 +4,8 @@ const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
 const { dbStore} = require('../common/customTypes/types.config');
 const {PassportStrategies} = require('../auth/services/strategies');
-const {DefaultRoutesConfig} = require('../routes/default.routes.config')
-const {DefaultController} = require('../controllers/default.controller')
+const {DefaultRoutesConfig} = require('../routes')
+const {DefaultController} = require('../controllers')
 class JsonModel {
 
   constructor(jsonSchema, callback = null) {
@@ -28,10 +28,7 @@ class JsonModel {
         // assign
         this.model = User;
     } else {
-        this.model = mongoose.model(this.name, this.schema);
-        // add routes
-       new DefaultRoutesConfig(this.name, new DefaultController(this.name));
-        
+        this.model = mongoose.model(this.name, this.schema);  
     }
     
   }else if(typeof callback === 'function') {
@@ -43,9 +40,10 @@ class JsonModel {
     console.log("added ( " + this.name + " ) to DbStore :");
   }
 
-  static async createInstance(jsonModel, callback) {
-    let dbb = new JsonModel(jsonModel, callback);
-    return await Promise.resolve(dbb);
+  static async createInstance(json_schema, callback) {
+    let DB = new JsonModel(json_schema, callback);
+     // add routes
+    return await Promise.resolve(DB);
   }
 
   async create(obj) {
@@ -55,7 +53,7 @@ class JsonModel {
     return await this.model.find(obj_query);
   }
   async getById(id) {
-    return await this.model.findOne({ _id: id });
+    return await this.model.findById(id);
   }
   async First(obj) {
     return await this.model.findOne(obj);

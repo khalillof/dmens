@@ -1,7 +1,7 @@
 "use strict";
 const { DefaultController } = require('./default.controller');
 const passport = require('passport');
-const { AuthService } = require('../auth/services/auth.service');
+const { AuthService } = require('../../auth/services/auth.service');
 
 
 class UsersController extends DefaultController {

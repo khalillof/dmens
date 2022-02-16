@@ -1,6 +1,7 @@
 "use strict";
 
 exports.config = {
+    port:process.env.PORT || 3000,
     auth:process.env.AUTH || true,
     secretKey: process.env.SECRET_KEY || '',
     jwtSecret:process.env.SECRET_KEY || '',

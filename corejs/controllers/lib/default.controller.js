@@ -1,5 +1,5 @@
 "use strict";
-const { dbStore } = require('../common/customTypes/types.config');
+const { dbStore } = require('../../common/customTypes/types.config');
 
 class DefaultController {
 
@@ -10,48 +10,40 @@ class DefaultController {
   static async createInstance(svcName) {
     return await Promise.resolve(new DefaultController(svcName));
   }
-  ToList(self=this) {
-    return async (req, res, next)=>{
-      let items =  await self.db.Tolist(20, 0);
+ 
+
+ async list (req, res, next){
+      let items =  await this.db.Tolist(20, 0);
       res.json({success:true, items:items})
-    }
+    
   }
-  create(self) {
-    return async (req, res, next) => {
-     let item = await self.db.create(...req.body);
+ async create(req, res, next){
+     let item = await this.db.create(...req.body);
         console.log('document Created :', item);
         res.json({ success:true, id: item.id });
-    }
   }
 
 
-  getById(self) {
-    return async (req, res, next) => {
-     let item = await self.db.getById(req.params.id);
-        res.json({success:true,item:item})
-    }
+ async getById(req, res, next){
+     let item = await this.db.getById(req.params.id);
+        res.json({success:true,item: item || {}})  
   }
 
-  patch(self) {
-    return async (req, res, next) => {
-     await self.db.patchById(req.params.Id, ...req.body);
-        self.sendJson({ "status": "OK" }, 204, res);
-    }
+ async patch(req, res, next){
+     await this.db.patchById(req.params.Id, ...req.body);
+        this.sendJson({ "status": "OK" }, 204, res);
   }
 
-  put(self) {
-    return async (req, res, next) => {
-      await self.putById(req.params.Id, ...req.body);
-        self.sendJson({ "status": "OK" }, 204, res);
-    }
+ async put(req, res, next){
+      await this.putById(req.params.Id, ...req.body);
+        this.sendJson({ "status": "OK" }, 204, res);
   }
 
-  remove(self) {
-    return async (req, res, next) => {
-      await self.db.deleteById(req.params.id);
-        self.sendJson({ "status": "OK" }, 204, res);
+ async remove(req, res, next){
+      await this.db.deleteById(req.params.id);
+        this.sendJson({ "status": "OK" }, 204, res);
     }
-  }
+  
 
   ////// helpers
   extractId(req, res, next) {

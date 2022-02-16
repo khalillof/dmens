@@ -14,7 +14,7 @@ const  helmet = require('helmet');
 const {config} = require('./bin/config');
 const  {dbInit} = require('./common/services/mongoose.service');
 const {appRouter}  = require('./common/customTypes/types.config');
-const  {initCustomRoutes} = require('./routes/init.routes.config');
+const  {initCustomRoutes} = require('./routes');
 const passport = require('passport');
 
 
@@ -104,3 +104,6 @@ setTimeout(async()=>{
   });
 
 exports.app = app;
+app.listen(config.port, ()=>{
+  console.log('server is running on port: '+config.port)
+})

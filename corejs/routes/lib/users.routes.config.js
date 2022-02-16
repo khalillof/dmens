@@ -1,7 +1,7 @@
 "use strict";
-const {UsersController} = require('../controllers/users.controller');
+const {UsersController} = require('../../controllers');
 const {DefaultRoutesConfig } = require('./default.routes.config');
-const {AuthService} = require('../auth/services/auth.service')
+const {AuthService} = require('../../auth/services/auth.service')
 
  async function UsersRoutes(){
 
@@ -41,7 +41,7 @@ const {AuthService} = require('../auth/services/auth.service')
                self.cors,self.corsWithOption, 
                self.UsersMWare.verifyUser,
                self.UsersMWare.verifyUserIsAdmin,
-            self.controller.ToList(self.controller)); 
+            self.actions('list')); 
 
         self.router.get('/users/checkJWTtoken',
         self.corsWithOption,
@@ -51,11 +51,11 @@ const {AuthService} = require('../auth/services/auth.service')
         self.router.param('id', self.UsersMWare.extractUserId);
        
         self.router.all('/users/id',self.UsersMWare.validateUserExists(self.UsersMWare.controller));
-        self.router.get('/users/id',self.controller.getById(self.controller));
-        self.router.delete('/users/id',self.controller.remove(self.controller));
+        self.router.get('/users/id',self.actions('getById'));
+        self.router.delete('/users/id',self.actions('remove'));
         self.router.put('/users/id',
             self.UsersMWare.validateSameEmailBelongToSameUser(self.UsersMWare.controller),
-            self.controller.put(self.controller)); 
+            self.actions('put')); 
 });
 
 }

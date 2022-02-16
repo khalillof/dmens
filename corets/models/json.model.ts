@@ -29,10 +29,7 @@ export class JsonModel {
         // assign
         this.model = User;
     } else {
-        this.model = mongoose.model(this.name, this.schema);
-        // add routes
-       new DefaultRoutesConfig(this.name, new DefaultController(this.name));
-        
+        this.model = mongoose.model(this.name, this.schema);       
     }
     
   }else if(typeof callback === 'function') {

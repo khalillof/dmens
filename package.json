@@ -7,7 +7,7 @@
     "test": "karma start",
     "clean": "rm ./build",
     "dev": "node ./build/bin/www.js",
-    "core": "node ./corejs/bin/www.js",
+    "core": "node ./corejs/app.js",
     "client": "node ./client/index.js",
     "bu": "node ./build/bin/www.js",
     "start": "tsc && webpack --mode production && node ./build/bin/www.js",

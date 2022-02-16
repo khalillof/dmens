@@ -1,6 +1,6 @@
 "use strict";
 const { AuthService } = require('../../auth/services/auth.service');
-const { UsersController } = require('../../controllers/users.controller');
+const { UsersController } = require('../../controllers/');
 
 class UsersMiddleware {
 
