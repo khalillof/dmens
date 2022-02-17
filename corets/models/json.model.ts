@@ -4,8 +4,6 @@ import {JsonSchema, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import {PassportStrategies} from '../auth/services/strategies' ;
-import {DefaultRoutesConfig} from '../routes/default.routes.config';
-import {DefaultController} from '../controllers/default.controller';
 
 export class JsonModel {
 

@@ -20,6 +20,6 @@
         ],
         "inlineSourceMap": true
     },
-    "include": ["corets/**/*.ts", "corets/**/*.json", "./tests/**/*.ts"],
+    "include": ["corets/**/*.ts","corets/**/*.js", "corets/**/*.json", "./tests/**/*.ts"],
     "exclude": ["node_modules", ".vscode", "un_wanted", "client", "corejs", "build"]
 }

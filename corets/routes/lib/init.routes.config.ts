@@ -1,10 +1,9 @@
 "use strict";
-import {printRoutesToString } from '../common/customTypes/types.config';
+import {printRoutesToString, appRouter} from '../../common/customTypes/types.config';
 import { AuthRoutes } from './auth.routes.config';
 import { UsersRoutes } from './users.routes.config';
 const path = require('path');
-import { appRouter} from '../common/customTypes/types.config';
-import { DefaultRoutesConfig} from '../routes/default.routes.config';
+import { DefaultRoutesConfig} from './default.routes.config';
 
 function IndexRoutes() {
   let index = {

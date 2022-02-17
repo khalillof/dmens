@@ -1,5 +1,5 @@
 
-import {AuthController} from '../controllers/auth.controller';
+import {AuthController} from '../../controllers';
 import {DefaultRoutesConfig} from './default.routes.config'
 //app, '/auth',  AuthController
 export async function AuthRoutes(){

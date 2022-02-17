@@ -1,5 +1,5 @@
 import express from 'express';
-const { dbStore } = require('../common/customTypes/types.config');
+import { dbStore } from '../../common/customTypes/types.config';
 
 export class DefaultController{
     db:any;
@@ -12,45 +12,34 @@ export class DefaultController{
       return await Promise.resolve(new DefaultController(svcName));
     }
 
-  ToList(self:any) {
-      return async (req: express.Request, res: express.Response, next:express.NextFunction)=> {
-        let items =  await self.db.Tolist(20, 0);
+ async list(req: express.Request, res: express.Response, next:express.NextFunction){
+        let items =  await this.db.Tolist(20, 0);
         res.json({success:true, items:items})       
-    }
   }
 
-    getById(self:any) {
-      return async(req: express.Request, res: express.Response, next:express.NextFunction)=> {
-        let item = await self.db.getById(req.params.id);
+  async  getById(req: express.Request, res: express.Response, next:express.NextFunction){
+        let item = await this.db.getById(req.params.id);
         res.json({success:true,item:item})
-      }
     }
 
-    create (self:any) {
-      return async (req: express.Request, res: express.Response, next:express.NextFunction)=>{
-        let item = await self.db.create(...req.body);
+   async create (req: express.Request, res: express.Response, next:express.NextFunction){
+        let item = await this.db.create(...req.body);
         console.log('document Created :', item);
         res.json({ success:true, id: item.id });
-    }}
-
-    patch(self:any) {
-      return async(req: express.Request, res: express.Response, next:express.NextFunction)=> {
-        await self.db.patchById(req.params.Id, ...req.body);
-        self.sendJson({ "status": "OK" }, 204, res);
-      }
     }
 
-    put(self:any) {
-      return async(req: express.Request, res: express.Response, next:express.NextFunction)=> {
-        await self.putById(req.params.Id, ...req.body);
-        self.sendJson({ "status": "OK" }, 204, res);
+  async  patch(req: express.Request, res: express.Response, next:express.NextFunction){
+        await this.db.patchById(req.params.Id, ...req.body);
+        this.sendJson({ "status": "OK" }, 204, res);
     }
+
+   async put(req: express.Request, res: express.Response, next:express.NextFunction){
+        await this.db.putById(req.params.Id, ...req.body);
+        this.sendJson({ "status": "OK" }, 204, res);
   }
-    remove(self:any) {
-      return async(req: express.Request, res: express.Response, next:express.NextFunction)=> {
-        await self.db.deleteById(req.params.id);
-        self.sendJson({ "status": "OK" }, 204, res);
-    }
+   async remove(req: express.Request, res: express.Response, next:express.NextFunction){
+        await this.db.deleteById(req.params.id);
+        this.sendJson({ "status": "OK" }, 204, res);
   }
     ////// helpers
     extractId(req: express.Request, res: express.Response, next: express.NextFunction) {

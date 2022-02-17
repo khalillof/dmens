@@ -1,7 +1,7 @@
 import express from 'express';
 import { DefaultController } from './default.controller'
 import passport from 'passport';
-import { AuthService } from '../auth/services/auth.service'
+import { AuthService } from '../../auth/services/auth.service'
 
 export class UsersController extends DefaultController {
 

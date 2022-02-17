@@ -6,13 +6,13 @@ const session = require('express-session');
 //import * as http from 'http';
 // import createError from 'http-errors';
 var path = require('path');
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
+//import * as winston from 'winston';
+//import * as expressWinston from 'express-winston';
 import helmet from 'helmet';
 import {config} from './bin/config';
 import {dbInit} from './common/services/mongoose.service';
 import {appRouter} from './common/customTypes/types.config'
-import { initCustomRoutes } from './routes/init.routes.config';
+import { initCustomRoutes } from './routes';
 import passport from 'passport';
 
 

@@ -56,10 +56,7 @@ class DefaultRoutesConfig {
     this.router.post(this.routeName, this.corsWithOption, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('create'))
     this.router.put(this.routeParam, this.corsWithOption, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('put'))
     this.router.delete(this.routeParam, this.corsWithOption, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('remove'));
-    this.router.param('id', async (req,res,next, id)=>{
-              Assert.string(id, {required:true, notEmpty:true});
-              next()
-    });
+    this.router.param('id', async (req,res,next, id)=>{ Assert.string(id, {required:true, notEmpty:true}); next()});
     
 
   }
