@@ -15,6 +15,5 @@
         "type": "ObjectId",
         "ref": "User"
     }
-},
-"model":{}
+}
 }

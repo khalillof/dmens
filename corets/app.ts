@@ -6,8 +6,9 @@ const session = require('express-session');
 //import * as http from 'http';
 // import createError from 'http-errors';
 var path = require('path');
-//import * as winston from 'winston';
-//import * as expressWinston from 'express-winston';
+import morgan from 'morgan';
+
+
 import helmet from 'helmet';
 import {config} from './bin/config';
 import {dbInit} from './common/services/mongoose.service';
@@ -26,7 +27,10 @@ app.use(compression())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
+// static urls
+['../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(__dirname, url))));
+
 
 
 // connect to db and initialise db models then
@@ -48,29 +52,10 @@ app.set('view engine', 'pug');
   });
   })(app);
 
-
-
-// static urls
-function staticUrl(url:string[]) {
-  return url.map((e) => path.join(__dirname, e)).forEach((url) => app.use(express.static(url)))
-}
-staticUrl(['../public/coming_soon', '../public/angular', '../public/reactjs']);
-
-
 app.use(helmet({
   contentSecurityPolicy: false
 }));
-/*
-app.use(expressWinston.logger({
-  transports: [
-    new winston.transports.Console()
-  ], 
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.json()
-  )
-}));
-*/
+
 setTimeout(async()=>{
   // register routes
   app.use('/', appRouter);
@@ -79,25 +64,31 @@ setTimeout(async()=>{
  await initCustomRoutes()
   }, 500)
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
+  if (app.get('env') === 'development') {
+    console.log('development server')
+    // request handellar ==================================
+   // using a predefined format string
+  app.use(morgan('dev')) // dev|common|combined|short|tiny
+
+     // development error handler ===============================
+  // will print stacktrace
+    app.use(function(err:any, req:any, res:any, next:any) {
+      res.status(err.status || 500);
+      console.error(err.stack)
+      res.json({ error: err });
+    });
+  }else{
+    console.log('production server')
+    // request looger using a predefined format string
+   app.use(morgan('common')) // dev|common|combined|short|tiny
+
+      // production error handler
+  // no stacktraces leaked to user
   app.use(function(err:any, req:any, res:any, next:any) {
     res.status(err.status || 500);
-    console.error(err.stack);
-    res.json({ error: err });
+    console.error(err.stack)
+    res.json({ error: 'Something broke!' });
   });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err:any, req:any, res:any, next:any) {
-  res.status(err.status || 500);
-  console.error(err.stack);
-  res.json({ error: 'Something broke!' });
-});
-
-exports.app = app;
-
+  }
 
 export default app;

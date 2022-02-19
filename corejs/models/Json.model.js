@@ -1,22 +1,21 @@
 "use strict";
-const mongoose = require("mongoose");
+const { model,Schema} = require("mongoose");
 const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
 const { dbStore} = require('../common/customTypes/types.config');
 const {PassportStrategies} = require('../auth/services/strategies');
-const {DefaultRoutesConfig} = require('../routes')
-const {DefaultController} = require('../controllers')
+
 class JsonModel {
 
   constructor(jsonSchema, callback = null) {
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
-    this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true }); 
+    this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
     if (this.name === 'user') {
       
         this.schema.plugin(passportLocalMongoose);
-        const User = mongoose.model(this.name, this.schema);         
+        const User = model(this.name, this.schema);         
         //passport.use(new Strategy(User.authenticate()));
         passport.use(User.createStrategy());
         passport.serializeUser(User.serializeUser());
@@ -28,7 +27,7 @@ class JsonModel {
         // assign
         this.model = User;
     } else {
-        this.model = mongoose.model(this.name, this.schema);  
+        this.model = model(this.name, this.schema);  
     }
     
   }else if(typeof callback === 'function') {

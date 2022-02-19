@@ -1,7 +1,7 @@
 "use strict";
 const path = require('path');
 const fs = require('fs');
-const mongoose = require('mongoose');
+const { SchemaTypes} = require('mongoose');
 const { JsonModel } = require('./json.model');
 
 class JsonLoad {
@@ -40,7 +40,13 @@ class JsonLoad {
             return await this.makeSchema(jsobj, schema_only);
 
         } else {
-            throw new Error('file should be json and absolute')
+            // handel dirNames within files
+            if(path.dirname(filePath)){
+                console.log(' found dir name in : '+path.dirname(filePath))
+               await this.loadDirectory(filePath)
+            }else{
+            throw new Error('file should be json and absolute'+ filePath)
+            }
         }
     }
 
@@ -59,14 +65,13 @@ class JsonLoad {
     async makeSchema(jschema, schema_only = false) {
         // convert json type to mongoose schema type
         Object.entries(jschema.schema).forEach((item) => {
-            this.recursiveSearch(item);
-        })
-        if (schema_only) {
-            return jschema;
-        }
+            this.deepSearch(item);
+        });
+
         // finally return new jsonModel
-        return await JsonModel.createInstance(jschema);
+        return schema_only ? jschema : await JsonModel.createInstance(jschema);
     }
+
     typeMappings = {
         "String": String,
         "string": String,
@@ -74,20 +79,63 @@ class JsonLoad {
         "number": Number,
         "Boolean": Boolean,
         "boolean": Boolean,
-        "_id": mongoose.Schema.Types.ObjectId,
-        "id": mongoose.Schema.Types.ObjectId,
-        "ObjectId": mongoose.Schema.Types.ObjectId,
-        "objectId": mongoose.Schema.Types.ObjectId,
-        "Date": Date.now().toString(),
-        "date": Date.now().toString(),
+        "_id": SchemaTypes.ObjectId,
+        "id": SchemaTypes.ObjectId,
+        "ObjectId": SchemaTypes.ObjectId,
+        "objectid": SchemaTypes.ObjectId,
+        "Date": SchemaTypes.Date,
+        "date": SchemaTypes.Date,
+        "Binary": SchemaTypes.Buffer,
+        "binary": SchemaTypes.Buffer,
+        "documentArray": SchemaTypes.DocumentArray,
+        "documentarray": SchemaTypes.DocumentArray,
+        "subDocument": SchemaTypes.Subdocument,
+        "subdocument": SchemaTypes.Subdocument,
+        "mixed": SchemaTypes.Mixed,
+        "Mixed": SchemaTypes.Mixed,
+        "decimal": SchemaTypes.Decimal128,
+        "Decimal": SchemaTypes.Decimal128,
+        "array": SchemaTypes.Array,
+        "Array": SchemaTypes.Array,
+        "ofString": [String],
+        "ofstring": [String],
+        "ofNumber": [Number],
+        "ofnumber": [Number],
+        "ofDates": [Date],
+        "ofdates": [Date],
+        "ofBuffer": [Buffer],
+        "ofbuffer": [Buffer],
+        "ofBoolean": [Boolean],
+        "ofboolean": [Boolean],
+        "ofMixed": [SchemaTypes.Mixed],
+        "ofmixed": [SchemaTypes.Mixed],
+        "ofObjectId": [SchemaTypes.ObjectId],
+        "ofobjectId": [SchemaTypes.ObjectId],
+        "ofArrays": [SchemaTypes.Array],
+        "ofarrays": [SchemaTypes.Array],
+        "ofArrayOfNumbers": [[Number]],
+        "ofarrayofNumbers": [[Number]],
+        "map": Map,
+        "Map": Map,
+        "mapOfString": { type: Map, of: String },
+        "mapofstring": { type: Map, of: String }
+    }
+
+    validateSchema(json_schema) {
+        // _schema.eachPath((_path, _type)=>{ if(_schema.path(mapKey) instanceof mongoose.SchemaType)}) 
+        for (let [itemKey, itemValue] of Object.entries(json_schema.schema))
+            if (!itemKey instanceof mongoose.SchemaType) {
+                this.deepSearch({ itemKey: itemValue })
+                if (!itemKey instanceof mongoose.SchemaType)
+                    throw new Error('unvalid schema type :' + itemKey)
+            }
     }
     // search item in object and map to mongoose schema
-    recursiveSearch(item) {
+    deepSearch(item) {
         // types mapping
-
         for (let [itemKey, itemValue] of Object.entries(item)) {
             if (typeof itemValue === "object") {
-                this.recursiveSearch(itemValue)
+                this.deepSearch(itemValue)
             } else {
                 for (const [mapKey, mapValue] of Object.entries(this.typeMappings)) {
                     if (itemValue === mapKey) {

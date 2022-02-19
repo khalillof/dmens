@@ -1,57 +1,74 @@
 import { UsersController } from '../../controllers';
 import { DefaultRoutesConfig } from './default.routes.config';
-import{AuthService} from '../../auth/services/auth.service';
+import { AuthService } from '../../auth/services/auth.service';
+import path from 'path';
+import multer from 'multer';
+
+const upload = multer({
+    dest: path.resolve(__dirname,'../../models/schema/uploads'),
+    limits: { fieldNameSize: 30, fieldSize: 1048576, fields: 0, fileSize: 1048576, files: 1, headerPairs: 20 },
+    fileFilter: (req, file, cb) => file.mimetype === 'application/json' && path.extname(file.originalname) === '.json' ? cb(null, true) : cb(null, false),
+    storage: multer.diskStorage(
+        {
+            destination: (req, file, cb) => cb(null,path.resolve(__dirname, '../../models/schema/uploads')),
+            filename: (req, file, cb) => cb(null, file.fieldname + '.' + Date.now() + path.extname(file.originalname)) 
+        })
+});
+
 
 export async function UsersRoutes() {
-    return await DefaultRoutesConfig.instance('/users', await UsersController.createInstance(), 
-    function(self:DefaultRoutesConfig){
-              
-        self.router.post('/users/signup',
-            self.corsWithOption,
-            self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.signup(self.controller)
-            );
-        
-        self.router.post('/users/login',
-            self.corsWithOption,
-            self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.login(self.controller)
+    return await DefaultRoutesConfig.instance('/users', await UsersController.createInstance(),
+        function (self: DefaultRoutesConfig) {
+            self.router.all('/users', self.corsWithOption);
+            self.router.post('/users/signup',
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.actions('signup')
             );
 
-        self.router.get('/users/logout',
-            self.corsWithOption,
-            self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.logout
+            self.router.post('/users/login',
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.actions('login')
             );
 
-            self.router.get('/users/profile',
-            self.corsWithOption,
-            AuthService.authenticateUser,
-            self.controller.profile);
+            self.router.get('/users/logout',
+                self.UsersMWare.validateRequiredUserBodyFields,
+                self.actions('logout')
+            );
 
-        self.router.get('/facebook/token',
-                self.corsWithOption,
-                AuthService.authenticateFacebook,
-                self.controller.facebook);
+            self.router.post('/users/schema',
+                (req, res, next) => {
 
-        self.router.get('/users',
-               self.cors,self.corsWithOption, 
-               self.UsersMWare.verifyUser,
-               self.UsersMWare.verifyUserIsAdmin,
-            self.actions('list')); 
+                    let content = req.header('content-type');
 
-        self.router.get('/users/checkJWTtoken',
-        self.corsWithOption,
-        self.controller.checkJWTtoken(self.controller)
-        );
+                    if (content === 'application/json') { //if(content.startsWith('multipart/form-data'))
+                        let content = req.body;
+                        req.body = {};
+                        req.body.json = content;
+                        self.actions('schema')(req, res, next)
+                    } else {
+                        next()
+                    }
+                },
+                upload.single('schema'), self.actions('schema')
+            );
 
-        self.router.param('id', self.UsersMWare.extractUserId);
-       
-        self.router.all('/users/id',self.UsersMWare.validateUserExists(self.UsersMWare.controller));
-        self.router.get('/users/id',self.actions('getById'));
-        self.router.delete('/users/id',self.actions('remove'));
-        self.router.put('/users/id',
-            self.UsersMWare.validateSameEmailBelongToSameUser(self.UsersMWare.controller),
-            self.actions('put')); 
-});
+            self.router.get('/users/profile', AuthService.authenticateUser, self.actions('profile'));
+
+            self.router.get('/facebook/token', AuthService.authenticateFacebook, self.actions('facebook'));
+
+            self.router.get('/users', self.UsersMWare.verifyUser, self.UsersMWare.verifyUserIsAdmin, self.actions('list'));
+
+            self.router.get('/users/checkJWTtoken',
+                self.actions('checkJWTtoken')
+            );
+
+            self.router.param('id', self.UsersMWare.extractUserId);
+
+            self.router.all('/users/id', self.UsersMWare.validateUserExists(self.UsersMWare.controller));
+            self.router.get('/users/id', self.actions('getById'));
+            self.router.delete('/users/id', self.actions('remove'));
+            self.router.put('/users/id',
+                self.UsersMWare.validateSameEmailBelongToSameUser(self.UsersMWare.controller),
+                self.actions('put'));
+        });
 }

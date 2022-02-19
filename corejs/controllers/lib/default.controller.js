@@ -1,6 +1,6 @@
 "use strict";
 const { dbStore } = require('../../common/customTypes/types.config');
-
+const { Assert, AssertionError} = require('../../common/customTypes/assert');
 class DefaultController {
 
   constructor(name) {
@@ -59,14 +59,17 @@ class DefaultController {
     res:(res,next,callback)=>{
        return {
          cb:(err, obj)=> {
-            if (err)
+            if (err){
+              if (err instanceof AssertionError) {
+                res.json({ success: false, error: err})
+              } 
               //res.json({ success: false, message: 'operation Unsuccessful!', err: err })
               next(err)
-            else if (obj) {
+            }else if (obj) {
               typeof callback ==='function'? callback(obj) : res.json({ success: true, message: 'operation Successful!' })
             }
             else if(!err && !obj) {
-              res.json({ success: false, message: 'operation Unsuccessful!', err: 'error' })
+              res.json({ success: false, message: 'operation Unsuccessful!', error: 'error' })
             }   
           }    
        }

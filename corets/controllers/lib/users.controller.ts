@@ -2,6 +2,8 @@ import express from 'express';
 import { DefaultController } from './default.controller'
 import passport from 'passport';
 import { AuthService } from '../../auth/services/auth.service'
+import fs from 'fs';
+import path from 'path'
 
 export class UsersController extends DefaultController {
 
@@ -14,35 +16,62 @@ export class UsersController extends DefaultController {
 
   signup(self: any) {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-     await self.db.model.register(req.body, req.body.password, self.resultCb.res(res, next).cb)
+      await self.db.model.register(req.body, req.body.password, self.resultCb.res(res, next).cb)
     }
   }
 
   login(self: any) {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
-    await  self.authenticateUser(self, (user:any)=>{
-        req.login(user, function(err){
-          if(err){
-            res.json({success: false, message: err})
-          }else{
-            const token =  AuthService.generateToken({ _id: user._id });
-            res.json({success:true, message:"Authentication successful", token: token });
+      await self.authenticateUser(self, (user: any) => {
+        req.login(user, function (err) {
+          if (err) {
+            res.json({ success: false, message: err })
+          } else {
+            const token = AuthService.generateToken({ _id: user._id });
+            res.json({ success: true, message: "Authentication successful", token: token });
           }
         })
       })(req, res, next);
-      
+
     }
   }
 
-  profile(req: express.Request, res: express.Response, next: express.NextFunction){
-      res.json({
-        message: 'You made it to the secure route',
-        user: req.user,
-        token: req.query.secret_token
-      })
+  profile(req: express.Request, res: express.Response, next: express.NextFunction) {
+    res.json({
+      message: 'You made it to the secure route',
+      user: req.user,
+      token: req.query.secret_token
+    })
   }
-  
+  async schema(req: express.Request, res: express.Response, next: express.NextFunction) {
+    
+    if (req.body.json) {
+      let filepath = path.resolve(__dirname, '../../models/schema/uploads/schema.' + Date.now() + '.json');
+
+      //stringify JSON Object
+      let jsonContent = JSON.stringify(req.body.json);
+
+      fs.writeFile(filepath, jsonContent,'utf8', function (err) {
+        if (err) {
+          console.log(err);
+          res.json({ success: false, message: 'operation faild' })
+        } else {
+          console.log('wrote new file to :' + filepath);
+          res.json({ success: true, message: 'operation successfull' })
+        }
+
+      });
+
+    }
+    else if (req.file) {
+      let file = req.file;
+      console.log("json file saved on :" + file.path);
+      res.json({ success: true, message: 'operation successfully executed' })
+    } else {
+      res.json({ success: false, message: 'operation unsuccessfull, expected json file' })
+    }
+  }
   updateUser(self: any) {
     return async (req: any, res: express.Response, next: express.NextFunction) => {
       if (req.isUnauthenticated()) {
@@ -52,7 +81,7 @@ export class UsersController extends DefaultController {
         let User = await self.db.model.findById(req.user._id);
         if (req.user.password !== req.body.password)
           await User.setPassword(req.body.password)
-        await User.save(req.body, self.resultCb.res(res,next).cb)
+        await User.save(req.body, self.resultCb.res(res, next).cb)
       }
     }
   }
@@ -74,15 +103,15 @@ export class UsersController extends DefaultController {
     }
   }
 
-  checkJWTtoken(self:this){
-    return async (req: express.Request, res: express.Response, next: express.NextFunction)=> {
-    await  passport.authenticate('jwt', { session: false }, self.resultCb.res(res,next ).cb)(req, res, next);
-  };
-}
+  checkJWTtoken(self: this) {
+    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      await passport.authenticate('jwt', { session: false }, self.resultCb.res(res, next).cb)(req, res, next);
+    };
+  }
 
   authenticateUser(self: this, callback?: any) {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-     await passport.authenticate('local', self.resultCb.res(res,next,callback).cb)(req, res, next);
+      await passport.authenticate('local', self.resultCb.res(res, next, callback).cb)(req, res, next);
     }
   }
   // helper

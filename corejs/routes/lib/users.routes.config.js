@@ -1,51 +1,69 @@
 "use strict";
 const {UsersController} = require('../../controllers');
 const {DefaultRoutesConfig } = require('./default.routes.config');
-const {AuthService} = require('../../auth/services/auth.service')
+const {AuthService} = require('../../auth/services/auth.service');
+const path = require('path');
+const multer  = require('multer');
+
+const upload = multer({
+  dest: path.resolve(__dirname,'../../models/schema/uploads'),
+  limits: { fieldNameSize: 30, fieldSize: 1048576, fields: 0, fileSize: 1048576, files: 1, headerPairs: 20 },
+  fileFilter: (req, file, cb) => file.mimetype === 'application/json' && path.extname(file.originalname) === '.json' ? cb(null, true) : cb(null, false),
+  storage: multer.diskStorage(
+      {
+          destination: (req, file, cb) => cb(null,path.resolve(__dirname, '../../models/schema/uploads')),
+          filename: (req, file, cb) => cb(null, file.fieldname + '.' + Date.now() + path.extname(file.originalname)) 
+      })
+});
+
 
  async function UsersRoutes(){
 
  return await  DefaultRoutesConfig.instance('/users', await UsersController.createInstance(), 
     
    function(self){
-              
+        self.router.all('/users',self.corsWithOption);
         self.router.post('/users/signup',
-            self.corsWithOption,
             self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.signup(self.controller)
+            self.actions('signup')
             );
         
         self.router.post('/users/login',
-            self.corsWithOption,
             self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.login(self.controller)
+            self.actions('login')
+            //self.controller.login(self.controller)
             );
 
         self.router.get('/users/logout',
-            self.corsWithOption,
             self.UsersMWare.validateRequiredUserBodyFields,
-            self.controller.logout
+            self.actions('logout')
             );
 
-            self.router.get('/users/profile',
-            self.corsWithOption,
-            AuthService.authenticateUser,
-            self.controller.profile);
+        self.router.post('/users/schema',
+        (req,res,next)=>{ 
+            
+            let content = req.header('content-type');
+            
+            if(content === 'application/json'){ //if(content.startsWith('multipart/form-data'))
+              let content = req.body;
+              req.body = {};
+              req.body.json = content;
+              self.actions('schema')(req,res,next)
+            }else{
+            next()
+            }
+        },
+        upload.single('schema'), self.actions('schema')
+        );
 
-        self.router.get('/facebook/token',
-                self.corsWithOption,
-                AuthService.authenticateFacebook,
-                self.controller.facebook);
+        self.router.get('/users/profile',AuthService.authenticateUser,self.actions('profile'));
 
-        self.router.get('/users',
-               self.cors,self.corsWithOption, 
-               self.UsersMWare.verifyUser,
-               self.UsersMWare.verifyUserIsAdmin,
-            self.actions('list')); 
+        self.router.get('/facebook/token',AuthService.authenticateFacebook,self.actions('facebook'));
+
+        self.router.get('/users',self.UsersMWare.verifyUser,self.UsersMWare.verifyUserIsAdmin,self.actions('list')); 
 
         self.router.get('/users/checkJWTtoken',
-        self.corsWithOption,
-        self.controller.checkJWTtoken(self.controller)
+        self.actions('checkJWTtoken')
         );
 
         self.router.param('id', self.UsersMWare.extractUserId);
@@ -61,3 +79,4 @@ const {AuthService} = require('../../auth/services/auth.service')
 }
 
 exports.UsersRoutes = UsersRoutes;
+

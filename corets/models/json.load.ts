@@ -42,7 +42,13 @@ export class JsonLoad {
             return await this.makeSchema(jsobj, schema_only);
 
         } else {
-            throw new Error('file should be json and absolute')
+            // handel dirNames within files
+            if(path.dirname(filePath)){
+                console.log(' found dir name in : '+path.dirname(filePath))
+               await this.loadDirectory(filePath)
+            }else{
+            throw new Error('file should be json and absolute'+ filePath)
+            }
         }
     }
 

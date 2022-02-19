@@ -3,9 +3,11 @@ const { AssertionError } = require('./assertionError')
 const util = require('util')
 var { Stream } = require('stream')
 
+
 const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
 const validTypes = [Number, String, Object, Array, Boolean, Function]
+const unsafe_string = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/; 
 
 function isObject (v) {
   return v && (typeof v === 'object') && !Array.isArray(v)
@@ -92,6 +94,15 @@ class Assert {
     if (value !== undefined) Assert.typeOf(value, String, message)
     if (value !== undefined && !value.trim().length && notEmpty) Assert.fail(value, 'Not empty string', message)
   }
+  static safeString(value, message=''){
+    Assert.string(value,{required:true, notEmpty:true})
+     if (unsafe_string.test(value)) Assert.fail(value, 'unsafe charecters detected ', message)
+     
+  }
+  static idString (value = '', len=25, message = '') {
+      Assert.safeString(value, message)
+    if (value.length > len) Assert.fail(value, 'id string is too long', message)
+  }
 
   static boolean (value, { required = false, message = '' } = {}) {
     if (required) Assert.typeOf(value, Boolean, message)
@@ -141,4 +152,4 @@ class Assert {
 
 
 // credit to https://github.com/zmts/supra-api-nodejs/tree/master/core/lib/assert
-module.exports = { Assert }
+module.exports = { Assert, AssertionError }

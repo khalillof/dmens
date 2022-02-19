@@ -2,10 +2,10 @@
 const { DefaultController } = require('./default.controller');
 const passport = require('passport');
 const { AuthService } = require('../../auth/services/auth.service');
-
+const fs = require('fs');
+const path = require('path');
 
 class UsersController extends DefaultController {
-
 
   constructor(svc) {
     super(svc)
@@ -14,15 +14,13 @@ class UsersController extends DefaultController {
     return await Promise.resolve(new UsersController('user'));
   }
 
-  signup(self) {
-    return (req, res, next) => {
-      self.db.model.register(req.body, req.body.password,self.resultCb.res(res,next).cb)
+ async signup(req, res, next){
+    await  this.db.model.register(req.body, req.body.password,this.resultCb.res(res,next).cb)
     }
-  }
+  
 
-  login(self=this){
-    return (req, res, next)=>{
-      self.authenticateUser(self, (user)=>{
+ async login(req, res, next){
+      this.authenticateUser((user)=>{
         req.login(user, function(err){
           if(err){
             res.json({success: false, message: err})
@@ -33,7 +31,7 @@ class UsersController extends DefaultController {
         })
       })(req, res, next);
   }
-}
+
 updateUser(self=this) {
   return async (req, res, next) => {
     if (req.isUnauthenticated()) {
@@ -55,6 +53,35 @@ updateUser(self=this) {
       })
     
   }
+
+  schema(req, res, next){
+    if (req.body.json) {
+      let filepath = path.resolve(__dirname, '../../models/schema/uploads/schema.' + Date.now() + '.json');
+
+      //stringify JSON Object
+      let jsonContent = JSON.stringify(req.body.json);
+
+      fs.writeFile(filepath, jsonContent,'utf8', function (err) {
+        if (err) {
+          console.log(err);
+          res.json({ success: false, message: 'operation faild' })
+        } else {
+          console.log('wrote new file to :' + filepath);
+          res.json({ success: true, message: 'operation successfull' })
+        }
+
+      });
+
+    }
+    else if (req.file) {
+      let file = req.file;
+      console.log("json file saved on :" + file.path);
+      res.json({ success: true, message: 'operation successfully executed' })
+    } else {
+      res.json({ success: false, message: 'operation unsuccessfull, expected json file' })
+    }
+  }
+
   logout(req, res, next){
       if (req.session) {
         req.session.destroy();
@@ -73,10 +100,8 @@ updateUser(self=this) {
     }
 
 
-  checkJWTtoken(self=this){
-    return(req, res, next)=>{
-      passport.authenticate('jwt', self.resultCb.res(res,next).cb)(req, res, next);
-    }
+ async checkJWTtoken(req, res, next){
+      passport.authenticate('jwt', this.resultCb.res(res,next).cb)(req, res, next);
   };
 
   // helper
@@ -84,9 +109,9 @@ updateUser(self=this) {
     return this.db.First({ email: email });
   }
 
-  authenticateUser(self=this, callback) {
+  authenticateUser(callback) {
     return (req, res, next) => {
-     passport.authenticate('local', self.resultCb.res(res,next,callback).cb)(req, res, next);
+     passport.authenticate('local', this.resultCb.res(res,next,callback).cb)(req, res, next);
     }
   }
   

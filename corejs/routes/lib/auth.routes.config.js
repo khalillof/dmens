@@ -6,15 +6,13 @@ async function AuthRoutes() {
     // add routes
     return await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(),
         function (self) {
-
+            self.router.all('/auth',self.corsWithOption);
             self.router.post('/auth',
-                self.corsWithOption,
                 self.UsersMWare.validateRequiredUserBodyFields,
                 self.controller.createJWT
             );
 
             self.router.post('/auth/refresh-token',
-                self.corsWithOption,
                 self.controller.jwtMWare.validJWTNeeded,
                 self.controller.jwtMWare.verifyRefreshBodyField,
                 self.controller.jwtMWare.validRefreshNeeded,
