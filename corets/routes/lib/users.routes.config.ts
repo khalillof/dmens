@@ -3,14 +3,14 @@ import { DefaultRoutesConfig } from './default.routes.config';
 import { AuthService } from '../../auth/services/auth.service';
 import path from 'path';
 import multer from 'multer';
-
+const upload_url = path.resolve(__dirname,'../../models/schema/uploads');
 const upload = multer({
-    dest: path.resolve(__dirname,'../../models/schema/uploads'),
+    dest: upload_url,
     limits: { fieldNameSize: 30, fieldSize: 1048576, fields: 0, fileSize: 1048576, files: 1, headerPairs: 20 },
     fileFilter: (req, file, cb) => file.mimetype === 'application/json' && path.extname(file.originalname) === '.json' ? cb(null, true) : cb(null, false),
     storage: multer.diskStorage(
         {
-            destination: (req, file, cb) => cb(null,path.resolve(__dirname, '../../models/schema/uploads')),
+            destination: (req, file, cb) => cb(null,upload_url),
             filename: (req, file, cb) => cb(null, file.fieldname + '.' + Date.now() + path.extname(file.originalname)) 
         })
 });
