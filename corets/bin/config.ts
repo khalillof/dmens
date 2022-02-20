@@ -1,19 +1,19 @@
-//require('dotenv').config()
+import {env} from 'process';
 
 export const config = {
-  auth:process.env.AUTH || true,
-  secretKey: process.env.SECRET_KEY || '',
-  jwtSecret:process.env.SECRET_KEY || '',
+  auth:env.AUTH || true,
+  secretKey: env.SECRET_KEY || '',
+  jwtSecret: env.SECRET_KEY || '',
   mongoUrl: {
-    'dev': process.env.DB_CONNECTION_DEV || '',
-    'local': process.env.DB_CONNECTION_LOCAL || '',
-    'prod': process.env.DB_CONNECTION_PROD || '',
-    'admin': process.env.DB_CONNECTION_ADMIN || '',
-    'cluster': process.env.DB_CONNECTION_CLUSTER || ''
+    'dev': env.DB_CONNECTION_DEV || '',
+    'local': env.DB_CONNECTION_LOCAL || '',
+    'prod': env.DB_CONNECTION_PROD || '',
+    'admin': env.DB_CONNECTION_ADMIN || '',
+    'cluster': env.DB_CONNECTION_CLUSTER || ''
   },
   facebook: {
-    'clientId': process.env.FACEBOOK_CLIENT_ID || '',
-    'clientSecret': process.env.FACEBOOK_CLIENT_SECRET || ''
+    'clientId': env.FACEBOOK_CLIENT_ID || '',
+    'clientSecret': env.FACEBOOK_CLIENT_SECRET || ''
   }
 
 }

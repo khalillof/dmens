@@ -1,25 +1,10 @@
 "use strict";
 const Cors = require('cors');
+const {env} = require('process');
 
-const whitelist = [
-'http://tuban.me', 'http://static.tuban.me', 'http://test.tuban.me', 'http://mobile.tuban.me',
-'https://tuban.me', 'https://static.tuban.me', 'https://test.tuban.me', 'https://mobile.tuban.me'
-];
+const whitelist = env.NODE_ENV === 'development'? env.CORES_DMAINS_DEV.split(',') : env.CORES_DMAINS_PROD.split(',');
 
-if (process.env.NODE_ENV === 'development'){
-  ['http://localhost:3000', 'https://localhost:3443', 'http://localhost:4200'].forEach(i=> whitelist.push(i))
-}
-var corsOptionsDelegate = (req, callback)=> {
-    var corsOptions;
-   // console.log(req.header('Origin'));
-    if(whitelist.indexOf(req.header('Origin')) !== -1) {
-        corsOptions = { origin: true };
-    }
-    else {
-        corsOptions = { origin: false };
-    }
-    callback(null, corsOptions);
-};
+const corsOptions = (req, callback)=> callback(null, {origin: whitelist.indexOf(req.header('Origin')) !== -1 ? true:false});
 
 exports.cors = Cors();
-exports.corsWithOptions = Cors(corsOptionsDelegate);
+exports.corsWithOptions = Cors(corsOptions);
