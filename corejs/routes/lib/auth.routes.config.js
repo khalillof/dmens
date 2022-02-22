@@ -1,6 +1,7 @@
 "use strict";
 const { DefaultRoutesConfig} = require('./default.routes.config');
 const {AuthController} = require('../../controllers')
+
 async function AuthRoutes() {
 
     // add routes

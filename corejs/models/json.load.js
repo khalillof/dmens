@@ -3,76 +3,86 @@ const path = require('path');
 const fs = require('fs');
 const { SchemaTypes} = require('mongoose');
 const { JsonModel } = require('./json.model');
+const { dbStore} = require('../common/customTypes/types.config');
 
 class JsonLoad {
 
-    constructor(directoryPath, filePath, callback) {
-        if (directoryPath) {
-            this.loadDirectory(directoryPath)
-        } else if (filePath && typeof callback === 'function') {
-            this.loadCustomFile(filePath, callback)
-        } else if (filePath && !callback) {
-            this.loadFile(filePath)
-        } else {
-            // load default json directory
-            this.loadDirectory(path.join(__dirname, './schema/'));
-        }
-    }
-    static async createInstance(directoryPath, filePath) {
-        return await Promise.resolve(new JsonLoad(directoryPath, filePath));
-    }
-    async loadCustomFile(filePath, callback) {
-        let sschema = await this.loadFile(filePath, true);
 
-        if (typeof callback === 'function') {
-            return await JsonModel.createInstance(sschema, callback)
-        }
-        return await JsonModel.createInstance(sschema);
+    static async isValidName(name){
+        if (!name) 
+         throw new Error(' schema name is required property')
+    
+      if (dbStore[name.toLowerCase()]) 
+       throw new Error('schema name already on db : '+name)
+     }
+
+     static async loadFromData(jsonData){
+    
+            if (typeof jsonData === 'string')
+               jsonData = JSON.parse(jsonData);
+           
+            JsonLoad.isValidName(jsonData.name)
+    
+            return await JsonLoad.makeSchema(jsonData); 
+     }
+
+   static async loadCustomFile(filePath, callback) {
+        let sschema = await JsonLoad.loadFile(filePath, true);
+    return  await JsonModel.createInstance(sschema, callback);
     }
-    async loadFile(filePath, schema_only = false) {
+
+   static async loadFile(filePath, schema_only = false) {
         if (path.isAbsolute(filePath) && path.extname(filePath) === '.json') {
 
             let data = await fs.promises.readFile(filePath, 'utf8');
             let jsobj = JSON.parse(data);
-            if (!jsobj.name) {
-                throw new Error(' jschema name is required property')
-            }
-            return await this.makeSchema(jsobj, schema_only);
+            JsonLoad.isValidName(jsobj.name)
+
+            return await JsonLoad.makeSchema(jsobj, schema_only);
 
         } else {
             // handel dirNames within files
             if(path.dirname(filePath)){
                 console.log(' found dir name in : '+path.dirname(filePath))
-               await this.loadDirectory(filePath)
+               await JsonLoad.loadDirectory(filePath)
             }else{
             throw new Error('file should be json and absolute'+ filePath)
             }
         }
     }
+   static async loadDefaultDirectory() {
+        return await JsonLoad.loadDirectory(path.join(__dirname, './schema/'));
+    }
 
-    async loadDirectory(_directory) {
+   static async loadDirectory(directory) {
         const result = [];
-        //  const _directory = directoryPath ? directoryPath : path.join(__dirname, './schema/');
 
-        for (const fileName of await fs.promises.readdir(_directory)) {
-            let _file = path.join(_directory, fileName);
-            result.push(await this.loadFile(_file));
+        if(path.dirname(directory)){
+            for (const fileName of await fs.promises.readdir(directory)) {
+                let _file = path.join(directory, fileName);
+                if(path.extname(_file) ==='.json'){
+                    result.push(await JsonLoad.loadFile(_file)); 
+                }
+               
+            }
+
+        }else{
+
+        throw new Error('directory Not Found : '+ directory)
         }
-        console.log('total Db models : ' + result.length);
+
         return result;
     }
 
-    async makeSchema(jschema, schema_only = false) {
+   static async makeSchema(jschema, schema_only = false) {
         // convert json type to mongoose schema type
-        Object.entries(jschema.schema).forEach((item) => {
-            this.deepSearch(item);
-        });
+        Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
 
         // finally return new jsonModel
         return schema_only ? jschema : await JsonModel.createInstance(jschema);
     }
 
-    typeMappings = {
+   static typeMappings = {
         "String": String,
         "string": String,
         "Number": Number,
@@ -121,7 +131,7 @@ class JsonLoad {
         "mapofstring": { type: Map, of: String }
     }
 
-    validateSchema(json_schema) {
+   static validateSchema(json_schema) {
         // _schema.eachPath((_path, _type)=>{ if(_schema.path(mapKey) instanceof mongoose.SchemaType)}) 
         for (let [itemKey, itemValue] of Object.entries(json_schema.schema))
             if (!itemKey instanceof mongoose.SchemaType) {
@@ -131,13 +141,13 @@ class JsonLoad {
             }
     }
     // search item in object and map to mongoose schema
-    deepSearch(item) {
+  static  deepSearch(item) {
         // types mapping
         for (let [itemKey, itemValue] of Object.entries(item)) {
             if (typeof itemValue === "object") {
-                this.deepSearch(itemValue)
+                JsonLoad.deepSearch(itemValue)
             } else {
-                for (const [mapKey, mapValue] of Object.entries(this.typeMappings)) {
+                for (const [mapKey, mapValue] of Object.entries(JsonLoad.typeMappings)) {
                     if (itemValue === mapKey) {
                         item[itemKey] = mapValue;
                     }

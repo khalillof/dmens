@@ -1,9 +1,10 @@
 "use strict";
 const { corsWithOptions } = require('./cors.config');
-const { routeStore, appRouter, dbStore, pluralizeRoute } = require('../../common/customTypes/types.config');
+const { routeStore, appRouter, dbStore, pluralizeRoute} = require('../../common/customTypes/types.config');
 const { DefaultController } = require('../../controllers/');
 const { UsersMiddleware } = require('../../users/middleware/users.middleware');
 const {Assert} = require('../../common/customTypes/assert');
+
 class DefaultRoutesConfig {
 
   constructor(rName, control, callback) {
@@ -23,6 +24,7 @@ class DefaultRoutesConfig {
     typeof callback === 'function' ? callback(this) : this.configureRoutes();
     // add instance to routeStore
     routeStore[this.routeName] = this;
+
     console.log('Added ( ' + this.routeName + ' ) to routeStore');
   }
 
@@ -31,9 +33,9 @@ class DefaultRoutesConfig {
     return await Promise.resolve(result);
   }
 
-  static async createInstancesWithDefault() {
-    Object.keys(dbStore).forEach(async name => name !== 'user' ? await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name)) : false)
-  }
+  static async createInstancesWithDefault(){
+    Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name))})
+}
 
   custumMiddleWare(rName) {
     if (rName) {
@@ -59,13 +61,12 @@ class DefaultRoutesConfig {
     
 
   }
-
+ 
   actions(name) {
       return async (req, res, next) => {
       return await this.controller[name](req, res, next);
     }
   }
-
 }
 
 

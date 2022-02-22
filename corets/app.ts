@@ -31,8 +31,6 @@ app.set('view engine', 'ejs');
 // static urls
 ['../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(__dirname, url))));
 
-
-
 // connect to db and initialise db models then
 (async (app)=>{
 

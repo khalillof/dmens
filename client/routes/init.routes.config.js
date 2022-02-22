@@ -1,5 +1,5 @@
 "use strict";
-const  {initCustomRoutes} = require('../../corejs/routes');
+const  {initRouteStore} = require('../../corejs/routes');
 const path = require('path');
 const { appRouter} = require('../../corejs/common/customTypes/types.config');
 
@@ -15,6 +15,6 @@ function IndexRoutes() {
     }
   }
 
-exports.initClientRoutes = async ()=>{
- return await  initCustomRoutes(IndexRoutes)
-}
+exports.IndexRoutes = IndexRoutes;
+
+initRouteStore.push(IndexRoutes)

@@ -2,8 +2,6 @@ import express from 'express';
 import { DefaultController } from './default.controller'
 import passport from 'passport';
 import { AuthService } from '../../auth/services/auth.service'
-import fs from 'fs';
-import path from 'path'
 
 export class UsersController extends DefaultController {
 
@@ -44,34 +42,7 @@ export class UsersController extends DefaultController {
       token: req.query.secret_token
     })
   }
-  async schema(req: express.Request, res: express.Response, next: express.NextFunction) {
-    
-    if (req.body.json) {
-      let filepath = path.resolve(__dirname, '../../models/schema/uploads/schema.' + Date.now() + '.json');
-
-      //stringify JSON Object
-      let jsonContent = JSON.stringify(req.body.json);
-
-      fs.writeFile(filepath, jsonContent,'utf8', function (err) {
-        if (err) {
-          console.log(err);
-          res.json({ success: false, message: 'operation faild' })
-        } else {
-          console.log('wrote new file to :' + filepath);
-          res.json({ success: true, message: 'operation successfull' })
-        }
-
-      });
-
-    }
-    else if (req.file) {
-      let file = req.file;
-      console.log("json file saved on :" + file.path);
-      res.json({ success: true, message: 'operation successfully executed' })
-    } else {
-      res.json({ success: false, message: 'operation unsuccessfull, expected json file' })
-    }
-  }
+ 
   updateUser(self: any) {
     return async (req: any, res: express.Response, next: express.NextFunction) => {
       if (req.isUnauthenticated()) {

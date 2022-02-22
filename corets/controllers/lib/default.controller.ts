@@ -1,3 +1,4 @@
+import AssertionError from '../../common/customTypes/assertionError';
 import express from 'express';
 import { dbStore } from '../../common/customTypes/types.config';
 
@@ -41,7 +42,21 @@ export class DefaultController{
         await this.db.deleteById(req.params.id);
         this.sendJson({ "status": "OK" }, 204, res);
   }
-    ////// helpers
+  ////// helpers ================================
+  async tryCatchRes(res: express.Response, funToFire:Function) {
+    try {
+      // fire only - res
+       await funToFire()
+    } catch (err:any) {
+      if (err instanceof AssertionError) {
+        console.error(err.stack)
+        res.json({ success: false, error: err.message })
+      } else {
+        console.error(err.stack);
+        res.json({ success: false, error: "operation faild error!!" })
+      }
+    }
+  }
     extractId(req: express.Request, res: express.Response, next: express.NextFunction) {
         req.body.id = req.params.id;
         next();

@@ -1,5 +1,5 @@
 "use strict";
-import mongoose, { Schema, Model} from 'mongoose';
+import mongoose from 'mongoose';
 import {JsonSchema, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
@@ -10,6 +10,11 @@ export class JsonModel {
   constructor(jsonSchema?:JsonSchema, callback?:any) {
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
+
+    if(dbStore[this.name]){
+      throw new Error('there is already model in this name : '+this.name)
+    }
+
     this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true }); 
 
     if (this.name === 'user') {

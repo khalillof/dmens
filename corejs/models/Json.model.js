@@ -10,6 +10,9 @@ class JsonModel {
   constructor(jsonSchema, callback = null) {
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
+    if(dbStore[this.name]){
+      throw new Error('there is already model in this name : '+this.name)
+    }
     this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
     if (this.name === 'user') {

@@ -1,9 +1,9 @@
 "use strict";
 
 const {app} = require('../corejs/app');
-const  {initClientRoutes} = require('./routes/init.routes.config');
+const  {IndexRoutes} = require('./routes/init.routes.config');
 
-setTimeout(async()=>{
- await initClientRoutes()
-  }, 500)
+//setTimeout(async()=>{
+// await initClientRoutes()
+ // }, 500)
   

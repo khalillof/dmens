@@ -61,6 +61,8 @@ exports.getDb =(url) =>{
 // routesStore
 exports.routeStore = {};
 
+
+
 exports.getCont = (url)=> {
     for (let d in exports.routeStore) {
         if (d !== '/' && url.match(d) || d === '/' && url === d) {

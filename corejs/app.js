@@ -13,8 +13,8 @@ const morgan  = require('morgan');
 const  helmet = require('helmet');
 const {config} = require('./bin/config');
 const  {dbInit} = require('./common/services/mongoose.service');
-const {appRouter}  = require('./common/customTypes/types.config');
-const  {initCustomRoutes} = require('./routes');
+const {printRoutesToString ,appRouter}  = require('./common/customTypes/types.config');
+const  {initRouteStore} = require('./routes');
 const passport = require('passport');
 
 
@@ -61,14 +61,16 @@ app.use(helmet({
 
 
 setTimeout(async()=>{
+
+ //await initCustomRoutes()
+ 
+ initRouteStore.forEach(async(rout)=> await rout());
   // register routes
   app.use('/', appRouter);
-  
-  // print routes
- await initCustomRoutes()
+  printRoutesToString()
   }, 500)
   
-  
+  setTimeout(printRoutesToString,1000);
  
   if (app.get('env') === 'development') {
     console.log('development server')
@@ -100,6 +102,4 @@ setTimeout(async()=>{
 
 
 exports.app = app;
-app.listen(config.port, ()=>{
-  console.log('server is running on port: '+config.port)
-})
+app.listen(config.port, ()=> console.log('server is running on port: '+config.port))

@@ -5,7 +5,6 @@ import UsersMiddleware from '../../users/middleware/users.middleware';
 import { DefaultController, IController } from '../../controllers/';
 import {Assert} from '../../common/customTypes/assert' ;
 
-
 export class DefaultRoutesConfig {
     router:express.Router;
     routeName: string;
@@ -33,7 +32,7 @@ export class DefaultRoutesConfig {
            
         // add instance to routeStore
         routeStore[this.routeName]=this;
-        console.log('Added ( '+this.routeName+' ) to routeStore');
+        console.log('Added ( ' +this.routeName+ ' ) to routeStore');
 
     }
      
@@ -42,8 +41,9 @@ export class DefaultRoutesConfig {
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(){
-          Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name))})
+          Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))})
     }
+
     custumMiddleWare(rName?:string) {
       if (rName) {
         this.routeName = rName;
@@ -69,6 +69,7 @@ export class DefaultRoutesConfig {
   
     }
   
+ 
     actions(name:string) {
         return async (req: express.Request, res:express.Response, next:express.NextFunction) => {
         return await this.controller[name](req, res, next);

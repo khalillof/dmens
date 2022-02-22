@@ -21,7 +21,7 @@ if (err) {
  }
  else{
   console.log("Successfully Connected to db!");
-   await JsonLoad.createInstance();
+  console.log('Numbers of models added to the database are :'+ (await JsonLoad.loadDefaultDirectory()).length);
  } 
 }); 
 

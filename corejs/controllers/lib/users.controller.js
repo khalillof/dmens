@@ -2,8 +2,6 @@
 const { DefaultController } = require('./default.controller');
 const passport = require('passport');
 const { AuthService } = require('../../auth/services/auth.service');
-const fs = require('fs');
-const path = require('path');
 
 class UsersController extends DefaultController {
 
@@ -52,34 +50,6 @@ updateUser(self=this) {
         token: req.query.secret_token
       })
     
-  }
-
-  schema(req, res, next){
-    if (req.body.json) {
-      let filepath = path.resolve(__dirname, '../../models/schema/uploads/schema.' + Date.now() + '.json');
-
-      //stringify JSON Object
-      let jsonContent = JSON.stringify(req.body.json);
-
-      fs.writeFile(filepath, jsonContent,'utf8', function (err) {
-        if (err) {
-          console.log(err);
-          res.json({ success: false, message: 'operation faild' })
-        } else {
-          console.log('wrote new file to :' + filepath);
-          res.json({ success: true, message: 'operation successfull' })
-        }
-
-      });
-
-    }
-    else if (req.file) {
-      let file = req.file;
-      console.log("json file saved on :" + file.path);
-      res.json({ success: true, message: 'operation successfully executed' })
-    } else {
-      res.json({ success: false, message: 'operation unsuccessfull, expected json file' })
-    }
   }
 
   logout(req, res, next){

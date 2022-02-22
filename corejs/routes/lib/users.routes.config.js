@@ -2,27 +2,12 @@
 const {UsersController} = require('../../controllers');
 const {DefaultRoutesConfig } = require('./default.routes.config');
 const {AuthService} = require('../../auth/services/auth.service');
-const path = require('path');
-const multer  = require('multer');
-const upload_url = path.resolve(__dirname,'../../models/schema/uploads');
-
-const upload = multer({
-  dest: upload_url,
-  limits: { fieldNameSize: 30, fieldSize: 1048576, fields: 0, fileSize: 1048576, files: 1, headerPairs: 20 },
-  fileFilter: (req, file, cb) => file.mimetype === 'application/json' && path.extname(file.originalname) === '.json' ? cb(null, true) : cb(null, false),
-  storage: multer.diskStorage(
-      {
-          destination: (req, file, cb) => cb(null,upload_url),
-          filename: (req, file, cb) => cb(null, file.fieldname + '.' + Date.now() + path.extname(file.originalname)) 
-      })
-});
-
 
  async function UsersRoutes(){
 
  return await  DefaultRoutesConfig.instance('/users', await UsersController.createInstance(), 
     
-   function(self){
+   (self)=>{
         self.router.all('/users',self.corsWithOption);
         self.router.post('/users/signup',
             self.UsersMWare.validateRequiredUserBodyFields,
@@ -39,23 +24,6 @@ const upload = multer({
             self.UsersMWare.validateRequiredUserBodyFields,
             self.actions('logout')
             );
-
-        self.router.post('/users/schema',
-        (req,res,next)=>{ 
-            
-            let content = req.header('content-type');
-            
-            if(content === 'application/json'){ //if(content.startsWith('multipart/form-data'))
-              let content = req.body;
-              req.body = {};
-              req.body.json = content;
-              self.actions('schema')(req,res,next)
-            }else{
-            next()
-            }
-        },
-        upload.single('schema'), self.actions('schema')
-        );
 
         self.router.get('/users/profile',AuthService.authenticateUser,self.actions('profile'));
 
@@ -78,6 +46,7 @@ const upload = multer({
 });
 
 }
+
 
 exports.UsersRoutes = UsersRoutes;
 

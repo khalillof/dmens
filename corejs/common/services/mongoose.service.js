@@ -2,6 +2,7 @@
 const mongoose =require('mongoose');
 const { config } =require('../../bin/config');
 const { JsonLoad }=require('../../models/json.load');
+
 /////////////////
 const dbOptions ={
       rejectUnauthorized: true,
@@ -21,7 +22,7 @@ async function dbConnect (dbURL, options){
      }
      else{
       console.log("Successfully Connected to db!");
-       await JsonLoad.createInstance();
+      console.log('Numbers of models added to the database are :'+ (await JsonLoad.loadDefaultDirectory()).length);
      } 
    }); 
    
