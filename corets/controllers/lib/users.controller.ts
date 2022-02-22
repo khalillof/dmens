@@ -12,27 +12,22 @@ export class UsersController extends DefaultController {
     return await Promise.resolve(new UsersController('user'));
   }
 
-  signup(self: any) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      await self.db.model.register(req.body, req.body.password, self.resultCb.res(res, next).cb)
-    }
+ async signup(req: express.Request, res: express.Response, next: express.NextFunction){
+      await this.db.model.register(req.body, req.body.password, this.callBack.res(res).cb)
   }
 
-  login(self: any) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-
-      await self.authenticateUser(self, (user: any) => {
-        req.login(user, function (err) {
-          if (err) {
-            res.json({ success: false, message: err })
-          } else {
-            const token = AuthService.generateToken({ _id: user._id });
-            res.json({ success: true, message: "Authentication successful", token: token });
-          }
-        })
-      })(req, res, next);
-
-    }
+ async login(req: express.Request, res: express.Response, next: express.NextFunction){
+     this.authenticateUser((user: any) => {      
+       req.login(user, (err)=>{
+         if (err) {
+           console.log(err);
+           res.json({ success: false, message: err });
+         } else {
+           const token = AuthService.generateToken({ _id: user._id });
+           res.json({ success: true, message: "Authentication successful", token: token });
+         }
+       });
+     })(req, res, next);
   }
 
   profile(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -43,19 +38,18 @@ export class UsersController extends DefaultController {
     })
   }
  
-  updateUser(self: any) {
-    return async (req: any, res: express.Response, next: express.NextFunction) => {
+async  updateUser(req: any, res: express.Response, next: express.NextFunction){
       if (req.isUnauthenticated()) {
         res.status(401).send({ success: false, message: 'unauthorized' })
       } else {
         // user is already authenticated that is why I am checking for body.password only
-        let User = await self.db.model.findById(req.user._id);
+        let User = await this.db.model.findById(req.params.id);
         if (req.user.password !== req.body.password)
           await User.setPassword(req.body.password)
-        await User.save(req.body, self.resultCb.res(res, next).cb)
+        await User.save(req.body, this.callBack.res(res).cb)
       }
-    }
   }
+
   logout(req: any, res: express.Response, next: express.NextFunction) {
     if (req.session) {
       req.session.destroy();
@@ -74,15 +68,13 @@ export class UsersController extends DefaultController {
     }
   }
 
-  checkJWTtoken(self: this) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      await passport.authenticate('jwt', { session: false }, self.resultCb.res(res, next).cb)(req, res, next);
-    };
+ async checkJWTtoken(req: express.Request, res: express.Response, next: express.NextFunction){
+      await passport.authenticate('jwt', { session: false }, this.callBack.res(res).cb)(req, res, next);
   }
 
-  authenticateUser(self: this, callback?: any) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      await passport.authenticate('local', self.resultCb.res(res, next, callback).cb)(req, res, next);
+  authenticateUser(cb?: any) {
+    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      passport.authenticate('local', this.callBack.res(res,cb).cb)(req, res, next);
     }
   }
   // helper

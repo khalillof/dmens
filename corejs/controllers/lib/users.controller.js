@@ -13,35 +13,32 @@ class UsersController extends DefaultController {
   }
 
  async signup(req, res, next){
-    await  this.db.model.register(req.body, req.body.password,this.resultCb.res(res,next).cb)
+    await  this.db.model.register(req.body, req.body.password,this.callBack.res(res).cb)
     }
-  
 
  async login(req, res, next){
-      this.authenticateUser((user)=>{
-        req.login(user, function(err){
-          if(err){
-            res.json({success: false, message: err})
-          }else{
-            const token =  AuthService.generateToken({ _id: user._id });
-            res.json({success:true, message:"Authentication successful", token: token });
-          }
-        })
-      })(req, res, next);
+    this.authenticateUser((user) => {
+     req.login(user, (err) =>{
+       if (err) {
+         res.json({ success: false, message: err });
+       } else {
+         const token = AuthService.generateToken({ _id: user._id });
+         res.json({ success: true, message: "Authentication successful", token: token });
+       }
+     });
+   })(req, res, next);
   }
 
-updateUser(self=this) {
-  return async (req, res, next) => {
+async updateUser(req, res, next){
     if (req.isUnauthenticated()) {
       res.status(401).send({ success: false, message: 'unauthorized' })
     } else {
       // user is already authenticated that is why I am checking for body.password only
-      let User = await self.db.model.findById(req.user._id);
+      let User = await this.db.model.findById(req.params.id);
       if (req.user.password !== req.body.password)
         await User.setPassword(req.body.password)
-      await User.save(req.body, self.resultCb.res(res, next).cb)
+      await User.save(req.body, this.callBack.res(res).cb)
     }
-  }
 }
   profile(req, res, next){
       res.json({
@@ -71,7 +68,7 @@ updateUser(self=this) {
 
 
  async checkJWTtoken(req, res, next){
-      passport.authenticate('jwt', this.resultCb.res(res,next).cb)(req, res, next);
+      passport.authenticate('jwt', this.callBack.res(res).cb)(req, res, next);
   };
 
   // helper
@@ -79,9 +76,9 @@ updateUser(self=this) {
     return this.db.First({ email: email });
   }
 
-  authenticateUser(callback) {
+  authenticateUser(cb) {
     return (req, res, next) => {
-     passport.authenticate('local', this.resultCb.res(res,next,callback).cb)(req, res, next);
+     passport.authenticate('local', this.callBack.res(res,cb).cb)(req, res, next);
     }
   }
   

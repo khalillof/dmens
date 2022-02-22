@@ -1,6 +1,6 @@
 "use strict";
 const { dbStore } = require('../../common/customTypes/types.config');
-
+const {AssertionError} = require('../../common/customTypes/assertionError')
 class DefaultController {
 
   constructor(name) {
@@ -54,13 +54,8 @@ class DefaultController {
       // fire only - res
        await funToFire()
     } catch (err) {
-      if (err instanceof AssertionError) {
-        console.error(err.stack)
-        res.json({ success: false, error: err.message })
-      } else {
-        console.error(err.stack);
-        res.json({ success: false, error: "operation faild error!!" })
-      }
+      console.error(err.stack)
+      res.json({ success: false, error: err instanceof AssertionError ? err.message : 'error operarion faild' })
     }
   }
 
@@ -74,21 +69,19 @@ class DefaultController {
     res.status(status).json(obj);
   }
 
-  resultCb = {
-    res: (res, next, callback) => {
+  callBack = {
+    res: (res,done) => {
       return {
         cb: (err, obj) => {
           if (err) {
-            if (err instanceof AssertionError) {
-              res.json({ success: false, error: err })
-            }
-            //res.json({ success: false, message: 'operation Unsuccessful!', err: err })
-            next(err)
+            console.error(err.stack)
+            res.json({ success: false, error: err instanceof AssertionError ? err.message : 'operation faild!' })
+            
           } else if (obj) {
-            typeof callback === 'function' ? callback(obj) : res.json({ success: true, message: 'operation Successful!' })
+            typeof done === 'function' ? done(obj) : res.json({ success: true, message: 'operation Successful!' })
           }
           else if (!err && !obj) {
-            res.json({ success: false, message: 'operation Unsuccessful!', error: 'error' })
+            res.json({ success: false, message: 'Operation faild!', error: info ? info : 'error' })
           }
         }
       }

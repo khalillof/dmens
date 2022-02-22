@@ -135,7 +135,7 @@ class JsonLoad {
         // _schema.eachPath((_path, _type)=>{ if(_schema.path(mapKey) instanceof mongoose.SchemaType)}) 
         for (let [itemKey, itemValue] of Object.entries(json_schema.schema))
             if (!itemKey instanceof mongoose.SchemaType) {
-                this.deepSearch({ itemKey: itemValue })
+                JsonLoad.deepSearch({ itemKey: itemValue })
                 if (!itemKey instanceof mongoose.SchemaType)
                     throw new Error('unvalid schema type :' + itemKey)
             }

@@ -40,16 +40,6 @@
       "admin": {
         "type": "Boolean",
         "default": false
-      },
-      "createdAt":{
-        "type": "String",
-        "default": "Date"
-    
-      },
-      "updatedAt":{
-        "type": "String",
-        "default": "Date"
-    
       }
 }
 }

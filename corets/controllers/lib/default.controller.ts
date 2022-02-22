@@ -48,13 +48,8 @@ export class DefaultController{
       // fire only - res
        await funToFire()
     } catch (err:any) {
-      if (err instanceof AssertionError) {
         console.error(err.stack)
-        res.json({ success: false, error: err.message })
-      } else {
-        console.error(err.stack);
-        res.json({ success: false, error: "operation faild error!!" })
-      }
+        res.json({ success: false, error: err instanceof AssertionError ? err.message : 'error operarion faild' })
     }
   }
     extractId(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -67,21 +62,24 @@ export class DefaultController{
     }
   
 
-    resultCb ={
-      res:(res:express.Response,next: express.NextFunction, callback?:any)=>{
-         return {
-           cb:(err:any, obj:any, info:any)=> {
-              if (err)
-                res.json({ success: false, message: 'operation Unsuccessful!', err: info || err })
-              else if (obj) {
-                typeof callback ==='function' ? callback(obj) : res.json({ success: true, message: 'operation Successful!' })
-              }
-              else if(!err && !obj) {
-                res.json({ success: false, message: 'operation Unsuccessful!', err: info || err || 'error' })
-              }   
-            }    
-         }
-    }}
+    callBack = {
+      res: (res:express.Response, done?:Function) => {
+        return {
+          cb: (err:any, obj:any,info:any ) => {          
+            if (err) {
+              console.error(err.stack)
+              res.json({ success: false, error: err instanceof AssertionError ? err.message : 'operation faild!' })
+              
+            } else if (obj) {
+              typeof done === 'function' ? done(obj) : res.json({ success: true, message: 'operation Successful!' })
+            }
+            else if (!err && !obj) {
+              res.json({ success: false, message: 'Operation faild!', error: info ? info : 'error'})
+            }
+          }
+        }
+      }
+    }
 
 
 }

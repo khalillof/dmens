@@ -1,7 +1,7 @@
 "use strict";
 const { corsWithOptions } = require('./cors.config');
 const { routeStore, appRouter, dbStore, pluralizeRoute} = require('../../common/customTypes/types.config');
-const { DefaultController } = require('../../controllers/');
+const { DefaultController} = require('../../controllers/');
 const { UsersMiddleware } = require('../../users/middleware/users.middleware');
 const {Assert} = require('../../common/customTypes/assert');
 
@@ -34,7 +34,7 @@ class DefaultRoutesConfig {
   }
 
   static async createInstancesWithDefault(){
-    Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name))})
+    Object.keys(dbStore).forEach(async name =>  {if (name !== 'user' && name !== 'editor') await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name))})
 }
 
   custumMiddleWare(rName) {

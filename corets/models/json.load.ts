@@ -138,7 +138,7 @@ export class JsonLoad {
 
         for (let [itemKey, itemValue] of Object.entries(item)) {
             if (typeof itemValue === "object") {
-                this.recursiveSearch(itemValue)
+                JsonLoad.recursiveSearch(itemValue)
             } else {
                 for (const [mapKey, mapValue] of Object.entries(JsonLoad.typeMappings)) {
                     if (itemValue === mapKey) {
