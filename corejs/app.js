@@ -62,12 +62,10 @@ app.use(helmet({
 
 setTimeout(async()=>{
 
- //await initCustomRoutes()
- 
  initRouteStore.forEach(async(rout)=> await rout());
   // register routes
   app.use('/', appRouter);
-  printRoutesToString()
+
   }, 500)
   
   setTimeout(printRoutesToString,1000);

@@ -1,8 +1,8 @@
-const {SchemaController} =require('../../controllers');
-const {DefaultRoutesConfig} =require('./default.routes.config');
-const { dbStore} =require('../../common/customTypes/types.config');
-const path =require( 'path');
-const multer =require('multer');
+import {EditorController} from '../../controllers';
+import {DefaultRoutesConfig} from './default.routes.config'
+import { dbStore} from '../../common/customTypes/types.config';
+import path from 'path'
+import multer from 'multer';
 const upload_url = path.resolve(__dirname,'../../models/schema/uploads');
 const upload = multer({
     dest: upload_url,
@@ -16,15 +16,13 @@ const upload = multer({
 });
 
 
- async function SchemaRoutes(){
+export async function EditorRoutes(){
     
-    return dbStore['user'] ? await DefaultRoutesConfig.instance('/schema', await SchemaController.createInstance(), 
-    (self)=>{
+    return dbStore['user'] ? await DefaultRoutesConfig.instance('/editor', await EditorController.createInstance(), 
+    (self:DefaultRoutesConfig):void=>{
 
- self.router.post('/schema',self.corsWithOption, self.actions('pre'),upload.single('schema'), self.actions('schema'));
+ self.router.post('/editor',self.corsWithOption, self.actions('pre'),upload.single('schema'), self.actions('schema'));
 
 }) : console.log('User model is not avaliable in dbStore No Schema routes configuered');;
 };
-exports.SchemaRoutes = SchemaRoutes;
-
 

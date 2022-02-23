@@ -13,21 +13,21 @@ class UsersController extends DefaultController {
   }
 
  async signup(req, res, next){
-    await  this.db.model.register(req.body, req.body.password,this.callBack.res(res).cb)
+  await this.db.model.register(req.body, req.body.password, this.callBack(res).done)
     }
 
  async login(req, res, next){
-    this.authenticateUser((user) => {
-     req.login(user, (err) =>{
-       if (err) {
-         res.json({ success: false, message: err });
-       } else {
-         const token = AuthService.generateToken({ _id: user._id });
-         res.json({ success: true, message: "Authentication successful", token: token });
-       }
-     });
-   })(req, res, next);
-  }
+  this.authenticateUser((user) => {      
+    req.login(user,  (err)=>{
+      if (err) {
+        this.resErrIfErr(res,err)
+      } else {
+        const token = AuthService.generateToken({ _id: user._id });
+        res.json({ success: true, message: "Authentication successful", token: token });
+      }
+    });
+  })(req, res, next);
+}
 
 async updateUser(req, res, next){
     if (req.isUnauthenticated()) {
@@ -37,7 +37,7 @@ async updateUser(req, res, next){
       let User = await this.db.model.findById(req.params.id);
       if (req.user.password !== req.body.password)
         await User.setPassword(req.body.password)
-      await User.save(req.body, this.callBack.res(res).cb)
+      await User.save(req.body, this.callBack(res).done)
     }
 }
   profile(req, res, next){
@@ -53,9 +53,10 @@ async updateUser(req, res, next){
       if (req.session) {
         req.session.destroy();
         res.clearCookie('session-id');
-        res.redirect('/');
+        //res.redirect('/');
+        this.resSuccess(res, "You are logged out!")
       } else {
-        res.json({success:true, message:"You are not logged in!" });
+        this.resSuccess(res, "You are not logged in!")
       }
   }
 
@@ -68,7 +69,7 @@ async updateUser(req, res, next){
 
 
  async checkJWTtoken(req, res, next){
-      passport.authenticate('jwt', this.callBack.res(res).cb)(req, res, next);
+  await passport.authenticate('jwt', { session: false }, this.callBack(res).done)(req, res, next);
   };
 
   // helper
@@ -78,7 +79,7 @@ async updateUser(req, res, next){
 
   authenticateUser(cb) {
     return (req, res, next) => {
-     passport.authenticate('local', this.callBack.res(res,cb).cb)(req, res, next);
+      passport.authenticate('local', this.callBack(res,cb).done)(req, res, next);
     }
   }
   

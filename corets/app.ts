@@ -12,8 +12,8 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import {config} from './bin/config';
 import {dbInit} from './common/services/mongoose.service';
-import {appRouter} from './common/customTypes/types.config'
-import { initCustomRoutes } from './routes';
+import {appRouter, printRoutesToString} from './common/customTypes/types.config'
+import { initRouteStore, } from './routes';
 import passport from 'passport';
 
 
@@ -55,12 +55,14 @@ app.use(helmet({
 }));
 
 setTimeout(async()=>{
+  // activate routes
+  initRouteStore.forEach(async(rout)=> await rout());
   // register routes
   app.use('/', appRouter);
-  
-  // print routes
- await initCustomRoutes()
+
   }, 500)
+
+  setTimeout(printRoutesToString,1000);
 
   if (app.get('env') === 'development') {
     console.log('development server')

@@ -1,10 +1,10 @@
 "use strict";
 const path = require('path');
 const fs = require('fs');
-const { SchemaTypes} = require('mongoose');
+const { SchemaTypes, SchemaType} = require('mongoose');
 const { JsonModel } = require('./json.model');
 const { dbStore} = require('../common/customTypes/types.config');
-
+const {Assert} = require('../common/customTypes/assert')
 class JsonLoad {
 
 
@@ -36,7 +36,6 @@ class JsonLoad {
 
             let data = await fs.promises.readFile(filePath, 'utf8');
             let jsobj = JSON.parse(data);
-            JsonLoad.isValidName(jsobj.name)
 
             return await JsonLoad.makeSchema(jsobj, schema_only);
 
@@ -75,6 +74,7 @@ class JsonLoad {
     }
 
    static async makeSchema(jschema, schema_only = false) {
+        JsonLoad.isValidName(jschema.name)
         // convert json type to mongoose schema type
         Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
 
@@ -83,12 +83,12 @@ class JsonLoad {
     }
 
    static typeMappings = {
-        "String": String,
-        "string": String,
-        "Number": Number,
-        "number": Number,
-        "Boolean": Boolean,
-        "boolean": Boolean,
+        "String": SchemaTypes.String,
+        "string": SchemaTypes.String,
+        "Number": SchemaTypes.Number,
+        "number": SchemaTypes.Number,
+        "Boolean": SchemaTypes.Boolean,
+        "boolean": SchemaTypes.Boolean,
         "_id": SchemaTypes.ObjectId,
         "id": SchemaTypes.ObjectId,
         "ObjectId": SchemaTypes.ObjectId,
@@ -99,8 +99,8 @@ class JsonLoad {
         "binary": SchemaTypes.Buffer,
         "documentArray": SchemaTypes.DocumentArray,
         "documentarray": SchemaTypes.DocumentArray,
-        "subDocument": SchemaTypes.Subdocument,
-        "subdocument": SchemaTypes.Subdocument,
+       // "subDocument": SchemaTypes.Subdocument,
+        //"subdocument": SchemaTypes.Subdocument,
         "mixed": SchemaTypes.Mixed,
         "Mixed": SchemaTypes.Mixed,
         "decimal": SchemaTypes.Decimal128,
@@ -131,25 +131,29 @@ class JsonLoad {
         "mapofstring": { type: Map, of: String }
     }
 
-   static validateSchema(json_schema) {
-        // _schema.eachPath((_path, _type)=>{ if(_schema.path(mapKey) instanceof mongoose.SchemaType)}) 
-        for (let [itemKey, itemValue] of Object.entries(json_schema.schema))
-            if (!itemKey instanceof mongoose.SchemaType) {
-                JsonLoad.deepSearch({ itemKey: itemValue })
-                if (!itemKey instanceof mongoose.SchemaType)
-                    throw new Error('unvalid schema type :' + itemKey)
-            }
-    }
+    static isValidType (value) { 
+        return 'number,string,boolean'.indexOf(typeof value) !== -1 
+      }
     // search item in object and map to mongoose schema
   static  deepSearch(item) {
-        // types mapping
-        for (let [itemKey, itemValue] of Object.entries(item)) {
+     
+        // loop over the item
+        for (let [itemIndex, itemValue] of Object.entries(item))  {           
+        
+        // check if item is object then call deepSearch agin recursively
             if (typeof itemValue === "object") {
-                JsonLoad.deepSearch(itemValue)
+                JsonLoad.deepSearch(itemValue)           
             } else {
+    
+                // loop over typeMappings to map user schema string type to mongoose typings
                 for (const [mapKey, mapValue] of Object.entries(JsonLoad.typeMappings)) {
                     if (itemValue === mapKey) {
-                        item[itemKey] = mapValue;
+                        item[itemIndex] = mapValue;
+                    }
+                    else{
+                        // check for the item didn't match our typemappings is valid type or raise error
+                        if (!JsonLoad.isValidType(itemValue))
+                            throw new Error('unvalid schema type value for the key:' + item[itemIndex] +' :'+itemValue)
                     }
                 }
             }

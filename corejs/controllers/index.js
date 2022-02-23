@@ -1,8 +1,8 @@
 const {DefaultController} = require('./lib/default.controller');
 const {UsersController} = require('./lib/users.controller');
 const {AuthController} = require('./lib/auth.controller');
-const {SchemaController} = require('./lib/schema.controller');
+const {EditorController} = require('./lib/editor.controller');
 
  module.exports ={
-    DefaultController,AuthController,UsersController, SchemaController
+    DefaultController,AuthController,UsersController, EditorController
 }

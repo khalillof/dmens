@@ -1,8 +1,7 @@
 "use strict";
 import path from 'path';
-//import fs from 'fs';
 import fs from 'fs';
-import{SchemaTypes} from 'mongoose';
+import{SchemaTypes, SchemaType} from 'mongoose';
 import { JsonSchema , dbStore} from '../common/customTypes/types.config';
 import { JsonModel} from './json.model';
 
@@ -36,7 +35,6 @@ export class JsonLoad {
 
             let data = await fs.promises.readFile(filePath, 'utf8');
             let jsobj = JSON.parse(data);
-            JsonLoad.isValidName(jsobj.name)
 
             return await JsonLoad.makeSchema(jsobj, schema_only);
 
@@ -72,14 +70,11 @@ export class JsonLoad {
 
     return result;
 }
-    
+
    static async makeSchema(jschema:JsonSchema, schema_only = false) {
-        let name = jschema.name.toLowerCase();
-        if(dbStore[name]){
-            throw new Error('there is already model in this name : '+name)
-          }
+        JsonLoad.isValidName(jschema.name)
         // convert json type to mongoose schema type
-        Object.entries(jschema.schema).forEach((item) => JsonLoad.recursiveSearch(item))
+        Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item))
 
         // finally return new jsonModel
         return  schema_only ? jschema : await JsonModel.createInstance(jschema);
@@ -133,16 +128,29 @@ export class JsonLoad {
         "mapofstring": { type: Map, of: String }
     }
     // search item in object and map to mongoose schema
-  static  recursiveSearch(item:any) {
-        // types mapping
-
-        for (let [itemKey, itemValue] of Object.entries(item)) {
+    static isValidType (value:any) { 
+        return 'number,string,boolean'.indexOf(typeof value) !== -1 
+      }
+    // search item in object and map to mongoose schema
+  static  deepSearch(item:any) {
+     
+        // loop over the item
+        for (let [itemIndex, itemValue] of Object.entries(item))  {           
+        
+        // check if item is object then call deepSearch agin recursively
             if (typeof itemValue === "object") {
-                JsonLoad.recursiveSearch(itemValue)
+                JsonLoad.deepSearch(itemValue)           
             } else {
+    
+                // loop over typeMappings to map user schema string type to mongoose typings
                 for (const [mapKey, mapValue] of Object.entries(JsonLoad.typeMappings)) {
                     if (itemValue === mapKey) {
-                        item[itemKey] = mapValue;
+                        item[itemIndex] = mapValue;
+                    }
+                    else{
+                        // check for the item didn't match our typemappings is valid type or raise error
+                        if (!JsonLoad.isValidType(itemValue))
+                            throw new Error('unvalid schema type value for the key:' + item[itemIndex] +' :'+itemValue)
                     }
                 }
             }

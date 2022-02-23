@@ -1,12 +1,10 @@
 "use strict";
-import {printRoutesToString, appRouter} from '../../common/customTypes/types.config';
-import { AuthRoutes } from './auth.routes.config';
-import { UsersRoutes } from './users.routes.config';
-import { SchemaRoutes } from './schema.routes.config';
-const path = require('path');
-import { DefaultRoutesConfig} from './default.routes.config';
+import {appRouter} from '../../common/customTypes/types.config';
 
-function IndexRoutes() {
+const path = require('path');
+
+
+export function IndexRoutes() {
   let index = {
     '/':'../../public/coming_soon/index.html',
     '/angular':'../../public/angular/index.html',
@@ -17,6 +15,7 @@ function IndexRoutes() {
     appRouter.get(key, (req:any, res:any, next:any) => res.status(200).sendFile(path.join(__dirname, value)));
   }
 }
+/*
 export async function initCustomRoutes(callback?:Function){
     // index routes
     IndexRoutes();
@@ -33,3 +32,4 @@ export async function initCustomRoutes(callback?:Function){
     });
   });
 }
+*/

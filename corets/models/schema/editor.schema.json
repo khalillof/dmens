@@ -1,0 +1,28 @@
+{
+  "name": "Editor",
+  "schema": {
+    "name": {
+      "type": "String",
+      "unique": true,
+      "lowercase": true,
+      "required": true,
+      "minLength": 3,
+      "maxLength": 30
+    },
+    "content": {
+      "type": "String",
+      "required": true,
+      "minLength": 10
+    },
+    "editor": {
+      "type": "ObjectId",
+      "ref": "User",
+      "required": true
+    },
+    "descriptions": {
+      "type": "String",
+      "default": "",
+      "maxLength": 500
+    }
+  }
+}
