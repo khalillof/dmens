@@ -28,7 +28,7 @@ export class EditorController extends DefaultController {
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
     async schema(req: express.Request, res: express.Response, next: express.NextFunction) {
-        this.tryCatchRes(res, ()=>{
+
         if (req.body.json) {
             let filepath = path.join(upload_url + 'schema.' + Date.now() + '.json');
 
@@ -37,9 +37,10 @@ export class EditorController extends DefaultController {
 
             fs.writeFile(filepath, jsonContent, 'utf8', this.callBack(res).errSuccess);
 
+        }else{
+            this.resObjSuccessErr(res,req.file)
         }
         
-        this.resObjSuccessErr(res,req.file)
-    });
+        
     } 
 }

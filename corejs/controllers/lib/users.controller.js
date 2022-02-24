@@ -34,7 +34,7 @@ async updateUser(req, res, next){
       res.status(401).send({ success: false, message: 'unauthorized' })
     } else {
       // user is already authenticated that is why I am checking for body.password only
-      let User = await this.db.model.findById(req.params.id);
+      let User = await this.db.getOneById(req.params.id);
       if (req.user.password !== req.body.password)
         await User.setPassword(req.body.password)
       await User.save(req.body, this.callBack(res).done)
@@ -74,7 +74,7 @@ async updateUser(req, res, next){
 
   // helper
   getUserByEmail(email) {
-    return this.db.First({ email: email });
+    return this.db.getOneByQuery({ email: email });
   }
 
   authenticateUser(cb) {

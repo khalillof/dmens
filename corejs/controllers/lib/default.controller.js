@@ -11,17 +11,31 @@ class DefaultController {
     return await Promise.resolve(new DefaultController(svcName));
   }
 
+ async tryCatchWrapper(req, res, next, actionName){
+    try{
+       await this[actionName](req,res,next);
+    }catch(err){
+      this.resErrIfErr(res,err);
+    }
+}
 
   async list(req, res, next) {
+
     let items = await this.db.Tolist(20, 0);
     this.resItems(res, items)
   }
-
-  async getById(req, res, next) {
-    let item = await this.db.getById(req.params.id);
+  async listQuery(req, res, next) {
+    let items = await this.db.Tolist( req.query,20, 0);
+    this.resItems(res, items)
+  }
+  async getOneById(req, res, next) {
+    let item = await this.db.getOneById(req.params.id);
     this.resItem(res, item)
   }
-
+  async getOneByQuery(req, res, next) {
+    let item = await this.db.getOneByQuery(req.query);
+    this.resItem(res, item)
+  }
   async create(req, res, next) {
     let item = await this.db.create(...req.body);
     console.log('document Created :', item);
@@ -46,7 +60,7 @@ class DefaultController {
     try {
       this.Cb(funToFire)
     } catch (err) {
-      this.resError(res, err)
+      this.resErrIfErr(res, err)
     }
   }
   extractId(req, res, next) {

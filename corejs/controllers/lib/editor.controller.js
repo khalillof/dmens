@@ -31,7 +31,7 @@ const upload_url = path.resolve(__dirname, '../../models/schema/uploads');
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
     async schema(req, res, next) {
-        this.tryCatchRes(res, ()=>{
+
             if (req.body.json) {
                 let filepath = path.join(upload_url + 'schema.' + Date.now() + '.json');
     
@@ -39,10 +39,10 @@ const upload_url = path.resolve(__dirname, '../../models/schema/uploads');
                 let jsonContent = JSON.stringify(req.body.json);
     
                 fs.writeFile(filepath, jsonContent, 'utf8', this.callBack(res).errSuccess);
+            }else{
+                this.resObjSuccessErr(res,req.file);
             }
             
-            this.resObjSuccessErr(res,req.file)
-        });
     }
 
 }

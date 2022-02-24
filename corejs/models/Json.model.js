@@ -48,17 +48,27 @@ class JsonModel {
     return await Promise.resolve(DB);
   }
 
-  async create(obj) {
-    return await this.model.create(obj);
+  async Tolist(limit = 25, page = 0) {
+    return await this.model.find()
+      .limit(limit)
+      .skip(limit * page)
+      .exec();
   }
-  async query(obj_query) {
-    return await this.model.find(obj_query);
+  async TolistQuery( query,limit = 25, page = 0) {
+    return await this.model.find(query)
+      .limit(limit)
+      .skip(limit * page)
+      .exec();
   }
-  async getById(id) {
+  async getOneById(id) {
     return await this.model.findById(id);
   }
-  async First(obj) {
-    return await this.model.findOne(obj);
+  async getOneByQuery(query) {
+    return await this.model.findOne(query);
+  }
+
+  async create(obj) {
+    return await this.model.create(obj);
   }
 
   async putById(id, objFields) {
@@ -68,12 +78,8 @@ class JsonModel {
   async deleteById(id) {
     return await this.model.findByIdAndDelete(id);
   }
-
-  async Tolist(limit = 25, page = 0) {
-    return await this.model.find()
-      .limit(limit)
-      .skip(limit * page)
-      .exec();
+  async deleteByQuery(query) {
+    return await this.model.findOneAndDelete(query);
   }
 
   async patchById(id, objFields) {

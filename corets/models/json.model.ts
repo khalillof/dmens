@@ -52,18 +52,28 @@ export class JsonModel {
     let dbb = new JsonModel(jsonModel, callback);
     return await Promise.resolve(dbb);
   }
+  async Tolist(limit: number = 25, page: number = 0) {
+    return await this.model.find()
+        .limit(limit)
+        .skip(limit * page)
+        .exec();
+}
+async TolistQuery(query:{},limit: number = 25, page: number = 0) {
+  return await this.model.find(query)
+      .limit(limit)
+      .skip(limit * page)
+      .exec();
+}
+async getOneById(id: string) {
+  return await this.model.findOne({_id: id});
+}
+async getOneByQuery(query: {}) {
+  return await this.model.findOne(query);
+}
   async create(obj: any){
     return await this.model.create(obj);
   }
-  async query(obj_query:{}) {
-    return await this.model.find(obj_query);
-} 
-  async getById(id: string) {
-      return await this.model.findOne({_id: id});
-  }
-  async First(obj:any) {
-    return await this.model.findOne(obj);
-  }
+
   async putById(id:string, objFields: {}){
      return await this.model.findByIdAndUpdate(id, objFields);
   }
@@ -71,14 +81,9 @@ export class JsonModel {
   async deleteById(id: string) {
     return await this.model.findByIdAndDelete(id);
   }
-  
-  async Tolist(limit: number = 25, page: number = 0) {
-      return await this.model.find()
-          .limit(limit)
-          .skip(limit * page)
-          .exec();
+  async deleteByQuery(query:{}) {
+    return await this.model.findOneAndDelete(query);
   }
-  
   async patchById(objFields: any) {
    return await this.model.findOneAndUpdate(objFields._id, objFields);
   }

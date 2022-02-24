@@ -12,17 +12,24 @@ export class DefaultController {
   static async createInstance(svcName: string) {
     return await Promise.resolve(new DefaultController(svcName));
   }
-
+  
+  
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
     let items = await this.db.Tolist(20, 0);
     this.resItems(res, items)
   }
-
-  async getById(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.getById(req.params.id);
+  async listQuery(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let items = await this.db.TolistQuery(req.query,20, 0);
+    this.resItems(res, items)
+  }
+  async getOneById(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let item = await this.db.getOneById(req.params.id);
     this.resItem(res, item)
   }
-
+  async getOneByQuery(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let item = await this.db.getOneByQuery(req.query);
+    this.resItem(res, item)
+  }
   async create(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.create(...req.body);
     console.log('document Created :', item);
@@ -35,7 +42,7 @@ export class DefaultController {
   }
 
   async put(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.putById(req.params.Id, ...req.body);
+    await this.db.putById(req.params.Id,req.body);
     this.resSuccess(res)
   }
   async remove(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -43,11 +50,15 @@ export class DefaultController {
     this.resSuccess(res)
   }
   ////// helpers ================================
-  async tryCatchRes(res: express.Response, funToFire: Function) {
+  async tryCatchRes(res: express.Response, fun: Function) {
     try {
-      this.Cb(funToFire)
+    if (fun && typeof fun === 'function'){ 
+      await fun() 
+    }else{
+      throw new Error('function was expected instead we recived type :' + typeof fun)
+    }
     } catch (err: any) {
-      this.resError(res, err)
+      this.resErrIfErr(res, err)
     }
   }
   extractId(req: express.Request, res: express.Response, next: express.NextFunction) {

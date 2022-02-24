@@ -50,30 +50,39 @@ export class DefaultRoutesConfig {
         this.routeParam = this.routeName + '/:id';
       }
       return {
-        getList: (callback:[]) => this.router.get(this.routeName, this.corsWithOption,...callback, this.actions('list')),
-        getId: (callback:[]) => this.router.get(this.routeParam,this.corsWithOption, ...callback, this.actions('getById')),
-        post: (callback:[]) => this.router.post(this.routeName, this.corsWithOption, ...callback, this.actions('create')),
-        put: (callback:[]) => this.router.put(this.routeParam, this.corsWithOption, ...callback, this.actions('put')),
-        delete: (callback:[]) => this.router.delete(this.routeParam, this.corsWithOption, ...callback, this.actions('remove'))
+        getList:  (callback:[]) => this.router.get(this.routeName, this.corsWithOption,...callback, this.actions('list')),
+        getId: (callback:[]) => this.router.get(this.routeParam,this.corsWithOption, ...callback, this.tryCatchAction('getOneById')),
+        post: (callback:[]) => this.router.post(this.routeName, this.corsWithOption, ...callback, this.tryCatchAction('create')),
+        put: (callback:[]) => this.router.put(this.routeParam, this.corsWithOption, ...callback, this.tryCatchAction('put')),
+        delete: (callback:[]) => this.router.delete(this.routeParam, this.corsWithOption, ...callback, this.tryCatchAction('remove'))
       }
     }
     configureRoutes() {
       this.router.all(this.routeName,this.corsWithOption);
       this.router.get(this.routeName, this.actions('list'))
-      this.router.get(this.routeParam, this.actions('getById'))
-      this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('create'))
-      this.router.put(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('put'))
-      this.router.delete(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.actions('remove'));
+      this.router.get(this.routeParam, this.tryCatchAction('getOneById'))
+      this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('create'))
+      this.router.put(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('put'))
+      this.router.delete(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('remove'));
       this.router.param('id', async (req,res,next, id)=>{ Assert.string(id, {required:true, notEmpty:true}); next()});
       
   
     }
   
  
-    actions(name:string) {
-        return async (req: express.Request, res:express.Response, next:express.NextFunction) => {
-        return await this.controller[name](req, res, next);
-      }
-    }
-  
+ actions(actionName:string){ 
+     return async (req:express.Request,res:express.Response,next:express.NextFunction)=> await this.controller[actionName](req,res,next)
+     
+ }
+ tryCatchAction(actionName:string){
+  return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
+    try{
+      await this.controller[actionName](req,res,next)
+    }catch(err:any){
+      console.error(err.stack)
+      res.json({sucess:false, error: 'error operation faild!'})
+    }  
+  }
+}
+
   }
