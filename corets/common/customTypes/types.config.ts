@@ -2,6 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {ISvc} from '../../services/ISvc.services'
 import {IController, DefaultController} from '../../controllers/'
 import {DefaultRoutesConfig} from '../../routes/'
+import UsersMiddleware from '../../users/middleware/users.middleware'
 const pluralize = require('pluralize');
 import {Router} from 'express'
 
@@ -28,10 +29,6 @@ export function printRoutesToJson(){
     console.log('================= All Routes avaliable ================ \n'+ JSON.stringify(result, null, 2))
     //console.log(JSON.stringify(result, null, 2));
   }
-export function returnJson (obj : any,status:number, res: any){
-  res.setHeader('Content-Type', 'application/json');
-  res.status(status).json(obj)
-  };
   
 export function pluralizeRoute(routeName:string){ 
   routeName = routeName.toLowerCase();
@@ -48,17 +45,9 @@ export interface IConstructor<T> {
 }
 // types
 export type Dic<Type>  = { [key: string] : Type};
-export type routData = {routeName :string, controller :any,Service:any};
 
 // db object
 export const dbStore : Dic<Model<any,any> | any> = {};
-
-// routesDb
-export const routeStore : Dic<DefaultRoutesConfig> = {};
-
-export function extendedInstance<A extends DefaultController>(arg:any[], c: new(...args: any[])=> A): A {   
-  return new c(...arg);
-}
 
 export function  getDb(url:string):ISvc{
   for(let d in dbStore){
@@ -68,14 +57,23 @@ export function  getDb(url:string):ISvc{
 }
 throw new Error('service not found for arg :'+ name);
 }
-export function  getCont(url:string):IController{
+
+// routesStore
+export const routeStore : Dic<DefaultRoutesConfig> = {};
+
+export function  getCont(url:string):IController | null{
     for(let d in routeStore){     
       if(d !== '/' && url.match(d) || d === '/' && url === d){
      // console.log('from getcon : '+url +' - '+d)
       return routeStore[d].controller;
     }
-  }  
-  throw new Error('controller not found for the url :'+ url);
+  } 
+  return null; 
+  //throw new Error('controller not found for the url :'+ url);
+}
+
+export function extendedInstance<A extends DefaultController>(arg:any[], c: new(...args: any[])=> A): A {   
+  return new c(...arg);
 }
 
 export function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) {

@@ -11,9 +11,9 @@ export class DefaultRoutesConfig {
     routeParam: string;
     controller:IController | any;
     corsWithOption:any;
-    UsersMWare:UsersMiddleware | any
+    UsersMWare:UsersMiddleware | any;
 
-    constructor(rName: string, control:IController|any, callback?:any) { 
+    constructor(rName: string, control:IController, callback?:Function) { 
         this.router = appRouter;
         this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName+'/:id';
@@ -24,7 +24,9 @@ export class DefaultRoutesConfig {
           this.UsersMWare = null;
         }else{
           this.controller = control;
-          this.UsersMWare = new UsersMiddleware();
+
+          let item= Object.values(routeStore).find(r=> r.UsersMWare);
+          this.UsersMWare = item ? item.UsersMWare : new UsersMiddleware();
         } 
 
         
@@ -41,7 +43,7 @@ export class DefaultRoutesConfig {
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(){
-          Object.keys(dbStore).forEach(async name =>  {if (name !== 'user') await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))})
+        await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user,editor'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
     }
 
     custumMiddleWare(rName?:string) {
@@ -59,6 +61,8 @@ export class DefaultRoutesConfig {
     }
     configureRoutes() {
       this.router.all(this.routeName,this.corsWithOption);
+      this.router.all(this.routeParam,this.corsWithOption);
+      
       this.router.get(this.routeName, this.actions('list'))
       this.router.get(this.routeParam, this.tryCatchAction('getOneById'))
       this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('create'))

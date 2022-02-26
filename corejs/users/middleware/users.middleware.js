@@ -5,71 +5,48 @@ const { UsersController } = require('../../controllers/');
 class UsersMiddleware {
 
     constructor() {
-        this.controller = UsersController.createInstance();
+        this.cont = new UsersController();
     }
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())
     }
 
     verifyUser = AuthService.authenticateUser;
+    getUserFromReq(req) {
+        return req.body && req.body.email ? this.cont.getOneByQuery({ email: req.body.email }) : null;
+    }
 
-    validateRequiredUserBodyFields(req, res, next){
-        if(req.body && req.body.email || req.body.username && req.body.password){
+    validateRequiredUserBodyFields(req, res, next) {
+        if (req.body.email || req.body.username && req.body.password) {
             next();
-        }else{
-            res.json({success: false, error: 'Missing required body fields'});
+        } else {
+            this.cont.resError(res, 'Missing required body fields')
         }
     }
 
-    validateSameEmailDoesntExist(self) {
-        return (req, res, next) => {
-            self.getUserByEmail(req.body.email).then((user) => {
-                user ? self.sendJson({ error: `User email already exists` }, 400, res) : next();
 
-            }).catch((err) => {
-                console.error(err);
-                next(err)
-            })
-        }
+    validateSameEmailDoesntExist(req, res, next) {
+        this.getUserFromReq(req) ? this.cont.sendJson({ success: false, error: `User email already exists` }, 400, res) : next();
     }
 
-    validateSameEmailBelongToSameUser(self) {
-        return (req, res, next) => {
-            const user = self.getUserByEmail(req.body.email);
-            if (user && user.id === req.params.userId) {
-                next();
-            } else {
-                self.sendJson({ error: `Invalid email` }, 400, res);
-            }
-        }
+    validateSameEmailBelongToSameUser(req, res, next) {
+        let user = this.getUserFromReq(req)
+        user && user._id === req.params.id ? next() : this.cont.sendJson({ error: `Invalid email` }, 400, res);
     }
+
     // Here we need to use an arrow function to bind `this` correctly
-    validatePatchEmail(self) {
-        return (req, res, next) => {
-            if (req.body.email) {
-                self.validateSameEmailBelongToSameUser(req, res, next);
-            } else {
-                next();
-            }
-        }
+    validatePatchEmail(req, res, next) {
+        req.body && req.body.email ? this.validateSameEmailBelongToSameUser(req, res, next) : next();
     }
 
-    validateUserExists(self) {
-        return (req, res, next) => {
-            self.getUserByEmail(req.body.email).then((user) => {
-                user ? next() : self.sendJson({ error: 'User ${req.body.email' }, 404, res);
-            }).catch((err) => next(err));
-        }
+    validateUserExists(req, res, next) {
+        this.getUserFromReq(req) ? next() : this.cont.sendJson({ error: 'User does not exist : ' + req.body.email }, 404, res);
     }
 
-    verifyUserIsAdmin(req, res, next){
-            if (req.user && req.user.admin) {
-                next()
-            } else {
-                res.json({success:false, message: 'you are not authorized' });
-            }
-    }
+    verifyUserIsAdmin(req, res, next) {
+        req.user && req.user.admin ? next() : this.cont.resError(res, 'you are not authorized')
 
+    }
     extractUserId(req, res, next) {
         req.body.id = req.params.id;
         next();

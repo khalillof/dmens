@@ -56,7 +56,7 @@ app.use(helmet({
 
 setTimeout(async()=>{
   // activate routes
-  initRouteStore.forEach(async(rout)=> await rout());
+  initRouteStore.forEach(async(rout)=>  await rout());
   // register routes
   app.use('/', appRouter);
 

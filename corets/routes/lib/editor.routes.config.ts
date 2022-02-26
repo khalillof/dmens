@@ -18,11 +18,11 @@ const upload = multer({
 
 export async function EditorRoutes(){
     
-    return dbStore['user'] ? await DefaultRoutesConfig.instance('/editor', await EditorController.createInstance(), 
+    return dbStore['user'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/editor', await EditorController.createInstance(), 
     (self:DefaultRoutesConfig):void=>{
 
  self.router.post('/editor',self.corsWithOption, self.actions('pre'),upload.single('schema'), self.actions('schema'));
 
-}) : console.log('User model is not avaliable in dbStore No Schema routes configuered');;
+})) : console.log('User model is not avaliable in dbStore No Schema routes configuered');;
 };
 

@@ -5,7 +5,7 @@ const {AuthService} = require('../../auth/services/auth.service');
 
  async function UsersRoutes(){
 
- return await  DefaultRoutesConfig.instance('/users', await UsersController.createInstance(), 
+ return await  Promise.resolve(DefaultRoutesConfig.instance('/users', await UsersController.createInstance(), 
     
    (self)=>{
         self.router.all('/users',self.corsWithOption);
@@ -19,10 +19,7 @@ const {AuthService} = require('../../auth/services/auth.service');
             self.tryCatchAction('login')
             );
 
-        self.router.get('/users/logout',
-            self.UsersMWare.validateRequiredUserBodyFields,
-            self.actions('logout')
-            );
+        self.router.get('/users/logout',self.actions('logout'));
 
         self.router.get('/users/profile',AuthService.authenticateUser,self.tryCatchAction('profile'));
 
@@ -30,19 +27,17 @@ const {AuthService} = require('../../auth/services/auth.service');
 
         self.router.get('/users',self.UsersMWare.verifyUser,self.UsersMWare.verifyUserIsAdmin,self.actions('list')); 
 
-        self.router.get('/users/checkJWTtoken',
-        self.tryCatchAction('checkJWTtoken')
-        );
+        self.router.get('/users/checkJWTtoken',self.tryCatchAction('checkJWTtoken'));
 
         self.router.param('id', self.UsersMWare.extractUserId);
        
-        self.router.all('/users/id',self.UsersMWare.validateUserExists(self.UsersMWare.controller));
-        self.router.get('/users/id',self.tryCatchAction('getById'));
+        self.router.all('/users/id',self.UsersMWare.validateUserExists);
+        self.router.get('/users/id',self.tryCatchAction('getOneById'));
         self.router.delete('/users/id',self.tryCatchAction('remove'));
         self.router.put('/users/id',
-            self.UsersMWare.validateSameEmailBelongToSameUser(self.UsersMWare.controller),
+            self.UsersMWare.validateSameEmailBelongToSameUser,
             self.tryCatchAction('put')); 
-});
+}));
 
 }
 

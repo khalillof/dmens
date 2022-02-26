@@ -3,6 +3,7 @@
 const pluralize = require('pluralize');
 const router = require('express').Router();
 
+
 exports.appRouter = router;
   
 exports.printRoutesToString = ()=>{
@@ -26,12 +27,6 @@ exports.printRoutesToJson = ()=>{
     //console.log(JSON.stringify(result, null, 2));
   }
 
-exports.returnJson = (obj, status, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(status).json(obj);
-}
-
-
 exports.pluralizeRoute =(routeName)=> { 
     routeName = routeName.toLowerCase();
     if (routeName.indexOf('/') == -1){
@@ -39,10 +34,6 @@ exports.pluralizeRoute =(routeName)=> {
     }else{
         return routeName;
     } 
-}
-
-exports.extendedInstance = (c, arg)=> {
-    return new c(...arg);
 }
 
 // db object
@@ -61,9 +52,7 @@ exports.getDb =(url) =>{
 // routesStore
 exports.routeStore = {};
 
-
-
-exports.getCont = (url)=> {
+exports.getCont = function(url){
     for (let d in exports.routeStore) {
         if (d !== '/' && url.match(d) || d === '/' && url === d) {
             // console.log('from getcon : '+url +' - '+d)
@@ -75,6 +64,10 @@ exports.getCont = (url)=> {
 
 exports.getProperty = (obj, key)=> {
     return obj[key];
+}
+
+exports.extendedInstance = (c, arg)=> {
+    return new c(...arg);
 }
 
 exports.createInstance = (type, ...args)=> {

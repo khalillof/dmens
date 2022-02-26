@@ -5,8 +5,8 @@ const { AuthService } = require('../../auth/services/auth.service');
 
 class UsersController extends DefaultController {
 
-  constructor(svc) {
-    super(svc)
+  constructor(name) {
+    super(name)
   }
   static async createInstance() {
     return await Promise.resolve(new UsersController('user'));
@@ -71,11 +71,6 @@ async updateUser(req, res, next){
  async checkJWTtoken(req, res, next){
   await passport.authenticate('jwt', { session: false }, this.callBack(res).done)(req, res, next);
   };
-
-  // helper
-  getUserByEmail(email) {
-    return this.db.getOneByQuery({ email: email });
-  }
 
   authenticateUser(cb) {
     return (req, res, next) => {

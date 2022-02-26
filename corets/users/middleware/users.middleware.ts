@@ -3,74 +3,47 @@ import { UsersController } from '../../controllers';
 import { AuthService } from '../../auth/services/auth.service'
 
 class UsersMiddleware {
-    Controller: any
+    cont: UsersController | any;
     constructor() {
-        this.Controller = UsersController.createInstance();
+        this.cont = new UsersController('user');
     }
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())
     }
     verifyUser: any = AuthService.authenticateUser;
 
-
+    getUserFromReq(req:express.Request){
+        return req.body && req.body.email ? this.cont.getOneByQuery({email:req.body.email}) : null;
+    }
     validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
-            if (req.body && req.body.email || req.body.username && req.body.password) {
+            if ( req.body.email || req.body.username && req.body.password) {
                 next();
             } else {
-                res.json({success:false, error: 'Missing required body fields' });
+                this.cont.resError(res,'Missing required body fields')
             }
     }
 
-    validateSameEmailDoesntExist(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            self.getUserByEmail(req.body.email, self.controller).then((user: any) => {
-                user ? self.sendJson({ error: `User email already exists` }, 400, res) : next();
-
-            }).catch((err: any) => {
-                console.error(err);
-                next(err)
-            })
-        }
+  validateSameEmailDoesntExist (req: express.Request, res: express.Response, next: express.NextFunction){
+            this.getUserFromReq(req) ? this.cont.sendJson({ success:false, error: `User email already exists` }, 400, res) : next();
     }
 
-    validateSameEmailBelongToSameUser(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            const user = self.getUserByEmail(req.body.email, self.controller);
-            if (user && user.id === req.params.userId) {
-                next();
-            } else {
-                self.sendJson({ error: `Invalid email` }, 400, res);
-            }
-        }
+    validateSameEmailBelongToSameUser(req: express.Request, res: express.Response, next: express.NextFunction){
+            const user = this.getUserFromReq(req)
+            user && user._id === req.params.id ? next() : this.cont.sendJson({ error: `Invalid email` }, 400, res);
     }
 
     // Here we need to use an arrow function to bind `this` correctly
-    validatePatchEmail(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            if (req.body.email) {
-                self.validateSameEmailBelongToSameUser(req, res, next);
-            } else {
-                next();
-            }
-        }
+    validatePatchEmail(req: express.Request, res: express.Response, next: express.NextFunction){
+           req.body && req.body.email ?  this.validateSameEmailBelongToSameUser(req, res, next): next();
     }
 
-    validateUserExists(self: any) {
-        return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            self.getUserByEmail(req.body.email).then((user: any) => {
-                user ? next() : self.sendJson({ error: 'User ${req.body.email' }, 404, res);
-            }).catch((err: any) => next(err));
-        }
+    validateUserExists(req: express.Request, res: express.Response, next: express.NextFunction){
+         this.getUserFromReq(req) ? next() : this.cont.sendJson({ error: 'User does not exist : ' +req.body.email }, 404, res);
     }
     
     verifyUserIsAdmin(req: any, res: express.Response, next: express.NextFunction){
-
-            if (req.user && req.user.admin) {
-                next()
-            } else {
-                res.json({success:false, error: 'you are not authorized' });
-            }
-        
+            req.user && req.user.admin ? next() : this.cont.resError(res,'you are not authorized')
+  
     }
 
     extractUserId(req: express.Request, res: express.Response, next: express.NextFunction) {

@@ -6,7 +6,7 @@ import { dbStore } from '../../common/customTypes/types.config';
 
 export async function AuthRoutes(){
     
-    return dbStore['user'] ? await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(), function(self:DefaultRoutesConfig):void{
+    return dbStore['user'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(), function(self:DefaultRoutesConfig):void{
 
         self.router.post('/auth',
         self.corsWithOption,
@@ -21,5 +21,5 @@ export async function AuthRoutes(){
         self.controller.jwtMWare.validRefreshNeeded,
         self.controller.createJWT
     );
-}) : console.log('User model is not avaliable in dbStore No Auth routes configuered');;
+})) : console.log('User model is not avaliable in dbStore No Auth routes configuered');;
 };

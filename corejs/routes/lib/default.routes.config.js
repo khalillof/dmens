@@ -2,8 +2,9 @@
 const { corsWithOptions } = require('./cors.config');
 const { routeStore, appRouter, dbStore, pluralizeRoute} = require('../../common/customTypes/types.config');
 const { DefaultController} = require('../../controllers/');
-const { UsersMiddleware } = require('../../users/middleware/users.middleware');
 const {Assert} = require('../../common/customTypes/assert');
+const {UsersMiddleware} = require('../../users/middleware/users.middleware');
+
 
 class DefaultRoutesConfig {
 
@@ -18,7 +19,9 @@ class DefaultRoutesConfig {
       this.UsersMWare = null;
     } else {
       this.controller = control;
-      this.UsersMWare = new UsersMiddleware();
+
+      let item= Object.values(routeStore).find(r=> r.UsersMWare);
+      this.UsersMWare = item ? item.UsersMWare : new UsersMiddleware();
     }
 
     typeof callback === 'function' ? callback(this) : this.configureRoutes();
@@ -34,7 +37,8 @@ class DefaultRoutesConfig {
   }
 
   static async createInstancesWithDefault(){
-    Object.keys(dbStore).forEach(async name =>  {if (name !== 'user' && name !== 'editor') await DefaultRoutesConfig.instance(name, await DefaultController.createInstance(name))})
+    
+   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if (name !== 'user' && name !=='editor') await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
 }
 
   custumMiddleWare(rName) {
@@ -52,14 +56,14 @@ class DefaultRoutesConfig {
   }
   configureRoutes() {
     this.router.all(this.routeName,this.corsWithOption);
+    this.router.all(this.routeParam,this.corsWithOption);
+    
     this.router.get(this.routeName, this.actions('list'))
     this.router.get(this.routeParam, this.tryCatchAction('getOneById'))
     this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('create'))
     this.router.put(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('put'))
     this.router.delete(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('remove'));
     this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
-    
-
   }
  
   actions(actionName){ 

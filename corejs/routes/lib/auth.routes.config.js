@@ -5,7 +5,7 @@ const {AuthController} = require('../../controllers')
 async function AuthRoutes() {
 
     // add routes
-    return await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(),
+    return await Promise.resolve( DefaultRoutesConfig.instance('/auth', await AuthController.createInstance(),
         function (self) {
             self.router.all('/auth',self.corsWithOption);
             self.router.post('/auth',
@@ -19,7 +19,7 @@ async function AuthRoutes() {
                 self.controller.jwtMWare.validRefreshNeeded,
                 self.controller.createJWT
             );
-        })
+        }))
 
 };
 

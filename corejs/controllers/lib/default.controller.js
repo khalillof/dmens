@@ -1,12 +1,15 @@
-"use strict";
-const { dbStore } = require('../../common/customTypes/types.config');
+//"use strict";
 const {AssertionError} = require('../../common/customTypes/assertionError')
+const { dbStore} = require('../../common/customTypes/types.config');
+
 class DefaultController {
 
-  constructor(name) {
-    this.db = dbStore[name] ? dbStore[name] : null;
+  constructor(name) { 
+        this.db = dbStore[name];
+     
   }
 
+  // factory method
   static async createInstance(svcName) {
     return await Promise.resolve(new DefaultController(svcName));
   }
