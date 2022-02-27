@@ -6,7 +6,7 @@ import { dbStore } from '../../common/customTypes/types.config';
 
 
 export async function UsersRoutes() {
-    return dbStore['user'] ? await Promise.resolve(await DefaultRoutesConfig.instance('/users', await UsersController.createInstance(),
+    return dbStore['user'] ? await Promise.resolve(await DefaultRoutesConfig.instance('/users', await UsersController.createInstance('user'),
     (self:DefaultRoutesConfig)=>{
         self.router.all('/users',self.corsWithOption);
         self.router.post('/users/signup',

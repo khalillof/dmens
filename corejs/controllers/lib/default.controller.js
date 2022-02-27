@@ -11,7 +11,7 @@ class DefaultController {
 
   // factory method
   static async createInstance(svcName) {
-    return await Promise.resolve(new DefaultController(svcName));
+    return await Promise.resolve(new this(svcName));
   }
 
  async tryCatchWrapper(req, res, next, actionName){

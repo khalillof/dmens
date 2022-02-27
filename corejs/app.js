@@ -16,6 +16,7 @@ const  {dbInit} = require('./common/services/mongoose.service');
 const {printRoutesToString ,appRouter}  = require('./common/customTypes/types.config');
 const  {initRouteStore} = require('./routes');
 const passport = require('passport');
+const { Promise } = require('mongoose');
 
 
 // Create the Express application
@@ -59,10 +60,9 @@ app.use(helmet({
 }));
 
 
-
 setTimeout(async()=>{
+initRouteStore.forEach(async(rout)=> await rout())
 
- initRouteStore.forEach(async(rout)=> await rout());
   // register routes
   app.use('/', appRouter);
 

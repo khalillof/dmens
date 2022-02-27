@@ -5,7 +5,7 @@ const { UsersController } = require('../../controllers/');
 class UsersMiddleware {
 
     constructor() {
-        this.cont = new UsersController();
+        this.cont = new UsersController('user');
     }
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())

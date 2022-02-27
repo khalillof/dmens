@@ -14,10 +14,6 @@ export class AuthController extends DefaultController {
         this.jwtMWare = new JwtMiddleware();
     }
 
-    static async createInstance() {
-        return await Promise.resolve(new AuthController('user'));
-    }
-
     createJWT(req:express.Request, res:express.Response, next:express.NextFunction){
 
             let refreshId = req.body._id + config.jwtSecret;

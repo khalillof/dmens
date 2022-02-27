@@ -8,12 +8,8 @@ const upload_url = path.resolve(__dirname, '../../models/schema/uploads');
 
  class EditorController extends DefaultController {
 
-    constructor() {
-        super('editor')
-    }
-
-    static async createInstance() {
-        return await Promise.resolve(new EditorController());
+    constructor(name='editor') {
+        super(name)
     }
 
     pre(req, res, next) {

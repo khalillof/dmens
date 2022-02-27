@@ -10,7 +10,7 @@ export class DefaultController {
 
 
   static async createInstance(svcName: string) {
-    return await Promise.resolve(new DefaultController(svcName));
+    return await Promise.resolve(new this(svcName));
   }
   
   

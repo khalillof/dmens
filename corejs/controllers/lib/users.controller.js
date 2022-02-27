@@ -8,9 +8,6 @@ class UsersController extends DefaultController {
   constructor(name) {
     super(name)
   }
-  static async createInstance() {
-    return await Promise.resolve(new UsersController('user'));
-  }
 
  async signup(req, res, next){
   await this.db.model.register(req.body, req.body.password, this.callBack(res).done)
