@@ -99,7 +99,7 @@ class Assert {
      if (unsafe_string.test(value)) Assert.fail(value, 'unsafe charecters detected ', message)
      
   }
-  static idString (value = '', len=25, message = '') {
+  static idString (value, len=25, message = '') {
       Assert.safeString(value, message)
     if (value.length > len) Assert.fail(value, 'id string is too long', message)
   }

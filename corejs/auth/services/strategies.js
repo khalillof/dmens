@@ -18,7 +18,7 @@ class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-          dbStore['user'].findOne({ username: username })
+          dbStore['user'].model.findOne({ username: username })
               .then((err, user) => {
                 if (err) { return cb(err); }
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }

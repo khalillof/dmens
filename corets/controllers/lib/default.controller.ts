@@ -107,14 +107,10 @@ export class DefaultController {
             this.resErrIfErr(res, err);
           }
          else if (obj) {
-           let id = obj.id ? obj.id : null;
-            this.resObjCbSuccess(res, obj, cb, id);
+            this.resObjCbSuccess(res, obj, cb, obj._id);
           }
-          else if (cb) {
-            this.Cb(cb)
-          }
-          else if (!err && !obj && info) {
-            res.json({ success: false, message: 'Operation faild!', error: info ? info : 'error' });
+          else if (info) {
+            res.json({ success: false, message: 'Operation faild!', error: info ?? 'error' });
           }
         },
         errCb: (err: any) => this.resErrCb(res, err, cb),

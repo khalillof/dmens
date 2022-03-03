@@ -30,7 +30,7 @@ export class DefaultRoutesConfig {
         } 
 
         
-        typeof callback === 'function' ? callback(this): this.configureRoutes();
+        typeof callback === 'function' ? callback(this): this.defaultRoutes();
            
         // add instance to routeStore
         routeStore[this.routeName]=this;
@@ -46,47 +46,42 @@ export class DefaultRoutesConfig {
         await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user,editor'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
     }
 
-    custumMiddleWare(rName?:string) {
-      if (rName) {
-        this.routeName = rName;
-        this.routeParam = this.routeName + '/:id';
-      }
-      return {
-        getList:  (callback:[]) => this.router.get(this.routeName, this.corsWithOption,...callback, this.actions('list')),
-        getId: (callback:[]) => this.router.get(this.routeParam,this.corsWithOption, ...callback, this.tryCatchAction('getOneById')),
-        post: (callback:[]) => this.router.post(this.routeName, this.corsWithOption, ...callback, this.tryCatchAction('create')),
-        put: (callback:[]) => this.router.put(this.routeParam, this.corsWithOption, ...callback, this.tryCatchAction('put')),
-        delete: (callback:[]) => this.router.delete(this.routeParam, this.corsWithOption, ...callback, this.tryCatchAction('remove'))
-      }
+    buildMdWares(middlewares?:Array<Function>, useUserMWars=true){
+      let mdwares = [this.corsWithOption];
+      if(useUserMWars)
+        mdwares = [...mdwares,this.UsersMWare.verifyUser,this.UsersMWare.verifyUserIsAdmin];
+      if(middlewares)
+        mdwares = [...mdwares, ...middlewares];
+        return mdwares;
     }
-    configureRoutes() {
-      this.router.all(this.routeName,this.corsWithOption);
-      this.router.all(this.routeParam,this.corsWithOption);
-      
-      this.router.get(this.routeName, this.actions('list'))
-      this.router.get(this.routeParam, this.tryCatchAction('getOneById'))
-      this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('create'))
-      this.router.put(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('put'))
-      this.router.delete(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('remove'));
-      this.router.param('id', async (req,res,next, id)=>{ Assert.string(id, {required:true, notEmpty:true}); next()});
-      
-  
+    // custom routes
+    getList(middlewares?:any, useUserMWars=false){
+      this.router.get(this.routeName, ...this.buildMdWares(middlewares,useUserMWars),this.actions('list'))
+    }
+    getId(middlewares?:any, useUserMWars=false){
+      this.router.get(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('getOneById'))
+    }
+    post(middlewares?:any, useUserMWars=true){
+      this.router.post(this.routeName, ...this.buildMdWares(middlewares,useUserMWars),this.actions('create'))
+    }
+    put(middlewares?:any, useUserMWars=true){
+      this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
+    }
+    delete(middlewares?:any, useUserMWars=true){  
+      this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
     }
   
- 
+    defaultRoutes(){
+      this.getList(); 
+      this.getId();
+      this.post();
+      this.put();
+      this.delete()
+      this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
+    }
+
  actions(actionName:string){ 
      return async (req:express.Request,res:express.Response,next:express.NextFunction)=> await this.controller[actionName](req,res,next)
-     
  }
- tryCatchAction(actionName:string){
-  return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
-    try{
-      await this.controller[actionName](req,res,next)
-    }catch(err:any){
-      console.error(err.stack)
-      res.json({sucess:false, error: 'error operation faild!'})
-    }  
-  }
-}
 
   }

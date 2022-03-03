@@ -1,44 +1,51 @@
 
-const { DefaultController } =require('./default.controller');
-const fs =require('fs');
-const path =require( 'path');
+const { DefaultController } = require('./default.controller');
+const fs = require('fs');
+const path = require('path');
+const { JsonLoad } = require('../../models/json.load')
 
 
 const upload_url = path.resolve(__dirname, '../../models/schema/uploads');
 
- class EditorController extends DefaultController {
+class EditorController extends DefaultController {
 
-    constructor(name='editor') {
+    constructor(name = 'editor') {
         super(name)
     }
 
-    pre(req, res, next) {
-
-        let content = req.header('content-type');
-
-        if (content === 'application/json') { //if(content.startsWith('multipart/form-data'))
-            let content = req.body;
-            req.body = {};
-            req.body.json = content;
-            this.schema(req, res, next)
-        } else {
-            next()
-        }
-    }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
-    async schema(req, res, next) {
+    async create(req, res, next) {
 
-            if (req.body.json) {
-                let filepath = path.join(upload_url + 'schema.' + Date.now() + '.json');
-    
-                //stringify JSON Object
-                let jsonContent = JSON.stringify(req.body.json);
-    
+        if (req.header('content-type') ==='application/json') {
+            //const user = req.user;
+
+            await this.tryCatchRes(res, async () => {
+                // validated json obj
+                let jsObj = await JsonLoad.makeSchema({name :req.body.name,schema :req.body}, true);
+                let filepath = path.join(upload_url + 'editors/schema.' + Date.now() + '.json');
+                
+                jsObj.schema.editor = req.user._id;
+
+                //stringify JSON schema
+                jsObj.schema.data = JSON.stringify(jsObj.schema.data);
+                
+                // assign validated json object to body for process & save by supper create method
+                req.body = jsObj.schema;
+                await super.create(req, res, next);
+
+                 // for file save
+                 let jsonContent = JSON.stringify(jsObj)
                 fs.writeFile(filepath, jsonContent, 'utf8', this.callBack(res).errSuccess);
-            }else{
-                this.resObjSuccessErr(res,req.file);
-            }
-            
+                this.log('all the way up to the buttom of the function')
+            });
+
+
+        } else if(req.file) {
+            this.resObjSuccessErr(res, req.file);
+        }else{
+            this.resError(res);
+        }
+
     }
 
 }

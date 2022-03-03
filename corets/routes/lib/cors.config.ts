@@ -1,9 +1,7 @@
 import  Cors  from 'cors';
-import {env} from 'process'
+import {config} from '../../bin/config'
 
-const whitelist : any  = env.NODE_ENV === 'development'? env.CORES_DMAINS_DEV?.split(',') : env.CORES_DMAINS_PROD?.split(',');
-
-const corsOptions = (req:any, callback:Function)=> callback(null, {origin: whitelist.indexOf(req.header('Origin')) !== -1 ? true:false});
+const corsOptions = (req:any, callback:Function)=> callback(null, {origin: config.cores_domains.indexOf(req.header('Origin')) !== -1 ? true:false});
 
 
 export const cors = Cors();

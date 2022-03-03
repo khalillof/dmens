@@ -21,8 +21,12 @@ export async function EditorRoutes(){
     return dbStore['user'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/editor', await EditorController.createInstance('editor'), 
     (self:DefaultRoutesConfig):void=>{
 
- self.router.post('/editor',self.corsWithOption, self.actions('pre'),upload.single('schema'), self.actions('schema'));
-
+ //self.router.post('/editor',self.corsWithOption, upload.single('schema'), self.actions('schema'));
+ self.post([upload.single('schema')], false);
+ self.getId();
+ self.getList();
+ self.put();
+ self.delete()
 })) : console.log('User model is not avaliable in dbStore No Schema routes configuered');;
 };
 

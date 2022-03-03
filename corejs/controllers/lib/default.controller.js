@@ -1,4 +1,5 @@
 //"use strict";
+const { Error} = require("mongoose");
 const {AssertionError} = require('../../common/customTypes/assertionError')
 const { dbStore} = require('../../common/customTypes/types.config');
 
@@ -14,16 +15,15 @@ class DefaultController {
     return await Promise.resolve(new this(svcName));
   }
 
- async tryCatchWrapper(req, res, next, actionName){
+async tryCatch(req, res, next, actionName){
     try{
-       await this[actionName](req,res,next);
+      await this[actionName](req, res, next) //await this[actionName](req,res,next);
     }catch(err){
       this.resErrIfErr(res,err);
     }
 }
 
   async list(req, res, next) {
-
     let items = await this.db.Tolist(20, 0);
     this.resItems(res, items)
   }
@@ -40,9 +40,9 @@ class DefaultController {
     this.resItem(res, item)
   }
   async create(req, res, next) {
-    let item = await this.db.create(...req.body);
-    console.log('document Created :', item);
-    this.resItem(res, item._id)
+    let item = await this.db.create(req.body);
+    this.log('document Created :', item);
+    this.resItem(res, item)
   }
 
   async patch(req, res, next) {
@@ -59,9 +59,9 @@ class DefaultController {
     this.resSuccess(res)
   }
   ////// helpers ================================
-  async tryCatchRes(res, funToFire) {
+  async tryCatchRes(res, fun) {
     try {
-      this.Cb(funToFire)
+      if (typeof fun === 'function') await fun(this)
     } catch (err) {
       this.resErrIfErr(res, err)
     }
@@ -75,7 +75,7 @@ class DefaultController {
     res.status(status).json(obj);
   }
   logError(err) {
-    if (err) console.error(err.stack ? err.stack : err)
+    if (err) console.error(err.stack)
   }
   log(info) {
     if (info) console.log(info);
@@ -86,7 +86,7 @@ class DefaultController {
   resErrIfErr(res, err) {
     if (err) {
       this.logError(err)
-      this.resError(res, err instanceof AssertionError ? err.message : 'operation faild!');
+      this.resError(res, err instanceof Error.ValidationError || err instanceof AssertionError ? err.message : 'operation faild!');
     }
   }
   resSuccess(res, message) { res.json({ success: true, message: message ? message : 'operation Successful!' }) }
@@ -112,14 +112,10 @@ class DefaultController {
             this.resErrIfErr(res, err);
           }
          else if (obj) {
-           let id = obj.id ? obj.id : null;
-            this.resObjCbSuccess(res, obj, cb, id);
+            this.resObjCbSuccess(res, obj, cb, obj._id ?? '');
           }
-          else if (cb) {
-            this.Cb(cb)
-          }
-          else if (!err && !obj && info) {
-            res.json({ success: false, message: 'Operation faild!', error: info ? info : 'error' });
+          else if (info) {
+            res.json({ success: false, message: 'Operation faild!', error: info ?? 'error' });
           }
         },
         errCb: (err) => this.resErrCb(res, err, cb),

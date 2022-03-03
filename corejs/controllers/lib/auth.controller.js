@@ -13,6 +13,7 @@ class AuthController extends DefaultController {
     }
 
     createJWT(req, res, next){
+        this.tryCatchRes(res, ()=> {
                 let refreshId = req.body._id + config.jwtSecret;
                 let salt = randomBytes(16).toString('base64');
                 let hash = createHmac('sha512', salt).update(refreshId).digest("base64");
@@ -21,7 +22,7 @@ class AuthController extends DefaultController {
                 let b = Buffer.from(hash);
                 let refreshToken = b.toString('base64');
                 return res.json({success:true, accessToken: token, refreshToken: refreshToken });
-
+        });
         }
 }
 

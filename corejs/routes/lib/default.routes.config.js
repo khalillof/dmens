@@ -24,64 +24,62 @@ class DefaultRoutesConfig {
       this.UsersMWare = item ? item.UsersMWare : new UsersMiddleware();
     }
 
-    typeof callback === 'function' ? callback(this) : this.configureRoutes();
+    
+    typeof callback === 'function' ? callback(this) : this.defaultRoutes();
     // add instance to routeStore
     routeStore[this.routeName] = this;
 
     console.log('Added ( ' + this.routeName + ' ) to routeStore');
   }
 
-  static async instance(rName, control, callback) {
+  static async instance(rName, control, callback) {this.po
     var result = new DefaultRoutesConfig(rName, control, callback);
     return await Promise.resolve(result);
   }
 
-  static async createInstancesWithDefault(){
-    
-   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if (name !== 'user' && name !=='editor') await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
-}
+  buildMdWares(middlewares, useUserMWars=true){
+    let mdwares = [this.corsWithOption];
+    if(useUserMWars)
+      mdwares = [...mdwares,this.UsersMWare.verifyUser,this.UsersMWare.verifyUserIsAdmin];
+    if(middlewares)
+      mdwares = [...mdwares, ...middlewares];
+    return mdwares;
+  }
 
-  custumMiddleWare(rName) {
-    if (rName) {
-      this.routeName = rName;
-      this.routeParam = this.routeName + '/:id';
-    }
-    return {
-      getList: (...callback) => this.router.get(this.routeName,this.corsWithOption,...callback, this.actions('list')),
-      getId: (...callback) => this.router.get(this.routeParam,this.corsWithOption, ...callback, this.tryCatchAction('getById')),
-      post: (...callback) => this.router.post(this.routeName,this.corsWithOption, ...callback, this.tryCatchAction('create')),
-      put: (...callback) => this.router.put(this.routeParam, this.corsWithOption,...callback, this.tryCatchAction('put')),
-      delete: (...callback) => this.router.delete(this.routeParam,this.corsWithOption, ...callback, this.tryCatchAction('remove'))
-    }
+  static async createInstancesWithDefault(){
+    await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
+ }
+  // custom routes
+  getList(middlewares, useUserMWars=false){
+    this.router.get(this.routeName, ...this.buildMdWares(middlewares,useUserMWars), this.actions('list'))
   }
-  configureRoutes() {
-    this.router.all(this.routeName,this.corsWithOption);
-    this.router.all(this.routeParam,this.corsWithOption);
-    
-    this.router.get(this.routeName, this.actions('list'))
-    this.router.get(this.routeParam, this.tryCatchAction('getOneById'))
-    this.router.post(this.routeName, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('create'))
-    this.router.put(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('put'))
-    this.router.delete(this.routeParam, this.UsersMWare.verifyUser, this.UsersMWare.verifyUserIsAdmin, this.tryCatchAction('remove'));
-    this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
+  getId(middlewares, useUserMWars=false){
+    this.router.get(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('getOneById'))
   }
+  post(middlewares, useUserMWars=true){
+    this.router.post(this.routeName, ...this.buildMdWares(middlewares,useUserMWars),this.actions('create'))
+  }
+  put(middlewares, useUserMWars=true){
+    this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
+  }
+  delete(middlewares, useUserMWars=true){  
+    this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
+  }
+
+defaultRoutes(){
+  this.getList(); 
+  this.getId();
+  this.post();
+  this.put();
+  this.delete()
+  this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
+}
  
   actions(actionName){ 
-    return async (req,res,next)=> await this.controller[actionName](req,res,next)
-    
-}
-tryCatchAction(actionName){
- return async (req, res, next)=>{
-   try{
-     await this.controller[actionName](req,res,next)
-   }catch(err){
-     console.error(err.stack)
-     res.json({sucess:false, error: 'error operation faild!'})
-   }  
- }
-}
+    return async (req,res,next)=> await this.controller[actionName](req,res,next) 
 }
 
+}
 
 
 exports.DefaultRoutesConfig = DefaultRoutesConfig;

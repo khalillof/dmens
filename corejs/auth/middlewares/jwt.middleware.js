@@ -13,7 +13,7 @@ class JwtMiddleware {
             next();
         }
         else {
-            res.json({ success:false, error: 'some missing body field' });
+            res.json({ success:false, error: 'missing required body fields' });
         }
     }
     validRefreshNeeded(req, res, next){
@@ -36,7 +36,7 @@ class JwtMiddleware {
             try {
                 let authorization = req.headers['authorization'].split(' ');
                 if (authorization[0] !== 'Bearer') {
-                    res.json({ success:false, error: 'need: refreshToken' });
+                    res.json({ success:false, error: 'need refreshToken' });
                 }
                 else {
                     req.jwt = verify(authorization[1], config.jwtSecret);
@@ -44,11 +44,12 @@ class JwtMiddleware {
                 }
             }
             catch (err) {
-                res.json({ success:false,error: err });
+                console.error(err.stack)
+                res.status(500).json({ success:false,error: 'server error' });
             }
         }
         else {
-            res.json({ success:false, error: 'need body field: refreshToken' });
+            res.json({ success:false, error: 'missing required body fields' });
         }
     }
 }

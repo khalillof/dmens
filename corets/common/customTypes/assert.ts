@@ -6,6 +6,7 @@ var { Stream } = require('stream')
 const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
 const validTypes = [Number, String, Object, Array, Boolean, Function]
+const unsafe_string = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/; 
 
 function isObject (v:any) {
   return v && (typeof v === 'object') && !Array.isArray(v)
@@ -92,7 +93,15 @@ export class Assert {
     if (value !== undefined) Assert.typeOf(value, String, message)
     if (value !== undefined && !value.trim().length && notEmpty) Assert.fail(value, 'Not empty string', message)
   }
-
+  static safeString(value:any, message=''){
+    Assert.string(value,{required:true, notEmpty:true})
+     if (unsafe_string.test(value)) Assert.fail(value, 'unsafe charecters detected ', message)
+     
+  }
+  static idString (value:any, len=25, message = '') {
+      Assert.safeString(value, message)
+    if (value.length > len) Assert.fail(value, 'id string is too long', message)
+  }
   static boolean (value:any, { required = false, message = '' } = {}) {
     if (required) Assert.typeOf(value, Boolean, message)
     if (value !== undefined) Assert.typeOf(value, Boolean, message)

@@ -13,7 +13,7 @@ export class JwtMiddleware {
         if (req.body && req.body.refreshToken) {
              next();
         } else {
-            res.json({ success:false, error: 'some missing body field' });
+            res.json({ success:false, error: 'missing required body fields' });
         }
     }
 
@@ -36,14 +36,15 @@ export class JwtMiddleware {
             try {
                 let authorization = req.headers['authorization'].split(' ');
                 if (authorization[0] !== 'Bearer') {
-                     res.json({ success:false, error: 'need : refreshToken' });
+                     res.json({ success:false, error: 'need refreshToken' });
                 } else {
                     req.jwt = verify(authorization[1], config.jwtSecret);
                     next();                   
                 }
 
-            } catch (err) {
-                res.json({ success:false, error: 'error' });
+            } catch (err:any) {
+                console.error(err.stack)
+                res.status(500).json({ success:false,error: 'server error' });
             }
         } else {
             res.json({ success:false, error: 'need body field: refreshToken' });
