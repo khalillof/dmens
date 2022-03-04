@@ -80,8 +80,8 @@ export class DefaultRoutesConfig {
       this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
     }
 
- actions(actionName:string){ 
-     return async (req:express.Request,res:express.Response,next:express.NextFunction)=> await this.controller[actionName](req,res,next)
+ actions(actionName:string, tryCatch=true){ 
+     return async (req:express.Request,res:express.Response,next:express.NextFunction)=> tryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next)
  }
 
   }

@@ -4,15 +4,16 @@ import { dbStore } from '../../common/customTypes/types.config';
 
 export class DefaultController {
   db: any;
+  self:DefaultController | any
   public constructor(name: string) {
     this.db = dbStore[name];
+    this.self=this
   }
 
 
   static async createInstance(svcName: string) {
     return await Promise.resolve(new this(svcName));
   }
-  
   
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
     let items = await this.db.Tolist(20, 0);
@@ -50,6 +51,13 @@ export class DefaultController {
     this.resSuccess(res)
   }
   ////// helpers ================================
+  async tryCatch(req: express.Request, res: express.Response, next: express.NextFunction, actionName:string){
+    try{
+      await this.self[actionName](req, res, next) //await this[actionName](req,res,next);
+    }catch(err){
+      this.resErrIfErr(res,err);
+    }
+}
   async tryCatchRes(res: express.Response, fun: Function) {
     try {
     if (fun && typeof fun === 'function'){ 

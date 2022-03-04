@@ -75,8 +75,8 @@ defaultRoutes(){
   this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
 }
  
-  actions(actionName){ 
-    return async (req,res,next)=> await this.controller[actionName](req,res,next) 
+  actions(actionName, tryCatch=true){ 
+    return async (req,res,next)=> tryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next);
 }
 
 }

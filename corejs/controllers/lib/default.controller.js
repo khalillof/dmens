@@ -15,14 +15,6 @@ class DefaultController {
     return await Promise.resolve(new this(svcName));
   }
 
-async tryCatch(req, res, next, actionName){
-    try{
-      await this[actionName](req, res, next) //await this[actionName](req,res,next);
-    }catch(err){
-      this.resErrIfErr(res,err);
-    }
-}
-
   async list(req, res, next) {
     let items = await this.db.Tolist(20, 0);
     this.resItems(res, items)
@@ -59,6 +51,13 @@ async tryCatch(req, res, next, actionName){
     this.resSuccess(res)
   }
   ////// helpers ================================
+  async tryCatch(req, res, next, actionName){
+    try{
+      await this[actionName](req, res, next) //await this[actionName](req,res,next);
+    }catch(err){
+      this.resErrIfErr(res,err);
+    }
+}
   async tryCatchRes(res, fun) {
     try {
       if (typeof fun === 'function') await fun(this)
@@ -66,6 +65,7 @@ async tryCatch(req, res, next, actionName){
       this.resErrIfErr(res, err)
     }
   }
+
   extractId(req, res, next) {
     req.body.id = req.params.id;
     next();
