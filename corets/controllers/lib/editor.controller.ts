@@ -19,7 +19,6 @@ export class EditorController extends DefaultController {
         err ? this.logError(err):this.log('New json file document created path: '+file_path)
         }); 
 }
-    // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
     async create(req: express.Request, res: express.Response, next: express.NextFunction) {
 
         if (req.header('content-type') ==='application/json') {
