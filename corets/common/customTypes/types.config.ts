@@ -2,7 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {ISvc} from '../../services/ISvc.services'
 import {IController, DefaultController} from '../../controllers/'
 import {DefaultRoutesConfig} from '../../routes/'
-import UsersMiddleware from '../../users/middleware/users.middleware'
+
 const pluralize = require('pluralize');
 import {Router} from 'express'
 

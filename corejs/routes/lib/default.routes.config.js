@@ -4,16 +4,22 @@ const { routeStore, appRouter, dbStore, pluralizeRoute} = require('../../common/
 const { DefaultController} = require('../../controllers/');
 const {Assert} = require('../../common/customTypes/assert');
 const {UsersMiddleware} = require('../../users/middleware/users.middleware');
-
-
+ 
+async function getUserMWare(){
+  let item= Object.values(routeStore).find(r=>  r.UsersMWare instanceof UsersMiddleware );
+  let result = item ? item.UsersMWare : await UsersMiddleware.createInstance();
+return await Promise.resolve(result);
+}
 class DefaultRoutesConfig {
 
-  constructor(rName, control, callback) {
+  constructor(rName,controller=null,usersMWare=null,callback=null) {
     this.router = appRouter;
     this.routeName = pluralizeRoute(rName);
     this.routeParam = this.routeName + '/:id';
     this.corsWithOption = corsWithOptions;
-
+    this.controller = controller;
+    this.UsersMWare = usersMWare;
+/*
     if (!control) {
       this.controller = null;
       this.UsersMWare = null;
@@ -21,9 +27,9 @@ class DefaultRoutesConfig {
       this.controller = control;
 
       let item= Object.values(routeStore).find(r=> r.UsersMWare);
-      this.UsersMWare = item ? item.UsersMWare : new UsersMiddleware();
+      this.UsersMWare = item && item.UsersMWare ? item.UsersMWare : new UsersMiddleware();
     }
-
+*/
     
     typeof callback === 'function' ? callback(this) : this.defaultRoutes();
     // add instance to routeStore
@@ -32,8 +38,9 @@ class DefaultRoutesConfig {
     console.log('Added ( ' + this.routeName + ' ) to routeStore');
   }
 
-  static async instance(rName, control, callback) {this.po
-    var result = new DefaultRoutesConfig(rName, control, callback);
+  static async instance(rName, control, callback) {
+    let umwre = control ? await getUserMWare(): null;
+    let result =  new DefaultRoutesConfig(rName,control,umwre,callback);
     return await Promise.resolve(result);
   }
 
@@ -82,4 +89,4 @@ defaultRoutes(){
 }
 
 
-exports.DefaultRoutesConfig = DefaultRoutesConfig;
+module.exports = {DefaultRoutesConfig,getUserMWare};

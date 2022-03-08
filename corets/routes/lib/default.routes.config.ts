@@ -5,29 +5,27 @@ import UsersMiddleware from '../../users/middleware/users.middleware';
 import { DefaultController, IController } from '../../controllers/';
 import {Assert} from '../../common/customTypes/assert' ;
 
+export async function getUserMWare(){
+  let item= Object.values(routeStore).find(r=>  r.UsersMWare instanceof UsersMiddleware );
+  let result = item ? item.UsersMWare : await UsersMiddleware.createInstance();
+    return await Promise.resolve(result);
+}
+
 export class DefaultRoutesConfig {
     router:express.Router;
     routeName: string;
     routeParam: string;
     controller:IController | any;
     corsWithOption:any;
-    UsersMWare:UsersMiddleware | any;
+    UsersMWare?:UsersMiddleware ;
 
-    constructor(rName: string, control:IController, callback?:Function) { 
+    constructor(rName:string,controller?:IController,usersMWare?:UsersMiddleware,callback?:Function) { 
         this.router = appRouter;
         this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName+'/:id';
         this.corsWithOption = corsWithOptions;
-
-        if (!control){
-          this.controller = null;
-          this.UsersMWare = null;
-        }else{
-          this.controller = control;
-
-          let item= Object.values(routeStore).find(r=> r.UsersMWare);
-          this.UsersMWare = item ? item.UsersMWare : new UsersMiddleware();
-        } 
+        this.controller = controller;
+        this.UsersMWare = usersMWare;
 
         
         typeof callback === 'function' ? callback(this): this.defaultRoutes();
@@ -35,11 +33,11 @@ export class DefaultRoutesConfig {
         // add instance to routeStore
         routeStore[this.routeName]=this;
         console.log('Added ( ' +this.routeName+ ' ) to routeStore');
-
     }
      
-     static async instance(rName: string, control:any, callback?:any){
-        var result =  new DefaultRoutesConfig(rName,control,callback);
+     static async instance(rName: string, control:any, callback?:Function){
+        let umwre = control ? await getUserMWare(): undefined;
+        let result =  new DefaultRoutesConfig(rName,control,umwre,callback);
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(){
@@ -49,7 +47,7 @@ export class DefaultRoutesConfig {
     buildMdWares(middlewares?:Array<Function>, useUserMWars=true){
       let mdwares = [this.corsWithOption];
       if(useUserMWars)
-        mdwares = [...mdwares,this.UsersMWare.verifyUser,this.UsersMWare.verifyUserIsAdmin];
+        mdwares = [...mdwares,this.UsersMWare?.verifyUser,this.UsersMWare?.verifyUserIsAdmin];
       if(middlewares)
         mdwares = [...mdwares, ...middlewares];
         return mdwares;

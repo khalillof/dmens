@@ -10,7 +10,7 @@ export async function AuthRoutes(){
 
         self.router.post('/auth',
         self.corsWithOption,
-        self.UsersMWare.validateRequiredUserBodyFields,
+        self.UsersMWare!.validateRequiredUserBodyFields,
         self.controller.createJWT
     );
 

@@ -1,5 +1,5 @@
 "use strict";
-import mongoose from 'mongoose';
+import {Model ,Schema , model} from 'mongoose';
 import {JsonSchema, dbStore} from '../common/customTypes/types.config'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
@@ -15,12 +15,12 @@ export class JsonModel {
       throw new Error('there is already model in this name : '+this.name)
     }
 
-    this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true }); 
+    this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
     if (this.name === 'user') {
       
         this.schema.plugin(passportLocalMongoose);
-        const User :any = mongoose.model(this.name, this.schema);         
+        const User :any = model(this.name, this.schema);         
         //passport.use(new Strategy(User.authenticate()));
         passport.use(User.createStrategy());
         passport.serializeUser(User.serializeUser());
@@ -30,13 +30,15 @@ export class JsonModel {
         passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
         //passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
-        this.model = User;
+        this.db = User;
     } else {
-        this.model = mongoose.model(this.name, this.schema);       
+        this.db = model(this.name, this.schema);       
     }
     
   }else if(typeof callback === 'function') {
            callback(this);
+  }else{
+    throw new Error('jsonSchema is required')
   }
   
     // add to db store
@@ -45,46 +47,41 @@ export class JsonModel {
   }
 
   name: string= "";
-  schema:mongoose.Schema | any ;
-  model:mongoose.Model<any,any> | any;
+  schema?:Schema ;
+  db?:Model<any>;
 
   static async createInstance(jsonModel?:any, callback?:any) {
     let dbb = new JsonModel(jsonModel, callback);
     return await Promise.resolve(dbb);
   }
-  async Tolist(limit: number = 25, page: number = 0) {
-    return await this.model.find()
+  async Tolist(limit: number = 25, page: number = 0, query=null) {
+    return await this.db?.find(query)
         .limit(limit)
         .skip(limit * page)
         .exec();
 }
-async TolistQuery(query:{},limit: number = 25, page: number = 0) {
-  return await this.model.find(query)
-      .limit(limit)
-      .skip(limit * page)
-      .exec();
-}
+
 async getOneById(id: string) {
-  return await this.model.findOne({_id: id});
+  return await this.db?.findById(id);
 }
 async getOneByQuery(query: {}) {
-  return await this.model.findOne(query);
+  return await this.db?.findOne(query);
 }
-  async create(obj: any){
-    return await this.model.create(obj);
+  async create(obj: object){
+    return await this.db?.create(obj);
   }
 
-  async putById(id:string, objFields: {}){
-     return await this.model.findByIdAndUpdate(id, objFields);
+  async putById(id:string, objFields: object){
+     return await this.db?.findByIdAndUpdate(id, objFields);
   }
   
   async deleteById(id: string) {
-    return await this.model.findByIdAndDelete(id);
+    return await this.db?.findByIdAndDelete(id);
   }
   async deleteByQuery(query:{}) {
-    return await this.model.findOneAndDelete(query);
+    return await this.db?.findOneAndDelete(query);
   }
   async patchById(objFields: any) {
-   return await this.model.findOneAndUpdate(objFields._id, objFields);
+   return await this.db?.findOneAndUpdate(objFields._id, objFields);
   }
 }

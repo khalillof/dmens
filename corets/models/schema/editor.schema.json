@@ -9,17 +9,16 @@
       "minLength": 3,
       "maxLength": 30
     },
-    "content": {
+    "data": {
       "type": "String",
       "required": true,
       "minLength": 10
     },
     "editor": {
       "type": "ObjectId",
-      "ref": "User",
-      "required": true
+      "ref": "User"
     },
-    "descriptions": {
+    "description": {
       "type": "String",
       "default": "",
       "maxLength": 500

@@ -1,12 +1,15 @@
 "use strict";
 
 const {env} = require('process')
+const path = require('path');
 
 exports.config = {
     port:env.PORT || 3000,
     auth:env.AUTH || true,
     secretKey: env.SECRET_KEY || '',
     jwtSecret:env.SECRET_KEY || '',
+    getJsonUploadPath: ()=> path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR +`/schema.${Date.now()}.json`),
+    jsonUploadDir:path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR),
     cores_domains: env.NODE_ENV === 'development'? env.CORES_DMAINS_DEV.split(',') || [] : env.CORES_DMAINS_PROD.split(',') || [],
     mongoUrl: {
         'dev': env.DB_CONNECTION_DEV || '',
@@ -20,3 +23,4 @@ exports.config = {
         'clientSecret': env.FACEBOOK_CLIENT_SECRET || ''
     }
 };
+

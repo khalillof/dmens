@@ -5,7 +5,7 @@ const {AuthService} = require('../../auth/services/auth.service');
 
  async function UsersRoutes(){
 
- return await  Promise.resolve(DefaultRoutesConfig.instance('/users', await UsersController.createInstance('user'), 
+ return await  Promise.resolve(DefaultRoutesConfig.instance('user', await UsersController.createInstance('user'), 
     
    (self)=>{
         self.router.all('/users',self.corsWithOption);

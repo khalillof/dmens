@@ -1,5 +1,5 @@
 "use strict";
-const { model,Schema} = require("mongoose");
+const {model,Schema} = require("mongoose");
 const passport = require('passport');
 var passportLocalMongoose = require('passport-local-mongoose');
 const { dbStore} = require('../common/customTypes/types.config');
@@ -48,18 +48,13 @@ class JsonModel {
     return await Promise.resolve(DB);
   }
 
-  async Tolist(limit = 25, page = 0) {
-    return await this.model.find()
-      .limit(limit)
-      .skip(limit * page)
-      .exec();
-  }
-  async TolistQuery( query,limit = 25, page = 0) {
+  async Tolist(limit=25, page= 0, query=null) {
     return await this.model.find(query)
       .limit(limit)
       .skip(limit * page)
       .exec();
   }
+
   async getOneById(id) {
     return await this.model.findById(id);
   }

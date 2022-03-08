@@ -1,5 +1,6 @@
 //"use strict";
 const { Error} = require("mongoose");
+const {MongoServerError } = require("mongodb");
 const {AssertionError} = require('../../common/customTypes/assertionError')
 const { dbStore} = require('../../common/customTypes/types.config');
 
@@ -16,25 +17,22 @@ class DefaultController {
   }
 
   async list(req, res, next) {
-    let items = await this.db.Tolist(20, 0);
+    let items = await this.db.Tolist(20, 0,req.query);
     this.resItems(res, items)
   }
   async listQuery(req, res, next) {
     let items = await this.db.Tolist( req.query,20, 0);
     this.resItems(res, items)
   }
-  async getOneById(req, res, next) {
-    let item = await this.db.getOneById(req.params.id);
-    this.resItem(res, item)
-  }
+
   async getOneByQuery(req, res, next) {
     let item = await this.db.getOneByQuery(req.query);
     this.resItem(res, item)
   }
   async create(req, res, next) {
-    let item = await this.db.create(req.body);
-    this.log('document Created :', item);
-    this.resItem(res, item)
+      let item = await  this.db.create(req.body);
+      this.log('document Created :', item);
+      this.resItem(res, item)
   }
 
   async patch(req, res, next) {
@@ -86,7 +84,8 @@ class DefaultController {
   resErrIfErr(res, err) {
     if (err) {
       this.logError(err)
-      this.resError(res, err instanceof Error.ValidationError || err instanceof AssertionError ? err.message : 'operation faild!');
+      let msg = err instanceof Error.ValidationError || err instanceof AssertionError || err instanceof MongoServerError ? err.message : 'operation faild!'
+      this.resError(res, msg); 
     }
   }
   resSuccess(res, message) { res.json({ success: true, message: message ? message : 'operation Successful!' }) }

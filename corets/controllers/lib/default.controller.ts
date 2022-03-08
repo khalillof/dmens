@@ -1,4 +1,6 @@
 import AssertionError from '../../common/customTypes/assertionError';
+import { Error} from "mongoose";
+import {MongoServerError } from "mongodb";
 import express from 'express';
 import { dbStore } from '../../common/customTypes/types.config';
 
@@ -16,13 +18,10 @@ export class DefaultController {
   }
   
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let items = await this.db.Tolist(20, 0);
+    let items = await this.db.Tolist(20, 0, req.query);
     this.resItems(res, items)
   }
-  async listQuery(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let items = await this.db.TolistQuery(req.query,20, 0);
-    this.resItems(res, items)
-  }
+
   async getOneById(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.getOneById(req.params.id);
     this.resItem(res, item)
@@ -32,18 +31,18 @@ export class DefaultController {
     this.resItem(res, item)
   }
   async create(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.create(...req.body);
+    let item = await this.db.create(req.body);
     console.log('document Created :', item);
-    this.resItem(res, item._id)
+    this.resItem(res, item)
   }
 
   async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.patchById(req.params.Id, ...req.body);
+    await this.db.patchById(req.params.id, req.body);
     this.resSuccess(res)
   }
 
   async put(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.putById(req.params.Id,req.body);
+    await this.db.putById(req.params.id,req.body);
     this.resSuccess(res)
   }
   async remove(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -89,7 +88,8 @@ export class DefaultController {
   resErrIfErr(res: express.Response, err: any,) {
     if (err) {
       this.logError(err)
-      this.resError(res, err instanceof AssertionError ? err.message : 'operation faild!');
+      let msg = err instanceof Error.ValidationError || err instanceof AssertionError || err instanceof MongoServerError ? err.message : 'operation faild!'
+      this.resError(res, msg); 
     }
   }
   resSuccess(res: express.Response, message?: string) { res.json({ success: true, message: message ? message : 'operation Successful!' }) }

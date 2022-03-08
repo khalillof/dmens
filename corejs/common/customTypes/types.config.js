@@ -52,14 +52,15 @@ exports.getDb =(url) =>{
 // routesStore
 exports.routeStore = {};
 
-exports.getCont = function(url){
+exports.getCont = function(routename){
     for (let d in exports.routeStore) {
-        if (d !== '/' && url.match(d) || d === '/' && url === d) {
+        if (d !== '/' && routename.match(d) || d === '/' && routename === d) {
             // console.log('from getcon : '+url +' - '+d)
             return exports.routeStore[d].controller;
         }
     }
-    throw new Error('controller not found for the url :' + url);
+    return null;
+    //throw new Error('controller not found for the url :' + routename);
 }
 
 exports.getProperty = (obj, key)=> {

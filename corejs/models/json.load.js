@@ -1,15 +1,15 @@
 "use strict";
 const path = require('path');
 const fs = require('fs');
-const { SchemaTypes, SchemaType} = require('mongoose');
+const { SchemaTypes, Error} = require('mongoose');
 const { JsonModel } = require('./json.model');
 const { dbStore} = require('../common/customTypes/types.config');
-const {Assert} = require('../common/customTypes/assert')
+
 class JsonLoad {
 
 
     static async isValidName(name){
-        if (!name) 
+        if (!name)
          throw new Error(' schema name is required property')
     
       if (dbStore[name.toLowerCase()]) 
