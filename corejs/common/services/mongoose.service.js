@@ -8,6 +8,7 @@ const dbOptions ={
       rejectUnauthorized: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      autoIndex: true,
     };
 
  async function dbInit(){

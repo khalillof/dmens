@@ -8,6 +8,7 @@ export const config = {
   jwtSecret: env.SECRET_KEY || '',
   getJsonUploadPath:()=> path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR +`/schema.${Date.now()}.json`),
   jsonUploadDir:path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR),
+  imagesUploadDir:path.resolve(__dirname,'../' + env.IMAGES_UPLOAD_DIR),
   cores_domains: env.NODE_ENV === 'development'? env.CORES_DMAINS_DEV?.split(',') || [] : env.CORES_DMAINS_PROD?.split(',') || [],
   mongoUrl: {
     'dev': env.DB_CONNECTION_DEV || '',
