@@ -1,5 +1,5 @@
 {
-  "name": "Editor",
+  "name": "editor",
   "schema": {
     "name": {
       "type": "String",
@@ -16,7 +16,7 @@
     },
     "editor": {
       "type": "ObjectId",
-      "ref": "User"
+      "ref": "user"
     },
     "description": {
       "type": "String",

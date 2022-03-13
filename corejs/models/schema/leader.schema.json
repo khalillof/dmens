@@ -1,5 +1,5 @@
 {
-    "name":"Leader",
+    "name":"leader",
   "schema":{
     "name": {
     "type": "String",

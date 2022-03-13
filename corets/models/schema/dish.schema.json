@@ -1,5 +1,5 @@
 {
-    "name":"Dish",
+    "name":"dish",
     "schema":{
     "name": {
         "type": "String",
@@ -34,7 +34,7 @@
     "comments": [
         {
             "type": "ObjectId",
-            "ref": "Comment"
+            "ref": "comment"
         }
     ]
 }

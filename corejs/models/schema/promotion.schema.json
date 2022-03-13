@@ -1,5 +1,5 @@
 {
-    "name":"Promotion",
+    "name":"promotion",
     "schema":{
     "name": {
         "type": "String",

@@ -1,10 +1,12 @@
 {
-    "name":"Leader",
+    "name":"leader",
   "schema":{
     "name": {
     "type": "String",
     "required": true,
-    "unique": true
+    "unique": true,
+    "minLength":3,
+    "maxLength":30
 },
 "image": {
     "type": "String",

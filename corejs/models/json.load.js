@@ -114,7 +114,7 @@ class JsonLoad {
   static  deepSearch(item) {
      
         // loop over the item
-        for (let [itemIndex, itemValue] of Object.entries(item))  {           
+        for (let [itemKey, itemValue] of Object.entries(item))  {           
         
         // check if item is object then call deepSearch agin recursively
             if (typeof itemValue === "object") {
@@ -124,12 +124,12 @@ class JsonLoad {
                 // loop over typeMappings to map user schema string type to mongoose typings
                 for (const [mapKey, mapValue] of Object.entries(JsonLoad.typeMappings)) {
                     if (itemValue === mapKey) {
-                        item[itemIndex] = mapValue;
+                        item[itemKey] = mapValue;
                     }
                     else{
                         // check for the item didn't match our typemappings is valid type or raise error
                         if (!JsonLoad.isValidType(itemValue))
-                            throw new Error('unvalid schema type value for the key:' + item[itemIndex] +' :'+itemValue)
+                            throw new Error('unvalid schema type value for the key:' + item[itemKey] +' :'+itemValue)
                     }
                 }
             }

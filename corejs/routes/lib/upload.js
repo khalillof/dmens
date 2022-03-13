@@ -29,13 +29,14 @@ function errCallback(req,res,err){
     // req.file contains information of uploaded file
     // req.body contains information of text fields, if there were any
     if (err instanceof multer.MulterError) {
-        return res.json(err);
+        return res.json({success:false, error:err});
     }
     else if (req.fileValidationError) {
-        return res.json(req.fileValidationError);
+        return res.json({success:false, error:req.fileValidationError});
     }
     else if (err) {
-        return res.json(err);
+        console.log(err.stack);
+        return res.json({success:false, error:err.message});
     }
 }
 

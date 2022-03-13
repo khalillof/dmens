@@ -8,6 +8,7 @@ import {PassportStrategies} from '../auth/services/strategies' ;
 export class JsonModel {
 
   constructor(jsonSchema?:JsonSchema, callback?:any) {
+
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
 
@@ -17,6 +18,11 @@ export class JsonModel {
 
     this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
+    this.loadPopulateNames(jsonSchema.schema); 
+    this.hasPopulate = this.populate.length > 0 ;
+    if(this.hasPopulate) {
+      console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
+    }
     if (this.name === 'user') {
       
         this.schema.plugin(passportLocalMongoose);
@@ -30,9 +36,9 @@ export class JsonModel {
         passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
         //passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
-        this.db = User;
+        this.model = User;
     } else {
-        this.db = model(this.name, this.schema);       
+        this.model = model(this.name, this.schema);       
     }
     
   }else if(typeof callback === 'function') {
@@ -48,40 +54,70 @@ export class JsonModel {
 
   name: string= "";
   schema?:Schema ;
-  db?:Model<any>;
+  model?:Model<any>;
+  populate:Array<string> = [];
+  hasPopulate: boolean= false;
+  loadPopulateNames(_schema?:any){
+    Object.entries(_schema ??  this.schema!.obj).forEach((item, indx,arr) => this.deepSearch(item, indx, arr));
+  }
+  // search item in object and map to mongoose schema
+ deepSearch(obj:any, indx:number, arr:Array<any>) {
+
+    // loop over the item
+    for (let [itemKey, itemValue] of Object.entries(obj))  {           
+    
+      // check if item is object then call deepSearch agin recursively
+       if (typeof itemValue === "object") {
+           this.deepSearch(itemValue, indx,arr)           
+       } else {
+         if(itemKey === 'ref'){
+         //console.log(arr[indx][0])
+          this.populate.push(arr[indx][0])
+         }
+       }
+   }
+}
+
+async getPopulate(id:string){
+  let populatebuilder = "this.model.findById('"+id+"')";
+  this.populate.forEach(item=> populatebuilder +=".populate('"+item+"')");
+  populatebuilder+='.exec()';
+
+  return await eval("(" + populatebuilder + ")");
+}
 
   static async createInstance(jsonModel?:any, callback?:any) {
     let dbb = new JsonModel(jsonModel, callback);
     return await Promise.resolve(dbb);
   }
   async Tolist(limit: number = 25, page: number = 0, query=null) {
-    return await this.db?.find(query)
+    return await this.model?.find(query)
         .limit(limit)
         .skip(limit * page)
         .exec();
 }
 
 async getOneById(id: string) {
-  return await this.db?.findById(id);
+  return this.hasPopulate ? await this.getPopulate(id): await this.model!.findById(id);
 }
 async getOneByQuery(query: {}) {
-  return await this.db?.findOne(query);
+  return await this.model?.findOne(query);
 }
   async create(obj: object){
-    return await this.db?.create(obj);
+    return await this.model?.create(obj);
   }
 
   async putById(id:string, objFields: object){
-     return await this.db?.findByIdAndUpdate(id, objFields);
+     return await this.model?.findByIdAndUpdate(id, objFields);
   }
   
   async deleteById(id: string) {
-    return await this.db?.findByIdAndDelete(id);
+    return await this.model?.findByIdAndDelete(id);
   }
   async deleteByQuery(query:{}) {
-    return await this.db?.findOneAndDelete(query);
+    return await this.model?.findOneAndDelete(query);
   }
   async patchById(objFields: any) {
-   return await this.db?.findOneAndUpdate(objFields._id, objFields);
+   return await this.model?.findOneAndUpdate(objFields._id, objFields);
   }
 }

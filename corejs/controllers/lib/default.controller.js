@@ -24,7 +24,10 @@ class DefaultController {
     let items = await this.db.Tolist( req.query,20, 0);
     this.resItems(res, items)
   }
-
+  async getOneById(req, res, next) {
+    let item = await this.db.getOneById(req.params.id);
+    this.resItem(res, item)
+  }
   async getOneByQuery(req, res, next) {
     let item = await this.db.getOneByQuery(req.query);
     this.resItem(res, item)

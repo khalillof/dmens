@@ -1,5 +1,5 @@
 {
-"name":"Comment",
+"name":"comment",
   "schema":{
     "rating":  {
         "type": "Number",
@@ -13,7 +13,7 @@
     },
     "author": {
         "type": "ObjectId",
-        "ref": "User"
+        "ref": "user"
     }
 }
 }

@@ -15,6 +15,13 @@ class JsonModel {
     }
     this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
+    this.populate = [];
+    this.loadPopulateNames(jsonSchema.schema); 
+    this.hasPopulate = this.populate.length > 0 ;
+
+    if(this.hasPopulate) {
+      console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
+    }
     if (this.name === 'user') {
       
         this.schema.plugin(passportLocalMongoose);
@@ -30,7 +37,7 @@ class JsonModel {
         // assign
         this.model = User;
     } else {
-        this.model = model(this.name, this.schema);  
+        this.model = model(this.name, this.schema); 
     }
     
   }else if(typeof callback === 'function') {
@@ -41,6 +48,35 @@ class JsonModel {
     dbStore[this.name] = this;
     console.log("added ( " + this.name + " ) to DbStore :");
   }
+  loadPopulateNames(_schema = null){
+
+    Object.entries(_schema ??  this.schema.obj).forEach((item, indx,arr) => this.deepSearch(item, indx, arr));
+  }
+  // search item in object and map to mongoose schema
+ deepSearch(obj, indx,arr) {
+     
+    // loop over the item
+    for (let [itemKey, itemValue] of Object.entries(obj))  {           
+    
+       // check if item is object then call deepSearch agin recursively
+        if (typeof itemValue === "object") {
+            this.deepSearch(itemValue, indx,arr)           
+        } else {
+          if(itemKey === 'ref'){
+          //console.log(arr[indx][0])
+           this.populate.push(arr[indx][0])
+          }
+        }
+    }
+}
+async getPopulate(id){
+    let populatebuilder = "this.model.findById('"+id+"')";
+    this.populate.forEach(item=> populatebuilder +=".populate('"+item+"')");
+    populatebuilder+='.exec()';
+
+    return await eval("(" + populatebuilder + ")");
+}
+
 
   static async createInstance(json_schema, callback) {
     let DB = new JsonModel(json_schema, callback);
@@ -56,8 +92,9 @@ class JsonModel {
   }
 
   async getOneById(id) {
-    return await this.model.findById(id);
+    return this.hasPopulate ? await this.getPopulate(id): await this.model.findById(id);
   }
+
   async getOneByQuery(query) {
     return await this.model.findOne(query);
   }

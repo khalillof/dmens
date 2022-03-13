@@ -1,5 +1,5 @@
 {
-    "name":"Feedback",
+    "name":"feedback",
     "schema":{  
     "name": {
         "type": "String",

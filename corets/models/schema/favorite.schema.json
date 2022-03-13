@@ -1,14 +1,14 @@
 {
-    "name":"Favorite",
+    "name":"favorite",
     "schema":{  
     "user": {
         "type": "ObjectId",
-        "ref": "User"
+        "ref": "user"
     },
     "dishes": [
         {
             "type": "ObjectId",
-            "ref": "Dish"
+            "ref": "dish"
         }
     ]
 }
