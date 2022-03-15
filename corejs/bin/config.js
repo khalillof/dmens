@@ -8,9 +8,9 @@ exports.config = {
     auth:env.AUTH || true,
     secretKey: env.SECRET_KEY || '',
     jwtSecret:env.SECRET_KEY || '',
-    getJsonUploadPath: ()=> path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR +`/schema.${Date.now()}.json`),
-    jsonUploadDir:path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR),
-    imagesUploadDir:path.resolve(__dirname,'../' + env.IMAGES_UPLOAD_DIR),
+    getJsonUploadPath: ()=> path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR +`/schema.${Date.now()}.json`) || path.resolve(__dirname,`./schema.${Date.now()}.json`),
+    jsonUploadDir:path.resolve(__dirname,'../' + env.JSON_UPLOAD_DIR) || path.resolve(__dirname,'../'),
+    imagesUploadDir:path.resolve(__dirname,'../' + env.IMAGES_UPLOAD_DIR) || path.resolve(__dirname,'../'),
     cores_domains: env.NODE_ENV === 'development'? env.CORES_DMAINS_DEV.split(',') || [] : env.CORES_DMAINS_PROD.split(',') || [],
     mongoUrl: {
         'dev': env.DB_CONNECTION_DEV || '',

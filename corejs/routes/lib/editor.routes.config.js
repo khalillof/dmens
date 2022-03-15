@@ -9,11 +9,12 @@ const {uploadSchema} = require('./upload');
     return dbStore['user'] ? await Promise.resolve( await DefaultRoutesConfig.instance('editor', await EditorController.createInstance('editor'), 
     (self)=>{
 
- self.post([uploadSchema], false);
+ self.post([uploadSchema], true);
  self.getId();
  self.getList();
  self.put();
- self.delete()
+ self.delete();
+ self.param();
 })) : console.log('User model is not avaliable in dbStore No Schema routes configuered');
 };
 exports.EditorRoutes = EditorRoutes;

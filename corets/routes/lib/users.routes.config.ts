@@ -25,15 +25,15 @@ export async function UsersRoutes() {
 
         self.router.get('/facebook/token',AuthService.authenticateFacebook,self.actions('facebook'));
 
-        self.router.get('/users',self.UsersMWare!.verifyUser,self.UsersMWare!.verifyUserIsAdmin,self.actions('list')); 
+        self.router.get('/users',self.UsersMWare!.userIsAuthenticated,self.UsersMWare!.verifyUserIsAdmin,self.actions('list')); 
 
         self.router.get('/users/checkJWTtoken', self.actions('checkJWTtoken') );
 
-        self.router.param('id', self.UsersMWare!.extractUserId);
-       
+        //self.router.param('id', self.UsersMWare!.extractUserId);
+       self.param()
         self.router.all('/users/id',self.UsersMWare!.validateUserExists);
-        self.router.get('/users/id',self.actions('getOneById'));
-        self.router.delete('/users/id',self.actions('remove'));
+        self.router.get('/users/id',self.UsersMWare!.userIsAuthenticated,self.actions('getOneById'));
+        self.router.delete('/users/id',self.UsersMWare!.userIsAuthenticated, self.UsersMWare!.validateSameEmailBelongToSameUser, self.actions('remove'));
         self.router.put('/users/id',
             self.UsersMWare!.validateSameEmailBelongToSameUser,
             self.actions('put')); 

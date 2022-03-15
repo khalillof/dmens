@@ -47,30 +47,42 @@ class DefaultRoutesConfig {
   buildMdWares(middlewares, useUserMWars=true){
     let mdwares = [this.corsWithOption];
     if(useUserMWars)
-      mdwares = [...mdwares,this.UsersMWare.verifyUser,this.UsersMWare.verifyUserIsAdmin];
+      mdwares = [...mdwares,this.UsersMWare.userIsAuthenticated];
     if(middlewares)
       mdwares = [...mdwares, ...middlewares];
     return mdwares;
   }
 
   static async createInstancesWithDefault(){
-    await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
+  return  await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
  }
   // custom routes
-  getList(middlewares, useUserMWars=false){
-    this.router.get(this.routeName, ...this.buildMdWares(middlewares,useUserMWars), this.actions('list'))
+  getList(middlewares, useUserMWars=true){
+   return this.router.get(this.routeName, ...this.buildMdWares(middlewares,useUserMWars), this.actions('list'))
   }
-  getId(middlewares, useUserMWars=false){
-    this.router.get(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('getOneById'))
+  getId(middlewares, useUserMWars=true){
+   return this.router.get(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('getOneById'))
   }
   post(middlewares, useUserMWars=true){
-    this.router.post(this.routeName, ...this.buildMdWares(middlewares,useUserMWars),this.actions('create'))
+   return this.router.post(this.routeName, ...this.buildMdWares(middlewares,useUserMWars),this.actions('create'))
   }
   put(middlewares, useUserMWars=true){
-    this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
+   return this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
   }
   delete(middlewares, useUserMWars=true){  
-    this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
+    middlewares=  middlewares ? middlewares : [this.UsersMWare?.verifyUserIsAdmin]
+   return this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
+  }
+  param(){
+    return this.router.param('id', async (req,res,next, id)=>{ 
+      try{
+        Assert.idString(id); 
+        next()
+        }catch(err){
+          res.json({success:false, error:err.message})
+          console.log(err.stack)
+        }
+    });
   }
 
 defaultRoutes(){
@@ -78,8 +90,8 @@ defaultRoutes(){
   this.getId();
   this.post();
   this.put();
-  this.delete()
-  this.router.param('id', async (req,res,next, id)=>{ Assert.idString(id); next()});
+  this.delete();
+  this.param();
 }
  
   actions(actionName, tryCatch=true){ 

@@ -44,9 +44,13 @@ class UsersMiddleware {
     }
 
     verifyUserIsAdmin(req, res, next) {
-        req.user && req.user.admin ? next() : res.status(400).json({success:false,error:'you are not authorized'})
+        req.user && req.user.admin && req.isAuthenticated ? next() : res.status(400).json({success:false,error:'you are not authorized'})
 
     }
+    userIsAuthenticated(req, res, next){
+        req.user && req.isAuthenticated ? next() : res.status(400).json({success:false,error:'you are not authorized'})
+    }
+
     extractUserId(req, res, next) {
         req.body.id = req.params.id;
         next();

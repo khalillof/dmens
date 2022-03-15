@@ -8,20 +8,19 @@ const {PassportStrategies} = require('../auth/services/strategies');
 class JsonModel {
 
   constructor(jsonSchema, callback = null) {
+    this.log = console.log;
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
-    if(dbStore[this.name]){Error.ValidationError
+    if(dbStore[this.name]){
       throw new Error('there is already model in this name : '+this.name)
     }
     this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
-    this.populate = [];
-    this.loadPopulateNames(jsonSchema.schema); 
-    this.hasPopulate = this.populate.length > 0 ;
-
-    if(this.hasPopulate) {
-      console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
-    }
+    this.populateNames = [];
+    
+    this.hasPopulate = false;
+    this.#loadPopulates(jsonSchema.schema); 
+    
     if (this.name === 'user') {
       
         this.schema.plugin(passportLocalMongoose);
@@ -46,38 +45,52 @@ class JsonModel {
   
     // add to db store
     dbStore[this.name] = this;
-    console.log("added ( " + this.name + " ) to DbStore :");
+    this.log("added ( " + this.name + " ) to DbStore :");
   }
-  loadPopulateNames(_schema = null){
+  #populateBuilder = "";
 
-    Object.entries(_schema ??  this.schema.obj).forEach((item, indx,arr) => this.deepSearch(item, indx, arr));
+  #loadPopulates(_schema = null){
+    // check and load populates
+    Object.entries(_schema ??  this.schema.obj).forEach((item, indx,arr) => this.#deepSearch(item, indx, arr));
+    
+    this.hasPopulate = this.populateNames.length > 0 ;
+    if(this.hasPopulate) {
+      //console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
+      this.populateNames.forEach(item=> this.#populateBuilder +=".populate('"+item+"')");
+      this.#populateBuilder+=".exec()";
+    }
+
   }
   // search item in object and map to mongoose schema
- deepSearch(obj, indx,arr) {
+ #deepSearch(obj, indx,arr) {
      
     // loop over the item
     for (let [itemKey, itemValue] of Object.entries(obj))  {           
     
        // check if item is object then call deepSearch agin recursively
         if (typeof itemValue === "object") {
-            this.deepSearch(itemValue, indx,arr)           
+            this.#deepSearch(itemValue, indx,arr)           
         } else {
           if(itemKey === 'ref'){
           //console.log(arr[indx][0])
-           this.populate.push(arr[indx][0])
+           this.populateNames.push(arr[indx][0])
           }
         }
     }
 }
-async getPopulate(id){
-    let populatebuilder = "this.model.findById('"+id+"')";
-    this.populate.forEach(item=> populatebuilder +=".populate('"+item+"')");
-    populatebuilder+='.exec()';
-
-    return await eval("(" + populatebuilder + ")");
+async #factory(stringObj){
+  this.log(stringObj);
+  return await eval(stringObj);
+}
+async #getOnePopulated(arg, method='findById'){
+    let builder = `this.model.${method}(${JSON.stringify(arg)})${this.#populateBuilder}`;
+    return await this.#factory(builder);
 }
 
-
+async #getListPopulated(limit=25, page= 0, query=null){
+  let builder = `this.model.find(${JSON.stringify(query)}).limit(${limit}).skip(${(limit * page)})${this.#populateBuilder}`;
+  return await this.#factory(builder);
+}
   static async createInstance(json_schema, callback) {
     let DB = new JsonModel(json_schema, callback);
      // add routes
@@ -85,18 +98,21 @@ async getPopulate(id){
   }
 
   async Tolist(limit=25, page= 0, query=null) {
-    return await this.model.find(query)
+    return this.hasPopulate ? 
+    await this.#getListPopulated(limit,page,query) : 
+    await this.model.find(query)
       .limit(limit)
       .skip(limit * page)
       .exec();
+      
   }
 
   async getOneById(id) {
-    return this.hasPopulate ? await this.getPopulate(id): await this.model.findById(id);
+    return this.hasPopulate ? await this.#getOnePopulated(id): await this.model.findById(id);
   }
 
   async getOneByQuery(query) {
-    return await this.model.findOne(query);
+    return this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model.findOne(query);
   }
 
   async create(obj) {
