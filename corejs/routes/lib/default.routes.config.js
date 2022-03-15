@@ -19,17 +19,6 @@ class DefaultRoutesConfig {
     this.corsWithOption = corsWithOptions;
     this.controller = controller;
     this.UsersMWare = usersMWare;
-/*
-    if (!control) {
-      this.controller = null;
-      this.UsersMWare = null;
-    } else {
-      this.controller = control;
-
-      let item= Object.values(routeStore).find(r=> r.UsersMWare);
-      this.UsersMWare = item && item.UsersMWare ? item.UsersMWare : new UsersMiddleware();
-    }
-*/
     
     typeof callback === 'function' ? callback(this) : this.defaultRoutes();
     // add instance to routeStore
@@ -70,7 +59,7 @@ class DefaultRoutesConfig {
    return this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
   }
   delete(middlewares, useUserMWars=true){  
-    middlewares=  middlewares ? middlewares : [this.UsersMWare?.verifyUserIsAdmin]
+    middlewares=  middlewares ?? [this.UsersMWare.verifyUserIsAdmin]
    return this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
   }
   param(){
@@ -80,7 +69,7 @@ class DefaultRoutesConfig {
         next()
         }catch(err){
           res.json({success:false, error:err.message})
-          console.log(err.stack)
+          console.error(err.stack)
         }
     });
   }
@@ -94,8 +83,8 @@ defaultRoutes(){
   this.param();
 }
  
-  actions(actionName, tryCatch=true){ 
-    return async (req,res,next)=> tryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next);
+  actions(actionName, useTryCatch=true){ 
+    return async (req,res,next)=> useTryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next);
 }
 
 }

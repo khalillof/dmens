@@ -10,7 +10,7 @@
     "core": "node ./corejs/app.js",
     "client": "node ./client/index.js",
     "bu": "node ./ts-output/bin/www.js",
-    "start": "tsc && webpack --mode production && node ./build/bin/www.js",
+    "start": "tsc && webpack --mode production && node ./build/app.js",
     "trace": "tsc --traceResolution",
     "build": "tsc && webpack --mode production",
     "build-dev": "tsc && webpack --mode development",

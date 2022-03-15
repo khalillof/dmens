@@ -1,5 +1,5 @@
+"use strict";
 require('dotenv').config()
-declare function require(name: string): any;
 var compression = require('compression');
 import  express from 'express';
 const session = require('express-session');
@@ -7,15 +7,12 @@ const session = require('express-session');
 // import createError from 'http-errors';
 var path = require('path');
 import morgan from 'morgan';
-
-
 import helmet from 'helmet';
 import {config} from './bin/config';
 import {dbInit} from './common/services/mongoose.service';
 import {appRouter, printRoutesToString} from './common/customTypes/types.config'
 import { initRouteStore, } from './routes';
 import passport from 'passport';
-
 
 // Create the Express application
 const app = express();
@@ -64,31 +61,16 @@ setTimeout(async()=>{
 
   setTimeout(printRoutesToString,1000);
 
-  if (app.get('env') === 'development') {
-    console.log('development server')
-    // request handellar ==================================
-   // using a predefined format string
-  app.use(morgan('dev')) // dev|common|combined|short|tiny
+const dev_prod = app.get('env');
 
-     // development error handler ===============================
-  // will print stacktrace
-    app.use(function(err:any, req:any, res:any, next:any) {
-      res.status(err.status || 500);
-      console.error(err.stack)
-      res.json({ error: err });
-    });
-  }else{
-    console.log('production server')
-    // request looger using a predefined format string
-   app.use(morgan('common')) // dev|common|combined|short|tiny
+// server error handller will print stacktrace
+app.use(function(err:any, req:any, res:any, next:any) {
+  res.status(err.status || 500).json({success:false, error: dev_prod === 'development' ? err.message:"Ops! server error" });
+  console.error(err.stack)
+});
 
-      // production error handler
-  // no stacktraces leaked to user
-  app.use(function(err:any, req:any, res:any, next:any) {
-    res.status(err.status || 500);
-    console.error(err.stack)
-    res.json({ error: 'Something broke!' });
-  });
-  }
+// request looger using a predefined format string
+app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
+app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
 export default app;

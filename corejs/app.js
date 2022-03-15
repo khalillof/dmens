@@ -1,7 +1,6 @@
 "use strict";
 // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
 require('dotenv').config();
-
 var compression = require('compression')
 const express = require("express");
 const session = require('express-session');
@@ -9,15 +8,12 @@ const session = require('express-session');
 //const http_errors = require("http-errors");
 var path = require('path');
 const morgan  = require('morgan');
-
 const  helmet = require('helmet');
 const {config} = require('./bin/config');
 const  {dbInit} = require('./common/services/mongoose.service');
 const {printRoutesToString ,appRouter}  = require('./common/customTypes/types.config');
 const  {initRouteStore} = require('./routes');
 const passport = require('passport');
-const { Promise } = require('mongoose');
-
 
 // Create the Express application
 const app = express();
@@ -59,7 +55,6 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-
 setTimeout(async()=>{
 initRouteStore.forEach(async(rout)=> await rout())
 
@@ -70,34 +65,17 @@ initRouteStore.forEach(async(rout)=> await rout())
   
   setTimeout(printRoutesToString,1000);
  
-  if (app.get('env') === 'development') {
-    console.log('development server')
-    // request handellar ==================================
-   // using a predefined format string
-  app.use(morgan('dev')) // dev|common|combined|short|tiny
-
-     // development error handler ===============================
-  // will print stacktrace
-    app.use(function(err, req, res, next) {
-      res.status(err.status || 500);
-      console.error(err.stack)
-      res.json({ error: err });
-    });
-  }else{
-    console.log('production server')
-    // request looger using a predefined format string
-   app.use(morgan('common')) // dev|common|combined|short|tiny
-
-      // production error handler
-  // no stacktraces leaked to user
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    console.error(err.stack)
-    res.json({ error: 'Something broke!' });
-  });
-  }
+  const dev_prod = app.get('env');
   
+  // server error handller will print stacktrace
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500).json({success:false, error: dev_prod === 'development' ? err.message:"Ops! server error" });
+    console.error(err.stack)
+  });
+  
+  // request looger using a predefined format string
+  app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
+app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
 
 exports.app = app;
-app.listen(config.port, ()=> console.log('server is running on port: '+config.port))
