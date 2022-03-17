@@ -1,9 +1,8 @@
 "use strict";
 const { corsWithOptions } = require('./cors.config');
-const { routeStore, appRouter, dbStore, pluralizeRoute} = require('../../common/customTypes/types.config');
+const { routeStore, appRouter, dbStore, pluralizeRoute, Assert} = require('../../common');
 const { DefaultController} = require('../../controllers/');
-const {Assert} = require('../../common/customTypes/assert');
-const {UsersMiddleware} = require('../../users/middleware/users.middleware');
+const {UsersMiddleware} = require('../../middlewares');
  
 async function getUserMWare(){
   let item= Object.values(routeStore).find(r=>  r.UsersMWare instanceof UsersMiddleware );

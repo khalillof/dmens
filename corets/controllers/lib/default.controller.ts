@@ -1,8 +1,7 @@
-import AssertionError from '../../common/customTypes/assertionError';
 import { Error} from "mongoose";
 import {MongoServerError } from "mongodb";
 import express from 'express';
-import { dbStore } from '../../common/customTypes/types.config';
+import { dbStore,AssertionError} from '../../common';
 
 export class DefaultController {
   db: any;

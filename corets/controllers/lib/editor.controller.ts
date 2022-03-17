@@ -1,8 +1,8 @@
 import express from 'express';
 import { DefaultController } from '../../controllers';
 import fs from 'fs';
-import { JsonLoad } from '../../models/json.load';
-import {config} from '../../bin/config'
+import { JsonLoad } from '../../models/lib/json.load';
+import {config} from '../../common'
 
 export class EditorController extends DefaultController {
 
@@ -30,7 +30,7 @@ export class EditorController extends DefaultController {
                 if(stringify) 
                 jsonObject = JSON.stringify(jsonObject)
 
-                let file_path = config.getJsonUploadPath();
+                let file_path = config.getSchemaUploadPath();
                 fs.writeFile(file_path, jsonObject, 'utf8',(err)=>{
                 err ? this.logError(err):this.log('New json file document created path: '+file_path)
                 }); 

@@ -1,5 +1,5 @@
 const path =require( 'path');
-const {config} =require( '../../bin/config');
+const {config} =require( '../../common');
 const multer =require('multer');
 
 function setMulter(uploadDir,filterCallback, fieldsNum = 1){
@@ -41,7 +41,7 @@ function errCallback(req,res,err){
 }
 
 function uploadSchema(req, res, next){
-  return  setMulter(config.jsonUploadDir, schemaFilter).single('schema')(req,res,(err)=> err ? errCallback(req,res,err): next());
+  return  setMulter(config.schemaDir, schemaFilter).single('schema')(req,res,(err)=> err ? errCallback(req,res,err): next());
 };
 
 function uploadImages(req, res, next){

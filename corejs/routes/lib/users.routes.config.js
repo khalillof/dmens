@@ -1,7 +1,6 @@
 "use strict";
 const {UsersController} = require('../../controllers');
 const {DefaultRoutesConfig } = require('./default.routes.config');
-const {AuthService} = require('../../auth/services/auth.service');
 
  async function UsersRoutes(){
 
@@ -14,6 +13,7 @@ const {AuthService} = require('../../auth/services/auth.service');
             self.actions('signup')
             );
         
+
         self.router.post('/users/login',
             self.UsersMWare.validateRequiredUserBodyFields,
             self.actions('login')
@@ -21,9 +21,9 @@ const {AuthService} = require('../../auth/services/auth.service');
 
         self.router.get('/users/logout',self.actions('logout'));
 
-        self.router.get('/users/profile',AuthService.authenticateUser,self.actions('profile'));
+        self.router.get('/users/profile',self.UsersMWare.verifyUser("jwt"),self.actions('profile'));
 
-        self.router.get('/facebook/token',AuthService.authenticateFacebook,self.actions('facebook'));
+        self.router.get('/facebook/token',self.UsersMWare.verifyUser('facebook'),self.actions('facebook'));
 
         self.router.get('/users',self.UsersMWare.userIsAuthenticated,self.UsersMWare.verifyUserIsAdmin,self.actions('list')); 
 

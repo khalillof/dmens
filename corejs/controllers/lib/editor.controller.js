@@ -1,8 +1,8 @@
 
 const { DefaultController } = require('./default.controller');
 const fs = require('fs');
-const {config} = require('../../bin/config')
-const { JsonLoad } = require('../../models/json.load')
+const {config} = require('../../common')
+const { JsonLoad } = require('../../models')
 
 class EditorController extends DefaultController {
 
@@ -29,7 +29,7 @@ class EditorController extends DefaultController {
                 if(stringify) 
                 jsonObject = JSON.stringify(jsonObject)
 
-                let file_path = config.getJsonUploadPath();
+                let file_path = config.getSchemaUploadPath();
                 fs.writeFile(file_path, jsonObject, 'utf8',(err)=>{
                 err ? this.logError(err):this.log('New json file document created path: '+file_path)
                 }); 

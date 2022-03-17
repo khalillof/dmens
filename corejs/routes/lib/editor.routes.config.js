@@ -1,6 +1,6 @@
 const {EditorController} =require('../../controllers');
 const {DefaultRoutesConfig} =require('./default.routes.config');
-const { dbStore} =require('../../common/customTypes/types.config');
+const { dbStore} =require('../../common');
 const {uploadSchema} = require('./upload');
 
 

@@ -1,7 +1,7 @@
 
 import {AuthController} from '../../controllers';
 import {DefaultRoutesConfig} from './default.routes.config'
-import { dbStore } from '../../common/customTypes/types.config';
+import { dbStore } from '../../common';
 
 
 export async function AuthRoutes(){

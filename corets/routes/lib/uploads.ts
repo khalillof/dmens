@@ -1,5 +1,5 @@
 import path from  'path';
-import {config} from  '../../bin/config';
+import {config} from  '../../common';
 import multer from 'multer';
 
 function setMulter(uploadDir:string,filterCallback:Function|any, fieldsNum = 1){
@@ -39,7 +39,7 @@ function errCallback(req:any,res:any,err:any){
 }
 
 function uploadSchema(req:any, res:any, next:any){
-  return  setMulter(config.jsonUploadDir, schemaFilter).single('schema')(req,res,(err:any)=> err ? errCallback(req,res,err): next());
+  return  setMulter(config.schemaDir, schemaFilter).single('schema')(req,res,(err:any)=> err ? errCallback(req,res,err): next());
 };
 
 function uploadImages(req:any, res:any, next:any){

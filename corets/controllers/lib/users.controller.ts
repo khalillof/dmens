@@ -1,7 +1,6 @@
 import express from 'express';
 import { DefaultController } from './default.controller'
-import passport from 'passport';
-import { AuthService } from '../../auth/services/auth.service'
+import { AuthService } from '../../services/lib/auth.service'
 
 export class UsersController extends DefaultController {
 
@@ -14,17 +13,24 @@ export class UsersController extends DefaultController {
   }
 
  async login(req: express.Request, res: express.Response, next: express.NextFunction){
-     this.authenticateUser((user: any) => {      
-       req.login(user,  (err)=>{
-         if (err) {
-           this.resErrIfErr(res,err)
-         } else {
-           const token = AuthService.generateToken({ _id: user._id });
-           res.json({ success: true, message: "Authentication successful", token: token });
-         }
-       });
-     })(req, res, next);
+  return await AuthService.authenticate('local', null, 
+  (err:any, user:any, info:any) => {  
+    if(user){
+   return req.login(user,  (err)=>{
+      if (err) {
+        this.resErrIfErr(res,err)
+      } else {
+        const token = AuthService.generateToken({ _id: user._id });
+        res.json({ success: true, message: "Authentication successful", token: token });
+      }
+    });
   }
+  else{
+   return this.callBack(res).done(user,err,info)
+  }
+  }
+  )(req, res, next);
+ }
 
   profile(req: express.Request, res: express.Response, next: express.NextFunction) {
     res.json({
@@ -66,14 +72,9 @@ async  updateUser(req: any, res: express.Response, next: express.NextFunction){
   }
 
  async checkJWTtoken(req: express.Request, res: express.Response, next: express.NextFunction){
-      await passport.authenticate('jwt', { session: false }, this.callBack(res).done)(req, res, next);
+  return await AuthService.authenticate('jwt',{ session: false }, this.callBack(res).done)(req,res,next);
   }
 
-  authenticateUser(cb?: any) {
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      passport.authenticate('local', this.callBack(res,cb).done)(req, res, next);
-    }
-  }
   // helper
   getUserByEmail(email: string) {
     return this.db.getOneByQuery({ email: email });

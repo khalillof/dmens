@@ -8,9 +8,8 @@ const session = require('express-session');
 var path = require('path');
 import morgan from 'morgan';
 import helmet from 'helmet';
-import {config} from './bin/config';
-import {dbInit} from './common/services/mongoose.service';
-import {appRouter, printRoutesToString} from './common/customTypes/types.config'
+import {dbInit} from './services';
+import {config, appRouter, printRoutesToString} from './common'
 import { initRouteStore, } from './routes';
 import passport from 'passport';
 

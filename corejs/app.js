@@ -9,9 +9,8 @@ const session = require('express-session');
 var path = require('path');
 const morgan  = require('morgan');
 const  helmet = require('helmet');
-const {config} = require('./bin/config');
-const  {dbInit} = require('./common/services/mongoose.service');
-const {printRoutesToString ,appRouter}  = require('./common/customTypes/types.config');
+const  {dbInit} = require('./services');
+const {config ,printRoutesToString ,appRouter}  = require('./common');
 const  {initRouteStore} = require('./routes');
 const passport = require('passport');
 

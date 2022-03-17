@@ -2,8 +2,8 @@
 const { sign } = require('jsonwebtoken');
 const { randomBytes, createHmac } = require('crypto');
 const { DefaultController } = require('./default.controller');
-const { JwtMiddleware } = require('../../auth/middlewares/jwt.middleware');
-const { config } = require('../../bin/config');
+const { JwtMiddleware } = require('../../middlewares');
+const { config } = require('../../common');
 
 class AuthController extends DefaultController {
 

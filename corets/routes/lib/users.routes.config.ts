@@ -1,7 +1,6 @@
 import { UsersController } from '../../controllers';
 import { DefaultRoutesConfig } from './default.routes.config';
-import { AuthService } from '../../auth/services/auth.service';
-import { dbStore } from '../../common/customTypes/types.config';
+import { dbStore } from '../../common';
 
 
 
@@ -21,9 +20,9 @@ export async function UsersRoutes() {
 
         self.router.get('/users/logout',self.actions('logout'));
 
-        self.router.get('/users/profile',AuthService.authenticateUser,self.actions('profile'));
+        self.router.get('/users/profile',self.UsersMWare!.verifyUser("jwt"),self.actions('profile'));
 
-        self.router.get('/facebook/token',AuthService.authenticateFacebook,self.actions('facebook'));
+        self.router.get('/facebook/token',self.UsersMWare!.verifyUser("facebook"),self.actions('facebook'));
 
         self.router.get('/users',self.UsersMWare!.userIsAuthenticated,self.UsersMWare!.verifyUserIsAdmin,self.actions('list')); 
 

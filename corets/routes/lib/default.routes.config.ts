@@ -1,9 +1,9 @@
 import express from 'express';
 import {corsWithOptions} from './cors.config';
-import {routeStore, dbStore, pluralizeRoute, appRouter} from '../../common/customTypes/types.config'
-import UsersMiddleware from '../../users/middleware/users.middleware';
+import {routeStore, dbStore, pluralizeRoute, appRouter} from '../../common'
+import {UsersMiddleware} from '../../middlewares';
 import { DefaultController, IController } from '../../controllers/';
-import {Assert} from '../../common/customTypes/assert' ;
+import {Assert} from '../../common/lib/assert' ;
 
 export async function getUserMWare(){
   let item= Object.values(routeStore).find(r=>  r.UsersMWare instanceof UsersMiddleware );

@@ -6,4 +6,4 @@ import {UsersRoutes} from './lib/users.routes.config';
 import {EditorRoutes} from './lib/editor.routes.config';
 import {uploadImages, uploadSchema} from './lib/uploads';
 const initRouteStore = [UsersRoutes,AuthRoutes, EditorRoutes,IndexRoutes, DefaultRoutesConfig.createInstancesWithDefault ]
-export { corsWithOptions,cors,DefaultRoutesConfig, UsersRoutes,AuthRoutes,EditorRoutes,IndexRoutes, initRouteStore, uploadImages, uploadSchema}
+export { corsWithOptions,cors,DefaultRoutesConfig,initRouteStore, uploadImages, uploadSchema}

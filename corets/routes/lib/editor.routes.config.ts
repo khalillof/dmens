@@ -1,6 +1,6 @@
 import {EditorController} from '../../controllers';
 import {DefaultRoutesConfig} from './default.routes.config'
-import { dbStore} from '../../common/customTypes/types.config';
+import { dbStore} from '../../common';
 import {uploadSchema} from './uploads';
 export async function EditorRoutes(){
     

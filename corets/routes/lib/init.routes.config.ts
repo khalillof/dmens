@@ -1,5 +1,5 @@
 "use strict";
-import {appRouter} from '../../common/customTypes/types.config';
+import {appRouter} from '../../common';
 
 const path = require('path');
 

@@ -1,8 +1,6 @@
 "use strict";
 const { DefaultController } = require('./default.controller');
-const passport = require('passport');
-const { AuthService } = require('../../auth/services/auth.service');
-
+const { AuthService } = require('../../services');
 class UsersController extends DefaultController {
 
   constructor(name) {
@@ -14,8 +12,10 @@ class UsersController extends DefaultController {
     }
 
  async login(req, res, next){
-  this.authenticateUser((user) => {      
-    req.login(user,  (err)=>{
+  return AuthService.authenticate('local', null, 
+  (err, user, info) => {  
+    if(user){
+   return req.login(user,  (err)=>{
       if (err) {
         this.resErrIfErr(res,err)
       } else {
@@ -23,8 +23,13 @@ class UsersController extends DefaultController {
         res.json({ success: true, message: "Authentication successful", token: token });
       }
     });
-  })(req, res, next);
-}
+  }
+  else{
+   return this.callBack(res).done(user,err,info)
+  }
+  }
+  )(req, res, next);
+ }
 
 async updateUser(req, res, next){
     if (req.isUnauthenticated()) {
@@ -66,14 +71,8 @@ async updateUser(req, res, next){
 
 
  async checkJWTtoken(req, res, next){
-  await passport.authenticate('jwt', { session: false }, this.callBack(res).done)(req, res, next);
+   return await AuthService.authenticate('jwt',{ session: false }, this.callBack(res).done)(req,res,next);
   };
-
-  authenticateUser(cb) {
-    return (req, res, next) => {
-      passport.authenticate('local', this.callBack(res,cb).done)(req, res, next);
-    }
-  }
   
 }
 

@@ -1,6 +1,7 @@
 {
-  "name": "express-api-server",
+  "name": "mongoexprss-api",
   "version": "1.0.0",
+  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations",
   "private": true,
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",

@@ -3,8 +3,8 @@ import express from 'express';
 import {randomBytes, createHmac} from 'crypto';
 import { sign } from 'jsonwebtoken';
 import { DefaultController } from './default.controller';
-import { JwtMiddleware } from '../../auth/middlewares/jwt.middleware';
-import { config } from '../../bin/config';
+import { JwtMiddleware } from '../../middlewares';
+import { config } from '../../common';
 
 export class AuthController extends DefaultController {
 

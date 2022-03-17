@@ -1,8 +1,7 @@
 //"use strict";
 const { Error} = require("mongoose");
 const {MongoServerError } = require("mongodb");
-const {AssertionError} = require('../../common/customTypes/assertionError')
-const { dbStore} = require('../../common/customTypes/types.config');
+const {dbStore, AssertionError} = require('../../common')
 
 class DefaultController {
 
