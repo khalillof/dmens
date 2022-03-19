@@ -1,7 +1,7 @@
 "use strict";
-const  {initRouteStore} = require('../../corejs/routes');
+const  {appRouter} = require('../../src/javascript/common');
 const path = require('path');
-const { appRouter} = require('../../corejs/common');
+const { initRouteStore} = require('../../src/javascript/routes');
 
 function IndexRoutes() {
     let index = {

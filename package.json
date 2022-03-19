@@ -1,14 +1,14 @@
 {
-  "name": "mongoexprss-api",
+  "name": "mens",
   "version": "1.0.0",
-  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations",
+  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, then name - mens - stand for Mongodb, Expressjs, nodejs srever,",
   "private": true,
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
     "test": "karma start",
     "clean": "rm ./build",
     "dev": "node ./build/bin/www.js",
-    "core": "node ./corejs/app.js",
+    "core": "node ./src/javascript/app.js",
     "client": "node ./client/index.js",
     "bu": "node ./ts-output/bin/www.js",
     "start": "tsc && webpack --mode production && node ./build/app.js",
