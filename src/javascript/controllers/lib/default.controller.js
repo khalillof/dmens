@@ -80,6 +80,10 @@ class DefaultController {
   resError(res, message) {
     res.json({ success: false, error: message ? message : 'operation faild!' });
   }
+  resErrInfo(res, err,info){
+    let message = err ? err.message : info.message;
+   return res.json({success:false,error: message});
+  }
   resErrIfErr(res, err) {
     if (err) {
       this.logError(err)
@@ -106,12 +110,11 @@ class DefaultController {
   callBack(res, cb){
       return {
         done: (err, obj, info) => {
-          if(err || info){
-            this.resErrIfErr(res, err ?? info);
+
+         if (obj) {
+          return  this.resObjCbSuccess(res, obj, cb, obj._id ?? '');
           }
-         else if (obj) {
-            this.resObjCbSuccess(res, obj, cb, obj._id ?? '');
-          }
+          this.resErrInfo(res,err,info);
         },
         errCb: (err) => this.resErrCb(res, err, cb),
         errSuccess: (err) => this.resErrSuccess(res, err)

@@ -43,7 +43,15 @@ export class AuthService {
                 }
               });
             } else {
-              // next function after user is authnicated
+                // other type like jwt | facebook
+                req.login(user,  sessionFalse, async (err)=>{
+                  if (err) {
+                    return res.json({success:false, error:err})
+                  } 
+                });
+                
+                // next function after user is authnicated
+                // could be jwt or facebook
               return next();
             }
 

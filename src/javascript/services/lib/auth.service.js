@@ -33,11 +33,13 @@ class AuthService{
      let sessionFalse = { session: false };
      let option = type === "jwt"? sessionFalse : {};
      try{
+     
          return await passport.authenticate(type, opts ?? option,(err,user,info) => {  
-
+          
                   if(user) {
                      // handle local login
                      if (type === 'local'){
+
                    return req.login(user,  sessionFalse, async (err)=>{
                       if (err) {
                         return res.json({success:false, error:err})
@@ -48,6 +50,13 @@ class AuthService{
                       }
                     });
                   }else{
+                    // other type like jwt | facebook
+                    req.login(user,  sessionFalse, async (err)=>{
+                      if (err) {
+                        return res.json({success:false, error:err})
+                      } 
+                    });
+                    
                     // next function after user is authnicated
                     // could be jwt or facebook
                   return  next();

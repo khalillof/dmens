@@ -61,6 +61,11 @@ initRouteStore.forEach(async(rout)=> await rout())
   // register routes
   app.use('/', appRouter);
 
+   // handel 404 shoud be at the midlleware
+   app.use((req, res, next) => {
+    res.status(404).json( { success:false, message:"Sorry can't find that!"})
+  })
+
   }, 500)
   
   setTimeout(
@@ -78,6 +83,7 @@ initRouteStore.forEach(async(rout)=> await rout())
   // request looger using a predefined format string
   app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
+ 
 app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
 
 

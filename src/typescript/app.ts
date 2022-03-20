@@ -59,6 +59,10 @@ setTimeout(async()=>{
   // register routes
   app.use('/', appRouter);
 
+   // handel 404 shoud be at the midlleware
+   app.use((req, res, next) => {
+    res.status(404).json( { success:false, message:"Sorry can't find that!"})
+  })
   }, 500)
 
   setTimeout(printRoutesToString,1000);

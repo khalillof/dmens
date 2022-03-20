@@ -32,8 +32,8 @@ class JsonModel {
          passport.deserializeUser(Account.deserializeUser());
          // extras
         passport.use(PassportStrategies.Facebook());
-        //passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
-        passport.use(PassportStrategies.JwtQueryParameterStrategy());
+        passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+        //passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
         this.model = Account;
     } else {

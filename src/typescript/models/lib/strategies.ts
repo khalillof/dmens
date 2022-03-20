@@ -43,7 +43,18 @@ export class PassportStrategies {
       issuer: '',//'accounts.examplesoft.com',
       audience: '', //'yoursite.net'
     }, function (jwt_payload, done) {
-      dbStore['account'].model.findOne({ id: jwt_payload.sub }, done);
+   
+      dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err:any, user:any) {
+          if (err) {
+              return done(err, false);
+          }
+          if (user) {
+              return done(null, user);
+          } else {
+              return done(null, false);
+              // or you could create a new account
+          }
+        });
     });
   }
   // JWT stratigy

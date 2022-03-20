@@ -45,7 +45,17 @@ class PassportStrategies {
       issuer: '',//'accounts.examplesoft.com',
       audience: '', //'yoursite.net'
     }, function (jwt_payload, done) {
-      dbStore['account'].model.findOne({ id: jwt_payload.sub }, done);
+      dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err, user) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+            // or you could create a new account
+        }
+      });
     });
   }
   // JWT stratigy
@@ -53,7 +63,7 @@ class PassportStrategies {
     return new JwtStrategy(
       {
         secretOrKey: config.jwtSecret,
-        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('secret_token')
+        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
       },
       async (token, done) => {
         try {

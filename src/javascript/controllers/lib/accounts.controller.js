@@ -58,18 +58,11 @@ async updateUser(req, res, next){
     }
 }
   profile(req, res, next){
-    AuthService.authenticate('jwt', { session: false }, async (err, user, info) =>{
-      if(user){
      return res.json({
        message: 'You made it to the secure route',
        user: req.user,
-       token: req.query.token
      })
-   }else{
-     return res.json({success:false,error: err || info});
-   }
-    })(req,res,next)
-    
+ 
   }
 
   logout(req, res, next){

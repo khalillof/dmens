@@ -47,11 +47,12 @@ async changePassword(req: express.Request, res: express.Response, next: express.
 }
 }
   profile(req: express.Request, res: express.Response, next: express.NextFunction) {
-    return res.json({
-      message: 'You made it to the secure route',
-      user: req.user,
-      token: req.query.token
-    })
+
+     return res.json({
+       message: 'You made it to the secure route',
+       user: req.user,
+     })
+    
   }
  
 async  updateUser(req: any, res: express.Response, next: express.NextFunction){

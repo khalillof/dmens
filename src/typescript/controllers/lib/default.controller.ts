@@ -84,6 +84,10 @@ export class DefaultController {
   resError(res: express.Response, message?: string) {
     res.json({ success: false, error: message ? message : 'operation faild!' });
   }
+  resErrInfo(res:express.Response, err?:any,info?:any){
+    let message = err ? err.message : info.message;
+   return res.json({success:false,error: message});
+  }
   resErrIfErr(res: express.Response, err: any,) {
     if (err) {
       this.logError(err)
@@ -110,12 +114,10 @@ export class DefaultController {
   callBack(res: express.Response, cb?: Function){
       return {
         done: (err: any, obj: any, info: any) => {
-          if(err || info){
-            this.resErrIfErr(res, err ?? info);
+           if (obj) {
+           return this.resObjCbSuccess(res, obj, cb, obj._id);
           }
-         else if (obj) {
-            this.resObjCbSuccess(res, obj, cb, obj._id);
-          }
+          this.resErrInfo(res,err,info);
         },
         errCb: (err: any) => this.resErrCb(res, err, cb),
         errSuccess: (err: any) => this.resErrSuccess(res, err)
