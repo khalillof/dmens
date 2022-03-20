@@ -4,34 +4,18 @@ import { AuthService } from '../../services/lib/auth.service'
 import { dbStore } from '../../common';
 
 export class UsersMiddleware {
-    userDb: JsonModel;
-
+    db: JsonModel;
+    auth = AuthService;
     constructor() {
-        this.userDb = dbStore['user'];
+        this.db = dbStore['account'];
     }
 
     static async createInstance() {
         return await Promise.resolve(new UsersMiddleware())
     }
-    verifyUser(type:string){
-        return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
-         let option = type === "jwt"? {session: false} : {};
-             return await AuthService.authenticate(type, option,(err:any,user:object,info:any) => {  
-                       if (err || info) {
-                         res.json({success:false,error: err ? err.message : info});
-                         console.error(err ?  err.stack : info);
-                       } else if(user) {
-                         next()
-                       }else{
-                         res.json({success:false,error:"server error"});
-                         console.error(err || info || 'what is going on !');
-                       }
-                   
-             })(req,res,next)
-         }
-        }
+
   async  getUserFromReq(req:express.Request){
-        return req.body && req.body.email ? await this.userDb.getOneByQuery({email:req.body.email}) : null;
+        return req.body && req.body.email ? await this.db.getOneByQuery({email:req.body.email}) : null;
     }
     validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
             if ( req.body.email || req.body.username && req.body.password) {

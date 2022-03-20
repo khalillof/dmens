@@ -22,20 +22,20 @@ class JsonModel {
     this.hasPopulate = false;
     this.#loadPopulates(jsonSchema.schema); 
     
-    if (this.name === 'user') {
+    if (this.name === 'account') {
       
         this.schema.plugin(passportLocalMongoose);
-        const User = model(this.name, this.schema);         
+        const Account = model(this.name, this.schema);         
         //passport.use(new Strategy(User.authenticate()));
-        passport.use(User.createStrategy());
-        passport.serializeUser(User.serializeUser());
-         passport.deserializeUser(User.deserializeUser());
+        passport.use(Account.createStrategy());
+        passport.serializeUser(Account.serializeUser());
+         passport.deserializeUser(Account.deserializeUser());
          // extras
         passport.use(PassportStrategies.Facebook());
-        passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
-        //passport.use(PassportStrategies.JwtQueryParameterStrategy());
+        //passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+        passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
-        this.model = User;
+        this.model = Account;
     } else {
         this.model = model(this.name, this.schema); 
     }

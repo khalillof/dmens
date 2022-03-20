@@ -2,14 +2,12 @@
 const { sign } = require('jsonwebtoken');
 const { randomBytes, createHmac } = require('crypto');
 const { DefaultController } = require('./default.controller');
-const { JwtMiddleware } = require('../../middlewares');
 const { config } = require('../../common');
 
 class AuthController extends DefaultController {
 
     constructor(svc) {
         super(svc)
-        this.jwtMWare = new JwtMiddleware();
     }
 
     createJWT(req, res, next){

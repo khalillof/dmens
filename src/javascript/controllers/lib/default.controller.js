@@ -106,14 +106,11 @@ class DefaultController {
   callBack(res, cb){
       return {
         done: (err, obj, info) => {
-          if(err){
-            this.resErrIfErr(res, err);
+          if(err || info){
+            this.resErrIfErr(res, err ?? info);
           }
          else if (obj) {
             this.resObjCbSuccess(res, obj, cb, obj._id ?? '');
-          }
-          else if (info) {
-            res.json({ success: false, message: 'Operation faild!', error: info ?? 'error' });
           }
         },
         errCb: (err) => this.resErrCb(res, err, cb),

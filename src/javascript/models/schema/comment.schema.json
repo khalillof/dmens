@@ -13,7 +13,7 @@
     },
     "author": {
         "type": "ObjectId",
-        "ref": "user"
+        "ref": "account"
     }
 }
 }

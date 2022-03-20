@@ -3,7 +3,7 @@
     "schema":{  
     "user": {
         "type": "ObjectId",
-        "ref": "user"
+        "ref": "account"
     },
     "dishes": [
         {

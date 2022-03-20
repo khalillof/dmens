@@ -16,7 +16,7 @@
     },
     "editor": {
       "type": "ObjectId",
-      "ref": "user"
+      "ref": "account"
     },
     "description": {
       "type": "String",

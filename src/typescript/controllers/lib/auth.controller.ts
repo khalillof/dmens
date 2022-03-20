@@ -3,15 +3,12 @@ import express from 'express';
 import {randomBytes, createHmac} from 'crypto';
 import { sign } from 'jsonwebtoken';
 import { DefaultController } from './default.controller';
-import { JwtMiddleware } from '../../middlewares';
 import { config } from '../../common';
 
 export class AuthController extends DefaultController {
 
-    jwtMWare: JwtMiddleware;
     constructor(svc:string) {
         super(svc)
-        this.jwtMWare = new JwtMiddleware();
     }
 
     createJWT(req:express.Request, res:express.Response, next:express.NextFunction){

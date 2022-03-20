@@ -6,8 +6,8 @@ import { DefaultController, IController } from '../../controllers/';
 import {Assert} from '../../common/lib/assert' ;
 
 export async function getUserMWare(){
-  let item= Object.values(routeStore).find(r=>  r.UsersMWare instanceof UsersMiddleware );
-  let result = item ? item.UsersMWare : await UsersMiddleware.createInstance();
+  let item= Object.values(routeStore).find(r=>  r.mWares instanceof UsersMiddleware );
+  let result = item ? item.mWares : await UsersMiddleware.createInstance();
     return await Promise.resolve(result);
 }
 
@@ -17,7 +17,7 @@ export class DefaultRoutesConfig {
     routeParam: string;
     controller:IController | any;
     corsWithOption:any;
-    UsersMWare?:UsersMiddleware ;
+    mWares?:UsersMiddleware ;
 
     constructor(rName:string,controller?:IController,usersMWare?:UsersMiddleware,callback?:Function) { 
         this.router = appRouter;
@@ -25,7 +25,7 @@ export class DefaultRoutesConfig {
         this.routeParam = this.routeName+'/:id';
         this.corsWithOption = corsWithOptions;
         this.controller = controller;
-        this.UsersMWare = usersMWare;
+        this.mWares = usersMWare;
 
         
         typeof callback === 'function' ? callback(this): this.defaultRoutes();
@@ -41,13 +41,13 @@ export class DefaultRoutesConfig {
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(){
-     return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user,editor'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
+     return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account,editor'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
     }
 
     buildMdWares(middlewares?:Array<Function>, useUserMWars=true){
       let mdwares = [this.corsWithOption];
       if(useUserMWars)
-        mdwares = [...mdwares,this.UsersMWare!.userIsAuthenticated];
+        mdwares = [...mdwares,this.mWares!.userIsAuthenticated];
       if(middlewares)
         mdwares.concat(middlewares);
         return mdwares;
@@ -66,7 +66,7 @@ export class DefaultRoutesConfig {
      return this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
     }
     delete(middlewares?:any, useUserMWars=true){  
-      middlewares=  middlewares ? middlewares : [this.UsersMWare?.verifyUserIsAdmin]
+      middlewares=  middlewares ? middlewares : [this.mWares?.verifyUserIsAdmin]
       return this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
     }
     param(){

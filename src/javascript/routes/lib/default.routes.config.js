@@ -17,7 +17,7 @@ class DefaultRoutesConfig {
     this.routeParam = this.routeName + '/:id';
     this.corsWithOption = corsWithOptions;
     this.controller = controller;
-    this.UsersMWare = usersMWare;
+    this.mWares = usersMWare;
     
     typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
     // add instance to routeStore
@@ -35,14 +35,14 @@ class DefaultRoutesConfig {
   buildMdWares(middlewares, useUserMWars=true){
     let mdwares = [this.corsWithOption];
     if(useUserMWars)
-      mdwares = [...mdwares,this.UsersMWare.userIsAuthenticated];
+      mdwares = [...mdwares,this.mWares.userIsAuthenticated];
     if(middlewares)
       mdwares.concat(middlewares);
     return mdwares;
   }
 
   static async createInstancesWithDefault(){
-  return  await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('user editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
+  return  await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(name,await DefaultController.createInstance(name))}))
  }
   // custom routes
   getList(middlewares, useUserMWars=true){
@@ -58,7 +58,7 @@ class DefaultRoutesConfig {
    return this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
   }
   delete(middlewares, useUserMWars=true){  
-    middlewares=  middlewares ?? [this.UsersMWare.verifyUserIsAdmin]
+    middlewares=  middlewares ?? [this.mWares.verifyUserIsAdmin]
    return this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
   }
   param(){

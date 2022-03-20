@@ -1,5 +1,5 @@
 {
-  "name": "user",
+  "name": "account",
   "schema": {
     "username": {
       "type": "String",
@@ -17,6 +17,7 @@
       "minLength": 3,
       "maxLength": 30
     },
+    "active":false,
     "firstname": {
       "type": "String",
       "default": "",

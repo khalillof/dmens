@@ -110,14 +110,11 @@ export class DefaultController {
   callBack(res: express.Response, cb?: Function){
       return {
         done: (err: any, obj: any, info: any) => {
-          if(err){
-            this.resErrIfErr(res, err);
+          if(err || info){
+            this.resErrIfErr(res, err ?? info);
           }
          else if (obj) {
             this.resObjCbSuccess(res, obj, cb, obj._id);
-          }
-          else if (info) {
-            res.json({ success: false, message: 'Operation faild!', error: info ?? 'error' });
           }
         },
         errCb: (err: any) => this.resErrCb(res, err, cb),

@@ -6,20 +6,17 @@ import { dbStore } from '../../common';
 
 export async function AuthRoutes(){
     
-    return dbStore['user'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance('user'), function(self:DefaultRoutesConfig):void{
+    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance('account'), function(self:DefaultRoutesConfig):void{
 
         self.router.post('/auth',
         self.corsWithOption,
-        self.UsersMWare!.validateRequiredUserBodyFields,
+        self.mWares!.validateRequiredUserBodyFields,
         self.controller.createJWT
     );
 
     self.router.post('/auth/refresh-token',
         self.corsWithOption,
-        self.controller.jwtMWare.validJWTNeeded,
-        self.controller.jwtMWare.verifyRefreshBodyField,
-        self.controller.jwtMWare.validRefreshNeeded,
         self.controller.createJWT
     );
-})) : console.log('User model is not avaliable in dbStore No Auth routes configuered');;
+})) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');;
 };

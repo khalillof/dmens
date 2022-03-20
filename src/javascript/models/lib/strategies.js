@@ -17,7 +17,7 @@ class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-          dbStore['user'].model.findOne({ username: username })
+          dbStore['account'].model.findOne({ username: username })
               .then((err, user) => {
                 if (err) { return cb(err); }
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
@@ -45,7 +45,7 @@ class PassportStrategies {
       issuer: '',//'accounts.examplesoft.com',
       audience: '', //'yoursite.net'
     }, function (jwt_payload, done) {
-      dbStore['user'].model.findOne({ id: jwt_payload.sub }, done);
+      dbStore['account'].model.findOne({ id: jwt_payload.sub }, done);
     });
   }
   // JWT stratigy
@@ -71,7 +71,7 @@ class PassportStrategies {
       clientID: config.facebook.clientId,
       clientSecret: config.facebook.clientSecret
     }, function (accessToken, refreshToken, profile, done){
-      dbStore['user'].findOne({ facebookId: profile.id }, done);
+      dbStore['account'].findOne({ facebookId: profile.id }, done);
     }
     );
   } 
@@ -85,7 +85,7 @@ function validPassword(password, hash, salt) {
 
 
 function verifyPasswordSafe(username, password, cb) {
-  dbStore['user'].findOne({ username: username }).then((err, user)=>{
+  dbStore['account'].findOne({ username: username }).then((err, user)=>{
     if (err) { return cb(err); }
     if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
 
@@ -125,7 +125,7 @@ function genHashedPassword(password) {
 * object later on.
 
 passport.deserializeUser(function(id, cb) {
-  dbStore['user'].findById(id, function (err, user) {
+  dbStore['account'].findById(id, function (err, user) {
       if (err) { return cb(err); }
       cb(null, user);
   });
