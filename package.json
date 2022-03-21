@@ -1,7 +1,7 @@
 {
-  "name": "mens",
+  "name": "dynamic-mens",
   "version": "1.0.0",
-  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, the name - mens - stand for Mongodb, Expressjs, nodejs srever",
+  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever",
   "private": true,
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",

@@ -11,6 +11,9 @@ class EditorController extends DefaultController {
         super(name)
     }
   async schemaDataHandller(req,res,next){
+      // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
+      JsonLoad.validate(req.body.data)
+      
         let jsonObj = await JsonLoad.makeSchema(req.body, true);
         jsonObj.schema.editor = req.user._id;
         // to save as file later

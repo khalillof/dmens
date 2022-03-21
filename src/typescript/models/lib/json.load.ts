@@ -15,11 +15,11 @@ export class JsonLoad {
 
     static validate(jsonSchema:any){
         if (!jsonSchema.name)
-           throw new Error(' schema name is required property')
-        if (jsonSchema.loadref instanceof Boolean)
-           throw new Error(' schema loadref is required property')
+           throw new Error(' schema validation faild ! property name is required')
+        if (typeof jsonSchema.loadref !== 'boolean')
+           throw new Error(' schema validation faild ! property loadref is required')
         if (dbStore[jsonSchema.name.toLowerCase()]) 
-          throw new Error('schema name already on db : '+jsonSchema.name)
+          throw new Error(`schema validation faild ! name property : ${jsonSchema.name} already on db : `)
      }
 
  static isJsonFile(file:string){

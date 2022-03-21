@@ -13,8 +13,7 @@ class JsonLoad {
 
         if (!jsonSchema.name)
            throw new Error(' schema name is required property')
-           
-        if (jsonSchema.loadref instanceof Boolean)
+        if (typeof jsonSchema.loadref !== 'boolean')
            throw new Error(' schema loadref is required property')
         if (dbStore[jsonSchema.name.toLowerCase()]) 
           throw new Error('schema name already on db : '+jsonSchema.name)
