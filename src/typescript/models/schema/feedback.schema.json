@@ -1,5 +1,6 @@
 {
     "name":"feedback",
+    "loadref":false,
     "schema":{  
     "name": {
         "type": "String",

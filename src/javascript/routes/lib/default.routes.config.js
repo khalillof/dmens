@@ -35,7 +35,7 @@ class DefaultRoutesConfig {
   buildMdWares(middlewares, useUserMWars=true){
     let mdwares = [this.corsWithOption];
     if(useUserMWars)
-      mdwares = [...mdwares,this.mWares.userIsAuthenticated];
+      mdwares = [...mdwares,this.mWares.isAuthenticated];
     if(middlewares)
       mdwares.concat(middlewares);
     return mdwares;

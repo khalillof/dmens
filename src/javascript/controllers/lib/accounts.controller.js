@@ -1,6 +1,6 @@
 "use strict";
 const { DefaultController } = require('./default.controller');
-const { AuthService } = require('../../services');
+const { authenticateUser,generateGwt } = require('../../services');
 class AccountsController extends DefaultController {
 
   constructor(name) {
@@ -13,7 +13,7 @@ class AccountsController extends DefaultController {
 
  async login(req, res, next){
    // local /jwt
-  return await AuthService.authenticateUser('local')(req, res, next);
+  return await authenticateUser('local')(req, res, next);
  }
 
 async forgetPassword(req, res, next){
@@ -79,7 +79,7 @@ async updateUser(req, res, next){
 
   facebook(req, res, next){
       if (req.user) {
-        var token = AuthService.generateToken({ _id: req.user._id });
+        var token = generateGwt(req.user);
         res.json({ success: true, token: token, status: 'You are successfully logged in!' });
       }
     }

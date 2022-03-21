@@ -47,7 +47,7 @@ export class DefaultRoutesConfig {
     buildMdWares(middlewares?:Array<Function>, useUserMWars=true){
       let mdwares = [this.corsWithOption];
       if(useUserMWars)
-        mdwares = [...mdwares,this.mWares!.userIsAuthenticated];
+        mdwares = [...mdwares,this.mWares!.isAuthenticated];
       if(middlewares)
         mdwares.concat(middlewares);
         return mdwares;
@@ -66,7 +66,7 @@ export class DefaultRoutesConfig {
      return this.router.put(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('put'))
     }
     delete(middlewares?:any, useUserMWars=true){  
-      middlewares=  middlewares ? middlewares : [this.mWares?.verifyUserIsAdmin]
+      middlewares=  middlewares ? middlewares : [this.mWares?.isAdmin]
       return this.router.delete(this.routeParam, ...this.buildMdWares(middlewares,useUserMWars),this.actions('remove'))
     }
     param(){

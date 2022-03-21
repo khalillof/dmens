@@ -9,12 +9,15 @@ const { JsonModel } = require('./json.model');
 class JsonLoad {
 
 
-    static isValidName(name){
-        if (!name)
-         throw new Error(' schema name is required property')
-    
-      if (dbStore[name.toLowerCase()]) 
-       throw new Error('schema name already on db : '+name)
+    static validate(jsonSchema){
+
+        if (!jsonSchema.name)
+           throw new Error(' schema name is required property')
+           
+        if (jsonSchema.loadref instanceof Boolean)
+           throw new Error(' schema loadref is required property')
+        if (dbStore[jsonSchema.name.toLowerCase()]) 
+          throw new Error('schema name already on db : '+jsonSchema.name)
      }
      static isJsonFile(file){
         return path.extname(file) ==='.json';
@@ -25,7 +28,7 @@ class JsonLoad {
             if (typeof jsonData === 'string')
                jsonData = JSON.parse(jsonData);
            
-            JsonLoad.isValidName(jsonData.name)
+            JsonLoad.validate(jsonData)
     
             return await JsonLoad.makeSchema(jsonData); 
      }
@@ -78,7 +81,7 @@ class JsonLoad {
     }
 
    static async makeSchema(jschema, schema_only = false) {
-        JsonLoad.isValidName(jschema.name)
+        JsonLoad.validate(jschema)
         // convert json type to mongoose schema type
         Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
 

@@ -1,11 +1,10 @@
 import passport from 'passport';
 import express from 'express'
-import { sign } from 'jsonwebtoken'; // used to create, sign, and verify tokens
+import { sign , verify} from 'jsonwebtoken'; // used to create, sign, and verify tokens
 import { config } from "../../common";
 
-export class AuthService {
 
-  static generateToken(user: any) {
+  function generateGwt(user: any) {
     try {
       const body = { _id: user._id, email: user.email };
       const token = sign({ user: body }, config.secretKey, { expiresIn: 3600 });
@@ -16,13 +15,7 @@ export class AuthService {
   }
 
   //type = 'local' || 'jwt'|| 'facebook-token'
-  static authenticate(type: string, option?: any, cb?: Function | any) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      return await passport.authenticate(type, option!, cb)(req, res, next);
-    }
-  }
-
-  static authenticateUser(type: string, opts?: any) {
+  function authenticateUser(type: string, opts?: any) {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
       let sessionFalse = { session: false };
       let option = type === "jwt" ? sessionFalse : {};
@@ -68,5 +61,8 @@ export class AuthService {
         console.error(err.stack);
       }
     }
-  }
+  
 }
+
+
+export {generateGwt, authenticateUser}

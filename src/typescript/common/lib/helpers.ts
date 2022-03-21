@@ -38,7 +38,7 @@ export function pluralizeRoute(routeName:string){
       return routeName;
   } 
 }
-export interface JsonSchema  {name:string,schema?:Schema |any};
+export interface JsonSchema  {name:string,loadref:boolean,schema:Schema};
 
 export interface IConstructor<T> {
   new (...args: any[]): T;

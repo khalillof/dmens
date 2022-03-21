@@ -1,5 +1,6 @@
 {
   "name": "editor",
+  "loadref":true,
   "schema": {
     "name": {
       "type": "String",
@@ -9,19 +10,25 @@
       "minLength": 3,
       "maxLength": 30
     },
-    "data": {
-      "type": "String",
-      "required": true,
-      "minLength": 10
+    "loadref":{
+      "type": "Boolean",
+      "default": false,
+      "required":true
     },
     "editor": {
       "type": "ObjectId",
-      "ref": "account"
+      "ref": "account",
+      "required":true
     },
     "description": {
       "type": "String",
       "default": "",
       "maxLength": 500
+    },
+    "data": {
+      "type": "String",
+      "required": true,
+      "minLength": 10
     }
   }
 }

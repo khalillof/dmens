@@ -1,5 +1,6 @@
 {
     "name":"favorite",
+    "loadref":true,
     "schema":{  
     "user": {
         "type": "ObjectId",

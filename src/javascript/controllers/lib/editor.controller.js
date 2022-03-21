@@ -10,8 +10,8 @@ class EditorController extends DefaultController {
     constructor(name = 'editor') {
         super(name)
     }
-  async schemaDataHandller(req,res,next, data){
-        let jsonObj = await JsonLoad.makeSchema({name :data.name,schema :data}, true);
+  async schemaDataHandller(req,res,next){
+        let jsonObj = await JsonLoad.makeSchema(req.body, true);
         jsonObj.schema.editor = req.user._id;
         // to save as file later
         let objForFileCopy = jsonObj;
@@ -39,7 +39,7 @@ class EditorController extends DefaultController {
     async create(req, res, next) {
         if (req.header('content-type') ==='application/json' && req.body) {
                 // to save as file later
-                let fileDataCopy = await this.schemaDataHandller(req,res,next,req.body);
+                let fileDataCopy = await this.schemaDataHandller(req,res,next);
 
                 // save data to file
                 this.saveJsnoToFile(fileDataCopy); 
@@ -50,7 +50,8 @@ class EditorController extends DefaultController {
                 if (err) {
                     this.resErrIfErr(res,err);
                 }else {
-                     await this.schemaDataHandller(req,res,next,JSON.parse(data))
+                    req.body = JSON.parse(data);
+                     await this.schemaDataHandller(req,res,next)
                     }
               });
         }else{

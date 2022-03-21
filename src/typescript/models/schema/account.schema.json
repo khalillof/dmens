@@ -1,5 +1,6 @@
 {
   "name": "account",
+  "loadref":false,
   "schema": {
     "username": {
       "type": "String",

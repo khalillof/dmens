@@ -1,6 +1,6 @@
 import express from 'express';
 import { DefaultController } from './default.controller'
-import { AuthService } from '../../services/lib/auth.service'
+import { authenticateUser,generateGwt } from '../../services/lib/auth.service'
 
 export class AccountsController extends DefaultController {
 
@@ -14,7 +14,7 @@ export class AccountsController extends DefaultController {
 
  async login(req: express.Request, res: express.Response, next: express.NextFunction){
   // local /jwt
-  return await AuthService.authenticateUser('local')(req, res, next);
+  return await authenticateUser('local')(req, res, next);
  }
  async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
   //Normally setPassword is used when the user forgot the password 
@@ -82,7 +82,7 @@ async  updateUser(req: any, res: express.Response, next: express.NextFunction){
   facebook(req: any, res: express.Response, next: express.NextFunction) {
 
     if (req.user) {
-      var token = AuthService.generateToken({ _id: req.user._id });
+      var token = generateGwt(req.user);
       res.json({ success: true, token: token, status: 'You are successfully logged in!' });
     }
   }

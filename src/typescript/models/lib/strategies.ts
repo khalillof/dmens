@@ -62,7 +62,9 @@ export class PassportStrategies {
     return new JwtStrategy(
       {
         secretOrKey: config.jwtSecret,
-        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
+        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token'),
+        issuer: '',//'accounts.examplesoft.com',
+        audience: '', //'yoursite.net'
       },
       async (token, done) => {
         try {
@@ -81,9 +83,18 @@ export class PassportStrategies {
       clientSecret: config.facebook.clientSecret
     }, function (accessToken, refreshToken, profile, done){
      
-      dbStore['account'].findOne({ facebookId: profile.id }, done)
+      dbStore['account'].findOne({ facebookId: profile.id }, async function(err:any, user:any) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+            // or you could create a new account
+        }
+      });
      } );
-    
   } 
 }
 

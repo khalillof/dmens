@@ -81,10 +81,19 @@ class PassportStrategies {
       clientID: config.facebook.clientId,
       clientSecret: config.facebook.clientSecret
     }, function (accessToken, refreshToken, profile, done){
-      dbStore['account'].findOne({ facebookId: profile.id }, done);
-    }
-    );
-  } 
+      dbStore['account'].findOne({ facebookId: profile.id }, async function(err, user) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+            // or you could create a new account
+        }
+      });
+     } );
+  }  
 }
 module.exports = {PassportStrategies};
 

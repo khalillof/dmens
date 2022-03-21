@@ -1,5 +1,6 @@
 {
     "name":"promotion",
+    "loadref":false,
     "schema":{
     "name": {
         "type": "String",

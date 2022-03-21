@@ -26,13 +26,13 @@ const {DefaultRoutesConfig } = require('./default.routes.config');
 
         self.router.get('/facebook/token',self.mWares.auth.authenticateUser('facebook'),self.actions('facebook'));
 
-        self.router.get('/accounts',self.mWares.userIsAuthenticated,self.mWares.verifyUserIsAdmin,self.actions('list')); 
+        self.router.get('/accounts',self.mWares.isAuthenticated,self.mWares.isAdmin,self.actions('list')); 
 
         //self.router.param('id', self.mWares.extractUserId);
        self.param()
-        self.router.all('/accounts/id',self.mWares.validateUserExists);
-        self.router.get('/accounts/id',self.mWares.userIsAuthenticated, self.mWares.validateSameEmailBelongToSameUser,self.actions('getOneById'));
-        self.router.delete('/accounts/id',self.mWares.userIsAuthenticated, self.mWares.verifyUserIsAdmin,self.actions('remove'));
+        self.router.all('/accounts/id',self.mWares.userExist);
+        self.router.get('/accounts/id',self.mWares.isAuthenticated, self.mWares.validateSameEmailBelongToSameUser,self.actions('getOneById'));
+        self.router.delete('/accounts/id',self.mWares.isAuthenticated, self.mWares.isAdmin,self.actions('remove'));
         self.router.put('/accounts/id',
             self.mWares.validateSameEmailBelongToSameUser,
             self.actions('put')); 

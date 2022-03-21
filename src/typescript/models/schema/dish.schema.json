@@ -1,5 +1,6 @@
 {
     "name":"dish",
+    "loadref":true,
     "schema":{
     "name": {
         "type": "String",

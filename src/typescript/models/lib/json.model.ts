@@ -11,6 +11,7 @@ export class JsonModel {
 
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
+    this.loadref = jsonSchema.loadref ? jsonSchema.loadref  : false;
 
     if(dbStore[this.name]){
       throw new Error('there is already model on Db with this name : '+this.name)
@@ -53,6 +54,7 @@ export class JsonModel {
   schema?:Schema ;
   model?:Model<any>;
   populateNames:Array<string> = [];
+  loadref:boolean= false;
   hasPopulate: boolean= false;
   #populateBuilder="";
   log =console.log;
@@ -106,7 +108,7 @@ export class JsonModel {
   }
 
   async Tolist(limit: number = 25, page: number = 0, query={}) {
-    return this.hasPopulate ? 
+    return this.loadref && this.hasPopulate ? 
     await this.#getListPopulated(limit,page,query) : 
     await this.model!.find(query)
       .limit(limit)
@@ -115,10 +117,10 @@ export class JsonModel {
   }
 
 async getOneById(id: string) {
-  return this.hasPopulate ? await this.#getOnePopulated(id): await this.model!.findById(id);
+  return this.loadref && this.hasPopulate ? await this.#getOnePopulated(id): await this.model!.findById(id);
 }
 async getOneByQuery(query: {}) {
-  return this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model!.findOne(query);
+  return this.loadref && this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model!.findOne(query);
 }
   async create(obj: object){
     return await this.model?.create(obj);

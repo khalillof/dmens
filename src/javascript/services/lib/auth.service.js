@@ -5,9 +5,8 @@ const  {sign, verify} = require('jsonwebtoken'); // used to create, sign, and ve
 const {config} = require( "../../common");
 
 
-class AuthService{
 
-    static generateToken(user) {
+    function generateGwt(user) {
         try {
               const body = { _id: user._id, email: user.email };
               const token = sign({ user: body },config.secretKey,{expiresIn: 3600});
@@ -17,18 +16,8 @@ class AuthService{
         }
     }
 
-   //static authenticateUser() {return passport.authenticate('jwt', {session: false});}
-    // facebook
-   //static authenticateFacebook() {return passport.authenticate('facebook-token');}
-
   //type = 'local' || 'jwt'|| 'facebook-token'
-   static authenticate(type,option, cb) { 
-     return async (req,res,next)=>{
-     return await passport.authenticate(type,option,cb)(req,res,next);
-    }
-  }
-
-  static  authenticateUser(type, opts){
+  function  authenticateUser(type, opts){
     return async (req, res, next)=>{
      let sessionFalse = { session: false };
      let option = type === "jwt"? sessionFalse : {};
@@ -80,7 +69,7 @@ class AuthService{
     }
 
     // no need for this function just use authenticateUser('jwt)
-   static validJWTBearerToken(req, res, next){
+   function validJWTBearerToken(req, res, next){
     verify(req.token, 'shhhhh', function(err, decoded) {
       if (err) {
         /*
@@ -93,5 +82,5 @@ class AuthService{
       }
     });
    }
-}
-exports.AuthService = AuthService;
+
+module.exports ={generateGwt,authenticateUser};

@@ -1,12 +1,12 @@
 "use strict";
-const { AuthService } = require('../../services');
+const { authenticateUser, generateGwt } = require('../../services');
 const {dbStore} = require('../../common');
 
 class UsersMiddleware {
 
     constructor() {
         this.db = dbStore['account'];
-        this.auth = AuthService;
+        this.auth = {authenticateUser,generateGwt};
     }
 
     static async createInstance() {
@@ -40,16 +40,16 @@ class UsersMiddleware {
         req.body && req.body.email ? await this.validateSameEmailBelongToSameUser(req, res, next) : next();
     }
 
-   async validateUserExists(req, res, next) {
+   async userExist(req, res, next) {
         await  this.getUserFromReq(req) ? next() : res.status(404).json({ error: 'User does not exist : ' +req.body.email });
     }
 
-    verifyUserIsAdmin(req, res, next) {
+    isAdmin(req, res, next) {
         req.user && req.user.admin && req.isAuthenticated ? next() : res.status(400).json({success:false,error:'you are not authorized'})
 
     }
-    userIsAuthenticated(req, res, next){
-        req.user && req.isAuthenticated ? next() : res.status(400).json({success:false,error:'you are not authorized'})
+    isAuthenticated(req, res, next){
+        req.isAuthenticated ? next() : res.status(400).json({success:false,error:'you are not authorized'})
     }
 
     extractUserId(req, res, next) {

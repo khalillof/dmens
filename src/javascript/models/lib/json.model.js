@@ -12,6 +12,8 @@ class JsonModel {
     this.log = console.log;
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
+    this.loadref = jsonSchema.loadref ? jsonSchema.loadref  : false;
+
     if(dbStore[this.name]){
       throw new Error('there is already model in this name : '+this.name)
     }
@@ -99,7 +101,7 @@ async #getListPopulated(limit=25, page= 0, query=null){
   }
 
   async Tolist(limit=25, page= 0, query=null) {
-    return this.hasPopulate ? 
+    return this.loadref && this.hasPopulate ? 
     await this.#getListPopulated(limit,page,query) : 
     await this.model.find(query)
       .limit(limit)
@@ -109,11 +111,11 @@ async #getListPopulated(limit=25, page= 0, query=null){
   }
 
   async getOneById(id) {
-    return this.hasPopulate ? await this.#getOnePopulated(id): await this.model.findById(id);
+    return this.loadref && this.hasPopulate ? await this.#getOnePopulated(id): await this.model.findById(id);
   }
 
   async getOneByQuery(query) {
-    return this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model.findOne(query);
+    return this.loadref && this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model.findOne(query);
   }
 
   async create(obj) {

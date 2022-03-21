@@ -1,5 +1,6 @@
 {
 "name":"comment",
+"loadref":true,
   "schema":{
     "rating":  {
         "type": "Number",
