@@ -82,8 +82,9 @@ defaultRoutes(){
   this.param();
 }
  
-  actions(actionName, useTryCatch=true){ 
-    return async (req,res,next)=> useTryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next);
+  actions(actionName){ 
+    return this.controller.tryCatchActions(actionName)
+    //return async (req,res,next)=> useTryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next);
 }
 
 }

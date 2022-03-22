@@ -7,9 +7,8 @@ import { JsonModel} from './json.model';
 
 export class JsonLoad {
 
-
   static async loadCustomFile(filePath:string, callback?:any) {
-        let sschema = await JsonLoad.loadFile(filePath, true);
+        let sschema = await JsonLoad.loadFile(filePath);
         return await JsonModel.createInstance(sschema, callback);
     }
 
@@ -29,18 +28,18 @@ export class JsonLoad {
 
         if (typeof jsonData === 'string')
            jsonData = JSON.parse(jsonData);
-       
-        JsonLoad.validate(jsonData)
 
-        return await JsonLoad.makeSchema(jsonData); 
+        let validSchema = await JsonLoad.makeSchema(jsonData); 
+        return await JsonLoad.makeModel(validSchema);
  }
-   static async loadFile(filePath:string, schema_only = false) {
+ // will return valid schema or throw error
+   static async loadFile(filePath:string) {
         if (path.isAbsolute(filePath) && JsonLoad.isJsonFile(filePath)) {
 
             let data = await fs.promises.readFile(filePath, 'utf8');
             let jsobj = JSON.parse(data);
 
-            return await JsonLoad.makeSchema(jsobj, schema_only);
+            return await JsonLoad.makeSchema(jsobj);
 
         } else {
             // handel dirNames within files
@@ -64,7 +63,8 @@ export class JsonLoad {
         for (const fileName of await fs.promises.readdir(directory)) {
             let _file = path.join(directory, fileName);
             if(JsonLoad.isJsonFile(_file)){
-                result.push(await JsonLoad.loadFile(_file)); 
+                let validschema = await JsonLoad.loadFile(_file); 
+                result.push(await JsonLoad.makeModel(validschema!)); 
             }
         }
     }else{
@@ -75,13 +75,15 @@ export class JsonLoad {
     return result;
 }
 
-   static async makeSchema(jschema:JsonSchema, schema_only = false) {
+   static async makeSchema(jschema:JsonSchema) {
         JsonLoad.validate(jschema)
         // convert json type to mongoose schema type
-        Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item))
+        Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
 
-        // finally return new jsonModel
-        return  schema_only ? jschema : await JsonModel.createInstance(jschema);
+        return  jschema ;
+    }
+    static async makeModel(jschema:JsonSchema) {
+        return  await JsonModel.createInstance(jschema);
     }
     static typeMappings = {
         "String": SchemaTypes.String,

@@ -73,7 +73,7 @@ export class JsonModel {
   }
 
   async #factory(stringObj:string){
-    this.log(stringObj);
+    this.log('factory method : '+ stringObj);
     return await eval(stringObj);
   }
   async #getOnePopulated(arg:any, method='findById'){
@@ -107,7 +107,7 @@ export class JsonModel {
     return await Promise.resolve(dbb);
   }
 
-  async Tolist(limit: number = 25, page: number = 0, query={}) {
+  async Tolist(limit=25, page= 0, query={}) {
     return this.loadref && this.hasPopulate ? 
     await this.#getListPopulated(limit,page,query) : 
     await this.model!.find(query)

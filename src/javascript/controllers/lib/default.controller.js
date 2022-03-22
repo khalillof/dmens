@@ -48,14 +48,16 @@ class DefaultController {
     this.resSuccess(res)
   }
   ////// helpers ================================
-  async tryCatch(req, res, next, actionName){
-    try{
-      await this[actionName](req, res, next) //await this[actionName](req,res,next);
-    }catch(err){
-      this.resErrIfErr(res,err);
+  tryCatchActions(actionName){
+    return async (req, res, next)=>{
+      try{
+       await this[actionName](req, res, next) //await this[actionName](req,res,next);
+      }catch(err){
+        this.resErrIfErr(res,err);
+      }
     }
-}
-  async tryCatchRes(res, fun) {
+  }
+  async tryCatchCallback(res, fun) {
     try {
       if (typeof fun === 'function') await fun(this)
     } catch (err) {

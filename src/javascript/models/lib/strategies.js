@@ -42,8 +42,8 @@ class PassportStrategies {
     return new JwtStrategy({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: config.secretKey,
-      issuer: '',//'accounts.examplesoft.com',
-      audience: '', //'yoursite.net'
+      issuer: config.issuer,
+      audience: config.audience,
     }, function (jwt_payload, done) {
       dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err, user) {
         if (err) {
@@ -63,6 +63,8 @@ class PassportStrategies {
     return new JwtStrategy(
       {
         secretOrKey: config.jwtSecret,
+        issuer: config.issuer,
+         audience: config.audience,
         jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
       },
       async (token, done) => {
@@ -80,6 +82,7 @@ class PassportStrategies {
     return new FacebookStrategy({
       clientID: config.facebook.clientId,
       clientSecret: config.facebook.clientSecret
+      
     }, function (accessToken, refreshToken, profile, done){
       dbStore['account'].findOne({ facebookId: profile.id }, async function(err, user) {
         if (err) {

@@ -8,6 +8,10 @@ const { JsonModel } = require('./json.model');
 
 class JsonLoad {
 
+    static async loadCustomFile(filePath, callback) {
+        let sschema = await JsonLoad.loadFile(filePath);
+        return await JsonModel.createInstance(sschema, callback);
+    }
 
     static validate(jsonSchema){
 
@@ -18,32 +22,25 @@ class JsonLoad {
         if (dbStore[jsonSchema.name.toLowerCase()]) 
           throw new Error('schema name already on db : '+jsonSchema.name)
      }
+
      static isJsonFile(file){
         return path.extname(file) ==='.json';
      }
 
      static async loadFromData(jsonData){
-    
             if (typeof jsonData === 'string')
                jsonData = JSON.parse(jsonData);
-           
-            JsonLoad.validate(jsonData)
-    
-            return await JsonLoad.makeSchema(jsonData); 
+
+               let validSchema = await JsonLoad.makeSchema(jsonData); 
+               return await JsonLoad.makeModel(validSchema);
      }
 
-   static async loadCustomFile(filePath, callback) {
-        let sschema = await JsonLoad.loadFile(filePath, true);
-    return  await JsonModel.createInstance(sschema, callback);
-    }
-
-   static async loadFile(filePath, schema_only = false) {
+   static async loadFile(filePath) {
         if (path.isAbsolute(filePath) && JsonLoad.isJsonFile(filePath)) {
-
             let data = await fs.promises.readFile(filePath, 'utf8');
             let jsobj = JSON.parse(data);
 
-            return await JsonLoad.makeSchema(jsobj, schema_only);
+            return await JsonLoad.makeSchema(jsobj);
 
         } else {
             // handel dirNames within files
@@ -66,11 +63,10 @@ class JsonLoad {
             for (const fileName of await fs.promises.readdir(directory)) {
                 let _file = path.join(directory, fileName);
                 if(JsonLoad.isJsonFile(_file)){
-                    result.push(await JsonLoad.loadFile(_file)); 
-                }
-               
+                    let validschema = await JsonLoad.loadFile(_file); 
+                    result.push(await JsonLoad.makeModel(validschema));  
+                }           
             }
-
         }else{
 
         throw new Error('directory Not Found : '+ directory)
@@ -79,15 +75,16 @@ class JsonLoad {
         return result;
     }
 
-   static async makeSchema(jschema, schema_only = false) {
+   static async makeSchema(jschema) {
         JsonLoad.validate(jschema)
         // convert json type to mongoose schema type
         Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
-
-        // finally return new jsonModel
-        return schema_only ? jschema : await JsonModel.createInstance(jschema);
+        return jschema;
     }
-
+    
+    static async makeModel(jschema) {
+        return  await JsonModel.createInstance(jschema);
+    }
    static typeMappings = {
         "String": SchemaTypes.String,
         "string": SchemaTypes.String,
@@ -118,10 +115,9 @@ class JsonLoad {
       }
     // search item in object and map to mongoose schema
   static  deepSearch(item) {
-     
         // loop over the item
         for (let [itemKey, itemValue] of Object.entries(item))  {           
-        
+    
         // check if item is object then call deepSearch agin recursively
             if (typeof itemValue === "object") {
                 JsonLoad.deepSearch(itemValue)           

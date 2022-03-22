@@ -6,6 +6,8 @@ export const config = {
   auth:env.AUTH || true,
   secretKey: env.SECRET_KEY || '',
   jwtSecret: env.SECRET_KEY || '',
+  issuer: env.ISSUER || '',//'accos.examplesoft.com',
+  audience: env.AUDIENCE || '', //'yousite.net'
   getSchemaUploadPath:()=> path.resolve(__dirname,'../../' + env.SCHEMA_DIR +`/schema.${Date.now()}.json`) || path.resolve(__dirname,`../../schema.${Date.now()}.json`),
   schemaDir:path.resolve(__dirname,'../../' + env.SCHEMA_DIR)|| path.resolve(__dirname,'../../'),
   imagesUploadDir:path.resolve(__dirname,'../../' + env.IMAGES_UPLOAD_DIR)|| path.resolve(__dirname,'../../'),

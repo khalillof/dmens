@@ -18,7 +18,7 @@ export class DefaultRoutesConfig {
     controller:IController | any;
     corsWithOption:any;
     mWares?:UsersMiddleware ;
-
+    //actions:Function;
     constructor(rName:string,controller?:IController,usersMWare?:UsersMiddleware,callback?:Function) { 
         this.router = appRouter;
         this.routeName = pluralizeRoute(rName);
@@ -26,7 +26,7 @@ export class DefaultRoutesConfig {
         this.corsWithOption = corsWithOptions;
         this.controller = controller;
         this.mWares = usersMWare;
-
+        //this.actions = this.controller.tryCatch
         
         typeof callback === 'function' ? callback(this): this.defaultRoutes();
            
@@ -89,8 +89,10 @@ export class DefaultRoutesConfig {
       this.param();
     }
 
- actions(actionName:string, tryCatch=true){ 
-     return async (req:express.Request,res:express.Response,next:express.NextFunction)=> tryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next)
- }
+  actions(actionName:string){
+   return this.controller.tryCatchActions(actionName)
+  }
+     //return async (req:express.Request,res:express.Response,next:express.NextFunction)=> tryCatch ? await this.controller.tryCatch(req,res,next,actionName): await this.controller[actionName](req,res,next)
+ //}
 
   }

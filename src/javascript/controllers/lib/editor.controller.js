@@ -14,11 +14,15 @@ class EditorController extends DefaultController {
       // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
       JsonLoad.validate(req.body.data)
       
-        let jsonObj = await JsonLoad.makeSchema(req.body, true);
+        let jsonObj = await JsonLoad.makeSchema(req.body);
         jsonObj.schema.editor = req.user._id;
         // to save as file later
         let objForFileCopy = jsonObj;
 
+        //check for activation
+        if(jsonObj.activate)
+        await JsonLoad.makeModel(jsonObj.schema.data)
+        
         //stringify JSON schema feild to save on db
         jsonObj.schema.data = JSON.stringify(jsonObj.schema.data);
 

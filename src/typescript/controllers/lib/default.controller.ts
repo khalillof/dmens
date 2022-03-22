@@ -49,14 +49,17 @@ export class DefaultController {
     this.resSuccess(res)
   }
   ////// helpers ================================
-  async tryCatch(req: express.Request, res: express.Response, next: express.NextFunction, actionName:string){
-    try{
-      await this.self[actionName](req, res, next) //await this[actionName](req,res,next);
-    }catch(err){
-      this.resErrIfErr(res,err);
+  tryCatchActions(actionName:string){
+    return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
+      try{
+      return await this.self[actionName](req, res, next) //await this[actionName](req,res,next);
+      }catch(err){
+        this.resErrIfErr(res,err);
+      }
     }
-}
-  async tryCatchRes(res: express.Response, fun: Function) {
+  }
+
+  async tryCatchCallback(res: express.Response, fun: Function) {
     try {
     if (fun && typeof fun === 'function'){ 
       await fun() 

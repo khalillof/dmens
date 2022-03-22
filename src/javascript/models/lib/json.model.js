@@ -82,7 +82,7 @@ class JsonModel {
     }
 }
 async #factory(stringObj){
-  this.log(stringObj);
+  this.log('factory method : '+ stringObj);
   return await eval(stringObj);
 }
 async #getOnePopulated(arg, method='findById'){
