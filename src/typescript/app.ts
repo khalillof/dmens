@@ -16,6 +16,7 @@ import {config, printRoutesToString} from './common'
 import { initRouteStore, } from './routes';
 import passport from 'passport';
 
+import {SeedDatabase}from './seed.database'
 // Create the Express application
 const app = express();
 app.use(express.json());
@@ -74,6 +75,9 @@ initRouteStore.forEach(async(rout)=> await rout(app))
   res.status(404).json( { success:false, message:"Sorry can't find that!"})
 })
 
+
+// seed database
+new SeedDatabase();
   }
     ,1000);
   

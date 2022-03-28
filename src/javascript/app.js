@@ -14,6 +14,7 @@ const  {dbInit} = require('./services');
 const {config ,printRoutesToString }  = require('./common');
 const  {initRouteStore} = require('./routes');
 const passport = require('passport');
+const {SeedDatabase} =require('./seed.database');
 
 // Create the Express application
 const app = express();
@@ -76,6 +77,8 @@ initRouteStore.forEach(async(rout)=> await rout(app))
   res.status(404).json( { success:false, message:"Sorry can't find that!"})
 })
 
+// seed database
+new SeedDatabase();
   }
     ,1000);
   

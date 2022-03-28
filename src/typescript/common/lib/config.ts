@@ -3,7 +3,10 @@ import path from 'path'
 
 export const config = {
     port:env.PORT || 3000,
-    auth:env.AUTH || true,
+    admin_email:env.ADMIN_EMAIL || '',
+    admin_userName:env.ADMIN_USERNAME || '',
+    admin_password:env.ADMIN_PASSWORD || '',
+    useAuth:env.AUTH || true,
     secretKey: env['SECRET_KEY'] || '',
     jwtSecret:env['JWT_SECRET'] || '',
     jwtExpiration:Number(env['JWT_EXPIRATION']?? '3600'),

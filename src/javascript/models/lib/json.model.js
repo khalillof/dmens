@@ -41,22 +41,7 @@ class JsonModel {
         this.model = Account;
     } else {
         this.model = model(this.name, this.schema); 
-      // add default roles
-        if (this.name === 'role'){
-          this.model.estimatedDocumentCount((err, count) => {
-            if (!err && count === 0) {
-              new this.model({
-                name: "user"
-              }).save(err => err ? this.logerr("error", err) : this.log("added 'user' to roles collection"));
-              new this.model({
-                name: "application"
-              }).save(err => err ? this.logerr("error", err) : this.log("added 'moderator' to roles collection"));
-              new this.model({
-                name: "admin"
-              }).save(err => err ? this.logerr("error", err) : this.log("added 'admin' to roles collection"));
-            }
-          });
-        }
+      
     }
     
   }else if(typeof callback === 'function') {
@@ -81,6 +66,7 @@ class JsonModel {
     }
 
   }
+  
   // search item in object and map to mongoose schema
  #deepSearch(obj, indx,arr) {
      
