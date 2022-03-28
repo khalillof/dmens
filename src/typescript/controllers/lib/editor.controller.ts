@@ -37,7 +37,7 @@ export class EditorController extends DefaultController {
 
                 let file_path = config.getSchemaUploadPath();
                 fs.writeFile(file_path, jsonObject, 'utf8',(err)=>{
-                err ? this.logError(err):this.log('New json file document created path: '+file_path)
+                err ? this.log.err(err):this.log.log('New json file document created path: '+file_path)
                 }); 
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
@@ -53,7 +53,7 @@ export class EditorController extends DefaultController {
 
             fs.readFile(req.file.path, 'utf8', async (err, data)=> {
                 if (err) {
-                    this.resErrIfErr(res,err);
+                    this.responce(res).error(err);
                 }else {
                     req.body = JSON.parse(data);
                      await this.schemaDataHandller(req,res,next)
@@ -61,7 +61,7 @@ export class EditorController extends DefaultController {
               });
         }else{
             
-            this.resError(res,'content must be valid json');
+            this.responce(res).success(false,'content must be valid json');
         }
 
     }

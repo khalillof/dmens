@@ -1,6 +1,6 @@
 {
   "name": "account",
-  "loadref":false,
+  "loadref":true,
   "schema": {
     "username": {
       "type": "String",
@@ -18,6 +18,12 @@
       "minLength": 3,
       "maxLength": 30
     },
+    "roles": [
+      {
+        "type": "ObjectId",
+        "ref": "role"
+      }
+    ],
     "active":false,
     "firstname": {
       "type": "String",
@@ -37,10 +43,6 @@
     "facebookId": {
       "type": "String",
       "default": ""
-    },
-    "admin": {
-      "type": "Boolean",
-      "default": false
     }
   }
 }

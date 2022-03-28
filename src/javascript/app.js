@@ -11,7 +11,7 @@ var path = require('path');
 const morgan  = require('morgan');
 const  helmet = require('helmet');
 const  {dbInit} = require('./services');
-const {config ,printRoutesToString ,appRouter}  = require('./common');
+const {config ,printRoutesToString }  = require('./common');
 const  {initRouteStore} = require('./routes');
 const passport = require('passport');
 
@@ -56,21 +56,29 @@ app.use(helmet({
 }));
 
 setTimeout(async()=>{
-initRouteStore.forEach(async(rout)=> await rout())
 
-  // register routes
-  app.use('/', appRouter);
+  app.use(function(req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
 
-   // handel 404 shoud be at the midlleware
-   app.use((req, res, next) => {
-    res.status(404).json( { success:false, message:"Sorry can't find that!"})
-  })
+initRouteStore.forEach(async(rout)=> await rout(app))
 
   }, 500)
   
-  setTimeout(
-   printRoutesToString
+  setTimeout(()=> {
+    printRoutesToString(app);
+ // handel 404 shoud be at the midlleware
+ app.use((req, res, next) => {
+  res.status(404).json( { success:false, message:"Sorry can't find that!"})
+})
+
+  }
     ,1000);
+  
  
   const dev_prod = app.get('env');
   

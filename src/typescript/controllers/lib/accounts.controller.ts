@@ -9,7 +9,8 @@ export class AccountsController extends DefaultController {
   }
 
  async signup(req: express.Request, res: express.Response, next: express.NextFunction){
-      await this.db.model.register(req.body, req.body.password, this.callBack(res).done)
+   let mdl:any=this.db.model!
+      await mdl.register(req.body, req.body.password, this.responce(res).errObjInfo)
   }
 
  async login(req: express.Request, res: express.Response, next: express.NextFunction){
@@ -19,64 +20,54 @@ export class AccountsController extends DefaultController {
  async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
   //Normally setPassword is used when the user forgot the password 
   if(!req.body.email && req.body.password){
-   return this.resError(res,'some requied body fields are missing')
+   return this.responce(res).success(false,'some requied body fields are missing')
   }
-  let user = await this.getUserByEmail(req.body.email);
-  if (!user){
-    return this.resError(res,'some of your input are not valid')
-    }else{
-     return  user.setPassword(req.body.password, this.callBack(res).done)
-  }
+  let user = await this.db.findOne({email:req.body.email});
+   if (!user){
+     return this.responce(res).success(false,'some of your input are not valid')
+     }else{
+      return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
+   }
 
 }
-async changePassword(req: express.Request, res: express.Response, next: express.NextFunction){
+async changePassword(req: any, res: express.Response, next: express.NextFunction){
   //changePassword is used when the user wants to change the password
   if(req.isUnauthenticated()){
-    res.status(400).json({success:false,error:'you are not authorized'});
+    this.responce(res).errStatus(400,'you are not authorized');
   }
   if (!req.body.oldpassword || !req.body.newpassword){
-  return this.resError(res,'old and new pasword field are required')
+  return this.responce(res).success(false,'old and new pasword field are required')
   }else{
-     
-    let user:any=req.user;
-   return  user.changePassword(req.body.oldpassword, req.body.newpassword, (err:any)=>{
-    if(err)
-     return res.json({success:true,error:err})
-     return this.resSuccess(res)
-  })
+      let user:any=await this.db.model!.findById(req.user._id);
+   return  user.changePassword(req.body.oldpassword, req.body.newpassword,this.responce(res).errSuccess)
 }
 }
-  profile(req: express.Request, res: express.Response, next: express.NextFunction) {
-
-     return res.json({
-       message: 'You made it to the secure route',
-       user: req.user,
-     })
-    
+  profile(req: any, res: express.Response, next: express.NextFunction) {
+    return this.responce(res).item(req.user,'You made it to the secure route')
   }
  
 async  updateUser(req: any, res: express.Response, next: express.NextFunction){
-      if (req.isUnauthenticated()) {
-        res.status(401).send({ success: false, message: 'unauthorized' })
-      } else {
-        // user is already authenticated that is why I am checking for body.password only
-        let User = await this.db.getOneById(req.params.id);
-        if (req.user.password !== req.body.password)
-          await User.setPassword(req.body.password)
-        await User.save(req.body, this.callBack(res).done)
-      }
+  if (req.isUnauthenticated()) {
+    this.responce(res).errStatus(401, 'unauthorized')
+  } else {
+    // user is already authenticated that is why I am checking for body.password only
+    let User = await this.db.findById(req.params.id);
+    if (req.user.password !== req.body.password)
+      await User.setPassword(req.body.password)
+    await User.save(req.body, this.responce(res).errObjInfo)
+  }
   }
 
   logout(req: any, res: express.Response, next: express.NextFunction) {
-    req.logOut()
-    if (req.session) {
-      req.session.destroy();
-      res.clearCookie('session-id');
-      //res.redirect('/');
-      this.resSuccess(res, "You are logged out!");
-    } else {
-      this.resSuccess(res, "You are not logged in!");
-    }
+    req.logOut();
+      if (req.session) {
+        req.session.destroy();
+        res.clearCookie('session-id');
+        //res.redirect('/');
+        this.responce(res).success(true,"You are logged out!")
+      } else {
+        this.responce(res).success(true,"You are not logged in!")
+      }
   }
 
   facebook(req: any, res: express.Response, next: express.NextFunction) {
@@ -86,11 +77,7 @@ async  updateUser(req: any, res: express.Response, next: express.NextFunction){
       res.json({ success: true, token: token, status: 'You are successfully logged in!' });
     }
   }
-
-  // helper
- async getUserByEmail(email: string) {
-    return await this.db.getOneByQuery({ email: email });
-  }
+  
 }
 
 

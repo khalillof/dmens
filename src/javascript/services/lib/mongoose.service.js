@@ -1,5 +1,6 @@
 "use strict";
 const mongoose =require('mongoose');
+mongoose.Promise = global.Promise;
 const { config } =require('../../common');
 const { JsonLoad }=require('../../models');
 

@@ -1,9 +1,7 @@
 import express from 'express';
-
-import {randomBytes, createHmac} from 'crypto';
-import { sign } from 'jsonwebtoken';
 import { DefaultController } from './default.controller';
-import { config } from '../../common';
+import { dbStore} from '../../common';
+import { verifyTokenExpiration,generateGwt } from '../../services';
 
 export class AuthController extends DefaultController {
 
@@ -11,16 +9,33 @@ export class AuthController extends DefaultController {
         super(svc)
     }
 
-    createJWT(req:express.Request, res:express.Response, next:express.NextFunction){
+     // find check refeshToken and create accessToken
+ async createAccessTokenBaseOnRefershToken(req:express.Request, res:express.Response, next:express.NextFunction){
 
-            let refreshId = req.body._id + config.jwtSecret;
-            let salt = randomBytes(16).toString('base64');
-            let hash = createHmac('sha512', salt).update(refreshId).digest("base64");
-            req.body.refreshKey = salt;
-            let token = sign(req.body,config.jwtSecret, { expiresIn: 36000, issuer:config.issuer, audience:config.audience });
-            let b = Buffer.from(hash);
-            let refreshToken = b.toString('base64');
-            return res.json({success:true, accessToken: token, refreshToken: refreshToken });
-    }
+        const requestRefreshToken  = req.query.token;
+        if (requestRefreshToken == null) {
+          return this.responce(res).errStatus(403,"Refresh Token is required!" );
+        }
+       
+          let refreshToken = await dbStore['token'].model!.findOne({ token: requestRefreshToken });
+          if (!refreshToken) {
+            this.responce(res).errStatus(403, "Refresh token is not found!" );
+            return;
+          }
+          if (verifyTokenExpiration(refreshToken)) {
+            dbStore['token'].model!.findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
+            
+            this.responce(res).errStatus(403,"Refresh token was expired. Please make a new signin request");
+            return;
+          }
+          let newAccessToken = generateGwt(refreshToken.owner);
+          return res.status(200).json({
+            success:true,
+            accessToken: newAccessToken,
+            refreshToken: refreshToken.token,
+          });
+        
+      };
+    
 }
 

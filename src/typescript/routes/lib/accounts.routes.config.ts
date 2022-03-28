@@ -1,39 +1,41 @@
+import express from 'express'
 import { AccountsController } from '../../controllers';
 import { DefaultRoutesConfig } from './default.routes.config';
 import { dbStore } from '../../common';
+import { IDefaultRoutesConfig} from '../../interfaces';
 
 
+export async function AccountsRoutes(app:express.Application) {
+    return dbStore['account'] ? await Promise.resolve(await DefaultRoutesConfig.instance(app,'account', await AccountsController.createInstance('account'),
+    (self:IDefaultRoutesConfig)=>{
 
-export async function AccountsRoutes() {
-    return dbStore['account'] ? await Promise.resolve(await DefaultRoutesConfig.instance('account', await AccountsController.createInstance('account'),
-    (self:DefaultRoutesConfig)=>{
-
-        self.router.all('/accounts',self.corsWithOption);
-        self.router.post('/accounts/signup',
-            self.mWares!.validateRequiredUserBodyFields,
+        self.app.all('/accounts',self.corsWithOption);
+        self.app.post('/accounts/signup',
+            self.mware!.validateRequiredUserBodyFields,
             self.actions('signup')
             );
         
-        self.router.post('/accounts/login',
-            self.mWares!.validateRequiredUserBodyFields,
+
+        self.app.post('/accounts/login',
+            self.mware!.validateRequiredUserBodyFields,
             self.actions('login')
             );
 
-        self.router.get('/accounts/logout',self.actions('logout'));
+        self.app.get('/accounts/logout',self.actions('logout'));
 
-        self.router.get('/accounts/profile',self.mWares!.auth.authenticateUser("jwt"),self.actions('profile'));
+        self.app.get('/accounts/profile',self.authenticate("jwt"),self.mware!.validateSameEmailBelongToSameUser,self.actions('profile'));
 
-        self.router.get('/facebook/token',self.mWares!.auth.authenticateUser("facebook"),self.actions('facebook'));
+        self.app.get('/facebook/token',self.authenticate('facebook'),self.actions('facebook'));
 
-        self.router.get('/accounts',self.mWares!.isAuthenticated,self.mWares!.isAdmin,self.actions('list')); 
+        self.app.get('/accounts',self.authenticate("jwt"),self.mware!.isInRole('admin'),self.actions('list')); 
 
-        //self.router.param('id', self.accountsMWare!.extractUserId);
+        //self.app.param('id', self.mware.extractUserId);
        self.param()
-        self.router.all('/accounts/id',self.mWares!.userExist);
-        self.router.get('/accounts/id',self.mWares!.isAuthenticated,self.actions('getOneById'));
-        self.router.delete('/accounts/id',self.mWares!.isAuthenticated, self.mWares!.validateSameEmailBelongToSameUser, self.actions('remove'));
-        self.router.put('/accounts/id',
-            self.mWares!.validateSameEmailBelongToSameUser,
+        self.app.all('/accounts/id',self.authenticate("jwt"));
+        self.app.get('/accounts/id',self.mware!.validateSameEmailBelongToSameUser,self.actions('getOneById'));
+        self.app.delete('/accounts/id',self.mware!.isInRole('admin'),self.actions('remove'));
+        self.app.put('/accounts/id',
+            self.mware!.validateSameEmailBelongToSameUser,
             self.actions('put')); 
 })): console.log('Account model is not avaliable in dbStore No accounts routes configuered');
 }

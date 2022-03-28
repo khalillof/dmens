@@ -1,0 +1,14 @@
+{
+    "name":"role",
+    "loadref":false,
+    "schema": {
+      "name": {
+        "type": "String",
+        "unique": true,
+        "lowercase": true,
+        "required": true,
+        "minLength": 3,
+        "maxLength": 30
+     }
+     }
+    }

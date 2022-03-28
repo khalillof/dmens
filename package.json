@@ -2,6 +2,16 @@
   "name": "dynamic-mens",
   "version": "1.0.0",
   "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever",
+  "keywords": [
+    "secure",
+    "dynamic",
+    "mongodb",
+    "express",
+    "node.js",
+    "server"
+  ],
+  "author": "Khalil Tuban",
+  "license": "ISC",
   "private": true,
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
@@ -35,8 +45,9 @@
     "mongoose": "^6.0.12",
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
-    "nanoid": "^3.1.30",
+    "nanoid": "^3.3.1",
     "passport": "^0.5.0",
+    "passport-facebook": "^3.0.0",
     "passport-facebook-token": "^4.0.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

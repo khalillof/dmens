@@ -10,6 +10,7 @@ class JsonModel {
 
   constructor(jsonSchema, callback = null) {
     this.log = console.log;
+    this.logerr = console.error;
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
     this.loadref = jsonSchema.loadref ? jsonSchema.loadref  : false;
@@ -33,13 +34,29 @@ class JsonModel {
         passport.serializeUser(Account.serializeUser());
          passport.deserializeUser(Account.deserializeUser());
          // extras
-        passport.use(PassportStrategies.Facebook());
+        passport.use(PassportStrategies.FacebookToken());
         passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
         //passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
         this.model = Account;
     } else {
         this.model = model(this.name, this.schema); 
+      // add default roles
+        if (this.name === 'role'){
+          this.model.estimatedDocumentCount((err, count) => {
+            if (!err && count === 0) {
+              new this.model({
+                name: "user"
+              }).save(err => err ? this.logerr("error", err) : this.log("added 'user' to roles collection"));
+              new this.model({
+                name: "application"
+              }).save(err => err ? this.logerr("error", err) : this.log("added 'moderator' to roles collection"));
+              new this.model({
+                name: "admin"
+              }).save(err => err ? this.logerr("error", err) : this.log("added 'admin' to roles collection"));
+            }
+          });
+        }
     }
     
   }else if(typeof callback === 'function') {
@@ -110,11 +127,11 @@ async #getListPopulated(limit=25, page= 0, query=null){
       
   }
 
-  async getOneById(id) {
+  async findById(id) {
     return this.loadref && this.hasPopulate ? await this.#getOnePopulated(id): await this.model.findById(id);
   }
 
-  async getOneByQuery(query) {
+  async findOne(query) {
     return this.loadref && this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model.findOne(query);
   }
 
@@ -127,7 +144,8 @@ async #getListPopulated(limit=25, page= 0, query=null){
   }
 
   async deleteById(id) {
-    return await this.model.findByIdAndDelete(id);
+  return await this.model.findByIdAndDelete(id);
+
   }
   async deleteByQuery(query) {
     return await this.model.findOneAndDelete(query);

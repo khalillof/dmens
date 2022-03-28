@@ -1,5 +1,5 @@
 
 
-import {UsersMiddleware} from './lib/users.middleware';
+import {Middlewares} from './lib/middleware';
 
-export {UsersMiddleware}
+export {Middlewares}

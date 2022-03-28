@@ -1,11 +1,12 @@
 "use strict";
 import {Model ,Schema , model} from 'mongoose';
-import {JsonSchema, dbStore} from '../../common'
+import {dbStore} from '../../common'
+import {JsonSchema, IJsonModel} from '../../interfaces'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import {PassportStrategies} from './strategies' ;
 
-export class JsonModel {
+export class JsonModel implements IJsonModel {
 
   constructor(jsonSchema?:JsonSchema, callback?:any) {
 
@@ -19,7 +20,7 @@ export class JsonModel {
 
     this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
 
-    this.#loadPopulates(jsonSchema.schema); 
+    this.loadPopulates(jsonSchema.schema); 
 
     if (this.name === 'account') {
       
@@ -30,7 +31,7 @@ export class JsonModel {
         passport.serializeUser(Account.serializeUser());
          passport.deserializeUser(Account.deserializeUser());
          // extras
-        passport.use(PassportStrategies.Facebook());
+        passport.use(PassportStrategies.FacebookToken());
         passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
         //passport.use(PassportStrategies.JwtQueryParameterStrategy());
         // assign
@@ -56,43 +57,43 @@ export class JsonModel {
   populateNames:Array<string> = [];
   loadref:boolean= false;
   hasPopulate: boolean= false;
-  #populateBuilder="";
+ private populateBuilder="";
   log =console.log;
 
-  #loadPopulates(_schema?:any){
+ private loadPopulates(_schema?:any){
 
       // check and load populates
-      Object.entries(_schema ??  this.schema!.obj).forEach((item, indx,arr) => this.#deepSearch(item, indx, arr));
+      Object.entries(_schema ??  this.schema!.obj).forEach((item, indx,arr) => this.deepSearch(item, indx, arr));
       
       this.hasPopulate = this.populateNames.length > 0 ;
       if(this.hasPopulate) {
         //console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
-        this.populateNames.forEach(item=> this.#populateBuilder +=".populate('"+item+"')");
-        this.#populateBuilder+=".exec()";
+        this.populateNames.forEach(item=> this.populateBuilder +=".populate('"+item+"')");
+        this.populateBuilder+=".exec()";
       }
   }
 
-  async #factory(stringObj:string){
+ private async factory(stringObj:string){
     this.log('factory method : '+ stringObj);
     return await eval(stringObj);
   }
-  async #getOnePopulated(arg:any, method='findById'){
-      let builder = `this.model.${method}(${JSON.stringify(arg)})${this.#populateBuilder}`;
-      return await this.#factory(builder);
+ private async getOnePopulated(arg:any, method='findById'){
+      let builder = `this.model.${method}(${JSON.stringify(arg)})${this.populateBuilder}`;
+      return await this.factory(builder);
   }
   
-  async #getListPopulated(limit=25, page= 0, query={}){
-    let builder = `this.model.find(${JSON.stringify(query)}).limit(${limit}).skip(${(limit * page)})${this.#populateBuilder}`;
-    return await this.#factory(builder);
+ private async getListPopulated(limit=25, page= 0, query={}){
+    let builder = `this.model.find(${JSON.stringify(query)}).limit(${limit}).skip(${(limit * page)})${this.populateBuilder}`;
+    return await this.factory(builder);
   }
   // search item in object and map to mongoose schema
- #deepSearch(obj:any, indx:number, arr:Array<any>) {
+private deepSearch(obj:any, indx:number, arr:Array<any>) {
     // loop over the item
     for (let [itemKey, itemValue] of Object.entries(obj))  {           
     
       // check if item is object then call deepSearch agin recursively
        if (typeof itemValue === "object") {
-           this.#deepSearch(itemValue, indx,arr)           
+           this.deepSearch(itemValue, indx,arr)           
        } else {
          if(itemKey === 'ref'){
          //console.log(arr[indx][0])
@@ -109,18 +110,18 @@ export class JsonModel {
 
   async Tolist(limit=25, page= 0, query={}) {
     return this.loadref && this.hasPopulate ? 
-    await this.#getListPopulated(limit,page,query) : 
+    await this.getListPopulated(limit,page,query) : 
     await this.model!.find(query)
       .limit(limit)
       .skip(limit * page)
       .exec();
   }
 
-async getOneById(id: string) {
-  return this.loadref && this.hasPopulate ? await this.#getOnePopulated(id): await this.model!.findById(id);
+async findById(id: string) {
+  return this.loadref && this.hasPopulate ? await this.getOnePopulated(id): await this.model!.findById(id);
 }
-async getOneByQuery(query: {}) {
-  return this.loadref && this.hasPopulate ? await this.#getOnePopulated(query,'findOne'): await this.model!.findOne(query);
+async findOne(query: {}) {
+  return this.loadref && this.hasPopulate ? await this.getOnePopulated(query,'findOne'): await this.model!.findOne(query);
 }
   async create(obj: object){
     return await this.model?.create(obj);

@@ -1,22 +1,18 @@
-
+import express from 'express'
 import {AuthController} from '../../controllers';
 import {DefaultRoutesConfig} from './default.routes.config'
 import { dbStore } from '../../common';
+import { IDefaultRoutesConfig} from '../../interfaces';
 
-
-export async function AuthRoutes(){
+export async function AuthRoutes(app:express.Application){
     
-    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance('/auth', await AuthController.createInstance('account'), function(self:DefaultRoutesConfig):void{
+    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance('account'), 
+    function(self:IDefaultRoutesConfig):void{
 
-        self.router.post('/auth',
-        self.corsWithOption,
-        self.mWares!.validateRequiredUserBodyFields,
-        self.controller.createJWT
-    );
+        self.app.all('/auth',self.corsWithOption);
 
-    self.router.post('/auth/refresh-token',
-        self.corsWithOption,
-        self.controller.createJWT
-    );
+        self.app.post('/auth/refresh-token',
+        self.actions('createAccessTokenBaseOnRefershToken')
+        );
 })) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');;
 };

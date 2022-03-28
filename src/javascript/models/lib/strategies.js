@@ -1,10 +1,11 @@
 //const passport = require('passport');
-const FacebookStrategy = require('passport-facebook-token');
+const FacebookTokenStrategy = require('passport-facebook-token');
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const JwtStrategy = require('passport-jwt').Strategy;
 const { dbStore , config} = require('../../common');
 const LocalStrategy = require('passport-local').Strategy;
 const crypto = require('crypto');
+const FacebookStrategy = require('passport-facebook');
 
 
 class PassportStrategies {
@@ -17,8 +18,7 @@ class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-          dbStore['account'].model.findOne({ username: username })
-              .then((err, user) => {
+        dbStore['account'].model.findOne({ username: username },(err, user) => {
                 if (err) { return cb(err); }
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
                   
@@ -44,14 +44,17 @@ class PassportStrategies {
       secretOrKey: config.secretKey,
       issuer: config.issuer,
       audience: config.audience,
-    }, function (jwt_payload, done) {
-      dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err, user) {
+    }, (jwt_payload, done)=> {
+      
+       dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err, user) {
+        
         if (err) {
             return done(err, false);
         }
         if (user) {
             return done(null, user);
         } else {
+          
             return done(null, false);
             // or you could create a new account
         }
@@ -77,14 +80,13 @@ class PassportStrategies {
     );
   }
 
-  // facebook strategy
-  static Facebook() {
-    return new FacebookStrategy({
+  //passport facebook Token strategy
+  static FacebookToken() {
+    return new FacebookTokenStrategy({
       clientID: config.facebook.clientId,
       clientSecret: config.facebook.clientSecret
-      
-    }, function (accessToken, refreshToken, profile, done){
-      dbStore['account'].findOne({ facebookId: profile.id }, async function(err, user) {
+    }, (accessToken, refreshToken, profile, done)=>{
+      dbStore['account'].model.findOne({ facebookId: profile.id }, async function(err, user) {
         if (err) {
             return done(err, false);
         }
@@ -96,8 +98,26 @@ class PassportStrategies {
         }
       });
      } );
-  }  
+    } 
+
+  static facebook(){
+    return new FacebookStrategy({
+      clientID: config.facebook.clientId,
+      clientSecret: config.facebook.clientSecret,
+      callbackURL: config.facebook.callbackUrl
+    },
+    function(accessToken, refreshToken, profile, done) {
+      dbStore['account'].model.findOne({ facebookId: profile.id }, function(err, user) {
+        if (err) { return done(err, false); }
+        if (!user) { return done(null, false); }
+        return done(null, user);
+        
+      });
+    });
 }
+
+}
+
 module.exports = {PassportStrategies};
 
 function validPassword(password, hash, salt) {
@@ -107,7 +127,7 @@ function validPassword(password, hash, salt) {
 
 
 function verifyPasswordSafe(username, password, cb) {
-  dbStore['account'].findOne({ username: username }).then((err, user)=>{
+  dbStore['account'].model.findOne({ username: username },(err, user)=>{
     if (err) { return cb(err); }
     if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
 

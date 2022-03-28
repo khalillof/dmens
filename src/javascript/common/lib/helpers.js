@@ -1,21 +1,77 @@
 "use strict";
-
+const { ValidationError, ValidatorError} = require("mongoose").Error;
+const {MongoServerError} = require("mongodb");
+const {AssertionError} = require('../lib/assertionError')
+const { JsonWebTokenError} = require('jsonwebtoken');
 const pluralize = require('pluralize');
-const router = require('express').Router();
+//var aaa = require('express')
+exports.errStore = [ValidatorError, ValidationError,AssertionError,MongoServerError,JsonWebTokenError];
 
+exports.logger = {
+    log:console.log,
+    err:(err)=> console.error(err.stack),
+    resErrMsg:(res, ErorMsg)=> res.json({ success: false, error:ErorMsg ? ErorMsg: 'operation faild!' }),
+    resErr:function(res,err){
+        if (err) {
+           let errInstance= exports.errStore.filter((errObj)=> {
+               if(err instanceof errObj){ 
+                   return errObj
+               }
+            })[0];
+            //console.log(instance.length)
+           let msg = errInstance ? err.message : 'operation faild! server error'
+            this.err(err); 
+            this.resErrMsg(res,msg)
+          }
+    }
+}
+exports.responce =(res, cb)=>{
+    let successMsg='operation Successful!';
+    let  errMsg='error operation faild!';
 
-exports.appRouter = router;
+    let self= { 
+      errObjInfo:(err, obj, info)=>{
+        if (obj) {
+          cb ? self.callback(cb) : self.success();
+          return;
+        }
+        self.success(false, err ? err.message : info.message);
+        this.logger.err(err ?? info)
+        return;
+      },
+      success:(success=true,msg)=>{
+        let message,error;
+        success ===  true ? message = msg ?? successMsg : error = msg ?? errMsg
+       res.json({success,message,error});
+      },
+      errStatus:(status,msg)=> {return res.status(status).json({success:false,error:msg})},
+      error:(err)=> this.logger.resErr(res, err),
+      item:(item, message)=>{res.json({ success: true, message: message ?? successMsg, item: item })},
+      items:(items, message)=>{res.json({ success: true, message: message ?? successMsg, items: items })},
+      errCb:(err, cb)=>{ err ? self.error(err) : self.callback(cb)},
+      errSuccess:(err)=>{err ? self.error(err) : self.success()},
+      callback:(cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,
+      json:(obj) => res.json(obj)
+    }
 
-exports.printRoutesToString = ()=>{
-    let result = exports.appRouter.stack
+    return self;
+  };
+
+exports.Roles =["user", "admin", "application"];
+exports.isValidRole =(role)=> role ?  exports.Roles.indexOf(role) !== -1 : false;
+
+exports.printRoutesToString = (app)=>{ 
+    let result = app._router.stack
       .filter((r) => r.route)
       .map((r) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
       .join("\n");
 
       console.log('================= All Routes avaliable ================ \n'+ result)
+      return;
   }
-exports.printRoutesToJson = ()=>{
-    let result = exports.appRouter.stack
+
+exports.printRoutesToJson = (app)=>{
+    let result = app._router.stack
         .filter((r) => r.route)
         .map((r) => {
         return {

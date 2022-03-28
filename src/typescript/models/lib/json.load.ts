@@ -2,7 +2,8 @@
 import path from 'path';
 import fs from 'fs';
 import{SchemaTypes, SchemaType} from 'mongoose';
-import { JsonSchema , dbStore, config} from '../../common';
+import { dbStore, config} from '../../common';
+import { JsonSchema} from '../../interfaces';
 import { JsonModel} from './json.model';
 
 export class JsonLoad {
@@ -12,7 +13,7 @@ export class JsonLoad {
         return await JsonModel.createInstance(sschema, callback);
     }
 
-    static validate(jsonSchema:any){
+    static validate(jsonSchema:JsonSchema){
         if (!jsonSchema.name)
            throw new Error(' schema validation faild ! property name is required')
         if (typeof jsonSchema.loadref !== 'boolean')

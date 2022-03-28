@@ -4,9 +4,9 @@ const { dbStore} =require('../../common');
 const {uploadSchema} = require('./upload');
 
 
- async function EditorRoutes(){
+ async function EditorRoutes(exps){
     
-    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance('editor', await EditorController.createInstance('editor'), 
+    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance(exps,'editor', await EditorController.createInstance('editor'), 
    function (){
 let self =this;
  self.post([uploadSchema], true);

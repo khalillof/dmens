@@ -1,4 +1,5 @@
 "use strict";
+/*
 const {nanoid} = require('nanoid');
 
 class GenericInMemoryDao {
@@ -89,3 +90,5 @@ class GenericInMemoryDao {
 }
 
 exports.GenericInMemoryDao = GenericInMemoryDao;
+
+*/

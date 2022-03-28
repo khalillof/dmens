@@ -12,7 +12,7 @@ var path = require('path');
 import morgan from 'morgan';
 import helmet from 'helmet';
 import {dbInit} from './services';
-import {config, appRouter, printRoutesToString} from './common'
+import {config, printRoutesToString} from './common'
 import { initRouteStore, } from './routes';
 import passport from 'passport';
 
@@ -54,31 +54,44 @@ app.use(helmet({
 }));
 
 setTimeout(async()=>{
-  // activate routes
-  initRouteStore.forEach(async(rout)=>  await rout());
-  // register routes
-  app.use('/', appRouter);
 
-   // handel 404 shoud be at the midlleware
-   app.use((req, res, next) => {
-    res.status(404).json( { success:false, message:"Sorry can't find that!"})
-  })
+  app.use(function(req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
+
+initRouteStore.forEach(async(rout)=> await rout(app))
+
   }, 500)
+  
+  setTimeout(()=> {
+    printRoutesToString(app);
+ // handel 404 shoud be at the midlleware
+ app.use((req:express.Request, res:express.Response, next:express.NextFunction) => {
+  res.status(404).json( { success:false, message:"Sorry can't find that!"})
+})
 
-  setTimeout(printRoutesToString,1000);
+  }
+    ,1000);
+  
+ 
+  const dev_prod = app.get('env');
+  
+  // server error handller will print stacktrace
+  app.use(function(err:any, req:express.Request, res:express.Response, next:express.NextFunction) {
+    res.status(err.status || 500).json({success:false, error: dev_prod === 'development' ? err.message:"Ops! server error" });
+    console.error(err.stack)
+  });
+  
+  // request looger using a predefined format string
+  app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
-const dev_prod = app.get('env');
-
-// server error handller will print stacktrace
-app.use(function(err:any, req:any, res:any, next:any) {
-  res.status(err.status || 500).json({success:false, error: dev_prod === 'development' ? err.message:"Ops! server error" });
-  console.error(err.stack)
-});
-
-// request looger using a predefined format string
-app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
-
+ 
 app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
+
 
 
 export {app};

@@ -14,13 +14,22 @@ class JsonLoad {
     }
 
     static validate(jsonSchema){
-
-        if (!jsonSchema.name)
+     let name = jsonSchema.name.toLowerCase();
+        if (!name)
            throw new Error(' schema name is required property')
-        if (typeof jsonSchema.loadref !== 'boolean')
+
+        if (typeof jsonSchema.loadref !== 'boolean')       
            throw new Error(' schema loadref is required property')
-        if (dbStore[jsonSchema.name.toLowerCase()]) 
-          throw new Error('schema name already on db : '+jsonSchema.name)
+
+           if (!jsonSchema.schema && typeof jsonSchema.schema !== 'object'){
+               let msg = 'schema is required property, model with name : '+name + ' - has no schema property';
+               throw new Error(msg)
+           }
+           
+        if (dbStore[name]) {
+            let msg = 'schema name already on db : '+name
+          throw new Error(msg);
+        }
      }
 
      static isJsonFile(file){

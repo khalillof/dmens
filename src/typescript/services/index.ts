@@ -1,5 +1,5 @@
-import {authenticateUser,generateGwt, validateJWT} from './lib/auth.service';
-import {ISvc} from './lib/ISvc.services';
+import {generateGwt, authenticateUser, validateJWT, customVerifyToken, createRefershTokenWithChecks, verifyTokenExpiration, getRandomBytes,  nanoid} from './lib/auth.service';
+
 import {dbInit} from './lib/mongoose.service';
 
-export {dbInit,ISvc,authenticateUser,generateGwt,validateJWT }
+export {dbInit,generateGwt, authenticateUser, validateJWT, customVerifyToken, createRefershTokenWithChecks, verifyTokenExpiration, getRandomBytes,  nanoid}

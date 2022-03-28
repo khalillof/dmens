@@ -1,6 +1,8 @@
 "use strict";
 const { DefaultController } = require('./default.controller');
 const { authenticateUser,generateGwt } = require('../../services');
+
+
 class AccountsController extends DefaultController {
 
   constructor(name) {
@@ -8,7 +10,7 @@ class AccountsController extends DefaultController {
   }
 
  async signup(req, res, next){
-  await this.db.model.register(req.body, req.body.password, this.callBack(res).done)
+  await this.db.model.register(req.body, req.body.password,this.responce(res).errObjInfo)
     }
 
  async login(req, res, next){
@@ -19,50 +21,41 @@ class AccountsController extends DefaultController {
 async forgetPassword(req, res, next){
   //Normally setPassword is used when the user forgot the password 
   if(!req.body.email && req.body.password){
-    return this.resError(res,'some requied body fields are missing')
+
+    return this.responce(res).success(false,'some requied body fields are missing')
    }
-   let user = await this.getOneByQuery({email:req.body.email});
+   let user = await this.db.findOne({email:req.body.email});
    if (!user){
-     return this.resError(res,'some of your input are not valid')
+     return this.responce(res).success(false,'some of your input are not valid')
      }else{
-      return  user.setPassword(req.body.password, this.callBack(res).done)
+      return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
    }
 
 }
 async changePassword(req, res, next){
   //changePassword is used when the user wants to change the password
   if(req.isUnauthenticated()){
-    res.status(400).json({success:false,error:'you are not authorized'});
+    this.responce(res).errStatus(400,'you are not authorized');
   }
   if (!req.body.oldpassword || !req.body.newpassword){
-  return this.resError(res,'old and new pasword field are required')
+  return this.responce(res).success(false,'old and new pasword field are required')
   }else{
-     
-
-   return  req.user.changePassword(req.body.oldpassword, req.body.newpassword, (err)=>{
-    if(err)
-     return res.json({success:true,error:err})
-     return this.resSuccess(res)
-  })
+   return await this.db.model.fineById(req.user._id).changePassword(req.body.oldpassword, req.body.newpassword,this.responce(res).errSuccess)
 }
 }
 async updateUser(req, res, next){
     if (req.isUnauthenticated()) {
-      res.status(401).send({ success: false, message: 'unauthorized' })
+      this.responce(res).errStatus(401, 'unauthorized')
     } else {
       // user is already authenticated that is why I am checking for body.password only
-      let User = await this.db.getOneById(req.params.id);
+      let User = await this.db.findById(req.params.id);
       if (req.user.password !== req.body.password)
         await User.setPassword(req.body.password)
-      await User.save(req.body, this.callBack(res).done)
+      await User.save(req.body, this.responce(res).errObjInfo)
     }
 }
   profile(req, res, next){
-     return res.json({
-       message: 'You made it to the secure route',
-       user: req.user,
-     })
- 
+    return this.responce(res).item(req.user,'You made it to the secure route')
   }
 
   logout(req, res, next){
@@ -71,9 +64,9 @@ async updateUser(req, res, next){
         req.session.destroy();
         res.clearCookie('session-id');
         //res.redirect('/');
-        this.resSuccess(res, "You are logged out!")
+        this.responce(res).success(true,"You are logged out!")
       } else {
-        this.resSuccess(res, "You are not logged in!")
+        this.responce(res).success(true,"You are not logged in!")
       }
   }
 
