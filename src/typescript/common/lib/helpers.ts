@@ -114,7 +114,7 @@ throw new Error('service not found for arg :'+ url);
 // routesStore
 export const routeStore : Dic<DefaultRoutesConfig> = {};
 
-export function  getCont(url:string):IController | null{
+export function  getCont(url:string):IController | any{
     for(let d in routeStore){     
       if(d !== '/' && url.match(d) || d === '/' && url === d){
      // console.log('from getcon : '+url +' - '+d)

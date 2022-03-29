@@ -1,22 +1,29 @@
 "use strict";
-  // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
-  require('dotenv').config();
-
-
 var compression = require('compression');
 import  express from 'express';
 const session = require('express-session');
 //import * as http from 'http';
 // import createError from 'http-errors';
-var path = require('path');
+import path from 'path';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import {dbInit} from './services';
-import {config, printRoutesToString} from './common'
-import { initRouteStore, } from './routes';
 import passport from 'passport';
 
-import {SeedDatabase}from './seed.database'
+const mens = (env_path:string)=>(async function(env_path:string){
+  // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
+  if(env_path && !path.isAbsolute(env_path)){
+    console.log('enviroment path used :' +env_path)
+    throw new Error('enviroment path passed ashould be Absolute path :'+env_path);
+  }
+  
+  require('dotenv').config({path:env_path});
+
+
+const {dbInit,SeedDatabase} = require('./services');
+const {config, printRoutesToString} = require('./common');
+const { initRouteStore, } = require( './routes');
+const {menServer} = require('./bin/www');
+
 // Create the Express application
 const app = express();
 app.use(express.json());
@@ -37,7 +44,7 @@ app.set('view engine', 'ejs');
   await dbInit().then( async()=>{
 
   app.use(session({ 
-    secret: config.secretKey, 
+    secret: config.secretKey(), 
     resave: true, 
     saveUninitialized: true,
     cookie:{
@@ -64,7 +71,7 @@ setTimeout(async()=>{
     next();
   });
 
-initRouteStore.forEach(async(rout)=> await rout(app))
+initRouteStore.forEach(async(rout:any)=> await rout(app))
 
   }, 500)
   
@@ -94,8 +101,15 @@ new SeedDatabase();
   app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
  
-app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
+//app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
 
+await menServer(app,false)
 
+return app;
 
-export {app};
+})(env_path);
+
+export {mens};
+
+// fire from here should be from the client app
+mens(path.resolve(__dirname,'../.env'))

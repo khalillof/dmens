@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 "use strict";
 
-const {app} = require('../app');
-var debug = require('debug')('express-api-server:server');
+var debug = require('debug')('dynamic-mens:server');
 const http = require('http');
 const https = require('https');
 const { readFileSync} = require('fs');
 
-var server = configure_server(false);
-function configure_server(isHttps = false){
+async function menServer(app,isHttps = false){
+
   var server = {};
   var port = isHttps ? normalizePort(process.env.PORT || '443') : normalizePort(process.env.PORT || '3000');
   process.env.PORT = port;
@@ -16,7 +15,7 @@ function configure_server(isHttps = false){
   if (isHttps){
  app.set('secPort',port); 
  var options = {
-  key: readFileSync(__dirname+'/private.key'),
+  key:  readFileSync(__dirname+'/private.key'),
   cert: readFileSync(__dirname+'/certificate.pem')
  };
   server = https.createServer(options,app);
@@ -28,18 +27,16 @@ function configure_server(isHttps = false){
  }
 
 
- server.listen(port, () => {
-  console.log("express-api-server is listening on :"+ port);
-});
+ server.listen(port, ()=> console.log(`mens ${app.get('env')} server is listening on port: ${port}`));
 server.on('error', onError);
-server.on('listening', onListening);
+//server.on('listening', onListening);
 
 
 return server;
 };
 
 //====================
-exports.server = server;
+exports.menServer = menServer;
 
 //===================
 function normalizePort(val) {
@@ -84,7 +81,7 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
+/*
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
@@ -92,3 +89,4 @@ function onListening() {
     : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
+*/

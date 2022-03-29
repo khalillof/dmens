@@ -13,7 +13,7 @@ const dbOptions ={
     };
 
  async function dbInit(){
- return  await dbConnect(config.mongoUrl.dev,dbOptions);
+ return  await dbConnect(config.mongoUrl.dev(),dbOptions);
 }
 async function dbConnect (dbURL, options){
   console.log("=========== db initiation started ===============")

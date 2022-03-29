@@ -41,9 +41,9 @@ class PassportStrategies {
   static JwtAuthHeaderAsBearerTokenStrategy() {
     return new JwtStrategy({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.secretKey,
-      issuer: config.issuer,
-      audience: config.audience,
+      secretOrKey: config.secretKey(),
+      issuer: config.issuer(),
+      audience: config.audience(),
     }, (jwt_payload, done)=> {
       
        dbStore['account'].model.findOne({ id: jwt_payload.sub }, function(err, user) {
@@ -65,9 +65,9 @@ class PassportStrategies {
   static JwtQueryParameterStrategy() {
     return new JwtStrategy(
       {
-        secretOrKey: config.jwtSecret,
-        issuer: config.issuer,
-         audience: config.audience,
+        secretOrKey: config.jwtSecret(),
+        issuer: config.issuer(),
+         audience: config.audience(),
         jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
       },
       async (token, done) => {
@@ -83,8 +83,8 @@ class PassportStrategies {
   //passport facebook Token strategy
   static FacebookToken() {
     return new FacebookTokenStrategy({
-      clientID: config.facebook.clientId,
-      clientSecret: config.facebook.clientSecret
+      clientID: config.facebook.clientId(),
+      clientSecret: config.facebook.clientSecret()
     }, (accessToken, refreshToken, profile, done)=>{
       dbStore['account'].model.findOne({ facebookId: profile.id }, async function(err, user) {
         if (err) {
@@ -102,9 +102,9 @@ class PassportStrategies {
 
   static facebook(){
     return new FacebookStrategy({
-      clientID: config.facebook.clientId,
-      clientSecret: config.facebook.clientSecret,
-      callbackURL: config.facebook.callbackUrl
+      clientID: config.facebook.clientId(),
+      clientSecret: config.facebook.clientSecret(),
+      callbackURL: config.facebook.callbackUrl()
     },
     function(accessToken, refreshToken, profile, done) {
       dbStore['account'].model.findOne({ facebookId: profile.id }, function(err, user) {

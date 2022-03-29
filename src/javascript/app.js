@@ -1,7 +1,4 @@
 "use strict";
-// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
-require('dotenv').config();
-
 var compression = require('compression')
 const express = require("express");
 const session = require('express-session');
@@ -10,11 +7,21 @@ const session = require('express-session');
 var path = require('path');
 const morgan  = require('morgan');
 const  helmet = require('helmet');
-const  {dbInit} = require('./services');
+const passport = require('passport');
+
+const mens = (env_path)=>(async function(env_path){
+// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
+if(env_path && !path.isAbsolute(env_path)){
+  console.log('enviroment path used :' +env_path)
+  throw new Error('enviroment path passed ashould be Absolute path :'+env_path);
+}
+  require('dotenv').config({path:env_path});
+
+
+const  {dbInit,SeedDatabase} = require('./services');
 const {config ,printRoutesToString }  = require('./common');
 const  {initRouteStore} = require('./routes');
-const passport = require('passport');
-const {SeedDatabase} =require('./seed.database');
+const  {menServer} = require('./bin/www');
 
 // Create the Express application
 const app = express();
@@ -36,7 +43,7 @@ app.set('view engine', 'ejs');
   await dbInit().then(()=>{
 
     app.use(session({ 
-      secret: config.secretKey, 
+      secret: config.secretKey(), 
       resave: true, 
       saveUninitialized: true,
       cookie:{
@@ -95,8 +102,9 @@ new SeedDatabase();
   app.use(morgan(dev_prod === 'development'? 'dev': 'common')) // dev|common|combined|short|tiny
 
  
-app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
+//app.listen(config.port, ()=> console.log(`${dev_prod} server is running on port: ${config.port}`));
+menServer(app,false);
+return app;
+})(env_path);
 
-
-
-exports.app = app;
+exports.mens = mens;

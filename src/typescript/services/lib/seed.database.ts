@@ -1,10 +1,11 @@
-import { config, dbStore, Roles } from './common'
+import { config, dbStore, Roles } from '../../common'
 
 export class SeedDatabase {
     // add default roles
 constructor(){
     this.addRoles();
-    this.addAdminAccount()
+    this.addAdminAccount();
+    console.log('finished database seeding .........!')
 }
     addRoles() {
         let roleDb = dbStore['role'].model!;
@@ -13,7 +14,7 @@ constructor(){
                 Roles.forEach((role)=> {
                     new roleDb({
                         name: role
-                    }).save((err: any) => err ? console.log("seed Roles error :", err) : console.log(`added ${role} to roles collection`));
+                    }).save((err: any, obj:any) => err ? console.log("seed Roles error :", err) : console.log(`added ${obj.name} to roles collection`));
                 });
             }
         });

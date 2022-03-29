@@ -41,11 +41,11 @@ function errCallback(req,res,err){
 }
 
 function uploadSchema(req, res, next){
-  return  setMulter(config.schemaDir, schemaFilter).single('schema')(req,res,(err)=> err ? errCallback(req,res,err): next());
+  return  setMulter(config.schemaDir(), schemaFilter).single('schema')(req,res,(err)=> err ? errCallback(req,res,err): next());
 };
 
 function uploadImages(req, res, next){
-  return setMulter(config.imagesUploadDir, imagesFilter, 10).array('photos', 10)(req,res,(err)=> err ? errCallback(req,res,err): next());
+  return setMulter(config.imagesUploadDir(), imagesFilter, 10).array('photos', 10)(req,res,(err)=> err ? errCallback(req,res,err): next());
 };
 
 

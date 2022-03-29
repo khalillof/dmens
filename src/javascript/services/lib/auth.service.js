@@ -16,8 +16,8 @@ async function getRandomBytes(length=16){
 function generateGwt(user) {
   try {
     const body = { _id: user._id, email: user.email };
-    const ops = { expiresIn: config.jwtExpiration, issuer: config.issuer, audience: config.audience };
-    const token = sign({ user: body }, config.secretKey, ops);
+    const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
+    const token = sign({ user: body }, config.secretKey(), ops);
     return token;
   } catch (err) {
     throw err;
@@ -80,7 +80,7 @@ function reqLogin(user, options = { session: false }, tokenRequired = false) {
 
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req, res, next) {
-  verify(req.token, config.jwtSecret, function (err, decoded) {
+  verify(req.token, config.jwtSecret(), function (err, decoded) {
     if (err) {
       /*
         err = {
@@ -89,7 +89,7 @@ function validateJWT(req, res, next) {
           expiredAt: 1408621000
         }
       */
-      logger.resErr(err)
+      logger.resErr(res,err)
     }
     // next function token is valid
     next()
@@ -101,7 +101,7 @@ function customVerifyToken(req, res, next) {
   if (!token) {
     return res.status(403).json({ success: false, message: "No token provided!" });
   }
-  verify(token, config.jwtSecret, (err, decoded) => {
+  verify(token, config.jwtSecret(), (err, decoded) => {
     if (err) {
       return logger.resErr(res,err)
     }
@@ -113,7 +113,7 @@ function customVerifyToken(req, res, next) {
 async function createRefershTokenWithoutChecking(user) {
   if (user) {
     let expiredAt = new Date();
-    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration);
+    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration());
 
     let _token =  await nanoid();
     

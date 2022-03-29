@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-
-import {app} from '../app';
+import express from 'express';
 var debug = require('debug')('Express-Api-Server:server');
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
 
-const server = configure_server(false);
-export function configure_server(isHttps = false){
+
+export async function menServer(app:express.Application ,isHttps = false){
+ 
   var server: any;
   var port = isHttps ? normalizePort(process.env.PORT || '443') : normalizePort(process.env.PORT || '3000');
   process.env.PORT = port;
@@ -26,15 +26,14 @@ export function configure_server(isHttps = false){
  }
 
 
- server.listen(port, () => {
-  console.log("express-api-server is listening on :"+ port);
-});
+ server.listen(port, ()=> console.log(`mens ${app.get('env')} server is listening on port: ${port}`));
 server.on('error', onError);
-server.on('listening', onListening);
+//server.on('listening', onListening);
 
 
 return server;
 };
+
 
 
 function normalizePort(val:any) {
@@ -79,7 +78,7 @@ function onError(error:any) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
+/*
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
@@ -87,3 +86,4 @@ function onListening() {
     : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
+*/

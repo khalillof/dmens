@@ -1,7 +1,7 @@
 import passport from 'passport';
 import express from 'express'
 import { sign , verify} from 'jsonwebtoken'; // used to create, sign, and verify tokens
-const { config, dbStore, logger } = require("../../common");
+import { config, dbStore, logger } from "../../common";
 const {randomBytes} = require('crypto');
 import { nanoid } from 'nanoid/async';
 
@@ -15,8 +15,8 @@ async function getRandomBytes(length=16){
 function generateGwt(user:any) {
   try {
     const body = { _id: user._id, email: user.email };
-    const ops = { expiresIn: config.jwtExpiration, issuer: config.issuer, audience: config.audience };
-    const token = sign({ user: body }, config.secretKey, ops);
+    const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
+    const token = sign({ user: body }, config.secretKey(), ops);
     return token;
   } catch (err) {
     throw err;
@@ -79,7 +79,7 @@ function reqLogin(user:any, options = { session: false }, tokenRequired = false)
 
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req: any, res: express.Response, next: express.NextFunction) {
-  verify(req.token, config.jwtSecret, function (err:any, decoded:any) {
+  verify(req.token, config.jwtSecret(), function (err:any, decoded:any) {
     if (err) {
       /*
         err = {
@@ -88,7 +88,7 @@ function validateJWT(req: any, res: express.Response, next: express.NextFunction
           expiredAt: 1408621000
         }
       */
-      logger.resErr(err)
+      logger.resErr(res,err)
     }
     // next function token is valid
     next()
@@ -115,7 +115,7 @@ function customVerifyToken(req: express.Request, res: express.Response, next: ex
 async function createRefershTokenWithoutChecking(user:any) {
   if (user) {
     let expiredAt = new Date();
-    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration);
+    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration());
 
     let _token =  await nanoid();
     
@@ -135,7 +135,7 @@ async function createRefershTokenWithoutChecking(user:any) {
 
 async function createRefershTokenWithChecks(user:any) {
   // check database for avaliable token
-  let refToken = await dbStore['token'].model.findOne({ owner: user._id });
+  let refToken = await dbStore['token'].model?.findOne({ owner: user._id });
   if (!refToken) {
     return await createRefershTokenWithoutChecking(user);
   }
@@ -143,7 +143,7 @@ async function createRefershTokenWithChecks(user:any) {
     return refToken.token;
   } else {
     // remove expired token
-   await dbStore['token'].model.findByIdAndRemove(refToken._id, { useFindAndModify: false }).exec();
+   await dbStore['token'].model?.findByIdAndRemove(refToken._id, { useFindAndModify: false }).exec();
     return await createRefershTokenWithoutChecking(user);
   }
 };

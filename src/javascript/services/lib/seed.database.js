@@ -1,10 +1,11 @@
-const { config, dbStore, Roles }= require('./common')
+const { config, dbStore, Roles }= require('../../common')
 
-export class SeedDatabase {
+class SeedDatabase {
     // add default roles
 constructor(){
     this.addRoles();
     this.addAdminAccount()
+    console.log('finished database seeding .........!')
 }
     addRoles() {
         let roleDb = dbStore['role'].model;
@@ -13,7 +14,7 @@ constructor(){
                 Roles.forEach((role)=> {
                     new roleDb({
                         name: role
-                    }).save((err) => err ? console.log("seed Roles error :", err) : console.log(`added ${role} to roles collection`));
+                    }).save((err, obj) => err ? console.log("seed Roles error :", err) : console.log(`added ${obj.name} to roles collection`));
                 });
             }
         });
@@ -26,18 +27,18 @@ constructor(){
                 dbStore['role'].model.find((err, roles) => {
 
                     if (roles) {
-                        let adminUser = roles.map(r => { if ('user admin'.indexOf(r.name) !== -1) return r._id })
+                        let adminUserRoles = roles.map(r => { if ('user admin'.indexOf(r.name) !== -1) return r._id })
 
                         // add admin Account
                         let _user = {
                             email: config.admin_email,
                             username: config.admin_userName,
-                            roles: adminUser,
+                            roles: adminUserRoles,
                             active: true,
                             descriptions: 'this is seeded admin accoun'
 
                         };
-                        userDb.register(_user, config.admin_password, (err, userinfo) => {
+                        userDb.register(_user, config.admin_password, (err, user,info) => {
                             if (err || info) {
                                 console.log("seed admin account error :", err || info)
                             } else {
@@ -53,3 +54,5 @@ constructor(){
         });
     }
 }
+
+exports.SeedDatabase = SeedDatabase;

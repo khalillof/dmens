@@ -62,7 +62,7 @@ class JsonLoad {
         }
     }
    static async loadDefaultDirectory() {
-        return await JsonLoad.loadDirectory(config.schemaDir);
+        return await JsonLoad.loadDirectory(config.schemaDir());
     }
 
    static async loadDirectory(directory) {
