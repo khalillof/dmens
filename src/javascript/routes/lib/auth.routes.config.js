@@ -11,7 +11,7 @@ async function AuthRoutes(exps) {
             self.app.all('/auth',self.corsWithOption);
 
             self.app.post('/auth/refresh-token',
-                self.actions('createAccessTokenBaseOnRefershToken')
+                self.actions('checkAccessRefershTokensAndCreate')
             );
         }))
 

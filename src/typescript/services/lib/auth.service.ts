@@ -1,7 +1,7 @@
 import passport from 'passport';
 import express from 'express'
 import { sign , verify} from 'jsonwebtoken'; // used to create, sign, and verify tokens
-import { config, dbStore, logger } from "../../common";
+import { config, dbStore, logger, responce } from "../../common";
 const {randomBytes} = require('crypto');
 import { nanoid } from 'nanoid/async';
 
@@ -95,24 +95,7 @@ function validateJWT(req: any, res: express.Response, next: express.NextFunction
   });
 }
 
-function customVerifyToken(req: express.Request, res: express.Response, next: express.NextFunction) {
-  let token = req.headers["x-access-token"];
-  if(typeof token !== 'string'){
-    token = token![0]
-  }
-  if (!token) {
-    return res.status(403).json({ success: false, message: "No token provided!" });
-  }
-  verify(token, config.jwtSecret, (err:any, decoded:any) => {
-    if (err) {
-      return logger.resErr(res,err)
-    }
-    //req.id = decoded.id;
-    next();
-  });
-};
-
-async function createRefershTokenWithoutChecking(user:any) {
+async function createRefershToken(user:any) {
   if (user) {
     let expiredAt = new Date();
     expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration());
@@ -126,7 +109,6 @@ async function createRefershTokenWithoutChecking(user:any) {
     });
 
     console.log('createRefershTokenWithoutChecking : \n'+_refreshToken)
-
     return _refreshToken.token;
   }
   throw new Error('passed user object is undefind');
@@ -135,22 +117,22 @@ async function createRefershTokenWithoutChecking(user:any) {
 
 async function createRefershTokenWithChecks(user:any) {
   // check database for avaliable token
-  let refToken = await dbStore['token'].model?.findOne({ owner: user._id });
+  let refToken = await dbStore['token'].findOne({ owner: user._id });
   if (!refToken) {
-    return await createRefershTokenWithoutChecking(user);
+    return await createRefershToken(user);
   }
-  else if (!verifyTokenExpiration(refToken)) {
-    return refToken.token;
-  } else {
-    // remove expired token
-   await dbStore['token'].model?.findByIdAndRemove(refToken._id, { useFindAndModify: false }).exec();
-    return await createRefershTokenWithoutChecking(user);
-  }
+  else if (!isExpiredToken(refToken)) {
+    // update delete old token
+    await dbStore['token'].deleteById(refToken._id);
+    return await createRefershToken(user);
+  } 
 };
 
-function verifyTokenExpiration(token:any) {
+
+
+function isExpiredToken(token:any) {
   return token.expiryDate.getTime() < new Date().getTime();
 }
 
 
-export { generateGwt, authenticateUser, validateJWT, customVerifyToken, createRefershTokenWithChecks, verifyTokenExpiration, getRandomBytes,  nanoid};
+export { generateGwt, authenticateUser, validateJWT,verify, createRefershTokenWithChecks, createRefershToken, isExpiredToken ,  getRandomBytes,  nanoid};

@@ -12,7 +12,7 @@ export async function AuthRoutes(app:express.Application){
         self.app.all('/auth',self.corsWithOption);
 
         self.app.post('/auth/refresh-token',
-        self.actions('createAccessTokenBaseOnRefershToken')
+        self.actions('checkAccessRefershTokensAndCreate')
         );
 })) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');;
 };

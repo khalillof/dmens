@@ -96,21 +96,7 @@ function validateJWT(req, res, next) {
   });
 }
 
-function customVerifyToken(req, res, next) {
-  let token = req.headers["x-access-token"];
-  if (!token) {
-    return res.status(403).json({ success: false, message: "No token provided!" });
-  }
-  verify(token, config.jwtSecret(), (err, decoded) => {
-    if (err) {
-      return logger.resErr(res,err)
-    }
-    req.id = decoded.id;
-    next();
-  });
-};
-
-async function createRefershTokenWithoutChecking(user) {
+async function createRefershToken(user) {
   if (user) {
     let expiredAt = new Date();
     expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration());
@@ -124,7 +110,6 @@ async function createRefershTokenWithoutChecking(user) {
     });
 
     console.log('createRefershTokenWithoutChecking : \n'+_refreshToken)
-
     return _refreshToken.token;
   }
   throw new Error('passed user object is undefind');
@@ -133,22 +118,20 @@ async function createRefershTokenWithoutChecking(user) {
 
 async function createRefershTokenWithChecks(user) {
   // check database for avaliable token
-  let refToken = await dbStore['token'].model.findOne({ owner: user._id });
+  let refToken = await dbStore['token'].findOne({ owner: user._id });
   if (!refToken) {
-    return await createRefershTokenWithoutChecking(user);
+    return await createRefershToken(user);
   }
-  else if (!verifyTokenExpiration(refToken)) {
-    return refToken.token;
-  } else {
-    // remove expired token
-   await dbStore['token'].model.findByIdAndRemove(refToken._id, { useFindAndModify: false }).exec();
-    return await createRefershTokenWithoutChecking(user);
-  }
+  else if (!isExpiredToken(refToken)) {
+    // update delete old token
+    await dbStore['token'].deleteById(refToken._id);
+    return await createRefershToken(user);
+  } 
 };
 
-function verifyTokenExpiration(token) {
+function isExpiredToken(token) {
   return token.expiryDate.getTime() < new Date().getTime();
 }
 
 
-module.exports = { generateGwt, authenticateUser, validateJWT, customVerifyToken, createRefershTokenWithChecks, verifyTokenExpiration, getRandomBytes,  nanoid};
+module.exports = { generateGwt, authenticateUser, validateJWT, createRefershTokenWithChecks, createRefershToken, isExpiredToken, getRandomBytes,verify,  nanoid};
