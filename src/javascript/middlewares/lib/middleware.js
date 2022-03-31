@@ -16,18 +16,18 @@ class Middlewares {
         if (req.body.email || req.body.username && req.body.password) {
             next();
         } else {
-          responce(res).success(false, 'Missing required body fields')
+          responce(res).fail('Missing required body fields')
         }
     }
 
 
   async  validateSameEmailDoesntExist(req, res, next) {
-    await  this.getUserFromReq(req) ? responce(res).errStatus(400, 'User email already exists') : next();
+    await  this.getUserFromReq(req) ? responce(res).notAuthorized('User email already exists') : next();
     }
 
    async validateSameEmailBelongToSameUser(req, res, next) {
         const user = await this.getUserFromReq(req);
-        user && user._id === req.params.id ? next() :responce(res).errStatus(400, 'Invalid email');
+        user && user._id === req.params.id ? next() :responce(res).notAuthorized('Invalid email');
     }
 
     // Here we need to use an arrow function to bind `this` correctly
@@ -36,11 +36,11 @@ class Middlewares {
     }
 
    async userExist(req, res, next) {
-        await  this.getUserFromReq(req) ? next() :responce(res).errStatus(403, 'User does not exist : ' +req.body.email);
+        await  this.getUserFromReq(req) ? next() :responce(res).notAuthorized('User does not exist : ' +req.body.email);
     }
 
     isAuthenticated(req, res, next){
-        req.isAuthenticated() ? next() :responce(res).errStatus(403, 'you are not authorized');
+        req.isAuthenticated() ? next() :responce(res).notAuthorized('you are not authorized');
     }
 
     // roles
@@ -60,7 +60,7 @@ class Middlewares {
     isInRole(roleName){
       return async (req, res, next)=>{
         if(!req.isAuthenticated()){
-          responce(res).errStatus(400, 'you are not authorized')
+          responce(res).notAuthorized('you are not authorized')
         return;
       }
 
@@ -76,7 +76,7 @@ class Middlewares {
               }
             }
 
-            responce(res).errStatus(400, "Require Admin Role!" );
+            responce(res).notAuthorized("Require Admin Role!" );
               return;  
     }
     }

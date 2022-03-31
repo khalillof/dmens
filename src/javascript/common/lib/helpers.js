@@ -30,28 +30,26 @@ exports.responce =(res, cb)=>{
     let  errMsg='error operation faild!';
 
     let self= { 
-      errObjInfo:(err, obj, info)=>{
-        if (obj) {
-          cb ? self.callback(cb) : self.success();
-          return;
-        }
-        self.success(false, err ? err.message : info.message);
-        this.logger.err(err ?? info)
-        return;
-      },
-      success:(success=true,msg)=>{
-        let message,error;
-        success ===  true ? message = msg ?? successMsg : error = msg ?? errMsg
-       res.json({success,message,error});
-      },
-      errStatus:(status,msg)=> {return res.status(status).json({success:false,error:msg})},
-      error:(err)=> this.logger.resErr(res, err),
-      item:(item, message)=>{res.json({ success: true, message: message ?? successMsg, item: item })},
-      items:(items, message)=>{res.json({ success: true, message: message ?? successMsg, items: items })},
-      errCb:(err, cb)=>{ err ? self.error(err) : self.callback(cb)},
-      errSuccess:(err)=>{err ? self.error(err) : self.success()},
-      callback:(cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,
-      json:(obj) => res.json(obj)
+        errObjInfo:(err, obj, info)=>{
+            if (obj) {
+              cb ? self.callback(cb) : self.success();
+              return;
+            }
+            self.success(false, err ? err.message : info.message);
+            logger.err(err ?? info)
+            return;
+          },
+          success:(msg)=>res.json({success:true,message:msg ?? successMsg}),
+           fail:(msg)=> res.json({success:false,error:msg ?? errMsg}),
+          errStatus:(status,msg)=> res.status(status).json({success:false,error:msg}),
+          notAuthorized: (msg)=> self.errStatus(403,msg ?? 'not authorized'),
+          error:(err)=> logger.resErr(res, err),
+          item:(item, message)=> res.json({ success: true, message: message ?? successMsg, item: item }),
+          items:(items, message)=> res.json({ success: true, message: message ?? successMsg, items: items }),
+          errCb:(err, cb)=> err ? self.error(err) : self.callback(cb),
+          errSuccess:(err)=> err ? self.error(err) : self.success(),
+          callback:(cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,
+          json:(obj) => res.json(obj)
     }
 
     return self;

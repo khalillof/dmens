@@ -40,21 +40,19 @@ export const responce =(res:express.Response, cb?:Function)=>{
           cb ? self.callback(cb) : self.success();
           return;
         }
-        self.success(false, err ? err.message : info.message);
+        self.fail(err ? err.message : info.message);
         logger.err(err ?? info)
         return;
       },
-      success:(success=true,msg?:string)=>{
-        let message,error;
-        success ===  true ? message = msg ?? successMsg : error = msg ?? errMsg
-       res.json({success,message,error});
-      },
-      errStatus:(status:number,msg:string)=> {return res.status(status).json({success:false,error:msg})},
+      success:(msg?:string)=> res.json({success:true,message:msg ?? successMsg}),
+      fail:(msg?:string)=> res.json({success:false,error:msg ?? errMsg}),
+      errStatus:(status:number,msg:string)=> res.status(status).json({success:false,error:msg}),
+      notAuthorized: (msg?: string)=> self.errStatus(403,msg ?? 'operation not authorized'),
       error:(err:any)=> logger.resErr(res, err),
-      item:(item:{}, message?:string)=>{res.json({ success: true, message: message ?? successMsg, item: item })},
-      items:(items:{}, message?:string)=>{res.json({ success: true, message: message ?? successMsg, items: items })},
-      errCb:(err:any, cb:Function)=>{ err ? self.error(err) : self.callback(cb)},
-      errSuccess:(err:any)=>{err ? self.error(err) : self.success()},
+      item:(item:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, item: item }),
+      items:(items:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, items: items }),
+      errCb:(err:any, cb:Function)=> err ? self.error(err) : self.callback(cb),
+      errSuccess:(err:any)=> err ? self.error(err) : self.success(),
       callback:(cb:Function, obj?:any) => cb && typeof cb === 'function' ? cb(obj) : false,
       json:(obj:{}) => res.json(obj)
     }

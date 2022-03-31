@@ -8,20 +8,13 @@ class AuthController extends DefaultController {
     constructor(svc) {
         super(svc)
     }
-// check both Bearer tokens accessToken and refeshToken and return both new tokens;
-async  checkAccessRefershTokensAndCreate(req, res, next) {
-  let token = req.headers["x-access-token"];
-  let refersh_token = req.body["refersh-token"];
 
-  // check access token
-  if(!token || typeof token !== 'string'){
-    return this.responce(res).errStatus(403, "No access token provided!");
-  }
-  //check refersh token
-  if(!refersh_token || typeof refersh_token !== 'string'){
-    return this.responce(res).errStatus(403,"No valid referesh token provided!" );
-  }
+ // check both Bearer tokens accessToken and refeshToken and return both new tokens;
+ async  checkAccessRefershTokensAndCreate(req, res, next) {
+  let token = this.#getToken("x-access-token", req);
+  let refersh_token = this.#getToken("refersh_token", req);
 
+  if(token && refersh_token){
   verify(token, config.jwtSecret,async (err, user) => {
     // prcess if token expired
     if (err) {
@@ -30,7 +23,7 @@ async  checkAccessRefershTokensAndCreate(req, res, next) {
       await this.#check_refresh_create_tokens(user,refersh_token,res);
       //return logger.resErr(res,err)
       }else{
-        return this.responce(res).errStatus(403, "not authorized need to sigin!");
+        return this.responce(res).notAuthorized("not authorized need to sigin!");
       }
     }else{
       // process if token still valid
@@ -38,7 +31,9 @@ async  checkAccessRefershTokensAndCreate(req, res, next) {
       return;
     }
   });
-
+  }else{
+    return this.responce(res).notAuthorized("token not provided!");
+  }
 };
 
 async  #check_refresh_create_tokens(user,refersh_token, res){
@@ -51,9 +46,19 @@ async  #check_refresh_create_tokens(user,refersh_token, res){
        await dbStore['token'].deleteById(db_refToken._id)
        return;
   }else{
-    return this.responce(res).errStatus(403,"not authorized need to sigin!");
+    return this.responce(res).notAuthorized("not authorized need to sigin!");
   }
 }  
+
+#getToken(tokenFeild,req){
+  let token = req.headers[tokenFeild];
+  if(token && typeof token === 'string'){
+    return token;
+  }else{
+  return null;
+  } 
+}
+
 /*
 Refresh Token Automatic Reuse Detection
 Refresh tokens are bearer tokens. It's impossible for the authorization server to know who is legitimate or malicious when receiving a new access token request. We could then treat all users as potentially malicious.
@@ -90,5 +95,6 @@ It's critical for the most recently-issued refresh token to get immediately inva
 */
 
 }
+
 
 exports.AuthController=  AuthController;

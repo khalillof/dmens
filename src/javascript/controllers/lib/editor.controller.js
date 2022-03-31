@@ -63,7 +63,7 @@ class EditorController extends DefaultController {
               });
         }else{
             
-            this.responce(res).success(false,'content must be valid json');
+            this.responce(res).fail('content must be valid json');
         }
 
     }

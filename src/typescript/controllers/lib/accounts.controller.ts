@@ -20,11 +20,11 @@ export class AccountsController extends DefaultController {
  async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
   //Normally setPassword is used when the user forgot the password 
   if(!req.body.email && req.body.password){
-   return this.responce(res).success(false,'some requied body fields are missing')
+   return this.responce(res).fail('some requied body fields are missing')
   }
   let user = await this.db.findOne({email:req.body.email});
    if (!user){
-     return this.responce(res).success(false,'some of your input are not valid')
+     return this.responce(res).fail('some of your input are not valid')
      }else{
       return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
    }
@@ -33,10 +33,10 @@ export class AccountsController extends DefaultController {
 async changePassword(req: any, res: express.Response, next: express.NextFunction){
   //changePassword is used when the user wants to change the password
   if(req.isUnauthenticated()){
-    this.responce(res).errStatus(400,'you are not authorized');
+    this.responce(res).notAuthorized();
   }
   if (!req.body.oldpassword || !req.body.newpassword){
-  return this.responce(res).success(false,'old and new pasword field are required')
+  return this.responce(res).fail('old and new pasword field are required')
   }else{
       let user:any=await this.db.model!.findById(req.user._id);
    return  user.changePassword(req.body.oldpassword, req.body.newpassword,this.responce(res).errSuccess)
@@ -48,7 +48,7 @@ async changePassword(req: any, res: express.Response, next: express.NextFunction
  
 async  updateUser(req: any, res: express.Response, next: express.NextFunction){
   if (req.isUnauthenticated()) {
-    this.responce(res).errStatus(401, 'unauthorized')
+    this.responce(res).notAuthorized()
   } else {
     // user is already authenticated that is why I am checking for body.password only
     let User = await this.db.findById(req.params.id);
@@ -64,9 +64,9 @@ async  updateUser(req: any, res: express.Response, next: express.NextFunction){
         req.session.destroy();
         res.clearCookie('session-id');
         //res.redirect('/');
-        this.responce(res).success(true,"You are logged out!")
+        this.responce(res).success("You are logged out!")
       } else {
-        this.responce(res).success(true,"You are not logged in!")
+        this.responce(res).success("You are not logged in!")
       }
   }
 

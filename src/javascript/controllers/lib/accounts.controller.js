@@ -22,11 +22,11 @@ async forgetPassword(req, res, next){
   //Normally setPassword is used when the user forgot the password 
   if(!req.body.email && req.body.password){
 
-    return this.responce(res).success(false,'some requied body fields are missing')
+    return this.responce(res).fail('some requied body fields are missing')
    }
    let user = await this.db.findOne({email:req.body.email});
    if (!user){
-     return this.responce(res).success(false,'some of your input are not valid')
+     return this.responce(res).fail('some of your input are not valid')
      }else{
       return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
    }
@@ -35,17 +35,17 @@ async forgetPassword(req, res, next){
 async changePassword(req, res, next){
   //changePassword is used when the user wants to change the password
   if(req.isUnauthenticated()){
-    this.responce(res).errStatus(400,'you are not authorized');
+    this.responce(res).notAuthorized();
   }
   if (!req.body.oldpassword || !req.body.newpassword){
-  return this.responce(res).success(false,'old and new pasword field are required')
+  return this.responce(res).fail('old and new pasword field are required')
   }else{
    return await this.db.model.fineById(req.user._id).changePassword(req.body.oldpassword, req.body.newpassword,this.responce(res).errSuccess)
 }
 }
 async updateUser(req, res, next){
     if (req.isUnauthenticated()) {
-      this.responce(res).errStatus(401, 'unauthorized')
+      this.responce(res).notAuthorized()
     } else {
       // user is already authenticated that is why I am checking for body.password only
       let User = await this.db.findById(req.params.id);
@@ -64,9 +64,9 @@ async updateUser(req, res, next){
         req.session.destroy();
         res.clearCookie('session-id');
         //res.redirect('/');
-        this.responce(res).success(true,"You are logged out!")
+        this.responce(res).success("You are logged out!")
       } else {
-        this.responce(res).success(true,"You are not logged in!")
+        this.responce(res).success("You are not logged in!")
       }
   }
 

@@ -55,8 +55,10 @@ export interface IConstructor<T> {
 }
 export interface Iresponces {
   errObjInfo: (err: any, obj: any, info: any) => void;
-  success: (success?: boolean, msg?: string) => void,
+  success: (msg?: string) => void;
+  fail:(msg?:string)=> void;
   errStatus: (status: number, msg: string) => void;
+  notAuthorized: (msg?: string) => void;
   error: (err: any) => void;
   item: (item: {}, message?: string) => void;
   items: (items: {}, message?: string) => void;

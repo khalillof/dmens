@@ -1,7 +1,7 @@
 import passport from 'passport';
 import express from 'express'
 import { sign , verify} from 'jsonwebtoken'; // used to create, sign, and verify tokens
-import { config, dbStore, logger, responce } from "../../common";
+import { config, dbStore, logger} from "../../common";
 const {randomBytes} = require('crypto');
 import { nanoid } from 'nanoid/async';
 
