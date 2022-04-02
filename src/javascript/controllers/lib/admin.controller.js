@@ -1,26 +1,28 @@
-import express from 'express';
-import { DefaultController } from '../../controllers';
-import fs from 'fs';
-import { JsonLoad } from '../../models';
-import {config} from '../../common'
 
-export class EditorController extends DefaultController {
+const { DefaultController } = require('./default.controller');
+const fs = require('fs');
+const {config} = require('../../common')
+const { JsonLoad } = require('../../models');
 
-    constructor(name ='editor') {
+
+class AdminController extends DefaultController {
+
+    constructor(name = 'admin') {
         super(name)
     }
-    async schemaDataHandller(req: express.Request, res: express.Response, next: express.NextFunction){
-        // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
-        JsonLoad.validate(req.body.data)
-        let jsonObj :any = await JsonLoad.makeSchema(req.body);
-        let user : any = req.user;
-        jsonObj.schema.editor = user._id;
+  async schemaDataHandller(req,res,next){
+      // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
+      JsonLoad.validate(req.body.data)
+      
+        let jsonObj = await JsonLoad.makeSchema(req.body);
+        jsonObj.schema.admin = req.user._id;
         // to save as file later
         let objForFileCopy = jsonObj;
 
         //check for activation
         if(jsonObj.activate)
         await JsonLoad.makeModel(jsonObj.schema.data)
+        
         //stringify JSON schema feild to save on db
         jsonObj.schema.data = JSON.stringify(jsonObj.schema.data);
 
@@ -30,7 +32,7 @@ export class EditorController extends DefaultController {
 
         return objForFileCopy
     }
-    saveJsnoToFile(jsonObject:any,stringify=true){
+    saveJsnoToFile(jsonObject,stringify=true){
                 //stringify jsonContent 
                 if(stringify) 
                 jsonObject = JSON.stringify(jsonObject)
@@ -41,7 +43,7 @@ export class EditorController extends DefaultController {
                 }); 
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
-    async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+    async create(req, res, next) {
         if (req.header('content-type') ==='application/json' && req.body) {
                 // to save as file later
                 let fileDataCopy = await this.schemaDataHandller(req,res,next);
@@ -53,7 +55,7 @@ export class EditorController extends DefaultController {
 
             fs.readFile(req.file.path, 'utf8', async (err, data)=> {
                 if (err) {
-                    this.responce(res).error(err);
+                    this.log.resErrMsg(res,err);
                 }else {
                     req.body = JSON.parse(data);
                      await this.schemaDataHandller(req,res,next)
@@ -65,4 +67,7 @@ export class EditorController extends DefaultController {
         }
 
     }
+
 }
+
+exports.AdminController = AdminController;

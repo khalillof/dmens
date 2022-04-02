@@ -44,7 +44,7 @@ class DefaultRoutesConfig {
   }
 
   static async createInstancesWithDefault(exps){
-  return  await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account editor'.indexOf(name) === -1) await DefaultRoutesConfig.instance(exps,name,await DefaultController.createInstance(name))}))
+  return  await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1) await DefaultRoutesConfig.instance(exps,name,await DefaultController.createInstance(name))}))
  }
   // custom routes
   getList(middlewares, useMwar=true){

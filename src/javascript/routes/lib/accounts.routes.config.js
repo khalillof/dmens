@@ -1,11 +1,12 @@
 "use strict";
 const {AccountsController} = require('../../controllers');
 const {DefaultRoutesConfig } = require('./default.routes.config');
+const { dbStore} =require('../../common');
 
  async function AccountsRoutes(exp){
 
 
- return await  Promise.resolve(DefaultRoutesConfig.instance(exp,'account', await AccountsController.createInstance('account'), 
+ return dbStore['account'] ? await  Promise.resolve(DefaultRoutesConfig.instance(exp,'account', await AccountsController.createInstance('account'), 
     
    function(){
        let self = this;
@@ -38,7 +39,7 @@ const {DefaultRoutesConfig } = require('./default.routes.config');
         self.app.put('/accounts/id',
             self.mware.validateSameEmailBelongToSameUser,
             self.actions('put')); 
-}));
+})): console.log('Account model is not avaliable in dbStore No accounts routes configuered');
 
 }
 

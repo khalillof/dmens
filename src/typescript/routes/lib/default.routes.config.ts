@@ -42,7 +42,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       return  await Promise.resolve(result);
     }
     static async createInstancesWithDefault(app:express.Application){
-     return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account,editor'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))}))
+     return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))}))
     }
 
     buildMdWares(middlewares?:Array<Function>, useMware=true){

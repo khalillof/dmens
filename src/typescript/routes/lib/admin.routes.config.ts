@@ -1,13 +1,13 @@
 import express from 'express'
-import {EditorController} from '../../controllers';
+import {AdminController} from '../../controllers';
 import {DefaultRoutesConfig} from './default.routes.config'
 import { dbStore} from '../../common';
 import {uploadSchema} from './uploads';
 import { IDefaultRoutesConfig} from '../../interfaces';
 
-export async function EditorRoutes(app:express.Application){
+export async function AdminRoutes(app:express.Application){
     
-    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance(app,'editor', await EditorController.createInstance('editor'), 
+    return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance(app,'admin', await AdminController.createInstance('admin'), 
     (self:IDefaultRoutesConfig):void=>{
 
  self.post([uploadSchema], true);

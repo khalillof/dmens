@@ -14,5 +14,5 @@ export async function AuthRoutes(app:express.Application){
         self.app.post('/auth/refresh-token',
         self.actions('checkAccessRefershTokensAndCreate')
         );
-})) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');;
+})) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');
 };

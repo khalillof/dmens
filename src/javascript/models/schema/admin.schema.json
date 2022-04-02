@@ -1,5 +1,5 @@
 {
-  "name": "editor",
+  "name": "admin",
   "loadref":true,
   "schema": {
     "name": {
@@ -20,7 +20,7 @@
       "default": false,
       "required":true
     },
-    "editor": {
+    "admin": {
       "type": "ObjectId",
       "ref": "account",
       "required":true
