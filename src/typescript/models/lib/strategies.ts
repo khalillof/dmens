@@ -1,8 +1,9 @@
 import FacebookTokenStrategy from 'passport-facebook-token';
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
-import { config, dbStore } from "../../common";
+import { config, dbStore } from "../../common/index.js";
 import { Strategy as LocalStrategy } from  'passport-local';
-const FacebookStrategy = require('passport-facebook');
+import {Strategy as FacebookStrategy} from 'passport-facebook';
+
 import crypto from 'crypto';
 
 
@@ -42,22 +43,11 @@ export class PassportStrategies {
       secretOrKey: config.secretKey(),
       issuer: config.issuer(),
       audience: config.audience(),
-    }, (jwt_payload, done)=> {
-      
-       dbStore['account'].model!.findOne({ id: jwt_payload.sub }, function(err:any, user:any) {
-        
-        if (err) {
-            return done(err, false);
-        }
-        if (user) {
-            return done(null, user);
-        } else {
-          
-            return done(null, false);
-            // or you could create a new account
-        }
-      });
-    });
+     // passReqToCallback:true
+    },async (payload:any, done:any) => {
+     const _user = await  dbStore['account'].findById(payload.user._id);
+      return done(_user);
+     })
   }
   // JWT stratigy
   static JwtQueryParameterStrategy() {
@@ -97,15 +87,15 @@ export class PassportStrategies {
       });
      } );
     } 
-
+   // type VerifyFunction = (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any, info?: any) => void) => void
   static facebook(){
     return new FacebookStrategy({
-      clientID: config.facebook.clientId,
-      clientSecret: config.facebook.clientSecret,
-      callbackURL: config.facebook.callbackUrl
+      clientID: config.facebook.clientId(),
+      clientSecret: config.facebook.clientSecret(),
+      callbackURL: config.facebook.callbackUrl()
     },
     function(accessToken:string, refreshToken:string, profile:any, done:Function) {
-      dbStore['account'].model!.findOne({ facebookId: profile.id }, function(err:any, user:any) {
+      dbStore['account'].model!.findOne({ facebookId: profile.id }, function(err:any, user:any,info?: any) {
         if (err) { return done(err, false); }
         if (!user) { return done(null, false); }
         return done(null, user);

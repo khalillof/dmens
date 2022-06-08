@@ -1,21 +1,25 @@
 #!/usr/bin/env node
-import express from 'express';
-var debug = require('debug')('Express-Api-Server:server');
+//import express from 'express';
+//import  debug from 'debug';
+//debug('Express-Api-Server:server');
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const getCert =(certName:string) => path.join(path.dirname(fileURLToPath(import.meta.url)), certName);
 
-export async function menServer(app:express.Application ,isHttps = false){
+export async function menServer(app:any,isHttps = false){
  
   var server: any;
-  var port = isHttps ? normalizePort(process.env.PORT || '443') : normalizePort(process.env.PORT || '3000');
-  process.env.PORT = port;
+  var port = isHttps ? normalizePort(process.env['PORT'] || '443') : normalizePort(process.env['PORT'] || '3000');
+  process.env['PORT'] = port;
   if (isHttps){
  app.set('secPort',port); 
  var options = {
-  key: fs.readFileSync(__dirname+'/private.key'),
-  cert: fs.readFileSync(__dirname+'/certificate.pem')
+  key: fs.readFileSync(getCert('private.key')),
+  cert: fs.readFileSync(getCert('certificate.pem'))
  };
   server = https.createServer(options,app);
 }else{
@@ -35,7 +39,6 @@ return server;
 };
 
 
-
 function normalizePort(val:any) {
   var port = parseInt(val, 10);
 
@@ -52,12 +55,11 @@ function normalizePort(val:any) {
   return false;
 }
 
-
 function onError(error:any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
-  let port = process.env.PORT
+  let port = process.env['PORT']
   var bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;

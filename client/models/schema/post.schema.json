@@ -1,0 +1,58 @@
+{
+    "name":"post",
+    "loadref":true,
+    "schema":{
+    "title": {
+        "type": "String",
+        "required": true,
+        "unique": true,
+        "minLength": 5,
+        "maxLength": 150
+    },
+    "image": {
+        "type": "String",
+        "minLength": 5,
+        "maxLength": 150
+    },
+    "descriptions": {
+        "type": "String",
+        "minLength": 5
+    },
+    "body": {
+        "type": "String",
+        "required": true,
+        "minLength": 5
+    },
+    "featured": {
+        "type": "Boolean",
+        "default": false
+    },
+    "category": {
+        "type": "ObjectId",
+        "ref": "category",
+        "required":true
+    },
+    "author": {
+        "type": "ObjectId",
+        "ref": "account",
+        "required":true
+    },
+    "comments": [
+        {
+            "type": "ObjectId",
+            "ref": "comment"
+        }
+    ],
+    "likes":  {
+        "type": "Number",
+        "default": 0
+        
+    },
+    "like_user_id": [
+        {
+          "type": "ObjectId",
+          "ref": "account"
+        }
+      ]
+}
+}

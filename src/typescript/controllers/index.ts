@@ -1,6 +1,5 @@
-import  {DefaultController} from './lib/default.controller';
-import {AuthController} from './lib/auth.controller';
-import {AccountsController} from './lib/accounts.controller';
-import {AdminController} from './lib/admin.controller';
+import  {DefaultController} from './lib/default.controller.js';
+import {AuthController} from './lib/auth.controller.js';
+import {AdminController} from './lib/admin.controller.js';
 
-export { DefaultController,AuthController,AccountsController,AdminController}
+export { DefaultController,AuthController,AdminController}

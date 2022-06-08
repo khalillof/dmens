@@ -1,8 +1,8 @@
 import express from 'express';
-import { DefaultController } from '..';
+import { DefaultController } from './default.controller.js';
 import fs from 'fs';
-import { JsonLoad } from '../../models';
-import {config} from '../../common'
+import { JsonLoad } from '../../models/index.js';
+import {config} from '../../common/index.js'
 
 export class AdminController extends DefaultController {
 
@@ -41,7 +41,7 @@ export class AdminController extends DefaultController {
                 }); 
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
-    async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+  override  async  create(req: express.Request, res: express.Response, next: express.NextFunction) {
         if (req.header('content-type') ==='application/json' && req.body) {
                 // to save as file later
                 let fileDataCopy = await this.schemaDataHandller(req,res,next);

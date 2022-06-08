@@ -1,8 +1,11 @@
 "use strict";
-const path = require('path');
-const { initRouteStore} = require('../../src/javascript/routes');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import  {initRouteStore} from '../../ts-output/routes/index.js';
 
-function IndexRoutes(app) {
+const __dirname =path.dirname(fileURLToPath(import.meta.url));
+
+export default function IndexRoutes(app) {
     let index = {
       '/':'../../public/coming_soon/index.html',
       '/angular':'../../public/angular/index.html',
@@ -14,6 +17,5 @@ function IndexRoutes(app) {
     }
   }
 
-exports.IndexRoutes = IndexRoutes;
 
 initRouteStore.push(IndexRoutes)

@@ -18,31 +18,45 @@
       "minLength": 3,
       "maxLength": 30
     },
+    "refreshToken": {
+      "type": "String",
+      "unique": true,
+      "minLength": 10,
+      "maxLength": 100
+   },
+   "refreshToken_expireAt": {
+      "type": "Date"
+  },
+    "active":{
+      "type": "Boolean",
+      "default":false
+    },
+    "email_verified":{
+      "type": "Boolean",
+      "default":false
+    },
+    "firstname": {
+      "type": "String",
+      "minLength":3,
+      "maxLength": 50
+    },
+    "lastname": {
+      "type": "String",
+      "minLength":3,
+      "maxLength": 50
+    },
+    "last_login": {
+      "type": "Date"
+  },
+    "facebookId": {
+      "type": "String",
+      "default": ""
+    },    
     "roles": [
       {
         "type": "ObjectId",
         "ref": "role"
       }
-    ],
-    "active":false,
-    "firstname": {
-      "type": "String",
-      "default": "",
-      "maxLength": 50
-    },
-    "lastname": {
-      "type": "String",
-      "default": "",
-      "maxLength": 50
-    },
-    "descriptions": {
-      "type": "String",
-      "default": "",
-      "maxLength": 150
-    },
-    "facebookId": {
-      "type": "String",
-      "default": ""
-    }
+    ]
   }
 }

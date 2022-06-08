@@ -1,3 +1,4 @@
-import {mens} from './app'
+import {mens} from './app.js'
+
 
 export {mens};

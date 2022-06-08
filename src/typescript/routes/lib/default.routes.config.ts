@@ -1,23 +1,22 @@
 import express from 'express';
-import {corsWithOptions} from './cors.config';
-import {routeStore, dbStore, pluralizeRoute, Assert} from '../../common'
-import {Middlewares} from '../../middlewares';
-import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate} from '../../interfaces';
-import { DefaultController} from '../../controllers/';
-import {authenticateUser} from '../../services' ;
+import cors from "cors";
+import {routeStore, dbStore, pluralizeRoute, Assert} from '../../common/index.js'
+import {Middlewares} from '../../middlewares/index.js';
+import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate} from '../../interfaces/index.js';
+import { DefaultController} from '../../controllers/index.js';
+import {authenticateUser} from '../../services/index.js' ;
 
 export async function getMware():Promise<IMiddlewares>{
-  let item= Object.values(routeStore).find(r=>  r.mware instanceof Middlewares );
-  let result:any = item ? item.mware : await Middlewares.createInstance();
+  let item= Object.values(routeStore).find(r =>  r.mware !== null );
+  let result:IMiddlewares = item && item.mware ? item.mware : await Middlewares.createInstance();
     return await Promise.resolve(result);
 }
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig{
-    app:express.Application;
+    app:any;
     routeName: string;
     routeParam: string;
     controller?:IController;
-    corsWithOption:any;
     mware?:IMiddlewares ;
     authenticate:Iauthenticate;
     //actions:Function;
@@ -25,7 +24,6 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         this.app = exp;
         this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName+'/:id';
-        this.corsWithOption = corsWithOptions;
         this.controller = controller;
         this.mware = MWare;
         this.authenticate =authenticateUser;
@@ -45,33 +43,39 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
      return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))}))
     }
 
-    buildMdWares(middlewares?:Array<Function>, useMware=true){
-      let mdwares = [this.corsWithOption];
-      if(useMware)
+    buildMdWares(middlewares?:Array<Function>, useAuth=true, useAdmin=false){
+      let mdwares:any[] = [];
+      if(useAuth)
         mdwares = [...mdwares,this.authenticate("jwt")];
+      if(useAdmin)
+      mdwares = [...mdwares,this.mware!.isInRole('admin')];
       if(middlewares)
         mdwares.concat(middlewares);
         return mdwares;
     }
     // custom routes
-    getList(middlewares?:any, useMware=true){
-     return this.app.get(this.routeName, ...this.buildMdWares(middlewares,useMware),this.actions('list'))
+    getList(middlewares=null, useAuth=true,useAdmin=false){
+     
+     return this.app.get(this.routeName, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('list'))
     }
-    getId(middlewares?:any, useMware=true){
-     return this.app.get(this.routeParam, ...this.buildMdWares(middlewares,useMware),this.actions('findById'))
+    getId(middlewares=null, useAuth=true,useAdmin=false){
+     return this.app.get(this.routeParam, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('findById'))
     }
-    post(middlewares?:any, useMware=true){
-     return this.app.post(this.routeName, ...this.buildMdWares(middlewares,useMware),this.actions('create'))
+    post(middlewares=null, useAuth=true,useAdmin=false){
+     return this.app.post(this.routeName, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('create'))
     }
-    put(middlewares?:any, useMware=true){
-     return this.app.put(this.routeParam, ...this.buildMdWares(middlewares,useMware),this.actions('put'))
+    put(middlewares=null, useAuth=true,useAdmin=false){
+     return this.app.put(this.routeParam, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('put'))
     }
-    delete(middlewares?:any, useMware=true){  
-      middlewares=  middlewares ? middlewares : [this.mware!.validateSameEmailBelongToSameUser]
-      return this.app.delete(this.routeParam, ...this.buildMdWares(middlewares,useMware),this.actions('remove'))
+    delete(middlewares=null, useAuth=true, useAdmin=false){  
+      let mdl =  middlewares ? middlewares : [this.mware!.validateCurrentUserOwnParamId]
+      return this.app.delete(this.routeParam, ...this.buildMdWares(mdl,useAuth, useAdmin),this.actions('remove'))
+    }
+    options(routPath:string){
+      this.app.options(routPath, cors({ origin: 'http://localhost:3000', optionsSuccessStatus: 200 }));
     }
     param(){
-      return this.app.param('id', async (req,res,next, id)=>{ 
+      return this.app.param('id', async (req:any,res:any,next:any, id:string)=>{ 
         try{
           Assert.idString(id); 
           next()
@@ -82,12 +86,16 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       });
     }
     defaultRoutes(){
+      
       this.getList(); 
       this.getId();
       this.post();
       this.put();
       this.delete();
       this.param();
+
+      this.options(this.routeName);
+      this.options(this.routeParam);
     }
 
   actions(actionName:string){

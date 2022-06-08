@@ -1,10 +1,12 @@
 "use strict";
 import path from 'path';
 import fs from 'fs';
-import{SchemaTypes, SchemaType} from 'mongoose';
-import { dbStore, config} from '../../common';
-import { JsonSchema} from '../../interfaces';
-import { JsonModel} from './json.model';
+
+import { dbStore, config} from '../../common/index.js';
+import { JsonSchema} from '../../interfaces/index.js';
+import { JsonModel} from './json.model.js';
+import mongoose from 'mongoose';
+
 
 export class JsonLoad {
 
@@ -51,6 +53,7 @@ export class JsonLoad {
             throw new Error('file should be json and absolute'+ filePath)
             }
         }
+        throw new Error('file should be json and absolute'+ filePath)
     }
 
     static async loadDefaultDirectory() {
@@ -87,28 +90,28 @@ export class JsonLoad {
         return  await JsonModel.createInstance(jschema);
     }
     static typeMappings = {
-        "String": SchemaTypes.String,
-        "string": SchemaTypes.String,
-        "Number": SchemaTypes.Number,
-        "number": SchemaTypes.Number,
-        "Date": SchemaTypes.Date,
-        "date": SchemaTypes.Date,
-        "Binary": SchemaTypes.Buffer,
-        "binary": SchemaTypes.Buffer,
-        "Boolean": SchemaTypes.Boolean,
-        "boolean": SchemaTypes.Boolean,
-        "mixed": SchemaTypes.Mixed,
-        "Mixed": SchemaTypes.Mixed,
-        "_id": SchemaTypes.ObjectId,
-        "id": SchemaTypes.ObjectId,
-        "ObjectId": SchemaTypes.ObjectId,
-        "objectid": SchemaTypes.ObjectId,
-        "array": SchemaTypes.Array,
-        "Array": SchemaTypes.Array,
-        "decimal": SchemaTypes.Decimal128,
-        "Decimal": SchemaTypes.Decimal128,
-        "map": Map,
-        "Map": Map,
+        "String": mongoose.SchemaTypes.String,
+        "string": mongoose.SchemaTypes.String,
+        "Number": mongoose.SchemaTypes.Number,
+        "number": mongoose.SchemaTypes.Number,
+        "Date": mongoose.SchemaTypes.Date,
+        "date": mongoose.SchemaTypes.Date,
+        "Binary": mongoose.SchemaTypes.Buffer,
+        "binary": mongoose.SchemaTypes.Buffer,
+        "Boolean": mongoose.SchemaTypes.Boolean,
+        "boolean": mongoose.SchemaTypes.Boolean,
+        "mixed": mongoose.SchemaTypes.Mixed,
+        "Mixed": mongoose.SchemaTypes.Mixed,
+        "_id": mongoose.SchemaTypes.ObjectId,
+        "id": mongoose.SchemaTypes.ObjectId,
+        "ObjectId": mongoose.SchemaTypes.ObjectId,
+        "objectid": mongoose.SchemaTypes.ObjectId,
+        "array": mongoose.SchemaTypes.Array,
+        "Array": mongoose.SchemaTypes.Array,
+        "decimal": mongoose.SchemaTypes.Decimal128,
+        "Decimal": mongoose.SchemaTypes.Decimal128,
+        "map": mongoose.SchemaTypes.Map,
+        "Map": mongoose.SchemaTypes.Map,
     }
     // search item in object and map to mongoose schema
     static isValidType (value:any) { 

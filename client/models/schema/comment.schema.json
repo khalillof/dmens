@@ -1,20 +1,21 @@
 {
-"name":"Comment",
+"name":"comment",
+"loadref":true,
   "schema":{
-    "rating":  {
-        "type": "Number",
-        "min": 1,
-        "max": 5,
-        "required": true
-    },
-    "content":  {
+    "body":  {
         "type": "String",
-        "required": true
+        "required": true,
+        "minLength": 3
     },
     "author": {
         "type": "ObjectId",
-        "ref": "User"
+        "ref": "account",
+        "required":true
+    },
+    "post_id": {
+        "type": "ObjectId",
+        "ref": "post",
+        "required":true
     }
-},
-"model":{}
+}
 }

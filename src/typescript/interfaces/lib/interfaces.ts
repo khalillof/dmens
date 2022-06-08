@@ -39,7 +39,7 @@ export interface IJsonModel {
   // private deepSearch(obj:any, indx:number, arr:Array<any>):any;
 
   //createInstance(jsonModel?:any, callback?:any):Promise<IJsonModel>;
-  Tolist(limit?: number, page?: number, query?: {}): Promise<[any]>;
+  Tolist(limit: number, page: number, query: {}): Promise<[any]>;
   findById(id: string): Promise<any>;
   findOne(query: {}): Promise<any>;
   create(obj: object): Promise<any>;
@@ -100,17 +100,17 @@ export interface IDefaultRoutesConfig {
   routeName: string;
   routeParam: string;
   controller?: IController;
-  corsWithOption: any;
   mware?: IMiddlewares;
   authenticate: Iauthenticate;
   //actions:Function;
-  buildMdWares(middlewares?: Array<Function>, useMWare?: boolean): any[];
+  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): any[];
   // custom routes
-  getList(middlewares?: any, useMWare?: boolean): express.Application;
-  getId(middlewares?: any, useMWare?: boolean): express.Application;
-  post(middlewares?: any, useMWare?: boolean): express.Application;
-  put(middlewares?: any, useMWare?: boolean): express.Application;
-  delete(middlewares?: any, useMWare?: boolean): express.Application;
+  getList(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
+  getId(middlewares?: any, useAuth?: boolean,useAdmin?:boolean): express.Application;
+  post(middlewares?: any, useAuth?: boolean,useAdmin?:boolean ): express.Application;
+  put(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
+  delete(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
+  options(routPath:string):void;
   param(): void;
   defaultRoutes(): void;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
@@ -124,10 +124,11 @@ export interface IMiddlewares {
 
   validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction): void;
 
-  validateSameEmailBelongToSameUser(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  validateCurrentUserOwnParamId(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  
+  validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction):void;
 
-  // Here we need to use an arrow function to bind `this` correctly
-  validatePatchEmail(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction):void ;
 
   userExist(req: express.Request, res: express.Response, next: express.NextFunction): Promise<any>;
 

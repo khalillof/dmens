@@ -1,21 +1,92 @@
 import express from 'express';
-import { DefaultController } from './default.controller';
-import { dbStore, config} from '../../common';
-import { isExpiredToken,generateGwt, verify, createRefershToken } from '../../services';
+import { DefaultController } from './default.controller.js';
+import {authenticateUser, generateJwt} from '../../services/index.js';
 
 export class AuthController extends DefaultController {
 
     constructor(svc:string) {
         super(svc)
     }
+  
+ async signup(req: express.Request, res: express.Response, next: express.NextFunction){
+  let mdl:any=this.db.model!;
+     await mdl.register(req.body, req.body.password, this.responce(res).errObjInfo)
+ }
 
+async signin(req: express.Request, res: express.Response, next: express.NextFunction){
+ // local /jwt
+ return await authenticateUser('local')(req, res, next);
+}
+async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
+ //Normally setPassword is used when the user forgot the password 
+ if(!req.body.email && req.body.password){
+  return this.responce(res).fail('some requied body fields are missing')
+ }
+ let user = await this.db.findOne({email:req.body.email});
+  if (!user){
+    return this.responce(res).fail('some of your input are not valid')
+    }else{
+     return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
+  }
+
+}
+async changePassword(req: any, res: express.Response, next: express.NextFunction){
+ //changePassword is used when the user wants to change the password
+ if(req.isUnauthenticated()){
+   this.responce(res).notAuthorized();
+ }
+ if (!req.body.oldpassword || !req.body.newpassword){
+ return this.responce(res).fail('old and new pasword field are required')
+ }else{
+     let user:any=await this.db.model!.findById(req.user._id);
+  return  user.changePassword(req.body.oldpassword, req.body.newpassword,this.responce(res).errSuccess)
+}
+}
+async profile(req: any, res: express.Response, next: express.NextFunction) {
+//let item = await this.db.findById(String(req.user._id));
+   return this.responce(res).item(req.user,'You made it to the secure route')
+ }
+
+async  updateUser(req: any, res: express.Response, next: express.NextFunction){
+ if (req.isUnauthenticated()) {
+   this.responce(res).notAuthorized()
+ } else {
+   // user is already authenticated that is why I am checking for body.password only
+   let User = await this.db.findById(req.params.id);
+   if (req.user.password !== req.body.password)
+     await User.setPassword(req.body.password)
+   await User.save(req.body, this.responce(res).errObjInfo)
+ }
+ }
+
+ logout(req: any, res: any, next: express.NextFunction) {
+   req.logOut();
+     if (req.session) {
+       req.session.destroy();
+       res.clearCookie('session-id');
+       //res.redirect('/');
+       this.responce(res).success("You are logged out!")
+     } else {
+       this.responce(res).success("You are not logged in!")
+     }
+ }
+
+ facebook(req: any, res: express.Response, next: express.NextFunction) {
+
+   if (req.user) {
+     var token = generateJwt(req.user);
+     res.json({ success: true, token: token, status: 'You are successfully logged in!' });
+   }
+ }
+}
+  /**
      // check both Bearer tokens accessToken and refeshToken and return both new tokens;
       async  checkAccessRefershTokensAndCreate(req: express.Request, res: express.Response, next: express.NextFunction) {
         let token = this.getToken("x-access-token", req);
         let refersh_token = this.getToken("refersh_token", req);
 
         if(token && refersh_token){
-        verify(token, config.jwtSecret,async (err:any, user:any) => {
+        verify(token, config.jwtSecret(),async (err:any, user:any) => {
           // prcess if token expired
           if (err) {
             if(err.name === 'TokenExpiredError' || err.message === 'jwt expired'){
@@ -40,7 +111,7 @@ export class AuthController extends DefaultController {
         let db_refToken = await dbStore['token'].model?.findOne({ owner: user._id, token:refersh_token});
         if(db_refToken && !isExpiredToken(db_refToken.token)){
              let neRefersh_token = await createRefershToken(user);
-             let newSccessToken = generateGwt(user);
+             let newSccessToken = generateJwt(user);
              res.json({ success: true, message: "Authentication successful", accessToken: newSccessToken, refershToken: neRefersh_token });
              // update delete old token
              await dbStore['token'].deleteById(db_refToken._id)
@@ -58,41 +129,5 @@ export class AuthController extends DefaultController {
         return null;
         } 
       }
-
-      /*
-      Refresh Token Automatic Reuse Detection
-Refresh tokens are bearer tokens. It's impossible for the authorization server to know who is legitimate or malicious when receiving a new access token request. We could then treat all users as potentially malicious.
-
-How could we handle a situation where there is a race condition between a legitimate user and a malicious one? For example:
-
-🐱 Legitimate User has 🔄 Refresh Token 1 and 🔑 Access Token 1.
-
-😈 Malicious User manages to steal 🔄 Refresh Token 1 from 🐱 Legitimate User.
-
-🐱 Legitimate User uses 🔄 Refresh Token 1 to get a new refresh-access token pair.
-
-The 🚓 Auth0 Authorization Server returns 🔄 Refresh Token 2 and 🔑 Access Token 2 to 🐱 Legitimate User.
-
-😈 Malicious User then attempts to use 🔄 Refresh Token 1 to get a new access token. Pure evil!
-
-What do you think should happen next? Would 😈 Malicious User manage to get a new access token?
-
-This is what happens when your identity platform has 🤖 Automatic Reuse Detection:
-
-The 🚓 Auth0 Authorization Server has been keeping track of all the refresh tokens descending from the original refresh token. That is, it has created a "token family".
-
-The 🚓 Auth0 Authorization Server recognizes that someone is reusing 🔄 Refresh Token 1 and immediately invalidates the refresh token family, including 🔄 Refresh Token 2.
-
-The 🚓 Auth0 Authorization Server returns an Access Denied response to 😈 Malicious User.
-
-🔑 Access Token 2 expires, and 🐱 Legitimate User attempts to use 🔄 Refresh Token 2 to request a new refresh-access token pair.
-
-The 🚓 Auth0 Authorization Server returns an Access Denied response to 🐱 Legitimate User.
-
-The 🚓 Auth0 Authorization Server requires re-authentication to get new access and refresh tokens.
-
-It's critical for the most recently-issued refresh token to get immediately invalidated when a previously-used refresh token is sent to the authorization server. This prevents any refresh tokens in the same token family from being used to get new access tokens.
-      */
-    
-}
-
+  
+    **/

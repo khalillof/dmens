@@ -1,4 +1,4 @@
-import { config, dbStore, Roles } from '../../common'
+import { config, dbStore, Roles } from '../../common/index.js'
 
 export class SeedDatabase {
     // add default roles
@@ -11,7 +11,7 @@ constructor(){
         let roleDb = dbStore['role'].model!;
         roleDb.estimatedDocumentCount((err: any, count: number) => {
             if (!err && count === 0) {
-                Roles.forEach((role)=> {
+                Roles.forEach((role:any)=> {
                     new roleDb({
                         name: role
                     }).save((err: any, obj:any) => err ? console.log("seed Roles error :", err) : console.log(`added ${obj.name} to roles collection`));
@@ -27,18 +27,17 @@ constructor(){
                 dbStore['role'].model!.find((err, roles) => {
 
                     if (roles) {
-                        let adminUser = roles.map(r => { if ('user admin'.indexOf(r.name) !== -1) return r._id })
+                        let adminRoles = roles.map((r:any) => { if ('user admin'.indexOf(r.name) !== -1) return r._id })
 
                         // add admin Account
                         let _user = {
-                            email: config.admin_email,
-                            username: config.admin_userName,
-                            roles: adminUser,
-                            active: true,
-                            descriptions: 'this is seeded admin accoun'
+                            email: config.admin_email(),
+                            username: config.admin_userName(),
+                            roles: adminRoles,
+                            active: true
 
                         };
-                        userDb.register(_user, config.admin_password, (err: any, user: any, info: any) => {
+                        userDb.register(_user, config.admin_password(), (err: any, user: any, info: any) => {
                             if (err || info) {
                                 console.log("seed admin account error :", err || info)
                             } else {

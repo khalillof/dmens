@@ -1,30 +1,61 @@
 import passport from 'passport';
 import express from 'express'
-import { sign , verify} from 'jsonwebtoken'; // used to create, sign, and verify tokens
-import { config, dbStore, logger} from "../../common";
-const {randomBytes} = require('crypto');
+import jwt from 'jsonwebtoken';
+import { config, dbStore, logger } from "../../common/index.js";
+import { randomBytes } from 'crypto';
 import { nanoid } from 'nanoid/async';
+import { responce } from '../../common/index.js';
 
+const { verify, sign, TokenExpiredError } = jwt;
 // 16 | 48
-async function getRandomBytes(length=16){
-  let key = randomBytes(length).toString('hex'); 
+async function getRandomBytes(length = 16) {
+  let key = randomBytes(length).toString('hex');
   return key;
 }
 
+function getExpiredAt(refersh?: boolean) {
+  let expiredAt = new Date();
+  expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? config.jwtRefreshExpiration() : config.jwtExpiration()));
+  return expiredAt;
+}
 
-function generateGwt(user:any) {
+const extractors = {
+  fromHeader: function (header_name: string) {
+    return function (request: express.Request) {
+      var token = null;
+      if (request.headers[header_name]) {
+        token = request.headers[header_name];
+      }
+      return token;
+    };
+  },
+  fromBodyField: function (field_name: string) {
+    return function (request: express.Request) {
+      var token = null;
+      if (request.body && Object.prototype.hasOwnProperty.call(request.body, field_name)) {
+        token = request.body[field_name];
+      }
+      return token;
+    };
+  }
+};
+
+function generateJwt(user: any) {
   try {
+    //console.log('jwtExpiration: '+config.jwtExpiration())
     const body = { _id: user._id, email: user.email };
+    const accessToken_expireAt = getExpiredAt().getTime();
     const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
-    const token = sign({ user: body }, config.secretKey(), ops);
-    return token;
+
+    const accessToken = sign({ user: body }, config.secretKey(), ops);
+    return { accessToken, accessToken_expireAt };
   } catch (err) {
     throw err;
   }
 }
 
 //type = 'local' || 'jwt'|| 'facebook' || 'facebook-token'
-function authenticateUser(type:string, opts?:{}) {
+function authenticateUser(type: string, opts?: {}) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let loginOptions = { session: false };
     let pssportOptions = type === "jwt" ? loginOptions : {};
@@ -32,45 +63,85 @@ function authenticateUser(type:string, opts?:{}) {
       pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-        
+
         if (user) {
           // handle local login
-          if (type === 'local') {
-            return await reqLogin(user, loginOptions, true)(req, res, next)
-          } else {
-            // all other type like jwt | facebook
-            return await reqLogin(user, loginOptions)(req, res, next)
-          }
+          return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next)
 
         } else if (err || info) {
 
-          res.json({success:false, error: err ? err.message : info.message})
-        logger.err(err ?? info);
-        return;
+          // 
+          if (info instanceof TokenExpiredError) {
+
+            let _refToken = req.headers['refreshtoken'];
+            if (!_refToken) {
+              console.log(req.headers)
+              responce(res).notAuthorized('No refersh token! provided');
+
+              return;
+            }
+
+            // refresh token found in header
+            let refUser = await dbStore['account'].findOne({ refreshToken: _refToken });
+
+            if (!refUser) {
+              responce(res).notAuthorized('refresh token provided not found');
+              return;
+            }
+
+            // user found check refresh token is valid
+            if (isExpiredToken(refUser.refreshToken_expireAt)) {
+              responce(res).notAuthorized('expired refersh token! require sign in');
+             return ;
+            }
+
+            // valid refresh token was found next generate new access token only and let them access next()
+            return await reqLogin(refUser, loginOptions)(req, res, next)
+          }
+
+          responce(res).notAuthorized();
+          
+          logger.err(err ?? info);
+
+          return;
         }
       })(req, res, next); // end of passport authenticate
 
     } catch (err) {
 
-      logger.resErr(res,err)
+      logger.resErr(res, err)
     }
   }
 
 }
 
-function reqLogin(user:any, options = { session: false }, tokenRequired = false) {
+async function Tokens(user: any, access = true, refresh = false) {
+  // generate json token
+  let token = generateJwt(user);
+  // update user with new refresh token
+   await createRefershToken(user);
+  return  token
+}
+function reqLogin(user: any, options = { session: false }, both_tokens_required = false) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    return req.login(user, options, async (err:any) => {
+    return req.login(user, options, async (err: any) => {
       if (err) {
-        res.json({success:false,error:err.message})
+        res.json({ success: false, error: err.message })
         logger.err(err);
         return;
-      } else if (tokenRequired) {
-        // generate json token
-        let token = generateGwt(user);
-        let refreshT = await createRefershTokenWithChecks(user);
-        return res.json({ success: true, message: "Authentication successful", accessToken: token, refershToken: refreshT });
+      } else if (both_tokens_required) {
+
+        // generate json token, usually when then first sign in to get both access and refresh tokens
+        let _tokens = await Tokens(user, true, true)
+        return res.json({ success: true, user:user , tokens:_tokens });
+
       } else {
+        // issue accessToken base on valid refresh token and grant them access to resource next()
+        let access = generateJwt(user);
+
+        res.setHeader('Authorization', 'Bearer ' + access.accessToken);
+        res.setHeader('access_token_expireAt', access.accessToken_expireAt)
+
         return next()
       }
     });
@@ -79,7 +150,7 @@ function reqLogin(user:any, options = { session: false }, tokenRequired = false)
 
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req: any, res: express.Response, next: express.NextFunction) {
-  verify(req.token, config.jwtSecret(), function (err:any, decoded:any) {
+  verify(req.token, config.jwtSecret(), function (err: any, decoded: any) {
     if (err) {
       /*
         err = {
@@ -88,51 +159,41 @@ function validateJWT(req: any, res: express.Response, next: express.NextFunction
           expiredAt: 1408621000
         }
       */
-      logger.resErr(res,err)
+      logger.resErr(res, err)
     }
     // next function token is valid
     next()
   });
 }
 
-async function createRefershToken(user:any) {
-  if (user) {
-    let expiredAt = new Date();
-    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration());
 
-    let _token =  await nanoid();
-    
-    let _refreshToken = await dbStore['token'].create({
-      token: _token,
-      owner: user._id,
-      expiryDate: expiredAt.getTime(),
+async function createRefershToken(user: any) {
+  if (!user) {
+    throw new Error('user object is required');
+  }
+    let expireAt = getExpiredAt(true);
+
+    let _token = await nanoid();
+
+    await dbStore['account'].putById(user._id, {
+      refreshToken: _token,
+      refreshToken_expireAt: expireAt,
     });
-
-    console.log('createRefershTokenWithoutChecking : \n'+_refreshToken)
-    return _refreshToken.token;
-  }
-  throw new Error('passed user object is undefind');
+   user.refreshTokenb=_token,
+   user.refreshToken_expireAt = expireAt,
+    console.log('created Refersh Token : \n' + user.refreshToken)
+    /*
+    return {
+      refreshToken: _token,
+      refreshToken_expireAt: expireAt.getTime()
+    };
+    */
 }
 
 
-async function createRefershTokenWithChecks(user:any) {
-  // check database for avaliable token
-  let refToken = await dbStore['token'].findOne({ owner: user._id });
-  if (!refToken) {
-    return await createRefershToken(user);
-  }
-  else if (!isExpiredToken(refToken)) {
-    // update delete old token
-    await dbStore['token'].deleteById(refToken._id);
-    return await createRefershToken(user);
-  } 
-};
-
-
-
-function isExpiredToken(token:any) {
-  return token.expiryDate.getTime() < new Date().getTime();
+function isExpiredToken(expiryat: Date) {
+  return expiryat.getTime() < new Date().getTime();
 }
 
 
-export { generateGwt, authenticateUser, validateJWT,verify, createRefershTokenWithChecks, createRefershToken, isExpiredToken ,  getRandomBytes,  nanoid};
+export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, getRandomBytes, nanoid };

@@ -1,6 +1,6 @@
 import express from 'express';
-import {isValidRole, dbStore, responce} from '../../common';
-import {IMiddlewares} from '../../interfaces';
+import {isValidRole, dbStore, responce} from '../../common/index.js';
+import {IMiddlewares} from '../../interfaces/index.js';
 export class Middlewares implements IMiddlewares {
 
 
@@ -12,7 +12,8 @@ export class Middlewares implements IMiddlewares {
     return req.body && req.body.email ? await dbStore['account'].findOne({email:req.body.email}) : null;
     }
     validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
-        if (req.body.email || req.body.username && req.body.password) {
+
+        if (req.body.email || req.body.username && req.body.password) {         
             next();
         } else {
           responce(res).fail('Missing required body fields')
@@ -22,16 +23,16 @@ export class Middlewares implements IMiddlewares {
  async validateSameEmailDoesntExist (req: express.Request, res: express.Response, next: express.NextFunction){
     await  this.getUserFromReq(req) ? responce(res).notAuthorized('User email already exists') : next();
     }
-
-   async validateSameEmailBelongToSameUser(req: express.Request, res: express.Response, next: express.NextFunction){
-    const user = await this.getUserFromReq(req);
-    user && user._id === req.params.id ? next() :responce(res).notAuthorized('Invalid email');
+    
+  validateCurrentUserOwnParamId(req: any, res: express.Response, next: express.NextFunction){
+      req.user && String(req.user._id) === String(req.params['id']) ? next() :responce(res).notAuthorized();
+      } 
+   validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
+    req.user && req.body.email && req.body.email === req.user.email  ? next() :responce(res).notAuthorized();
     }
-
-    // Here we need to use an arrow function to bind `this` correctly
-  async  validatePatchEmail(req: express.Request, res: express.Response, next: express.NextFunction){
-           req.body && req.body.email ? await  this.validateSameEmailBelongToSameUser(req, res, next): next();
-    }
+    validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
+      req.user && req.query.email && req.query.email === req.user.email  ? next() :responce(res).notAuthorized('not authorized, require valid email');
+      }
 
   async  userExist(req: express.Request, res: express.Response, next: express.NextFunction){
     await  this.getUserFromReq(req) ? next() :responce(res).notAuthorized('User does not exist : ' +req.body.email);
@@ -56,15 +57,14 @@ export class Middlewares implements IMiddlewares {
 
 
 isInRole(roleName:string){
-  return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
+  return async (req: any, res: express.Response, next: express.NextFunction)=>{
     if(!req.isAuthenticated()){
       responce(res).notAuthorized('you are not authorized')
     return;
   }
-  let reqUser:any=req.user;
-let user = await  dbStore['account'].findById(reqUser._id);
+  let reqUser:any= req.user  && req.user.roles ? req.user : await  dbStore['account'].findById(req.user._id);
 
-let roles = await dbStore['role'].model!.find({_id: { $in: user.roles }})
+let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }})
           if(roles && roles.length > 0){
           for (let i = 0; i < roles.length; i++) {
             if (roles[i].name === roleName) {
@@ -74,7 +74,7 @@ let roles = await dbStore['role'].model!.find({_id: { $in: user.roles }})
           }
         }
 
-        responce(res).notAuthorized("Require Admin Role!" );
+  responce(res).notAuthorized("Require Admin Role!" );
           return;  
 }
 }

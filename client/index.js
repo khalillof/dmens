@@ -1,9 +1,11 @@
 "use strict";
-const path = require('path');
-const envpath = path.resolve(__dirname,'./.env');
-const {mens} = require('../src/javascript');
-const  {IndexRoutes} = require('./routes/init.routes.config');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import {mens} from '../ts-output/index.js';
+import  IndexRoutes from './routes/init.routes.config.js';
 
-mens();
+const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '.env');
+
+mens(envPath);
 
   

@@ -1,32 +1,30 @@
 "use strict";
-import {Model ,Schema , model} from 'mongoose';
-import {dbStore} from '../../common'
-import {JsonSchema, IJsonModel} from '../../interfaces'
+import mongoose from 'mongoose';
+import {dbStore} from '../../common/index.js'
+import {JsonSchema, IJsonModel} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
-import {PassportStrategies} from './strategies' ;
+import {PassportStrategies} from './strategies.js' ;
 
 export class JsonModel implements IJsonModel {
 
   
   constructor(jsonSchema?:JsonSchema, callback?:any) {
-
+    let self:any = this;
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
     this.loadref = jsonSchema.loadref ? jsonSchema.loadref  : false;
-
+   
     if(dbStore[this.name]){
       throw new Error('there is already model on Db with this name : '+this.name)
     }
 
-    this.schema = new Schema(jsonSchema.schema, { timestamps: true }); 
-
-    this.#loadPopulates(jsonSchema.schema); 
+    this.schema = new mongoose.Schema(jsonSchema.schema as any, { timestamps: true }); 
 
     if (this.name === 'account') {
       
         this.schema.plugin(passportLocalMongoose);
-        const Account :any = model(this.name, this.schema);         
+        const Account :any = mongoose.model(this.name, this.schema);         
         //passport.use(new Strategy(User.authenticate()));
         passport.use(Account.createStrategy());
         passport.serializeUser(Account.serializeUser());
@@ -38,7 +36,7 @@ export class JsonModel implements IJsonModel {
         // assign
         this.model = Account;
     } else {
-        this.model = model(this.name, this.schema);       
+        this.model = mongoose.model(this.name, this.schema);       
     }
     
   }else if(typeof callback === 'function') {
@@ -48,45 +46,44 @@ export class JsonModel implements IJsonModel {
   }
   
     // add to db store
-    dbStore[this.name] = this;
+    dbStore[this.name] = self;
     console.log("added ( " + this.name + " ) to DbStore :");
+
+    this.#loadPopulates(jsonSchema?.schema); 
+
+    if (this.loadref && this.hasPopulate){
+
+      self.Tolist = new Function('limit=25', 'page=0', 'query={}', `return this.model.find(query).limit(limit).skip(limit * page)${this.#populateBuilder}`);
+      self.findById = new Function('id', `return this.model.findById(id)${this.#populateBuilder}`);
+      self.findOne = new Function('query', `return this.model.findOne(query)${this.#populateBuilder}`);
+    }
   }
 
   name: string= "";
-  schema?:Schema ;
-  model?:Model<any>;
+  schema?:mongoose.Schema ;
+  model?:mongoose.Model<any>;
   populateNames:Array<string> = [];
   loadref:boolean= false;
   hasPopulate: boolean= false;
  #populateBuilder="";
   log =console.log;
-
+  ["add"](a:number, b:number) {
+    return a + b;
+  }
  #loadPopulates(_schema?:any){
-
+  
       // check and load populates
       Object.entries(_schema ??  this.schema!.obj).forEach((item, indx,arr) => this.#deepSearch(item, indx, arr));
       
       this.hasPopulate = this.populateNames.length > 0 ;
       if(this.hasPopulate) {
-        //console.log('========= this model => ( ' + this.name +' ) require popluate : ' + this.populate );
+      
         this.populateNames.forEach(item=> this.#populateBuilder +=".populate('"+item+"')");
         this.#populateBuilder+=".exec()";
       }
   }
 
- async #factory(stringObj:string){
-    this.log('factory method : '+ stringObj);
-    return await eval(stringObj);
-  }
- async getOnePopulated(arg:any, method='findById'){
-      let builder = `this.model.${method}(${JSON.stringify(arg)})${this.#populateBuilder}`;
-      return await this.#factory(builder);
-  }
-  
- async getListPopulated(limit=25, page= 0, query={}){
-    let builder = `this.model.find(${JSON.stringify(query)}).limit(${limit}).skip(${(limit * page)})${this.#populateBuilder}`;
-    return await this.#factory(builder);
-  }
+
   // search item in object and map to mongoose schema
 #deepSearch(obj:any, indx:number, arr:Array<any>) {
     // loop over the item
@@ -104,25 +101,25 @@ export class JsonModel implements IJsonModel {
    }
 }
 
-  static async createInstance(jsonModel?:any, callback?:any) {
+  static async createInstance(jsonModel?:JsonSchema, callback?:any) {
     let dbb = new JsonModel(jsonModel, callback);
     return await Promise.resolve(dbb);
   }
 
-  async Tolist(limit=25, page= 0, query={}) {
-    return this.loadref && this.hasPopulate ? 
-    await this.getListPopulated(limit,page,query) : 
-    await this.model!.find(query)
+  async Tolist(limit=25, page= 0, query={}){
+        let self:any =this;
+    return await self.model!.find(query)
       .limit(limit)
       .skip(limit * page)
-      .exec();
+      .exec(); 
+
   }
 
 async findById(id: string) {
-  return this.loadref && this.hasPopulate ? await this.getOnePopulated(id): await this.model!.findById(id);
+ return await this.model!.findById(id);
 }
 async findOne(query: {}) {
-  return this.loadref && this.hasPopulate ? await this.getOnePopulated(query,'findOne'): await this.model!.findOne(query);
+  return await this.model!.findOne(query);
 }
   async create(obj: object){
     return await this.model?.create(obj);

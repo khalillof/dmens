@@ -1,7 +1,6 @@
-import {AssertionError} from './assertionError';
-
-const util = require('util')
-var { Stream } = require('stream')
+import {AssertionError} from './assertionError.js';
+import util from 'util';
+import { Stream } from 'stream';
 
 const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i

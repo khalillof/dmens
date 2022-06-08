@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose';
-import { config } from '../../common';
-import {JsonLoad } from '../../models';
+import { config } from '../../common/index.js';
+import {JsonLoad } from '../../models/index.js';
 /////////////////
 const dbOptions ={
   rejectUnauthorized: true,
@@ -10,11 +10,10 @@ const dbOptions ={
 };
 
 export async function dbInit(){
-return  await dbConnect(config.mongoUrl.dev(),dbOptions);
-}
-async function dbConnect (dbURL:string, options:{}){
-console.log("=========== db initiation started ===============")
-mongoose.connect(dbURL, options, async function(err){
+  console.log('db connction string :'+config.mongoUrl.dev());
+
+return Promise.resolve(mongoose.connect(config.mongoUrl.dev(), dbOptions, async function(err){
+
 if (err) {
   console.error(err);
   process.exit(1);
@@ -23,9 +22,9 @@ if (err) {
   console.log("Successfully Connected to db!");
   console.log('Numbers of models added to the database are :'+ (await JsonLoad.loadDefaultDirectory()).length);
  } 
-}); 
-
+})); 
 }
+
 
 
 

@@ -27,8 +27,7 @@
     },
     "description": {
       "type": "String",
-      "default": "",
-      "maxLength": 500
+      "minLength":3
     },
     "data": {
       "type": "String",

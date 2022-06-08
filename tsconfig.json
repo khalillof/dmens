@@ -2,24 +2,40 @@
     "compilerOptions": {
         "baseUrl": "./",
         "outDir": "./ts-output",
+        "forceConsistentCasingInFileNames": true,
         "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
         "downlevelIteration": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
         "importHelpers": true,
-        "target": "es2016",
-        "module": "commonjs",
-        "resolveJsonModule": true,
+        "target": "es2022",
+        
         "lib": [
-            "ES2016",
-            "DOM"
+            "es2020",
+            "dom"
         ],
-        "inlineSourceMap": true
+        "inlineSourceMap": false
     },
-    "include": ["src/typescript/**/*.ts","src/typescript/**/*.js", "src/typescript/**/*.json", "./tests/**/*.ts"],
-    "exclude": ["node_modules", ".vscode", "test", "client", "src/javascript", "build"]
+    "include": [
+        "src/typescript/**/*.ts",
+        "src/typescript/**/*.js",
+        "src/typescript/**/*.json",
+        "./tests/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        ".vscode",
+        "test",
+        "client",
+        "src/javascript",
+        "build"
+    ]
 }

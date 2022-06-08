@@ -1,6 +1,6 @@
 import express from 'express';
-import { dbStore,logger, responce} from '../../common';
-import{Ilogger,Iresponce,IController, IJsonModel} from '../../interfaces';
+import { dbStore,logger, responce} from '../../common/index.js';
+import{Ilogger,Iresponce,IController, IJsonModel} from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
   db: IJsonModel;
@@ -23,7 +23,7 @@ export class DefaultController implements IController {
   }
 
   async findById(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.findById(req.params.id);
+    let item = await this.db.findById(req.params['id']);
     this.responce(res).items(item)
   }
   async findOne(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -37,16 +37,16 @@ export class DefaultController implements IController {
   }
 
   async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.patchById(req.params.id, req.body);
+    await this.db.patchById(req.params['id'], req.body);
     this.responce(res).success()
   }
 
   async put(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.putById(req.params.id,req.body);
+    await this.db.putById(req.params['id'],req.body);
     this.responce(res).success()
   }
   async remove(req: express.Request, res: express.Response, next: express.NextFunction) {
-   let item = await this.db.deleteById(req.params.id);
+   let item = await this.db.deleteById(req.params['id']);
    console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
     this.responce(res).success()
   }

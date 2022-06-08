@@ -1,16 +1,15 @@
 
-import { Error} from "mongoose";
+import mongoose from "mongoose";
 import {MongoServerError} from "mongodb";
-import {AssertionError} from '../lib/assertionError';
-import { JsonWebTokenError} from 'jsonwebtoken';
-import {IController,IJsonModel} from '../../interfaces'
-import {DefaultController} from '../../controllers'
-import {DefaultRoutesConfig} from '../../routes'
-import express from 'express'
+import {AssertionError} from '../lib/assertionError.js';
+import jwt from 'jsonwebtoken';
+import {IController,IJsonModel} from '../../interfaces/index.js';
+import {DefaultController} from '../../controllers/index.js';
+import {DefaultRoutesConfig} from '../../routes/index.js';
+import express from 'express';
+import pluralize from './pluralize.js';
 
-const pluralize = require('pluralize');
-
-export const errStore = [Error.ValidatorError, Error.ValidationError,AssertionError,MongoServerError,JsonWebTokenError];
+export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.ValidationError,AssertionError,MongoServerError,jwt.TokenExpiredError];
 
 export const logger = {
     log:console.log,
@@ -47,7 +46,7 @@ export const responce =(res:express.Response, cb?:Function)=>{
       success:(msg?:string)=> res.json({success:true,message:msg ?? successMsg}),
       fail:(msg?:string)=> res.json({success:false,error:msg ?? errMsg}),
       errStatus:(status:number,msg:string)=> res.status(status).json({success:false,error:msg}),
-      notAuthorized: (msg?: string)=> self.errStatus(403,msg ?? 'operation not authorized'),
+      notAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'Unauthorized!'),
       error:(err:any)=> logger.resErr(res, err),
       item:(item:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, item: item }),
       items:(items:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, items: items }),
@@ -63,15 +62,15 @@ export const responce =(res:express.Response, cb?:Function)=>{
 export const Roles =["user", "admin", "application"];
 export const isValidRole =(role:string)=> role ?  Roles.indexOf(role) !== -1 : false;
   
-export function printRoutesToString(app:express.Application){
-    let result = app._router.stack
+export function printRoutesToString(app:any){
+    let result = app._router!.stack
       .filter((r:any) => r.route)
       .map((r:any) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
       .join("\n");
       
       console.log('================= All Routes avaliable ================ \n'+ result)
   }
-export function printRoutesToJson(app:express.Application){
+export function printRoutesToJson(app:any){
     let result =  app._router.stack
         .filter((r:any) => r.route)
         .map((r:any) => {
@@ -106,7 +105,8 @@ export function  getDb(url:string):IJsonModel{
    return dbStore[d];
  }
 }
-throw new Error('service not found for arg :'+ url);
+throw new Error('service not found for arg :'+ url);;
+//throw 
 }
 
 // routesStore

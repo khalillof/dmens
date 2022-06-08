@@ -1,0 +1,27 @@
+{
+    "name":"message",
+    "loadref":true,
+      "schema":{
+        "titile":  {
+            "type": "String",
+            "required": true,
+            "minLength": 3,
+            "maxLength": 150
+        },
+        "body":  {
+            "type": "String",
+            "required": true,
+            "minLength": 3
+        },
+        "sender": {
+            "type": "ObjectId",
+            "ref": "account",
+            "required":true
+        },
+        "recipient": {
+            "type": "ObjectId",
+            "ref": "account",
+            "required":true
+        }
+    }
+    }
