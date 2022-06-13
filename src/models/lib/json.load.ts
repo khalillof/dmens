@@ -64,7 +64,7 @@ export class JsonLoad {
     const result = [];
 
     if(path.dirname(directory)){
-        for (const fileName of await fs.promises.readdir(directory)) {
+        for (const fileName of fs.readdirSync(directory)) {
             let _file = path.join(directory, fileName);
             if(JsonLoad.isJsonFile(_file)){
                 let validschema = await JsonLoad.loadFile(_file); 

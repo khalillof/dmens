@@ -63,12 +63,14 @@ function authenticateUser(type: string, opts?: {}) {
       pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-
+          console.log('user :'+(user && user._id))
+          console.log('info :'+info)
+          console.log('err :'+err)
         if (user) {
           // handle local login
           return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next)
 
-        } else if (err || info) {
+        } else{
 
           // 
           if (info instanceof TokenExpiredError) {
@@ -98,8 +100,12 @@ function authenticateUser(type: string, opts?: {}) {
             // valid refresh token was found next generate new access token only and let them access next()
             return await reqLogin(refUser, loginOptions)(req, res, next)
           }
-
-          responce(res).notAuthorized();
+ 
+          if(info){
+            res.status(401).json({sucess:false,errors:info})
+          }else{
+            responce(res).notAuthorized();
+          }
           
           logger.err(err ?? info);
 
@@ -177,7 +183,7 @@ async function createRefershToken(user: any) {
 
     await dbStore['account'].putById(user._id, {
       refreshToken: _token,
-      refreshToken_expireAt: expireAt,
+      refreshTokenExpireAt: expireAt,
     });
    user.refreshTokenb=_token,
    user.refreshToken_expireAt = expireAt,

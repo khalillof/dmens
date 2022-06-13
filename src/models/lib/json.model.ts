@@ -77,7 +77,7 @@ export class JsonModel implements IJsonModel {
       
       this.hasPopulate = this.populateNames.length > 0 ;
       if(this.hasPopulate) {
-      
+
         this.populateNames.forEach(item=> this.#populateBuilder +=".populate('"+item+"')");
         this.#populateBuilder+=".exec()";
       }
@@ -103,7 +103,7 @@ export class JsonModel implements IJsonModel {
 
   static async createInstance(jsonModel?:JsonSchema, callback?:any) {
     let dbb = new JsonModel(jsonModel, callback);
-    return await Promise.resolve(dbb);
+    return  dbb;
   }
 
   async Tolist(limit=25, page= 0, query={}){

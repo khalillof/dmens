@@ -10,6 +10,7 @@
         "noFallthroughCasesInSwitch": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
+        "resolveJsonModule":true,
         "downlevelIteration": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
@@ -25,9 +26,9 @@
         "inlineSourceMap": false
     },
     "include": [
-        "src/typescript/**/*.ts",
-        "src/typescript/**/*.js",
-        "src/typescript/**/*.json",
+        "src/**/*.ts",
+        "src/**/*.js",
+        "src/**/*.json",
         "./tests/**/*.ts"
     ],
     "exclude": [
@@ -35,7 +36,6 @@
         ".vscode",
         "test",
         "client",
-        "src/javascript",
         "build"
     ]
 }

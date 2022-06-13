@@ -35,12 +35,12 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     }
      
      static async instance(exp:express.Application,rName: string, control:any, callback?:Function){
-        let umwre = control ? await getMware(): undefined;
+        let umwre = control && await getMware();
         let result =  new DefaultRoutesConfig(exp,rName,control,umwre,callback);
-      return  await Promise.resolve(result);
+      return  result;
     }
     static async createInstancesWithDefault(app:express.Application){
-     return   await Promise.resolve(Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))}))
+     return   Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))})
     }
 
     buildMdWares(middlewares?:Array<Function>, useAuth=true, useAdmin=false){
@@ -54,7 +54,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         return mdwares;
     }
     // custom routes
-    getList(middlewares=null, useAuth=true,useAdmin=false){
+    getList(middlewares=null, useAuth=false,useAdmin=false){
      
      return this.app.get(this.routeName, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('list'))
     }

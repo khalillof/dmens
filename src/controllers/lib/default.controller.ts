@@ -13,7 +13,7 @@ export class DefaultController implements IController {
   }
 
  public static async createInstance(svcName: string){
-    return await Promise.resolve(new this(svcName));
+    return new this(svcName);
   }
   
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {

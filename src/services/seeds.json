@@ -1,0 +1,191 @@
+{
+    "roles":[
+        {
+            "name":"user"
+        },
+        {
+            "name":"admin"
+        },
+        {
+            "name":"editor"
+        },
+        {
+            "name":"application"
+        },
+        {
+            "name":"writer"
+        }
+    ],
+    "accounts": [
+        {
+            "firstname": "Khalil",
+            "lastname": "Tuban",
+            "username": "tuban",
+            "email": "t@tuban.me",
+            "admin": true,
+            "active": true,
+            "email_verified": true,
+            "roles": [{}]
+        },
+        {
+            "firstname": "John",
+            "lastname": "Franswa",
+            "username": "john",
+            "email": "john@john.com",
+            "admin": false,
+            "active": true,
+            "email_verified": true,
+            "roles": [{}]
+        },
+        {
+            "firstname": "Anaas",
+            "lastname": "Samwael",
+            "username": "anaas",
+            "email": "anaas@anaas.com",
+            "admin": false,
+            "active": true,
+            "email_verified": true,
+            "roles": [{}]
+        }
+    ],
+    "categories":[
+        {
+            "name":"Asp.net Core"
+        },
+        {
+            "name":"JavaScript"
+        },
+        {
+            "name":"Angular"
+        },
+        {
+            "name":"React"
+        },
+        {
+            "name":"Python"
+        },
+        {
+            "name":"Automation"
+        },
+        {
+            "name":"Artificial Intelligence"
+        },
+        {
+            "name":"Microservices"
+        }
+    ],
+    "posts": [
+        {
+            "title": "Award winning three-star Michelin chef",
+            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "isPublished":true,
+            "isfeatured" : true,
+            "publisheDate": {},
+            "category":"",
+            "likes": 5,
+            "author":""
+        },
+        {
+            "title": "creating mouthwatering Indo-Italian fusion experiences",
+            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia! ,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "isPublished":true,
+            "publisheDate": {},
+            "category":"",
+            "likes": 5,
+            "author":""
+        },
+        {
+            "title": "Put together the cuisines from the two craziest cultures",
+            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia! ,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "isPublished":true,
+            "publisheDate": {},
+            "isfeatured" : true,
+            "category":"",
+            "likes": 5
+        },
+        {
+            "title": "Put together all the knowledge",
+            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia! ,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "isPublished":true,
+            "publisheDate": {},
+            "category":"",
+            "likes": 5,
+            "author":""
+        },
+        {
+            "title": "The virtual world now days",
+            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia! ,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "isPublished":true,
+            "publisheDate": {},
+            "isfeatured" : true,
+            "category":"",
+            "likes": 5,
+            "author":""
+        }
+    ],
+    "comments":[
+        {
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "author":"",
+            "post_id": ""
+        },
+        {
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "author":"",
+            "post_id": ""
+        },
+        {
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "author":"",
+            "post_id": ""
+        },
+        {
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "author":"",
+            "post_id": ""
+        },
+        {
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "author":"",
+            "post_id": ""
+        }
+
+    ],
+    "messages":[
+        {
+            "titile":  "hi hello, how are you!",
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "sender": "",
+            "recipient": ""
+        },
+        {
+            "titile":  "hi hello, how are you!",
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "sender": "",
+            "recipient": ""
+        },
+        {
+            "titile":  "hi hello, how are you!",
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "sender": "",
+            "recipient": ""
+        },
+        {
+            "titile":  "hi hello, how are you!",
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "sender": "",
+            "recipient": ""
+        },
+        {
+            "titile":  "hi hello, how are you!",
+            "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
+            "sender": "",
+            "recipient": ""
+        }
+    ]
+}

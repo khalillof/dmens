@@ -20,11 +20,10 @@
     },
     "refreshToken": {
       "type": "String",
-      "unique": true,
       "minLength": 10,
       "maxLength": 100
    },
-   "refreshToken_expireAt": {
+   "refreshTokenExpireAt": {
       "type": "Date"
   },
     "active":{

@@ -45,8 +45,15 @@ export class PassportStrategies {
       audience: config.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
-     const _user = await  dbStore['account'].findById(payload.user._id);
-      return done(_user);
+      dbStore['account'].model?.findById(payload.user._id,(error: any, user?: any, info?:any)=>{
+      //if(user)
+        return user && done(false,user) || error && done(error,null) || info && done(false,null,info);
+      //if(error)
+      //return done(error,null)
+      //if(info)
+      //return done(false,null,info)
+      });
+      //return done(_user);
      })
   }
   // JWT stratigy

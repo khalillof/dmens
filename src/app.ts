@@ -9,7 +9,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
 import { config, printRoutesToString } from './common/index.js';
-import { dbInit, SeedDatabase } from './services/index.js';
+import { dbInit, SeedDatabase , ClientSeedDatabase} from './services/index.js';
 import { initRouteStore,corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
 import cors from "cors";
@@ -76,16 +76,17 @@ const mens = (async (envpath?: string) => {
         
       initRouteStore.forEach(async (rout: any) => await rout(app))
 
-    }, 500)
+    }, 750)
 
-    setTimeout(() => {
+    setTimeout(async () => {
       printRoutesToString(app);
       // handel 404 shoud be at the midlleware
       app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
         res.status(404).json({ success: false, message: "Sorry can't find that!" })
       })
       // seed database
-      new SeedDatabase();
+     // new SeedDatabase();
+     await new ClientSeedDatabase().init();
     }
       , 1000);
 

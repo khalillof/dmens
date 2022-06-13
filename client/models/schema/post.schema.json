@@ -23,9 +23,16 @@
         "required": true,
         "minLength": 5
     },
-    "featured": {
+    "isfeatured": {
         "type": "Boolean",
         "default": false
+    },
+    "isPublished": {
+        "type": "Boolean",
+        "default": false
+    },
+    "publisheDate": {
+        "type": "Date"
     },
     "category": {
         "type": "ObjectId",
