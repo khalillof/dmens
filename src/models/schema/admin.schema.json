@@ -1,6 +1,6 @@
 {
   "name": "admin",
-  "loadref":true,
+  "populates":["admin"],
   "schema": {
     "name": {
       "type": "String",
@@ -10,10 +10,9 @@
       "minLength": 3,
       "maxLength": 30
     },
-    "loadref":{
-      "type": "Boolean",
-      "default": false,
-      "required":true
+    "populates":{
+      "type": "Array",
+      "default": []
     },
     "activate":{
       "type": "Boolean",

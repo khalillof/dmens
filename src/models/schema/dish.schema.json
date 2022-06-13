@@ -1,6 +1,6 @@
 {
     "name":"dish",
-    "loadref":true,
+    "populates":["comments"],
     "schema":{
     "name": {
         "type": "String",

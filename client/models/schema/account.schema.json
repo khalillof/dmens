@@ -1,6 +1,6 @@
 {
   "name": "account",
-  "loadref":true,
+  "populates":["roles"],
   "schema": {
     "username": {
       "type": "String",

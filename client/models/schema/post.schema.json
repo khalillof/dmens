@@ -1,6 +1,6 @@
 {
     "name":"post",
-    "loadref":true,
+    "populates":["category","author","comments"],
     "schema":{
     "title": {
         "type": "String",

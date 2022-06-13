@@ -1,6 +1,6 @@
 {
     "name":"message",
-    "loadref":true,
+    "populates":["sender","recipient"],
       "schema":{
         "titile":  {
             "type": "String",

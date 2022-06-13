@@ -1,6 +1,6 @@
 {
 "name":"comment",
-"loadref":true,
+"populates":["author"],
   "schema":{
     "rating":  {
         "type": "Number",

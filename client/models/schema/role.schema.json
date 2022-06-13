@@ -1,6 +1,6 @@
 {
     "name":"role",
-    "loadref":false,
+    "populates":[],
     "schema": {
       "name": {
         "type": "String",

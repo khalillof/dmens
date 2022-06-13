@@ -1,6 +1,6 @@
 {
     "name":"favorite",
-    "loadref":true,
+    "populates":["user","dishes"],
     "schema":{  
     "user": {
         "type": "ObjectId",

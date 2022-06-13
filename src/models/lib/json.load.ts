@@ -18,8 +18,8 @@ export class JsonLoad {
     static validate(jsonSchema:JsonSchema){
         if (!jsonSchema.name)
            throw new Error(' schema validation faild ! property name is required')
-        if (typeof jsonSchema.loadref !== 'boolean')
-           throw new Error(' schema validation faild ! property loadref is required')
+        //if (typeof jsonSchema.loadref !== 'boolean')
+        //   throw new Error(' schema validation faild ! property loadref is required')
         if (dbStore[jsonSchema.name.toLowerCase()]) 
           throw new Error(`schema validation faild ! name property : ${jsonSchema.name} already on db : `)
      }

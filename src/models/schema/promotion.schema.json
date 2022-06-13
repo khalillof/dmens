@@ -1,6 +1,6 @@
 {
     "name":"promotion",
-    "loadref":false,
+    "populates":[],
     "schema":{
     "name": {
         "type": "String",

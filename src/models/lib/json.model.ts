@@ -13,7 +13,8 @@ export class JsonModel implements IJsonModel {
     let self:any = this;
   if(jsonSchema){
     this.name = jsonSchema.name.toLowerCase() || "";
-    this.loadref = jsonSchema.loadref ? jsonSchema.loadref  : false;
+    this.populates = jsonSchema.populates!;
+    this.hasPopulate  = jsonSchema.populates &&  jsonSchema.populates.length ? true : false;
    
     if(dbStore[this.name]){
       throw new Error('there is already model on Db with this name : '+this.name)
@@ -49,38 +50,38 @@ export class JsonModel implements IJsonModel {
     dbStore[this.name] = self;
     console.log("added ( " + this.name + " ) to DbStore :");
 
-    this.#loadPopulates(jsonSchema?.schema); 
-
-    if (this.loadref && this.hasPopulate){
-
-      self.Tolist = new Function('limit=25', 'page=0', 'query={}', `return this.model.find(query).limit(limit).skip(limit * page)${this.#populateBuilder}`);
-      self.findById = new Function('id', `return this.model.findById(id)${this.#populateBuilder}`);
-      self.findOne = new Function('query', `return this.model.findOne(query)${this.#populateBuilder}`);
+    //this.#loadPopulates(jsonSchema?.schema); 
+   
+    if (this.hasPopulate){
+      this.#buildPopulates();
+      
+      self.Tolist = new Function('limit=25', 'page=0', 'query={}', `return this.model.find(query).limit(limit).skip(limit * page)${this.#populateQuery}`);
+      self.findById = new Function('id', `return this.model.findById(id)${this.#populateQuery}`);
+      self.findOne = new Function('query', `return this.model.findOne(query)${this.#populateQuery}`);
     }
   }
 
   name: string= "";
   schema?:mongoose.Schema ;
   model?:mongoose.Model<any>;
-  populateNames:Array<string> = [];
-  loadref:boolean= false;
+  populates:Array<string> = [];
   hasPopulate: boolean= false;
- #populateBuilder="";
+  #populateQuery="";
   log =console.log;
-  ["add"](a:number, b:number) {
-    return a + b;
+
+  #buildPopulates(){
+    if(this.hasPopulate) {
+      this.populates.forEach(item=>  this.#populateQuery +=".populate('"+item+"')"); 
+      this.#populateQuery+=".exec()";
+    }
   }
+
  #loadPopulates(_schema?:any){
   
       // check and load populates
       Object.entries(_schema ??  this.schema!.obj).forEach((item, indx,arr) => this.#deepSearch(item, indx, arr));
       
-      this.hasPopulate = this.populateNames.length > 0 ;
-      if(this.hasPopulate) {
-
-        this.populateNames.forEach(item=> this.#populateBuilder +=".populate('"+item+"')");
-        this.#populateBuilder+=".exec()";
-      }
+      this.#buildPopulates();
   }
 
 
@@ -95,7 +96,7 @@ export class JsonModel implements IJsonModel {
        } else {
          if(itemKey === 'ref'){
          //console.log(arr[indx][0])
-          this.populateNames.push(arr[indx][0])
+          this.populates.push(arr[indx][0])
          }
        }
    }

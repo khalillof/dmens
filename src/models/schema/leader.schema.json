@@ -1,6 +1,6 @@
 {
     "name":"leader",
-    "loadref":false,
+    "populates":[],
   "schema":{
     "name": {
     "type": "String",

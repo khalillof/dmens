@@ -1,6 +1,6 @@
 {
 "name":"comment",
-"loadref":true,
+"populates":["author"],
   "schema":{
     "body":  {
         "type": "String",

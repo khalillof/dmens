@@ -15,7 +15,7 @@ export interface ISvc {
 }*/
 export interface JsonSchema {
   name: string;
-  loadref: boolean;
+  populates?:Array<string>,
   schema: Schema
 };
 export interface IJsonModel {
@@ -23,8 +23,7 @@ export interface IJsonModel {
   readonly name: string;
   readonly schema?: Schema;
   readonly model?: Model<any>;
-  readonly populateNames: Array<string>;
-  readonly loadref: boolean;
+  readonly populates?:Array<string>,
   readonly hasPopulate: boolean;
 
   log(...data: any[]): void;
