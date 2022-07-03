@@ -36,7 +36,7 @@ const mens = (async (envpath?: string) => {
   app.set('views', path.join(config.baseDir, 'views'));
   app.set('view engine', 'ejs');
   // static urls
-  ['../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
+  [ '../public','../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
 
   await dbInit().then(async () => {
 
@@ -76,7 +76,7 @@ const mens = (async (envpath?: string) => {
         
       initRouteStore.forEach(async (rout: any) => await rout(app))
 
-    }, 750)
+    }, 1000)
 
     setTimeout(async () => {
       printRoutesToString(app);
@@ -88,7 +88,7 @@ const mens = (async (envpath?: string) => {
      // new SeedDatabase();
      await new ClientSeedDatabase().init();
     }
-      , 1000);
+      , 1500);
 
 
     const dev_prod = app.get('env');
@@ -111,5 +111,5 @@ const mens = (async (envpath?: string) => {
 });
 
 export { mens };
-
+//console.log('================================================='+config.baseDir)
 //mens(path.resolve(config.baseDir, '../.env'));

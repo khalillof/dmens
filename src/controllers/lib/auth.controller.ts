@@ -20,11 +20,11 @@ async signin(req: express.Request, res: express.Response, next: express.NextFunc
 async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
  //Normally setPassword is used when the user forgot the password 
  if(!req.body.email && req.body.password){
-  return this.responce(res).fail('some requied body fields are missing')
+  return this.responce(res).badRequest('some requied body fields are missing')
  }
  let user = await this.db.findOne({email:req.body.email});
   if (!user){
-    return this.responce(res).fail('some of your input are not valid')
+    return this.responce(res).badRequest('some of your input are not valid')
     }else{
      return  user.setPassword(req.body.password, this.responce(res).errObjInfo)
   }
@@ -33,7 +33,7 @@ async forgetPassword(req: express.Request, res: express.Response, next: express.
 async changePassword(req: any, res: express.Response, next: express.NextFunction){
  //changePassword is used when the user wants to change the password
  if(req.isUnauthenticated()){
-   this.responce(res).notAuthorized();
+   this.responce(res).unAuthorized();
  }
  if (!req.body.oldpassword || !req.body.newpassword){
  return this.responce(res).fail('old and new pasword field are required')
@@ -44,12 +44,12 @@ async changePassword(req: any, res: express.Response, next: express.NextFunction
 }
 async profile(req: any, res: express.Response, next: express.NextFunction) {
 //let item = await this.db.findById(String(req.user._id));
-   return this.responce(res).item(req.user,'You made it to the secure route')
+   return this.responce(res).data(req.user,'You made it to the secure route')
  }
 
 async  updateUser(req: any, res: express.Response, next: express.NextFunction){
  if (req.isUnauthenticated()) {
-   this.responce(res).notAuthorized()
+   this.responce(res).unAuthorized()
  } else {
    // user is already authenticated that is why I am checking for body.password only
    let User = await this.db.findById(req.params.id);

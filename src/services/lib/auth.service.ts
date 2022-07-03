@@ -63,9 +63,9 @@ function authenticateUser(type: string, opts?: {}) {
       pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-          console.log('user :'+(user && user._id))
-          console.log('info :'+info)
-          console.log('err :'+err)
+          console.log('authenticate user :')
+          console.log(user || info || err )
+
         if (user) {
           // handle local login
           return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next)
@@ -78,7 +78,7 @@ function authenticateUser(type: string, opts?: {}) {
             let _refToken = req.headers['refreshtoken'];
             if (!_refToken) {
               console.log(req.headers)
-              responce(res).notAuthorized('No refersh token! provided');
+              responce(res).badRequest('No refersh token! provided');
 
               return;
             }
@@ -87,13 +87,13 @@ function authenticateUser(type: string, opts?: {}) {
             let refUser = await dbStore['account'].findOne({ refreshToken: _refToken });
 
             if (!refUser) {
-              responce(res).notAuthorized('refresh token provided not found');
+              responce(res).badRequest('refresh token provided not found');
               return;
             }
 
             // user found check refresh token is valid
             if (isExpiredToken(refUser.refreshToken_expireAt)) {
-              responce(res).notAuthorized('expired refersh token! require sign in');
+              responce(res).unAuthorized('expired refersh token! require sign in');
              return ;
             }
 
@@ -102,9 +102,9 @@ function authenticateUser(type: string, opts?: {}) {
           }
  
           if(info){
-            res.status(401).json({sucess:false,errors:info})
+            responce(res).badRequest((info.message ?? info ))
           }else{
-            responce(res).notAuthorized();
+            responce(res).unAuthorized();
           }
           
           logger.err(err ?? info);
@@ -113,9 +113,8 @@ function authenticateUser(type: string, opts?: {}) {
         }
       })(req, res, next); // end of passport authenticate
 
-    } catch (err) {
-
-      logger.resErr(res, err)
+    } catch (err:any) {
+      logger.resErr(res, (err.message ?? err))
     }
   }
 
@@ -132,7 +131,7 @@ function reqLogin(user: any, options = { session: false }, both_tokens_required 
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     return req.login(user, options, async (err: any) => {
       if (err) {
-        res.json({ success: false, error: err.message })
+        responce(res).badRequest(err.message)
         logger.err(err);
         return;
       } else if (both_tokens_required) {

@@ -58,7 +58,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
      
      return this.app.get(this.routeName, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('list'))
     }
-    getId(middlewares=null, useAuth=true,useAdmin=false){
+    getId(middlewares=null, useAuth=false,useAdmin=false){
      return this.app.get(this.routeParam, ...this.buildMdWares(middlewares!,useAuth, useAdmin),this.actions('findById'))
     }
     post(middlewares=null, useAuth=true,useAdmin=false){

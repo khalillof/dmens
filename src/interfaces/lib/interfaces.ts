@@ -1,18 +1,6 @@
 import express from 'express'
 import { Model, Schema } from 'mongoose';
-/*
-export interface ISvc {
 
-  db: Model<any, any>;
-
-  //create: (resource: any) => Promise<any>,
-  create<Tentity>(resource: Tentity): Promise<Tentity>;
-  putById: (resourceId: any) => Promise<string>;
-  getById: (resourceId: any) => Promise<any>;
-  deleteById: (resourceId: any) => Promise<string>;
-  patchById: (resourceId: any) => Promise<string>;
-  Tolist<Tentity>(limit: number, page: number): Promise<Tentity[]>;
-}*/
 export interface JsonSchema {
   name: string;
   populates?:Array<string>,
@@ -27,17 +15,6 @@ export interface IJsonModel {
   readonly hasPopulate: boolean;
 
   log(...data: any[]): void;
-
-  // private loadPopulates(_schema?:any):void;
-
-  //private  factory(stringObj:string):any;
-  // private  getOnePopulated(arg:any, method?:string):Promise<any>;
-
-  // private getListPopulated(limit?:number, page?:number, query?:{}):Promise<[any]>
-  // search item in object and map to mongoose schema
-  // private deepSearch(obj:any, indx:number, arr:Array<any>):any;
-
-  //createInstance(jsonModel?:any, callback?:any):Promise<IJsonModel>;
   Tolist(limit: number, page: number, query: {}): Promise<[any]>;
   findById(id: string): Promise<any>;
   findOne(query: {}): Promise<any>;
@@ -57,10 +34,11 @@ export interface Iresponces {
   success: (msg?: string) => void;
   fail:(msg?:string)=> void;
   errStatus: (status: number, msg: string) => void;
-  notAuthorized: (msg?: string) => void;
+  badRequest: (msg?: string) => void;
+  forbidden: (msg?: string) => void;
+  unAuthorized: (msg?: string) => void;
   error: (err: any) => void;
-  item: (item: {}, message?: string) => void;
-  items: (items: {}, message?: string) => void;
+  data: (item: {}, message?: string) => void;
   errCb: (err: any, cb: Function) => void;
   errSuccess: (err: any) => void;
   callback: (cb: Function, obj?: any) => void;

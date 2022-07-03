@@ -61,7 +61,7 @@ export class AdminController extends DefaultController {
               });
         }else{
             
-            this.responce(res).fail('content must be valid json');
+            this.responce(res).badRequest('content must be valid json');
         }
 
     }

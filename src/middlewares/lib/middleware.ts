@@ -16,30 +16,30 @@ export class Middlewares implements IMiddlewares {
         if (req.body.email || req.body.username && req.body.password) {         
             next();
         } else {
-          responce(res).fail('Missing required body fields')
+          responce(res).badRequest('Missing required body fields')
         }
     }
 
  async validateSameEmailDoesntExist (req: express.Request, res: express.Response, next: express.NextFunction){
-    await  this.getUserFromReq(req) ? responce(res).notAuthorized('User email already exists') : next();
+    await  this.getUserFromReq(req) ? responce(res).badRequest('User email already exists') : next();
     }
     
   validateCurrentUserOwnParamId(req: any, res: express.Response, next: express.NextFunction){
-      req.user && String(req.user._id) === String(req.params['id']) ? next() :responce(res).notAuthorized();
+      req.user && String(req.user._id) === String(req.params['id']) ? next() :responce(res).unAuthorized();
       } 
    validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
-    req.user && req.body.email && req.body.email === req.user.email  ? next() :responce(res).notAuthorized();
+    req.user && req.body.email && req.body.email === req.user.email  ? next() :responce(res).unAuthorized();
     }
     validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
-      req.user && req.query.email && req.query.email === req.user.email  ? next() :responce(res).notAuthorized('not authorized, require valid email');
+      req.user && req.query.email && req.query.email === req.user.email  ? next() :responce(res).forbidden('not authorized, require valid email');
       }
 
   async  userExist(req: express.Request, res: express.Response, next: express.NextFunction){
-    await  this.getUserFromReq(req) ? next() :responce(res).notAuthorized('User does not exist : ' +req.body.email);
+    await  this.getUserFromReq(req) ? next() :responce(res).forbidden('User does not exist : ' +req.body.email);
     }
     
     isAuthenticated(req: any, res: express.Response, next: express.NextFunction){
-        req.isAuthenticated() ? next() :responce(res).notAuthorized('you are not authorized');
+        req.isAuthenticated() ? next() :responce(res).unAuthorized();
 
 }
  // roles
@@ -59,7 +59,7 @@ export class Middlewares implements IMiddlewares {
 isInRole(roleName:string){
   return async (req: any, res: express.Response, next: express.NextFunction)=>{
     if(!req.isAuthenticated()){
-      responce(res).notAuthorized('you are not authorized')
+      responce(res).forbidden()
     return;
   }
   let reqUser:any= req.user  && req.user.roles ? req.user : await  dbStore['account'].findById(req.user._id);
@@ -74,7 +74,7 @@ let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }})
           }
         }
 
-  responce(res).notAuthorized("Require Admin Role!" );
+  responce(res).forbidden("Require Admin Role!" );
           return;  
 }
 }

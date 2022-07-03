@@ -14,7 +14,7 @@ export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.Validatio
 export const logger = {
     log:console.log,
     err:(err:any)=> console.error(err.stack),
-    resErrMsg:(res:express.Response, ErorMsg?:string)=> res.json({ success: false, error:ErorMsg ? ErorMsg: 'operation faild!' }),
+    resErrMsg:(res:express.Response, ErorMsg?:string)=> res.status(400).json({ success: false, message:ErorMsg ? ErorMsg: 'operation faild!' }),
     resErr:function(res:express.Response,err:any){
         if (err) {
            let errInstance= errStore.filter((errObj:any)=> {
@@ -44,12 +44,13 @@ export const responce =(res:express.Response, cb?:Function)=>{
         return;
       },
       success:(msg?:string)=> res.json({success:true,message:msg ?? successMsg}),
-      fail:(msg?:string)=> res.json({success:false,error:msg ?? errMsg}),
-      errStatus:(status:number,msg:string)=> res.status(status).json({success:false,error:msg}),
-      notAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'Unauthorized!'),
+      fail:(msg?:string)=> res.json({success:false,message:msg ?? errMsg}),
+      errStatus:(status:number,msg:string)=> res.status(status).json({success:false,message:msg}),
+      badRequest: (msg?: string)=> self.errStatus(400,msg ?? 'bad Request!'),
+      unAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'unAuthorized!'),
+      forbidden: (msg?: string)=> self.errStatus(403,msg ?? 'forbidden!'),
       error:(err:any)=> logger.resErr(res, err),
-      item:(item:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, item: item }),
-      items:(items:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, items: items }),
+      data:(item:{}, message?:string)=> res.json({ success: true, message: message ?? successMsg, data: item }),
       errCb:(err:any, cb:Function)=> err ? self.error(err) : self.callback(cb),
       errSuccess:(err:any)=> err ? self.error(err) : self.success(),
       callback:(cb:Function, obj?:any) => cb && typeof cb === 'function' ? cb(obj) : false,

@@ -7,10 +7,7 @@ type dbCallback = {
     (db: Model<any>): Promise<any>;
 }
 export class ClientSeedDatabase {
-    // add default roles
-    // constructor() {
-    //    (async () => await this.init())()
-    //}
+
     async init() {
         this.addRoles().then(()=> console.log('finished seeding roles'))
          .then(async ()=>await this.addAccounts().then(()=> console.log('finished seeding Accounts'))
@@ -18,11 +15,8 @@ export class ClientSeedDatabase {
 
          setTimeout(()=>this.addPosts().then(()=> console.log('finished seeding posts')), 2000)
          setTimeout(()=>this.addComments().then(()=> console.log('finished seeding comments')), 3000)
-         setTimeout(()=>this.addmessages().then(()=> console.log('finished seeding messages')), 4000)
 
-         setTimeout(()=>this.addCommentsToPosts()
-         .then(()=> console.log('finished seeding and adding comments to posts'))
-         .then(()=>console.log('finished database seeding .........!')), 5000);
+         setTimeout(()=>this.addmessages().then(()=> console.log('finished seeding messages')).then(()=>console.log('finished database seeding .........!')),4000)
      
     }
     accountsCache:any[]=[];
@@ -99,7 +93,7 @@ export class ClientSeedDatabase {
 
             await this.countDb('message', async (Db) => await this.saver(seeds.messages, Db));
     }
-
+    /* canceled
     async addCommentsToPosts() {
       let posts_ids =await this.getIDs('post'); 
             
@@ -113,7 +107,7 @@ export class ClientSeedDatabase {
              })                             
             }
     }
-
+*/
     async countDb(dbName: string, callback: dbCallback) {
         let Db = dbStore[dbName].model!;
         Db.estimatedDocumentCount(async (err: any, count: number) => {

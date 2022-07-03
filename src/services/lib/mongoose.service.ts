@@ -12,7 +12,7 @@ const dbOptions ={
 export async function dbInit(){
   console.log('db connction string :'+config.mongoUrl.dev());
 
-return Promise.resolve(mongoose.connect(config.mongoUrl.dev(), dbOptions, async function(err){
+ mongoose.connect(config.mongoUrl.dev()!, dbOptions, async function(err){
 
 if (err) {
   console.error(err);
@@ -22,7 +22,7 @@ if (err) {
   console.log("Successfully Connected to db!");
   console.log('Numbers of models added to the database are :'+ (await JsonLoad.loadDefaultDirectory()).length);
  } 
-})); 
+}); 
 }
 
 

@@ -18,22 +18,22 @@ export class DefaultController implements IController {
   
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
     let items = await this.db.Tolist(20, 0, req.query);
-    this.responce(res).items(items)
+    this.responce(res).data(items)
 
   }
 
   async findById(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.findById(req.params['id']);
-    this.responce(res).items(item)
+    this.responce(res).data(item)
   }
   async findOne(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.findOne(req.query);
-    this.responce(res).items(item)
+    this.responce(res).data(item)
   }
   async create(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.create(req.body);
     console.log('document Created :', item);
-    this.responce(res).item(item)
+    this.responce(res).data(item)
   }
 
   async patch(req: express.Request, res: express.Response, next: express.NextFunction) {

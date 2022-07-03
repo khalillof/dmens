@@ -1,6 +1,6 @@
 {
     "name":"post",
-    "populates":["category","author","comments"],
+    "populates":["category","author","like_user_ids"],
     "schema":{
     "title": {
         "type": "String",
@@ -44,18 +44,12 @@
         "ref": "account",
         "required":true
     },
-    "comments": [
-        {
-            "type": "ObjectId",
-            "ref": "comment"
-        }
-    ],
     "likes":  {
         "type": "Number",
         "default": 0
         
     },
-    "like_user_id": [
+    "like_user_ids": [
         {
           "type": "ObjectId",
           "ref": "account"

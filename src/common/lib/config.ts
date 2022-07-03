@@ -27,7 +27,8 @@ export const config = {
         'dev': ()=> env['DB_CONNECTION_DEV']!,
         'prod': ()=>  env['DB_CONNECTION_PROD'],
         'admin': ()=> env['DB_CONNECTION_ADMIN'],
-        'cluster': ()=> env['DB_CONNECTION_CLUSTER']!
+        'cluster': ()=> env['DB_CONNECTION_CLUSTER'],
+        'docker': () => env['DB_DOCKER']
     },
     facebook: {
         'clientId': ()=> env['FACEBOOK_CLIENT_ID']!,
