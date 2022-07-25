@@ -38,7 +38,9 @@ const mens = (async (envpath?: string) => {
   // static urls
   [ '../public','../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
 
-  await dbInit().then(async () => {
+  await dbInit();
+
+  setTimeout(async()=> {
 
     app.use(session({
       secret: config.secretKey(),
@@ -64,7 +66,7 @@ const mens = (async (envpath?: string) => {
 
     setTimeout(async () => {
     
-      var allowCrossDomain = function(req:any, res:any, next:any) {
+       function allowCrossDomain(req:any, res:any, next:any) {
         res.header('Access-Control-Allow-Origin', "http://localhost:3000");
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -74,9 +76,9 @@ const mens = (async (envpath?: string) => {
     
     app.use(allowCrossDomain);
         
-      initRouteStore.forEach(async (rout: any) => await rout(app))
+     initRouteStore.forEach(async (rout: any) => await rout(app))
 
-    }, 1000)
+   }, 1000)
 
     setTimeout(async () => {
       printRoutesToString(app);
@@ -103,12 +105,9 @@ const mens = (async (envpath?: string) => {
     app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')) // dev|common|combined|short|tiny
 
     dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
-
-  });
-
-
+  },3000)
   return app;
-});
+  });
 
 export { mens };
 //console.log('================================================='+config.baseDir)

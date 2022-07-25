@@ -1,0 +1,36 @@
+{
+    "name":"contact",
+    "populates":[],
+    "schema":{  
+        "contactType": {
+            "type": "String",
+            "required":true,
+            "enum": ["consultation","query","hireme","contact"]
+          }
+        ,
+    "fullname": {
+        "type": "String",
+        "required": true,
+        "minLength":3,
+        "maxLength": 50
+    },
+    "email": {
+        "type": "String",
+        "lowercase": true,
+        "required": true,
+        "minLength": 3,
+        "maxLength": 30
+      },
+    "telphone": {
+        "type": "string",
+        "lowercase": true,
+        "minLength": 3,
+        "maxLength": 30
+      },
+    "message": {
+        "type": "String",
+        "required": true,
+        "minLength": 5
+    }
+}
+}

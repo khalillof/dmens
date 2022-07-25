@@ -55,7 +55,7 @@ export class DefaultController implements IController {
     return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
       try{
         let self:any=this;
-      await self[actionName](req, res, next) //await this[actionName](req,res,next);
+      await self[actionName](req, res, next) 
       return;
       }catch(err){
         this.responce(res).error(err);

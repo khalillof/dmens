@@ -24,6 +24,7 @@ export const config = {
     imagesUploadDir: ()=> env['IMAGES_UPLOAD_DIR'] || path.join(baseDir, '/public/'),
     cores_domains:()=>  env['NODE_ENV'] === 'development'? env['CORES_DMAINS_DEV']?.split(',') || [] : env['CORES_DMAINS_PROD']?.split(',') || [],
     mongoUrl: {
+        'cosmodb':()=> env['COSMOSDB_CON']!,
         'dev': ()=> env['DB_CONNECTION_DEV']!,
         'prod': ()=>  env['DB_CONNECTION_PROD'],
         'admin': ()=> env['DB_CONNECTION_ADMIN'],

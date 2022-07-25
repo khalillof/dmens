@@ -44,11 +44,11 @@ function generateJwt(user: any) {
   try {
     //console.log('jwtExpiration: '+config.jwtExpiration())
     const body = { _id: user._id, email: user.email };
-    const accessToken_expireAt = getExpiredAt().getTime();
+    const accessTokenExpireAt = getExpiredAt().getTime();
     const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
 
     const accessToken = sign({ user: body }, config.secretKey(), ops);
-    return { accessToken, accessToken_expireAt };
+    return { accessToken, accessTokenExpireAt };
   } catch (err) {
     throw err;
   }
@@ -145,7 +145,7 @@ function reqLogin(user: any, options = { session: false }, both_tokens_required 
         let access = generateJwt(user);
 
         res.setHeader('Authorization', 'Bearer ' + access.accessToken);
-        res.setHeader('access_token_expireAt', access.accessToken_expireAt)
+        res.setHeader('accessTokenExpireAt', access.accessTokenExpireAt)
 
         return next()
       }
