@@ -15,7 +15,8 @@ export class JsonModel implements IJsonModel {
     this.name = jsonSchema.name.toLowerCase() || "";
     this.populates = jsonSchema.populates!;
     this.hasPopulate  = jsonSchema.populates &&  jsonSchema.populates.length ? true : false;
-   
+   jsonSchema.useAdmin && (this.useAuth = jsonSchema.useAuth);
+   jsonSchema.useAdmin && (this.useAdmin = jsonSchema.useAdmin);
     if(dbStore[this.name]){
       throw new Error('there is already model on Db with this name : '+this.name)
     }
@@ -65,9 +66,19 @@ export class JsonModel implements IJsonModel {
   schema?:mongoose.Schema ;
   model?:mongoose.Model<any>;
   populates:Array<string> = [];
+  useAuth?:Array<string>
+  useAdmin?: Array<string>
   hasPopulate: boolean= false;
   #populateQuery="";
   log =console.log;
+
+  //check useAuth and useAdmin
+  checkAuth(method:string){
+    return[
+      (this.useAuth && this.useAuth.length ? this.useAuth.indexOf(method) !== -1 : false), 
+      (this.useAdmin && this.useAdmin.length ? this.useAdmin.indexOf(method) !== -1 : false)
+    ]
+}
 
   #buildPopulates(){
     if(this.hasPopulate) {

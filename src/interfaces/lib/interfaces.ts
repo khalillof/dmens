@@ -4,19 +4,23 @@ import { Model, Schema } from 'mongoose';
 export interface JsonSchema {
   name: string;
   populates?:Array<string>,
+  useAuth?:Array<string>, 
+  useAdmin?: Array<string>,
   schema: Schema
 };
 export interface IJsonModel {
 
-  readonly name: string;
+  readonly name: string
   readonly schema?: Schema;
+  readonly useAuth?:Array<string>
+  readonly useAdmin?: Array<string>
   readonly model?: Model<any>;
-  readonly populates?:Array<string>,
-  readonly hasPopulate: boolean;
-
-  log(...data: any[]): void;
+  readonly populates?:Array<string>
+  readonly hasPopulate: boolean
+  checkAuth(method:string):Array<boolean>
+  log(...data: any[]): void
   Tolist(limit: number, page: number, query: {}): Promise<[any]>;
-  findById(id: string): Promise<any>;
+  findById(id: string): Promise<any>
   findOne(query: {}): Promise<any>;
   create(obj: object): Promise<any>;
   putById(id: string, objFields: object): Promise<any>;
@@ -82,6 +86,7 @@ export interface IDefaultRoutesConfig {
   //actions:Function;
   buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): any[];
   // custom routes
+  getCount(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
   getList(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
   getId(middlewares?: any, useAuth?: boolean,useAdmin?:boolean): express.Application;
   post(middlewares?: any, useAuth?: boolean,useAdmin?:boolean ): express.Application;

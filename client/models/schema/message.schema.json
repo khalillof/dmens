@@ -1,6 +1,8 @@
 {
     "name":"message",
     "populates":["sender","recipient"],
+    "useAuth":["list","get","post","put","delete","count"], 
+    "useAdmin": [], 
       "schema":{
         "titile":  {
             "type": "String",

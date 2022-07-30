@@ -1,6 +1,8 @@
 {
   "name": "account",
   "populates":["roles"],
+  "useAuth":["list","get","post","put","delete"], 
+  "useAdmin": ["list","count"], 
   "schema": {
     "username": {
       "type": "String",

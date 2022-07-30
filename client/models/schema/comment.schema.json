@@ -1,6 +1,8 @@
 {
 "name":"comment",
 "populates":["author"],
+"useAuth":["post","put","delete"], 
+"useAdmin": [], 
   "schema":{
     "body":  {
         "type": "String",

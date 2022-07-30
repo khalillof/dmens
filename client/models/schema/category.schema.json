@@ -1,6 +1,8 @@
 {
     "name":"category",
-    "loadref":false,
+    "populates":[],
+    "useAuth":["post","put","delete"], 
+    "useAdmin": ["post","put","delete"], 
     "schema": {
       "name": {
         "type": "String",

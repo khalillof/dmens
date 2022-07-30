@@ -1,6 +1,8 @@
 {
     "name":"post",
     "populates":["category","author","like_user_ids"],
+    "useAuth":["post","put","delete"], 
+    "useAdmin": ["post","put","delete"], 
     "schema":{
     "title": {
         "type": "String",

@@ -15,7 +15,10 @@ export class DefaultController implements IController {
  public static async createInstance(svcName: string){
     return new this(svcName);
   }
-  
+  async count(req: express.Request, res: express.Response, next: express.NextFunction){
+  let num =  await this.db.model?.countDocuments(req.query)
+  this.responce(res).data(num!)
+  }
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
     let items = await this.db.Tolist(20, 0, req.query);
     this.responce(res).data(items)
