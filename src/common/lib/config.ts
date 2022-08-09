@@ -11,6 +11,7 @@ export const config = {
     admin_email:()=> env['ADMIN_EMAIL']!,
     admin_userName: ()=> env['ADMIN_USERNAME']!,
     admin_password: ()=> env['ADMIN_PASSWORD']!,
+    getSecret:(key:string)=> env[key] ?? null,
     useAuth: ()=> env['AUTH'] || true,
     useCore: ()=> env['USE_CORES'] || true,
     secretKey: ()=>  env['SECRET_KEY']!,

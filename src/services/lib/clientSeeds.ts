@@ -30,9 +30,10 @@ export class ClientSeedDatabase {
         await this.countDb('role', async (Db) => await this.saver(seeds.roles, Db));
     }
     async addAccounts() {
-        await this.countDb('account', async (Db: any) => {
-            const roles = (await dbStore['role'].model!.find()).filter(e => 'admin user'.indexOf(e.name) !== -1).map(r => r._id);
+       this.countDb('account', async (Db: any) => {
 
+            const roles =  await dbStore['role'].model!.find( { name: { $in: ["admin", "user"] } } )
+       
             if (roles) {
                 for (let i = 0; i < seeds.accounts.length; i++) {
                     let user = seeds.accounts[i];

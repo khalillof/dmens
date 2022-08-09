@@ -22,6 +22,9 @@ export async function AuthRoutes(app:express.Application){
         self.app.get('/auth/profile/:id',self.authenticate("jwt"),self.mware!.validateCurrentUserOwnParamId, self.actions('findById'));
         self.app.delete('/auth/profile/:id',self.authenticate("jwt"),self.mware!.validateCurrentUserOwnParamId,self.actions('remove'));
         self.app.put('/auth/profile/:id',self.authenticate("jwt"),self.mware!.validateCurrentUserOwnParamId,self.actions('put')); 
+        // get secrets form envirmoment variables
+        self.app.get('/auth/secure',self.authenticate("jwt"),self.mware!.isInRole('admin'),self.actions('secure')); 
+        
         self.param()
         // get profile require query string eg ==>  /auth/profile?email=user@user.co
         self.app.get('/auth/profile',self.authenticate("jwt"),self.mware!.validateHasQueryEmailBelongToCurrentUser, self.actions('profile'));

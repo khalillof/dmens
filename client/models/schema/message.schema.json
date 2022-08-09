@@ -4,7 +4,7 @@
     "useAuth":["list","get","post","put","delete","count"], 
     "useAdmin": [], 
       "schema":{
-        "titile":  {
+        "title":  {
             "type": "String",
             "required": true,
             "minLength": 3,

@@ -1,13 +1,17 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
 import {authenticateUser, generateJwt} from '../../services/index.js';
-
+import { config} from '../../common/index.js';
 export class AuthController extends DefaultController {
 
     constructor(svc:string) {
         super(svc)
     }
   
+    async secure(req: express.Request, res: express.Response, next: express.NextFunction){
+      const data =config.getSecret(req.query['api'] as string) ;
+       this.responce(res).data(data!)
+       }
  async signup(req: express.Request, res: express.Response, next: express.NextFunction){
   let mdl:any=this.db.model!;
      await mdl.register(req.body, req.body.password, this.responce(res).errObjInfo)

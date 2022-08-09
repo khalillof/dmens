@@ -54,6 +54,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         return mdwares;
     }
     // custom routes
+    
     getCount(middlewares=null){
       return this.app.get(this.routeName+'/count', ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('count')!),this.actions('count'))
      }
