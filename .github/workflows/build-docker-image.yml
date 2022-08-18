@@ -1,0 +1,80 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: dynamic mens CI
+cache:
+  path:
+   - node_modules/
+
+stages:
+  - build
+  - publish_to_Docker
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: install npm dependencies
+      run: npm ci
+    - name: build nodejs app
+      run: npm run build --if-present
+   #  run: npm test
+  #==============================
+  publish_to_Docker:
+
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+     - name: Docker Build & Push Action
+       # You may pin to the exact commit or the version.
+       # uses: mr-smithers-excellent/docker-build-push@a7fe6652db5c7274374844e81692992f5a2befb9
+       uses: mr-smithers-excellent/docker-build-push@v5.6
+       with:
+        # Name of the Docker image
+        image: mens
+
+        # Tags override for Docker image
+        #tags: # optional
+        # Target Docker registry
+        registry: docker.io
+
+        # Location of Dockerfile, if not Dockerfile in root directory
+        #dockerfile: # optional, default is Dockerfile
+        # Directory to run `docker build` from, if not project root
+        #directory: # optional
+        # Docker build arguments passed via --build-arg
+        #buildArgs: # optional
+        # Docker build labels passed via --label
+        #labels: # optional
+        # Docker build target passed via --target
+        #target: # optional
+        # Docker registry username
+        username: ${{ secrets.DOCKER_USERNAME }}
+
+        # Docker registry password
+        password: ${{ secrets.DOCKER_PSSWORD }}
+
+        # Adds latest tag to auto-generated GitOps tag
+        addLatest: true # optional, default is false
+
+        # Suffixes a build timestamp to the branch-based Docker tag
+        #addTimestamp: # optional, default is false
