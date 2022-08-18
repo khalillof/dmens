@@ -1,0 +1,16 @@
+build/**/*
+build
+
+node_modules/**/*
+node_modules
+
+src/**/*
+src
+.git/**/*
+.git
+views/**/*
+views
+
+admin_data.txt
+tsconfig.json
+README.md

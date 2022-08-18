@@ -5,14 +5,6 @@ bin/private.key
 
 ts-output
 
-purejs/bin/cert.csr
-purejs/bin/private.key
-purejs/bin/certificate.pem
-
-purets/bin/cert.csr
-purets/bin/private.key
-purets/bin/certificate.pem
-
 dist
 build
 .env

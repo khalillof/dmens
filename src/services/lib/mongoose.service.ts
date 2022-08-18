@@ -27,9 +27,9 @@ export async function dbInit(){
 }
 */
 export async function dbInit(){
-  console.log('db connction string :'+config.mongoUrl.dev());
+  console.log('db connction string :'+config.mongoUrl.cosmodb());
 
-  mongoose.connect(config.mongoUrl.dev()!, dbOptions).then(async ()=> (await JsonLoad.loadDefaultDirectory()).length
+  mongoose.connect(config.mongoUrl.cosmodb()!, dbOptions).then(async ()=> (await JsonLoad.loadDefaultDirectory()).length
   ).then((num:any)=>{
     console.log("Successfully Connected to db!");
     console.log('Numbers of models added to the database are :' + num);

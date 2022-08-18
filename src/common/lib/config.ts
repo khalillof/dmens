@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname =fileURLToPath(import.meta.url);
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib','').replace('common',''));
-
+const isDevelopment = ()=> env['NODE_ENV'] === 'development';
 
 export const config = {
     baseDir,
@@ -20,10 +20,12 @@ export const config = {
     jwtRefreshExpiration: ()=> Number((env['JWT_REFRESH_EXPIRATION'] || '86400')),// 24 hour
     issuer:  ()=> env['ISSUER']!,//'accounts.examplesoft.com',
     audience: ()=> env['AUDIENCE']!, //'yoursite.net'
-    schemaDir: ()=> env['SCHEMA_DIR'] || path.join(baseDir, '/models/schema/'),
+    schemaDir: ()=> isDevelopment() ? (env['SCHEMA_DIR_DEV'] ?? baseDir) : (env['SCHEMA_DIR_PROD'] ?? baseDir),
     getSchemaUploadPath: ()=> path.join(config.schemaDir(),`/schema.${Date.now()}.json`),
-    imagesUploadDir: ()=> env['IMAGES_UPLOAD_DIR'] || path.join(baseDir, '/public/'),
-    cores_domains:()=>  env['NODE_ENV'] === 'development'? env['CORES_DMAINS_DEV']?.split(',') || [] : env['CORES_DMAINS_PROD']?.split(',') || [],
+    imagesUploadDir: ()=> isDevelopment() ? (env['IMAGES_UPLOAD_DIR_DEV'] ?? baseDir) : (env['IMAGES_UPLOAD_DIR_PROD'] ?? baseDir),
+    cores_domains:()=>  isDevelopment() ? env['CORES_DMAINS_DEV']?.split(',') || [] : env['CORES_DMAINS_PROD']?.split(',') || [],
+    static_urls:()=>  isDevelopment() ? env['STATIC_URL_DEV']?.split(',') || [] : env['STATIC_URL_PROD']?.split(',') || [],
+    allow_origin:()=>  isDevelopment() ? env['ORIGIN_DEV']?? baseDir : env['ORIGIN_PROD']?? baseDir,
     mongoUrl: {
         'cosmodb':()=> env['COSMOSDB_CON']!,
         'dev': ()=> env['DB_CONNECTION_DEV']!,

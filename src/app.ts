@@ -36,7 +36,7 @@ const mens = (async (envpath?: string) => {
   app.set('views', path.join(config.baseDir, 'views'));
   app.set('view engine', 'ejs');
   // static urls
-  [ '../public','../public/coming_soon', '../public/angular', '../public/reactjs'].forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
+  config.static_urls().forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
 
   await dbInit();
 
@@ -62,12 +62,12 @@ const mens = (async (envpath?: string) => {
     // cors activation
      // app.use(corsWithOptions);
      //app.options("*", cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
-      app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
+      app.use(cors({ origin: config.allow_origin(), optionsSuccessStatus: 200 }));
 
     setTimeout(async () => {
     
        function allowCrossDomain(req:any, res:any, next:any) {
-        res.header('Access-Control-Allow-Origin', "http://localhost:3000");
+        res.header('Access-Control-Allow-Origin', config.allow_origin());
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
