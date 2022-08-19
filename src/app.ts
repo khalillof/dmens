@@ -9,8 +9,8 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
 import { config, printRoutesToString } from './common/index.js';
-import { dbInit, SeedDatabase , ClientSeedDatabase} from './services/index.js';
-import { initRouteStore,corsWithOptions } from './routes/index.js';
+import { dbInit, ClientSeedDatabase} from './services/index.js';
+import { initRouteStore} from './routes/index.js';
 import { menServer } from './bin/www.js';
 import cors from "cors";
 
@@ -36,7 +36,7 @@ const mens = (async (envpath?: string) => {
   app.set('views', path.join(config.baseDir, 'views'));
   app.set('view engine', 'ejs');
   // static urls
-  config.static_urls().forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
+  config.static_urls().forEach((url:string) => app.use(express.static(path.join(config.baseDir, url))));
 
   await dbInit();
 
@@ -45,9 +45,11 @@ const mens = (async (envpath?: string) => {
     app.use(session({
       secret: config.secretKey(),
       resave: true,
-      saveUninitialized: true,
+      saveUninitialized: true, 
       cookie: {
-        maxAge: 1000 * 30
+        maxAge: 1000 * 30, 
+        secure:true, 
+        httpOnly:true, 
       }
     }));
 
