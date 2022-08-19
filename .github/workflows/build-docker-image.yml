@@ -44,6 +44,7 @@ jobs:
     needs: [build]
 
     steps:
+     - uses: actions/checkout@v3
      - name: Docker Build & Push Action
        # You may pin to the exact commit or the version.
        # uses: mr-smithers-excellent/docker-build-push@a7fe6652db5c7274374844e81692992f5a2befb9
