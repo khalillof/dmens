@@ -49,7 +49,7 @@ export class AdminController extends DefaultController {
                 // save data to file
                 this.saveJsnoToFile(fileDataCopy); 
 
-        } else if(req.file) {
+        } else if(req.file && req.file.mimetype === 'application/json') {
 
             fs.readFile(req.file.path, 'utf8', async (err, data)=> {
                 if (err) {

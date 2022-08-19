@@ -3,41 +3,52 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname =fileURLToPath(import.meta.url);
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib','').replace('common',''));
+
 const isDevelopment = ()=> env['NODE_ENV'] === 'development';
 
+function devOrProd(dev:string, prod:any, or:string | any =baseDir){
+  return  isDevelopment() ? getOr(dev, or) : getOr(prod,or);
+}
+
+function getOr(key:string, or:any=null){
+    return  env[key] ??  or ;
+  }
 export const config = {
+    isDevelopment,
     baseDir,
-    port:()=> env['PORT'] || 3000,
-    admin_email:()=> env['ADMIN_EMAIL']!,
-    admin_userName: ()=> env['ADMIN_USERNAME']!,
-    admin_password: ()=> env['ADMIN_PASSWORD']!,
-    getSecret:(key:string)=> env[key] ?? null,
-    useAuth: ()=> env['AUTH'] || true,
-    useCore: ()=> env['USE_CORES'] || true,
-    secretKey: ()=>  env['SECRET_KEY']!,
-    jwtSecret:()=> env['JWT_SECRET']!,
-    jwtExpiration:()=> Number((env['JWT_EXPIRATION'] || '3600')),// 1 hour
-    jwtRefreshExpiration: ()=> Number((env['JWT_REFRESH_EXPIRATION'] || '86400')),// 24 hour
-    issuer:  ()=> env['ISSUER']!,//'accounts.examplesoft.com',
-    audience: ()=> env['AUDIENCE']!, //'yoursite.net'
-    schemaDir: ()=> isDevelopment() ? (env['SCHEMA_DIR_DEV'] ?? baseDir) : (env['SCHEMA_DIR_PROD'] ?? baseDir),
+    port:()=> getOr('PORT',3000),
+    admin_email:()=> getOr('ADMIN_EMAIL'),
+    admin_userName: ()=> getOr('ADMIN_USERNAME'),
+    admin_password: ()=> getOr('ADMIN_PASSWORD'),
+    getSecret:getOr,
+    useAuth: ()=> getOr('AUTH', true),
+    useCore: ()=> getOr('USE_CORES',true),
+    secretKey: ()=>  getOr('SECRET_KEY'),
+    jwtSecret:()=> getOr('JWT_SECRET'),
+    jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
+    jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
+    issuer:  ()=> getOr('ISSUER'),//'accounts.examplesoft.com',
+    audience: ()=> getOr('AUDIENCE'), //'yoursite.net'
+    schemaDir: ()=> devOrProd('SCHEMA_DIR_DEV','SCHEMA_DIR_PROD'),
     getSchemaUploadPath: ()=> path.join(config.schemaDir(),`/schema.${Date.now()}.json`),
-    imagesUploadDir: ()=> isDevelopment() ? (env['IMAGES_UPLOAD_DIR_DEV'] ?? baseDir) : (env['IMAGES_UPLOAD_DIR_PROD'] ?? baseDir),
-    cores_domains:()=>  isDevelopment() ? env['CORES_DMAINS_DEV']?.split(',') || [] : env['CORES_DMAINS_PROD']?.split(',') || [],
-    static_urls:()=>  isDevelopment() ? env['STATIC_URL_DEV']?.split(',') || [] : env['STATIC_URL_PROD']?.split(',') || [],
-    allow_origin:()=>  isDevelopment() ? env['ORIGIN_DEV']?? baseDir : env['ORIGIN_PROD']?? baseDir,
+    imagesUploadDir: ()=> devOrProd('IMAGES_UPLOAD_DIR_DEV','IMAGES_UPLOAD_DIR_PROD'),
+    cores_domains:()=>  devOrProd('CORES_DMAINS_DEV','CORES_DMAINS_PROD', [])?.split(','),
+    static_urls:()=>  devOrProd('STATIC_URL_DEV','STATIC_URL_PROD',[])?.split(','),
+    allow_origin:()=>  devOrProd('ORIGIN_DEV','ORIGIN_PROD'),
     mongoUrl: {
-        'cosmodb':()=> env['COSMOSDB_CON']!,
-        'dev': ()=> env['DB_CONNECTION_DEV']!,
-        'prod': ()=>  env['DB_CONNECTION_PROD'],
-        'admin': ()=> env['DB_CONNECTION_ADMIN'],
-        'cluster': ()=> env['DB_CONNECTION_CLUSTER'],
-        'docker': () => env['DB_DOCKER']
+        'cosmodb':()=> getOr('COSMOSDB_CON'),
+        'dev': ()=> getOr('DB_CONNECTION_DEV'),
+        'prod': ()=>  getOr('DB_CONNECTION_PROD'),
+        'admin': ()=> getOr('DB_CONNECTION_ADMIN'),
+        'cluster': ()=> getOr('DB_CONNECTION_CLUSTER'),
+        'docker': () => getOr('DB_DOCKER')
     },
     facebook: {
-        'clientId': ()=> env['FACEBOOK_CLIENT_ID']!,
-        'clientSecret':()=> env['FACEBOOK_CLIENT_SECRET']!,
-        'callbackUrl': ()=> env['FACEBOOK_CALLBACK_URL']!,
+        'clientId': ()=> getOr('FACEBOOK_CLIENT_ID'),
+        'clientSecret':()=> getOr('FACEBOOK_CLIENT_SECRET'),
+        'callbackUrl': ()=> getOr('FACEBOOK_CALLBACK_URL'),
     }
 };
+
+
 
