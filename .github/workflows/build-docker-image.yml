@@ -23,8 +23,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -51,10 +50,10 @@ jobs:
        uses: mr-smithers-excellent/docker-build-push@v5.6
        with:
         # Name of the Docker image
-        image: mens
+        image: ${{ secrets.DOCKER_USERNAME }}/mens
 
         # Tags override for Docker image
-        #tags: # optional
+        tags: latest
         # Target Docker registry
         registry: docker.io
 
@@ -75,7 +74,7 @@ jobs:
         password: ${{ secrets.DOCKER_PSSWORD }}
 
         # Adds latest tag to auto-generated GitOps tag
-        addLatest: true # optional, default is false
+        #addLatest: true # optional, default is false
 
         # Suffixes a build timestamp to the branch-based Docker tag
         #addTimestamp: # optional, default is false
