@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-        
+    environment: .env 
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -36,6 +36,10 @@ jobs:
     - name: build nodejs app
       run: npm run build --if-present
    #  run: npm test
+    - name: copy enviroment variables ===============================
+      run: echo {{$.env}} >> .env
+    - name: printing variable for test only ============================
+      run: echo {{$.env}}
   #==============================
   publish_to_Docker:
 
