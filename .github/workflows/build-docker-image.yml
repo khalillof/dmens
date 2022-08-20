@@ -94,7 +94,7 @@ jobs:
               ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
               ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}}
               SECRET_KEY=${{ secrets.SECRET_KEY }}
-              JWT_SECRET: ${{ secrets.JWT_SECRET }}
+              JWT_SECRET=${{ secrets.JWT_SECRET }}
               JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}
               JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }}
               ISSUER=${{secrets.ISSUER }}
