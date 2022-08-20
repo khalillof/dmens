@@ -33,6 +33,8 @@ jobs:
         cache: 'npm'
     - name: install npm dependencies
       run: npm ci
+    - name: create folder ts-output
+      run: mkdir ./ts-output
     - name: build nodejs app
       run: npm run tsc 
    #  run: npm test
