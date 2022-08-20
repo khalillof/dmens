@@ -22,14 +22,14 @@ USER node
 RUN mkdir -p ${appDir}
 WORKDIR ${appDir}
 
-RUN mkdir ./ts-output
+RUN mkdir ${appDir}/ts-output
 #COPY --chown=userGroup:userGroup . . ## this feature is only supported in lunix containers otherwie use #RUN chown -R node:node  .
 COPY --chown=node:node . .
 
 COPY --from=builder /app/node_modules  ${appDir}/node_modules
 
-RUN chmod +x ./client/create-env-file.sh
-RUN ./client/create-env-file.sh
+RUN chmod +x  ${appDir}/client/create-env-file.sh
+RUN ${appDir}/client/create-env-file.sh
 RUN echo $ADMIN_USERNAME
 
 CMD ["npm", "run","client"]
