@@ -39,13 +39,13 @@ jobs:
     - name: copy enviroment variables ===============================
       run: |
           touch .env
-          echo PORT=${{.env.PORT }} >> .env
-          echo NODE_ENV=${{.env.NODE_ENV }} >> .env
-          echo ADMIN_EMAIL=${{.env.ADMIN_EMAIL }} >> .env
-          echo ADMIN_USERNAME=${{.env.ADMIN_USERNAME }} >> .env
-          echo ADMIN_PASSWORD=${{.env.ADMIN_USERNAME}} >> .env
-          echo SECRET_KEY=${{.env.SECRET_KEY }} >> .env
-          echo JWT_SECRET=${{.env.JWT_SECRET }} >> .env
+          echo PORT=${{ .env.PORT }} >> .env
+          echo NODE_ENV=${{ .env.NODE_ENV }} >> .env
+          echo ADMIN_EMAIL=${{ .env.ADMIN_EMAIL }} >> .env
+          echo ADMIN_USERNAME=${{ .env.ADMIN_USERNAME }} >> .env
+          echo ADMIN_PASSWORD=${{ .env.ADMIN_USERNAME}} >> .env
+          echo SECRET_KEY=${{ .env.SECRET_KEY }} >> .env
+          echo JWT_SECRET=${{ .env.JWT_SECRET }} >> .env
           echo JWT_EXPIRATION=${{.env.JWT_EXPIRATION }}  >> .env
           echo JWT_REFRESH_EXPIRATION=${{.env.JWT_REFRESH_EXPIRATION }} >> .env
           echo ISSUER=${{.env.ISSUER }} >> .env
