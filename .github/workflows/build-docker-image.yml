@@ -41,7 +41,7 @@ jobs:
           touch .env
           echo PORT=5000 >> .env
           echo NODE_ENV=DEV >> .env
-          echo ADMIN_EMAIL=${{ secrets.DOCKER_USERNAME }} >> .env
+          echo ADMIN_EMAIL=${{ secrets.ISSUER }} >> .env
           cat .env
     - name: printing variable for test only ============================
       run: cat .env
