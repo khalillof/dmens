@@ -37,8 +37,7 @@ jobs:
       run: npm run build --if-present
    #  run: npm test
     - name: copy enviroment variables ===============================
-      run: |
-          touch .env
+      run: touch .env
           echo PORT=${{ .env.PORT }} >> .env
           echo NODE_ENV=${{ .env.NODE_ENV }} >> .env
           echo ADMIN_EMAIL=${{ .env.ADMIN_EMAIL }} >> .env
