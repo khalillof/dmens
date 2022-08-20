@@ -37,13 +37,14 @@ jobs:
       run: npm run build --if-present
    #  run: npm test
     - name: copy enviroment variables ===============================
-      run: touch .env
+      run: |
+          touch .env
           echo PORT=5000 >> .env
           echo NODE_ENV=DEV >> .env
           echo ADMIN_EMAIL=${{ secrets.DOCKER_USERNAME }} >> .env
           cat .env
     - name: printing variable for test only ============================
-      run: echo .env
+      run: cat .env
     - name: moving env file to 
       run : mv .env ./client
   #==============================
