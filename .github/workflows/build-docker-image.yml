@@ -32,8 +32,8 @@ jobs:
           cache: "npm"
       - name: install npm dependencies =================
         run: npm ci
-      - name: create folder ts-output ===================
-        run: mkdir ./ts-output
+      #- name: create folder ts-output ===================
+      #  run: mkdir ./ts-output
       - name: build nodejs app =======================
         run: npm run tsc
         env:
@@ -57,10 +57,10 @@ jobs:
           CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
           STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
       #  run: npm test
-      - name: authorize create-env-file.sh to run ===============================
-        run: chmod +x ./client/create-env-file.sh
-      - name: create enviroment variables file ===============================
-        run: ./client/create-env-file.sh
+      #- name: authorize create-env-file.sh to run ===============================
+      #  run: chmod +x ./client/create-env-file.sh
+      #- name: create enviroment variables file ===============================
+      #  run: ./client/create-env-file.sh
 
   #==============================
   publish_to_Docker:
@@ -87,7 +87,26 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          #buildArgs: # optional
+          buildArgs: |
+              PORT=${{ secrets.PORT }}
+              NODE_ENV=${{ secrets.NODE_ENV }}
+              ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+              ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+              ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}}
+              SECRET_KEY=${{ secrets.SECRET_KEY }}
+              JWT_SECRET: ${{ secrets.JWT_SECRET }}
+              JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}
+              JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }}
+              ISSUER=${{secrets.ISSUER }}
+              AUDIENCE=${{secrets.AUDIENCE }}
+              GCP_MAP_API_KEY=${{secrets.GCP_MAP_API_KEY }}
+              COSMOSDB_CON=${{secrets.COSMOSDB_CON }}
+              DB_CONNECTION_CLUSTER=${{secrets.DB_CONNECTION_CLUSTER }}
+              SCHEMA_DIR_PROD=${{secrets.SCHEMA_DIR_PROD }}
+              IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }}
+              ORIGIN_PROD=${{secrets.ORIGIN_PROD }}
+              CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }}
+              STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }}          
           # Docker build labels passed via --label
           #labels: # optional
           # Docker build target passed via --target
