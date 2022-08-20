@@ -31,39 +31,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: install npm dependencies
+    - name: install npm dependencies =================
       run: npm ci
-    - name: create folder ts-output
+    - name: create folder ts-output ===================
       run: mkdir ./ts-output
-    - name: build nodejs app
+    - name: build nodejs app =======================
       run: npm run tsc 
    #  run: npm test
-    - name: copy enviroment variables ===============================
-      run: touch .env
-          echo PORT=${{ secrets.PORT }} >> .env
-          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
-          echo ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }} >> .env
-          echo ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }} >> .env
-          echo ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}} >> .env
-          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
-          echo JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}  >> .env
-          echo JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }} >> .env
-          echo ISSUER=${{secrets.ISSUER }} >> .env
-          echo AUDIENCE=${{secrets.AUDIENCE }} >> .env
-          echo GCP_MAP_API_KEY=${{secrets.GCP_MAP_API_KEY }} >> .env
-          echo COSMOSDB_CON=${{secrets.COSMOSDB_CON }} >> .env
-          echo DB_CONNECTION_CLUSTER=${{secrets.DB_CONNECTION_CLUSTER }} >> .env
-          echo SCHEMA_DIR_PROD=${{secrets.SCHEMA_DIR_PROD }} >> .env
-          echo IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }} >> .env
-          echo ORIGIN_PROD=${{secrets.ORIGIN_PROD }} >> .env
-          echo CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }} >> .env
-          echo STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }} >> .env
-        
-    #- name: printing variable for test only ============================
-      #run: cat .env
-    - name: moving env file to 
-      run : mv .env ./client
+    - name: authorize create-env-file.sh to run ===============================
+      run: chmod +x ./client/create-env-file.sh
+    - name: create enviroment variables file ===============================
+      run: ./client/create-env-file.sh
+
   #==============================
   publish_to_Docker:
 
