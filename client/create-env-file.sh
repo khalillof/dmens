@@ -23,5 +23,5 @@ echo STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }} >> .env
 
 echo "printing the first two line from the .env file"
 head -2 ./.env
-echo "moving env file to client directory"
-mv .env ./client
+#echo "moving env file to client directory"
+#mv .env ./client

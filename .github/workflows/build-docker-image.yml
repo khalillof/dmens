@@ -39,9 +39,9 @@ jobs:
       run: npm run tsc 
    #  run: npm test
     - name: authorize create-env-file.sh to run ===============================
-      run: chmod +x ./create-env-file.sh
+      run: chmod +x ./client/create-env-file.sh
     - name: create enviroment variables file ===============================
-      run: ./create-env-file.sh
+      run: ./client/create-env-file.sh
 
   #==============================
   publish_to_Docker:
