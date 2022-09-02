@@ -18,15 +18,13 @@ jobs:
         node-version: [18.x]
     environment: .env
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: install npm dependencies =================
-        run: npm ci
+      -  run: npm ci
       - name: create folder ts-output ===================
         run: mkdir ./ts-output
       - name: build nodejs app =======================
@@ -52,10 +50,8 @@ jobs:
           CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
           STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
         #run: npm test
-      - name: authorize create-env-file.sh to run ===============================
-        run: chmod +x ./client/create-env-file.sh
-      - name: create enviroment variables file ===============================
-        run: ./client/create-env-file.sh && sleep 2
+      -  run: chmod +x ./client/create-env-file.sh
+      -  run: ./client/create-env-file.sh && sleep 2
 
       - name: Docker Build & Push Action
         uses: mr-smithers-excellent/docker-build-push@v5.6
