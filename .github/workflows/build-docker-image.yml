@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: dynamic mens CI
+name: dynamic mens CICD
 #cache:
 #path:
 #- node_modules/
@@ -26,14 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - name: install npm dependencies =================
-        run: npm ci
-      - name: create folder ts-output ===================
-        run: mkdir ./ts-output
+      - run: npm ci
+      #- name: create folder ts-output ===================
+      #  run: mkdir ./ts-output
       - name: build nodejs app =======================
         run: npm run tsc
         env:
@@ -56,22 +56,15 @@ jobs:
           ORIGIN_PROD: ${{secrets.ORIGIN_PROD }}
           CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
           STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
-      #  run: npm test
+        #run: npm test
       - name: authorize create-env-file.sh to run ===============================
-        run: chmod +x ./client/create-env-file.sh
+      - run: chmod +x ./client/create-env-file.sh
       - name: create enviroment variables file ===============================
-        run: ./client/create-env-file.sh
-
-  #==============================
-  publish_to_Docker:
-    runs-on: ubuntu-latest
-    needs: [build]
-
-    steps:
-      - uses: actions/checkout@v3
+      -  run: ./client/create-env-file.sh
+      - run: sleep 2
+      - name: The job has succeeded
+        if: ${{ success() }}
       - name: Docker Build & Push Action
-        # You may pin to the exact commit or the version.
-        # uses: mr-smithers-excellent/docker-build-push@a7fe6652db5c7274374844e81692992f5a2befb9
         uses: mr-smithers-excellent/docker-build-push@v5.6
         with:
           # Name of the Docker image
@@ -87,7 +80,26 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          #buildArgs: # optional
+          #buildArgs: |
+              #PORT=${{ secrets.PORT }}
+              #NODE_ENV=${{ secrets.NODE_ENV }}
+              #ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+              #ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+              #ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}}
+              #SECRET_KEY=${{ secrets.SECRET_KEY }}
+              #JWT_SECRET=${{ secrets.JWT_SECRET }}
+              #JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}
+              #JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }}
+              #ISSUER=${{secrets.ISSUER }}
+              #AUDIENCE=${{secrets.AUDIENCE }}
+              #GCP_MAP_API_KEY=${{secrets.GCP_MAP_API_KEY }}
+              #COSMOSDB_CON=${{secrets.COSMOSDB_CON }}
+              #DB_CONNECTION_CLUSTER=${{secrets.DB_CONNECTION_CLUSTER }}
+              #SCHEMA_DIR_PROD=${{secrets.SCHEMA_DIR_PROD }}
+              #IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }}
+              #ORIGIN_PROD=${{secrets.ORIGIN_PROD }}
+              #CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }}
+              #STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }}          
           # Docker build labels passed via --label
           #labels: # optional
           # Docker build target passed via --target
