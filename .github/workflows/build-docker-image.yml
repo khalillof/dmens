@@ -61,12 +61,12 @@ jobs:
           image: ${{ secrets.DOCKER_USERNAME }}/mens
 
           # Tags override for Docker image
-          tags: ${{ secrets.DOCKER_USERNAME }}/mens:latest
+          tags: latest
           # Target Docker registry
           registry: docker.io
 
           # Location of Dockerfile, if not Dockerfile in root directory
-          #dockerfile: # optional, default is Dockerfile
+          dockerfile: Dockerfile
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg

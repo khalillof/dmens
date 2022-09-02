@@ -22,7 +22,7 @@ USER node
 RUN mkdir -p ${appDir}
 WORKDIR ${appDir}
 
-RUN mkdir ${appDir}/ts-output
+#RUN mkdir ${appDir}/ts-output
 #COPY --chown=userGroup:userGroup . . ## this feature is only supported in lunix containers otherwie use #RUN chown -R node:node  .
 COPY --chown=node:node . .
 
