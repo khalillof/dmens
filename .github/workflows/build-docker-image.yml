@@ -61,7 +61,7 @@ jobs:
           image: ${{ secrets.DOCKER_USERNAME }}/mens
 
           # Tags override for Docker image
-          tags: latest
+          tags: v1, latest
           # Target Docker registry
           registry: docker.io
 
@@ -70,7 +70,7 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          buildArgs: |
+          buildArgs: 
             PORT=${{ secrets.PORT }}
             NODE_ENV=${{ secrets.NODE_ENV }}
             ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
