@@ -58,10 +58,10 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5.6
         with:
           # Name of the Docker image
-          image: tuban/mens
+          image: ${{ secrets.DOCKER_USERNAME }}/mens
 
           # Tags override for Docker image
-          tags: latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/mens:latest
           # Target Docker registry
           registry: docker.io
 
