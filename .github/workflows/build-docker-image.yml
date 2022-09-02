@@ -70,26 +70,7 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          buildArgs: |
-            "PORT=${{ secrets.PORT }}"
-            "NODE_ENV=${{ secrets.NODE_ENV }}"
-            "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}"
-            "ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}"
-            "ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}}"
-            "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-            "JWT_SECRET=${{ secrets.JWT_SECRET }}"
-            "JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}"
-            "JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }}"
-            "ISSUER=${{secrets.ISSUER }}"
-            "AUDIENCE=${{secrets.AUDIENCE }}"
-            "GCP_MAP_API_KEY=${{secrets.GCP_MAP_API_KEY }}"
-            "COSMOSDB_CON=${{secrets.COSMOSDB_CON }}"
-            "DB_CONNECTION_CLUSTER=${{secrets.DB_CONNECTION_CLUSTER }}"
-            "SCHEMA_DIR_PROD=${{secrets.SCHEMA_DIR_PROD }}"
-            "IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }}"
-            "ORIGIN_PROD=${{secrets.ORIGIN_PROD }}"
-            "CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }}"
-
+          buildArgs: PORT=${{ secrets.PORT }},NODE_ENV=${{ secrets.NODE_ENV }},ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }} ,ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
 
           #STATIC_URL_PROD="${{secrets.STATIC_URL_PROD }}"
 
