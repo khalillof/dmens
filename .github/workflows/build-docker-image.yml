@@ -16,7 +16,8 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-    environment: .env
+    environment:
+        name: .env
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -30,6 +31,7 @@ jobs:
       - name: build nodejs app =======================
         run: npm run tsc
         env:
+          EnvUrl: ./client/.env
           PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
@@ -50,8 +52,31 @@ jobs:
           CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
           STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
         #run: npm test
-      -  run: chmod +x ./client/create-env-file.sh
-      -  run: ./client/create-env-file.sh && sleep 2
+      #-  run: chmod +x ./client/create-env-file.sh
+      #-  run: ./client/create-env-file.sh && sleep 2
+      - run : |
+         touch $EnvUrl
+         echo "PORT=$PORT"  >> $EnvUrl
+         echo "NODE_ENV=$NODE_ENV" >> $EnvUrl
+         echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> $EnvUrl
+         echo "ADMIN_USERNAME=$ADMIN_USERNAME" >> $EnvUrl
+         echo "ADMIN_PASSWORD=$ADMIN_USERNAME" >> $EnvUrl
+         echo "SECRET_KEY=$SECRET_KEY" >> $EnvUrl
+         echo "JWT_SECRET=$JWT_SECRET" >> $EnvUrl
+         echo "JWT_EXPIRATION=$JWT_EXPIRATION"   >> $EnvUrl
+         echo "JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION"  >> $EnvUrl
+         echo "ISSUER=$ISSUER"  >> $EnvUrl
+         echo "AUDIENCE=$AUDIENCE"  >> $EnvUrl
+         echo "GCP_MAP_API_KEY=$GCP_MAP_API_KEY"  >> $EnvUrl
+         echo "COSMOSDB_CON=$COSMOSDB_CON" >> $EnvUrl
+         echo "DB_CONNECTION_CLUSTER=$DB_CONNECTION_CLUSTER"  >> $EnvUrl
+         echo "SCHEMA_DIR_PROD=$SCHEMA_DIR_PROD"  >> $EnvUrl
+         echo "IMAGES_UPLOAD_DIR_PROD=$IMAGES_UPLOAD_DIR_PROD" >> $EnvUrl
+         echo "ORIGIN_PROD=$ORIGIN_PROD" >> $EnvUrl
+         echo "CORES_DMAINS_PROD=$CORES_DMAINS_PROD" >> $EnvUrl
+         echo "STATIC_URL_PROD=$STATIC_URL_PROD" >> $EnvUrl
+         echo "printing the first two line from the .env file"
+         head -2 $EnvUrl
 
       - name: Docker Build & Push Action
         uses: mr-smithers-excellent/docker-build-push@v5.6

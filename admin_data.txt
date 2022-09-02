@@ -3,7 +3,7 @@ docker image build ./  --tag tuban/pro-react:latest
 docker image push tuban/pro-react:latest    
 
 # access image 
-docker run -it --rm --entrypoint sh tuban-man
+docker run -it --rm --entrypoint sh tuban/mens
 
 {"name": "CoCo",
 "loadref":true,
