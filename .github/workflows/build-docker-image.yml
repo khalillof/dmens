@@ -89,7 +89,7 @@ jobs:
             IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }}
             ORIGIN_PROD=${{secrets.ORIGIN_PROD }}
             CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }}
-            STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }}
+            STATIC_URL_PROD="${{secrets.STATIC_URL_PROD }}"
 
           # labels: # optional
           # Docker build target passed via --target
