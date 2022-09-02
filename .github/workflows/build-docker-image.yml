@@ -70,8 +70,8 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          buildArgs: 
-            PORT="${{ secrets.PORT }}"
+          buildArgs: |
+            PORT=${{ secrets.PORT }}
             NODE_ENV="${{ secrets.NODE_ENV }}"
             ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
             ADMIN_USERNAME="${{ secrets.ADMIN_USERNAME }}"
