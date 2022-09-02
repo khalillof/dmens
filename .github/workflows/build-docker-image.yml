@@ -2,13 +2,7 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: dynamic mens CICD
-#cache:
-#path:
-#- node_modules/
 
-#stages:
-#- build
-#- publish_to_Docker
 on:
   push:
     branches: [master]
@@ -26,12 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-      - uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - name: install npm dependencies =================
-      - run: npm ci
+        run: npm ci
       #- name: create folder ts-output ===================
       #  run: mkdir ./ts-output
       - name: build nodejs app =======================
@@ -58,10 +52,10 @@ jobs:
           STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
         #run: npm test
       - name: authorize create-env-file.sh to run ===============================
-      - run: chmod +x ./client/create-env-file.sh
+        run: chmod +x ./client/create-env-file.sh
       - name: create enviroment variables file ===============================
-      -  run: ./client/create-env-file.sh
-      - run: sleep 2
+        run: ./client/create-env-file.sh && sleep 2
+
       - name: The job has succeeded
         if: ${{ success() }}
       - name: Docker Build & Push Action
