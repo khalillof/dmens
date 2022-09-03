@@ -1,6 +1,6 @@
 #!/bin/sh
 
-envFile=./.env
+envFile=/home/node/app/.env
 
 touch $envFile
 echo "PORT=$PORT"  >> $envFile
@@ -27,5 +27,5 @@ echo "printing the first two line from the .env file"
 head -2 $envFile
 #echo "moving env file to client directory"
 #mv .env ./client
-
+echo  $envFile
 npm run client
