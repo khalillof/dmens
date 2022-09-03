@@ -4,6 +4,11 @@ docker image push tuban/pro-react:latest
 
 # access image 
 docker run -it --rm --entrypoint sh tuban/mens
+# run container with .env file variables
+docker run --env-file ./.env  -it --rm --entrypoint sh tuban:latest
+
+# print out container enviroments variables
+ docker exec container-name-id /usr/bin/env
 
 {"name": "CoCo",
 "loadref":true,

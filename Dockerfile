@@ -29,7 +29,8 @@ COPY --chown=node:node . .
 COPY --from=builder /app/node_modules  ${appDir}/node_modules
 
 RUN chmod +x  ${appDir}/client/create-env-file.sh
-RUN ${appDir}/client/create-env-file.sh
-RUN echo $ADMIN_USERNAME
+#RUN ${appDir}/client/create-env-file.sh
+#RUN echo $ADMIN_USERNAME
 
-CMD ["npm", "run","client"]
+CMD [ "./client/create-env-file.sh" ]
+#CMD ["npm", "run","client"]

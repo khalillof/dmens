@@ -30,29 +30,6 @@ jobs:
         run: mkdir ./ts-output
       - name: build nodejs app =======================
         run: npm run tsc
-      #  env:
-      #    EnvUrl: ./client/.env
-      #    PORT: ${{ secrets.PORT }}
-      #    NODE_ENV: ${{ secrets.NODE_ENV }}
-      #    ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-      #    ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-      #    ADMIN_PASSWORD: ${{ secrets.ADMIN_USERNAME}}
-      #    SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      #    JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      #    JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION }}
-      #    JWT_REFRESH_EXPIRATION: ${{secrets.JWT_REFRESH_EXPIRATION }}
-      #    ISSUER: ${{secrets.ISSUER }}
-      #    AUDIENCE: ${{secrets.AUDIENCE }}
-      #    GCP_MAP_API_KEY: ${{secrets.GCP_MAP_API_KEY }}
-      #    COSMOSDB_CON: ${{secrets.COSMOSDB_CON }}
-      #    DB_CONNECTION_CLUSTER: ${{secrets.DB_CONNECTION_CLUSTER }}
-      #    SCHEMA_DIR_PROD: ${{secrets.SCHEMA_DIR_PROD }}
-      #    IMAGES_UPLOAD_DIR_PROD: ${{secrets.IMAGES_UPLOAD_DIR_PROD }}
-      #    ORIGIN_PROD: ${{secrets.ORIGIN_PROD }}
-      #    CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
-      #    STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
-      #-  run: chmod +x ./client/create-env-file.sh
-      #-  run: ./client/create-env-file.sh && sleep 2
 
       - name: Docker Build & Push Action
         uses: mr-smithers-excellent/docker-build-push@v5.6
@@ -70,20 +47,9 @@ jobs:
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          buildArgs: PORT=${{ secrets.PORT }},NODE_ENV=${{ secrets.NODE_ENV }},ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }} ,ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
-
-          #STATIC_URL_PROD="${{secrets.STATIC_URL_PROD }}"
-
-          # labels: # optional
-          # Docker build target passed via --target
-          #target: # optional
+          #buildArgs: PORT=${{ secrets.PORT }},NODE_ENV=${{ secrets.NODE_ENV }},ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }} ,ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
           username: ${{ secrets.DOCKER_USERNAME }}
 
           # Docker registry password
           password: ${{ secrets.DOCKER_PSSWORD }}
 
-          # Adds latest tag to auto-generated GitOps tag
-          #addLatest: true # optional, default is false
-
-          # Suffixes a build timestamp to the branch-based Docker tag
-          #addTimestamp: # optional, default is false
