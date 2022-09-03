@@ -2,13 +2,7 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: dynamic mens CICD
-#cache:
-#path:
-#- node_modules/
 
-#stages:
-#- build
-#- publish_to_Docker
 on:
   push:
     branches: [master]
@@ -16,54 +10,27 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [18.x]
-    environment: .env
+    environment:
+      name: .env
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-      - uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: install npm dependencies =================
       - run: npm ci
-      #- name: create folder ts-output ===================
-      #  run: mkdir ./ts-output
+      - name: create folder ts-output ===================
+        run: mkdir ./ts-output
       - name: build nodejs app =======================
         run: npm run tsc
-        env:
-          PORT: ${{ secrets.PORT }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_USERNAME}}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION }}
-          JWT_REFRESH_EXPIRATION: ${{secrets.JWT_REFRESH_EXPIRATION }}
-          ISSUER: ${{secrets.ISSUER }}
-          AUDIENCE: ${{secrets.AUDIENCE }}
-          GCP_MAP_API_KEY: ${{secrets.GCP_MAP_API_KEY }}
-          COSMOSDB_CON: ${{secrets.COSMOSDB_CON }}
-          DB_CONNECTION_CLUSTER: ${{secrets.DB_CONNECTION_CLUSTER }}
-          SCHEMA_DIR_PROD: ${{secrets.SCHEMA_DIR_PROD }}
-          IMAGES_UPLOAD_DIR_PROD: ${{secrets.IMAGES_UPLOAD_DIR_PROD }}
-          ORIGIN_PROD: ${{secrets.ORIGIN_PROD }}
-          CORES_DMAINS_PROD: ${{secrets.CORES_DMAINS_PROD }}
-          STATIC_URL_PROD: ${{secrets.STATIC_URL_PROD }}
-        #run: npm test
-      - name: authorize create-env-file.sh to run ===============================
-      - run: chmod +x ./client/create-env-file.sh
-      - name: create enviroment variables file ===============================
-      -  run: ./client/create-env-file.sh
-      - run: sleep 2
-      - name: The job has succeeded
-        if: ${{ success() }}
+
       - name: Docker Build & Push Action
         uses: mr-smithers-excellent/docker-build-push@v5.6
         with:
@@ -71,47 +38,18 @@ jobs:
           image: ${{ secrets.DOCKER_USERNAME }}/mens
 
           # Tags override for Docker image
-          tags: latest
+          tags: v1, latest
           # Target Docker registry
           registry: docker.io
 
           # Location of Dockerfile, if not Dockerfile in root directory
-          #dockerfile: # optional, default is Dockerfile
+          dockerfile: Dockerfile
           # Directory to run `docker build` from, if not project root
           #directory: # optional
           # Docker build arguments passed via --build-arg
-          #buildArgs: |
-              #PORT=${{ secrets.PORT }}
-              #NODE_ENV=${{ secrets.NODE_ENV }}
-              #ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-              #ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
-              #ADMIN_PASSWORD=${{ secrets.ADMIN_USERNAME}}
-              #SECRET_KEY=${{ secrets.SECRET_KEY }}
-              #JWT_SECRET=${{ secrets.JWT_SECRET }}
-              #JWT_EXPIRATION=${{secrets.JWT_EXPIRATION }}
-              #JWT_REFRESH_EXPIRATION=${{secrets.JWT_REFRESH_EXPIRATION }}
-              #ISSUER=${{secrets.ISSUER }}
-              #AUDIENCE=${{secrets.AUDIENCE }}
-              #GCP_MAP_API_KEY=${{secrets.GCP_MAP_API_KEY }}
-              #COSMOSDB_CON=${{secrets.COSMOSDB_CON }}
-              #DB_CONNECTION_CLUSTER=${{secrets.DB_CONNECTION_CLUSTER }}
-              #SCHEMA_DIR_PROD=${{secrets.SCHEMA_DIR_PROD }}
-              #IMAGES_UPLOAD_DIR_PROD=${{secrets.IMAGES_UPLOAD_DIR_PROD }}
-              #ORIGIN_PROD=${{secrets.ORIGIN_PROD }}
-              #CORES_DMAINS_PROD=${{secrets.CORES_DMAINS_PROD }}
-              #STATIC_URL_PROD=${{secrets.STATIC_URL_PROD }}          
-          # Docker build labels passed via --label
-          #labels: # optional
-          # Docker build target passed via --target
-          #target: # optional
-          # Docker registry username
+          #buildArgs: PORT=${{ secrets.PORT }},NODE_ENV=${{ secrets.NODE_ENV }},ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }} ,ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
           username: ${{ secrets.DOCKER_USERNAME }}
 
           # Docker registry password
           password: ${{ secrets.DOCKER_PSSWORD }}
 
-          # Adds latest tag to auto-generated GitOps tag
-          #addLatest: true # optional, default is false
-
-          # Suffixes a build timestamp to the branch-based Docker tag
-          #addTimestamp: # optional, default is false
