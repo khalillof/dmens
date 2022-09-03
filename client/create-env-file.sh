@@ -1,6 +1,6 @@
 #!/bin/sh
 
-envFile=/home/node/app/.env
+envFile=/home/node/app/client/.env
 
 touch $envFile
 echo "PORT=$PORT"  >> $envFile
@@ -22,6 +22,8 @@ echo "IMAGES_UPLOAD_DIR_PROD=$IMAGES_UPLOAD_DIR_PROD" >> $envFile
 echo "ORIGIN_PROD=$ORIGIN_PROD" >> $envFile
 echo "CORES_DMAINS_PROD=$CORES_DMAINS_PROD" >> $envFile
 echo "STATIC_URL_PROD=$STATIC_URL_PROD" >> $envFile
+
+sleep 2
 
 echo "printing the first two line from the .env file"
 head -2 $envFile
