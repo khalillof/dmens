@@ -6,7 +6,7 @@ import {config} from '../../common/index.js'
 var corsOptionsDelegate = (req:any, callback:any):any => {
     var corsOptions;
    // console.log(req.header('Origin'));
-    if(config.cores_domains().indexOf(req.header('Origin')) !== -1) {
+    if(config.allow_origins().indexOf(req.header('Origin')) !== -1) {
         corsOptions = { origin: true , methods: "GET,HEAD,PUT,PATCH,POST,DELETE"};
     }
     else {
