@@ -62,24 +62,23 @@ const mens = (async (envpath?: string) => {
     }));
 
     // cors activation
-     // app.use(corsWithOptions);
-     //app.options("*", cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
-      app.use(cors({ origin: config.allow_origin(), optionsSuccessStatus: 200 }));
 
-    setTimeout(async () => {
-    
-       function allowCrossDomain(req:any, res:any, next:any) {
-        res.header('Access-Control-Allow-Origin', config.allow_origin());
-        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+var corsOptionsDelegate = function (req:any, callback:any) {
+  var corsOptions;
+  if (config.allow_origins().indexOf(req.header('Origin')) !== -1) {
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
 
-        next();
-    };
-    
-    app.use(allowCrossDomain);
-        
+    setTimeout(async () => {  
+
      initRouteStore.forEach(async (rout: any) => await rout(app))
 
+     app.use(cors(corsOptionsDelegate));
+   
    }, 1000)
 
     setTimeout(async () => {
@@ -105,7 +104,7 @@ const mens = (async (envpath?: string) => {
 
     // request looger using a predefined format string
     app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')) // dev|common|combined|short|tiny
-
+    console.log(' allowed cores are :'+config.allow_origins())
     dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
   },3000)
   return app;

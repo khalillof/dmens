@@ -32,9 +32,8 @@ export const config = {
     schemaDir: ()=> devOrProd('SCHEMA_DIR_DEV','SCHEMA_DIR_PROD'),
     getSchemaUploadPath: ()=> path.join(config.schemaDir(),`/schema.${Date.now()}.json`),
     imagesUploadDir: ()=> devOrProd('IMAGES_UPLOAD_DIR_DEV','IMAGES_UPLOAD_DIR_PROD'),
-    cores_domains:()=>  devOrProd('CORES_DMAINS_DEV','CORES_DMAINS_PROD', [])?.split(','),
+    allow_origins:()=>  devOrProd('CORES_DMAINS_DEV','CORES_DMAINS_PROD', [])?.split(','),
     static_urls:()=>  devOrProd('STATIC_URL_DEV','STATIC_URL_PROD',[])?.split(','),
-    allow_origin:()=>  devOrProd('ORIGIN_DEV','ORIGIN_PROD'),
     mongoUrl: {
         'cosmodb':()=> getOr('COSMOSDB_CON'),
         'dev': ()=> getOr('DB_CONNECTION_DEV'),
