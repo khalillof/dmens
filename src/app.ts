@@ -10,9 +10,8 @@ import helmet from 'helmet';
 import passport from 'passport';
 import { config, printRoutesToString } from './common/index.js';
 import { dbInit, ClientSeedDatabase} from './services/index.js';
-import { initRouteStore} from './routes/index.js';
+import { initRouteStore, corsWithOptions} from './routes/index.js';
 import { menServer } from './bin/www.js';
-import cors from "cors";
 
 // connect to db and initialise db models then
 const mens = (async (envpath?: string) => {
@@ -35,6 +34,8 @@ const mens = (async (envpath?: string) => {
   // view engine setup
   app.set('views', path.join(config.baseDir, 'views'));
   app.set('view engine', 'ejs');
+
+      
   // static urls
   config.static_urls().forEach((url:string) => app.use(express.static(path.join(config.baseDir, url))));
 
@@ -62,24 +63,12 @@ const mens = (async (envpath?: string) => {
     }));
 
     // cors activation
-
-var corsOptionsDelegate = function (req:any, callback:any) {
-  var corsOptions;
-  if (config.allow_origins().indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
-}
+    app.use(corsWithOptions);
 
     setTimeout(async () => {  
-
-     initRouteStore.forEach(async (rout: any) => await rout(app))
-
-     app.use(cors(corsOptionsDelegate));
-   
+     initRouteStore.forEach(async (rout: any) => await rout(app))  
    }, 1000)
+
 
     setTimeout(async () => {
       printRoutesToString(app);

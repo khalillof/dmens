@@ -1,6 +1,6 @@
 import express from 'express';
-import cors from "cors";
-import {routeStore, dbStore, pluralizeRoute, Assert} from '../../common/index.js'
+import {corsWithOptions } from "./cors.config.js";
+import {routeStore, dbStore, pluralizeRoute, Assert, config} from '../../common/index.js'
 import {Middlewares} from '../../middlewares/index.js';
 import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate} from '../../interfaces/index.js';
 import { DefaultController} from '../../controllers/index.js';
@@ -76,8 +76,9 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       return this.app.delete(this.routeParam, ...this.buildMdWares(mdl,...this.controller?.db?.checkAuth('delete')!),this.actions('remove'))
     }
     options(routPath:string){
-      this.app.options(routPath, cors({ origin: 'http://localhost:3000', optionsSuccessStatus: 200 }));
+      this.app.options(routPath, corsWithOptions);
     }
+
     param(){
       return this.app.param('id', async (req:any,res:any,next:any, id:string)=>{ 
         try{

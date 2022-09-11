@@ -3,17 +3,22 @@ import {config} from '../../common/index.js'
 
 //const corsOptions = (req:any, callback:Function)=> callback(null, {origin: config.cores_domains().indexOf(req.header('Origin')) !== -1});
 
-var corsOptionsDelegate = (req:any, callback:any):any => {
-    var corsOptions;
-   // console.log(req.header('Origin'));
-    if(config.allow_origins().indexOf(req.header('Origin')) !== -1) {
-        corsOptions = { origin: true , methods: "GET,HEAD,PUT,PATCH,POST,DELETE"};
-    }
-    else {
-        corsOptions = { origin: false };
-    }
-    callback(null, corsOptions);
-};
+var corsOptionsDelegate = function (req:any, callback:any) {
+  
+    const whiteList = config.allow_origins();
+    let origin = req.header('Origin'); 
 
-export const cors = Cors();
-export const corsWithOptions = Cors(corsOptionsDelegate);
+    let corsOptions;
+    if (whiteList.indexOf(origin) !== -1) {
+      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
+  }
+
+
+ const cors = Cors();
+ const corsWithOptions = Cors(corsOptionsDelegate);
+
+ export {cors,corsWithOptions}

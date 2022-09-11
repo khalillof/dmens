@@ -13,6 +13,7 @@ function devOrProd(dev:string, prod:any, or:string | any =baseDir){
 function getOr(key:string, or:any=null){
     return  env[key] ??  or ;
   }
+
 export const config = {
     isDevelopment,
     baseDir,
@@ -32,8 +33,8 @@ export const config = {
     schemaDir: ()=> devOrProd('SCHEMA_DIR_DEV','SCHEMA_DIR_PROD'),
     getSchemaUploadPath: ()=> path.join(config.schemaDir(),`/schema.${Date.now()}.json`),
     imagesUploadDir: ()=> devOrProd('IMAGES_UPLOAD_DIR_DEV','IMAGES_UPLOAD_DIR_PROD'),
-    allow_origins:()=>  devOrProd('CORES_DMAINS_DEV','CORES_DMAINS_PROD', [])?.split(','),
-    static_urls:()=>  devOrProd('STATIC_URL_DEV','STATIC_URL_PROD',[])?.split(','),
+    allow_origins:()=>  devOrProd('CORES_DMAINS_DEV','CORES_DMAINS_PROD', [])?.split(',').map((e:string) => e.trim()),
+    static_urls:()=>  devOrProd('STATIC_URL_DEV','STATIC_URL_PROD',[])?.split(',').map((e:string) => e.trim()),
     mongoUrl: {
         'cosmodb':()=> getOr('COSMOSDB_CON'),
         'dev': ()=> getOr('DB_CONNECTION_DEV'),
