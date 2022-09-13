@@ -1,0 +1,118 @@
+name: Trigger auto deployment for mens
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: [ main ]
+  # Running your workflow when a pull request merges
+  pull_request_target:
+    branches: [master]
+    types:
+      - closed
+  # Allow mannually trigger 
+  #workflow_dispatch:      
+
+jobs:
+  analyze:
+    name: Analyze - code security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+  test:
+    needs: analyze
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+    environment:
+      name: .env
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - name: create folder ts-output ===================
+        run: mkdir ./ts-output
+      - name: build nodejs app =======================
+        run: npm run tsc
+
+  build:
+    # Run this job when pull request merges
+    if: ${{ github.event.pull_request.merged  == true }}
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.MENS_REGISTRY_USERNAME }}
+          password: ${{ secrets.MENS_REGISTRY_PASSWORD }}
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: docker.io/${{ secrets.MENS_REGISTRY_USERNAME }}/mens:${{ github.sha }}
+          file: ./Dockerfile
+          context: ./
+
+  deploy:
+    # Run this job when pull request merges
+    if: ${{ github.event.pull_request.merged  == true }}
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to containerapp
+        uses: azure/CLI@v1
+        env:
+          dockerusername: ${{ secrets.DOCKER_USERNAME }}
+          dockerpassword: ${{ secrets.DOCKER_PSSWORD }}
+          imageurl: ${{ secrets.DOCKER_USERNAME }}/docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
+
+        with:
+          inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az containerapp registry set -n mens -g tuban-container-apps --server docker.io --username  ${dockerusername} --password ${dockerpassword}
+            az containerapp update -n mens -g tuban-container-apps --image ${imageurl}
