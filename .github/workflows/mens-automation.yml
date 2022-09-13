@@ -109,7 +109,7 @@ jobs:
         env:
           dockerusername: ${{ secrets.DOCKER_USERNAME }}
           dockerpassword: ${{ secrets.DOCKER_PSSWORD }}
-          imageurl: ${{ secrets.DOCKER_USERNAME }}/docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
+          imageurl: docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
 
         with:
           inlineScript: |
