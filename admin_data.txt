@@ -4,7 +4,7 @@ docker image push tuban/pro-react:latest
 
 # access image 
 docker run -it --rm --entrypoint sh tuban/mens
-
+docker run -it --rm -p 3000:3000 tuban/khalil:latest
 # run container with .env file variables
 docker run --env-file ./client/.env  -it --rm tuban:latest
 

@@ -1,6 +1,6 @@
 
 ################################### stage one
-FROM node:18.4.0-alpine3.15 as builder
+FROM node:18.9-alpine3.15 as builder
 
 # install dependencies for node-gyp
 #RUN apk add --no-cache python make g++
@@ -12,7 +12,7 @@ COPY ./package-lock.json .
 RUN npm ci  --only=production
 
 ################################### stage two
-FROM node:18.4.0-alpine3.15
+FROM node:18.9-alpine3.15
 
 EXPOSE 3000
 ENV NODE_ENV=production
