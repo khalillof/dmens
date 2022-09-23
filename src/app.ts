@@ -14,7 +14,7 @@ import { initRouteStore, corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
 
 // connect to db and initialise db models then
-const mens = (async (envpath?: string) => {
+async function dmens(envpath?: string){
   if (envpath && !path.isAbsolute(envpath)) {
     throw new Error('enviroment path passed ashould be Absolute path :' + envpath);
   } else if (envpath && !fs.existsSync(envpath!)) {
@@ -95,11 +95,22 @@ const mens = (async (envpath?: string) => {
     // request looger using a predefined format string
     app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')) // dev|common|combined|short|tiny
     console.log(' allowed cores are :' + config.allow_origins())
-    dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
-  }, 3000)
-  return app;
-});
 
-export { mens };
+    dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
+  
+  
+// remove .env file if exist
+if (dev_prod === 'production' && envpath && fs.existsSync(envpath!)){
+  fs.unlinkSync(envpath)
+  console.log('.env file will be removed'+ envpath)
+}
+
+  }, 3000)
+
+
+  return app;
+};
+
+export { dmens };
 //console.log('================================================='+config.baseDir)
 //mens(path.resolve(config.baseDir, '../.env'));

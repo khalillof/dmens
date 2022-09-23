@@ -70,10 +70,10 @@
   "main": "ts-output/app.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Khalillof/mens.git"
+    "url": "git+https://github.com/Khalillof/dmens.git"
   },
   "bugs": {
-    "url": "https://github.com/Khalillof/mens/issues"
+    "url": "https://github.com/Khalillof/dmens/issues"
   },
-  "homepage": "https://github.com/Khalillof/mens#readme"
+  "homepage": "https://github.com/Khalillof/dmens#readme"
 }
