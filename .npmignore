@@ -1,10 +1,21 @@
-node_modules
-bin/cert.csr
-bin/certificate.pem
-bin/private.key
-npm.sh
 
-ts-output/**/*
+#ts-output/**/*
+.git
+.github
+mens-automation.yml
+build
+client
+node_modules
+src 
+.dockerignore
+.env
+**/.env
+gitignore
+ admin_data.txt
+Dockerfile
+tsconfig.json
+ts-output/models/schema/**
+npm.sh
 
 dist
 build
@@ -61,11 +72,8 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
 # Dependency directories
-node_modules/
+#node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files

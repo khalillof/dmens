@@ -100,7 +100,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
+          tags: |
+            docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
+            docker.io/${{ secrets.DOCKER_USERNAME }}/mens:latest
           file: ./Dockerfile
           context: ./
 
