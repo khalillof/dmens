@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@tuban'
+          scope: '@tuban/dmens'
       - run: npm ci
       - run: npm publish
         env:
