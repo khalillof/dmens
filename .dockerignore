@@ -4,7 +4,7 @@ npm.sh
 node_modules/**/*
 node_modules
 npm.sh
-client/create-env-file.sh
+#client/create-env-file.sh
 src/**/*
 src
 .git/**/*

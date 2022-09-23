@@ -12,7 +12,7 @@ src
 **/.env
 gitignore
 admin_data.txt
-client/create-env-file.sh
+#client/create-env-file.sh
 Dockerfile
 tsconfig.json
 ts-output/models/schema/**
