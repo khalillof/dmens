@@ -115,5 +115,3 @@ if (dev_prod === 'production' && envpath && fs.existsSync(envpath!)){
 };
 
 export { dmens };
-//console.log('================================================='+config.baseDir)
-//mens(path.resolve(config.baseDir, '../.env'));
