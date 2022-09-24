@@ -15,7 +15,10 @@ import { menServer } from './bin/www.js';
 
 // connect to db and initialise db models then
 async function dmens(envpath?: string){
-  if (envpath && !path.isAbsolute(envpath)) {
+  if(!envpath && !fs.existsSync('.env')){
+    throw new Error('enviroment not provided and found');
+  }
+  else if (envpath && !path.isAbsolute(envpath)) {
     throw new Error('enviroment path passed ashould be Absolute path :' + envpath);
   } else if (envpath && !fs.existsSync(envpath!)) {
     throw new Error('enviroment file path provided dose not exist :' + envpath);

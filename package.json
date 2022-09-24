@@ -19,10 +19,11 @@
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
     "test": "karma start",
-    "client": "node ./client/index.js",
+    "dev-client": "node ./dev-client/index.js",
     "tsc": "tsc",
     "start": "tsc && node ./ts-output/app.js",
-    "prod": "node ./app.js",
+    "dev-init": "node ./ts-output/init.js",
+    "init": "node ./init.js",
     "trace": "tsc --traceResolution"
   },
   "dependencies": {

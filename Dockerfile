@@ -24,13 +24,10 @@ WORKDIR ${appDir}
 
 #COPY --chown=userGroup:userGroup . . ## this feature is only supported in lunix containers otherwie use #RUN chown -R node:node  .
 COPY --chown=node:node . .
-#COPY --chown=node:node ts-output ${appDir}
-#COPY --chown=node:node  package-lock.json ${appDir}
-#COPY --chown=node:node package.json ${appDir}
 
 COPY --from=builder /app/node_modules  ${appDir}/node_modules
 
 #RUN chmod +x  ${appDir}/client/create-env-file.sh
 
 #CMD [ "./client/create-env-file.sh" ]
-#CMD ["npm", "run","client"]
+#CMD ["npm", "run","init"]
