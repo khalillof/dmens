@@ -1,4 +1,4 @@
-name: Trigger auto deployment for mens
+name: Trigger auto deployment for dmens
 
 # When this action will be executed
 on:
@@ -59,10 +59,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - name: create folder ts-output ===================
-        run: mkdir ./ts-output
-      - name: build nodejs app =======================
-        run: npm run tsc
+      - name: create folder ts-output, compile typescrept to ts-output folder and move ts-output content to main directory for production
+        run: |
+         mkdir ./ts-output
+         npm run tsc
+         sleep 2
+         mv  ./ts-output/ ./
 
   build:
     # Run this job when pull request merges
@@ -81,10 +83,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - name: create folder ts-output ===================
-        run: mkdir ./ts-output
-      - name: build nodejs app =======================
-        run: npm run tsc
+      - name: create folder ts-output, compile typescrept to ts-output folder and move ts-output content to main directory for production
+        run: |
+         mkdir ./ts-output
+         npm run tsc
+         sleep 2
+         mv  ./ts-output/ ./
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -101,8 +105,8 @@ jobs:
         with:
           push: true
           tags: |
-            docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
-            docker.io/${{ secrets.DOCKER_USERNAME }}/mens:latest
+            docker.io/${{ secrets.DOCKER_USERNAME }}/dmens:${{ github.sha }}
+            docker.io/${{ secrets.DOCKER_USERNAME }}/dmens:latest
           file: ./Dockerfile
           context: ./
 
@@ -123,7 +127,7 @@ jobs:
         env:
           dockerusername: ${{ secrets.DOCKER_USERNAME }}
           dockerpassword: ${{ secrets.DOCKER_PSSWORD }}
-          imageurl: docker.io/${{ secrets.DOCKER_USERNAME }}/mens:${{ github.sha }}
+          imageurl: docker.io/${{ secrets.DOCKER_USERNAME }}/dmens:${{ github.sha }}
 
         with:
           inlineScript: |

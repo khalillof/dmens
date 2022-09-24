@@ -13,7 +13,15 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
           scope: '@tuban/dmens'
+      - name: npm install (ci) ===================
       - run: npm ci
+      - name: create folder ts-output, compile typescrept to ts-output folder and move ts-output content to main directory for production
+        run: |
+         mkdir ./ts-output
+         npm run tsc
+         sleep 2
+         mv  ./ts-output/ ./
+      - name: finally publish to npm registry ===================
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS }}

@@ -1,6 +1,6 @@
 {
   "name": "@tuban/dmens",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever",
   "type": "module",
   "publishConfig": {
@@ -22,6 +22,7 @@
     "client": "node ./client/index.js",
     "tsc": "tsc",
     "start": "tsc && node ./ts-output/app.js",
+    "prod": "node ./app.js",
     "trace": "tsc --traceResolution"
   },
   "dependencies": {
