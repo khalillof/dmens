@@ -68,7 +68,7 @@ jobs:
       - name: delete ts-output folder
         run: rm -rf  ./ts-output
 
-  build:
+  build-deploy:
     # Run this job when pull request merges
     if: ${{ github.event.pull_request.merged  == true }}
     needs: test
@@ -112,28 +112,3 @@ jobs:
             docker.io/${{ secrets.DOCKER_USERNAME }}/dmens:latest
           file: ./Dockerfile
           context: ./
-
-  deploy:
-    # Run this job when pull request merges
-    if: ${{ github.event.pull_request.merged  == true }}
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:      
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy to containerapp
-        uses: azure/CLI@v1
-        env:
-          dockerusername: ${{ secrets.DOCKER_USERNAME }}
-          dockerpassword: ${{ secrets.DOCKER_PSSWORD }}
-          imageurl: docker.io/${{ secrets.DOCKER_USERNAME }}/dmens:${{ github.sha }}
-
-        with:
-          inlineScript: |
-            az config set extension.use_dynamic_install=yes_without_prompt
-            az containerapp registry set -n mens -g tuban-container-apps --server docker.io --username  ${dockerusername} --password ${dockerpassword}
-            az containerapp update -n mens -g tuban-container-apps --image ${imageurl}
