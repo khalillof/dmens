@@ -59,12 +59,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - name: create folder ts-output, compile typescrept to ts-output folder and move ts-output content to main directory for production
-        run: |
-         mkdir ./ts-output
-         npm run tsc
-         sleep 2
-         mv  ./ts-output/ ./
+      - name: create folder ts-output
+        run: mkdir ./ts-output
+      - name: compile typescrept to ts-output folder 
+        run: npm run tsc
+      - name: folder and move ts-output content to main directory for production
+        run: cp -r  ./ts-output/** ./
+      - name: delete ts-output folder
+        run: rm -rf  ./ts-output
 
   build:
     # Run this job when pull request merges
