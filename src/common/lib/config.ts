@@ -21,14 +21,14 @@ export const config = {
     baseDir,
     getAbsolutePath,
     port:()=> getOr('PORT',3000),
-    admin_email:()=> getOr('ADMIN_EMAIL', 'admin@admin.me'),
-    admin_userName: ()=> getOr('ADMIN_USERNAME','admin-username'),
-    admin_password: ()=> getOr('ADMIN_PASSWORD', 'some-password'),
+    admin_email:()=> getOr('ADMIN_EMAIL', ''),
+    admin_userName: ()=> getOr('ADMIN_USERNAME',''),
+    admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
     getSecret:getOr,
     useAuth: ()=> getOr('AUTH', true),
     useCore: ()=> getOr('USE_CORES',true),
-    secretKey: ()=>  getOr('SECRET_KEY', 'some secret'),
-    jwtSecret:()=> getOr('JWT_SECRET', 'some secret'),
+    secretKey: ()=>  getOr('SECRET_KEY', ' '),
+    jwtSecret:()=> getOr('JWT_SECRET', ' '),
     jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
     jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
     issuer:  ()=> getOr('ISSUER'),//'accounts.examplesoft.com',
@@ -40,9 +40,9 @@ export const config = {
     static_urls:()=>  getOr('STATIC_URL',[])?.split(',').map((e:string) => e.trim()),
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
     facebook: {
-        'clientId': ()=> getOr('FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_ID'),
-        'clientSecret':()=> getOr('FACEBOOK_CLIENT_SECRET', 'FACEBOOK_CLIENT_SECRET'),
-        'callbackUrl': ()=> getOr('FACEBOOK_CALLBACK_URL', 'FACEBOOK_CALLBACK_URL'),
+        'clientId': ()=> getOr('FACEBOOK_CLIENT_ID', ' '),
+        'clientSecret':()=> getOr('FACEBOOK_CLIENT_SECRET', ' '),
+        'callbackUrl': ()=> getOr('FACEBOOK_CALLBACK_URL', ''),
     }
 };
 
