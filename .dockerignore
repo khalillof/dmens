@@ -3,7 +3,7 @@ build
 npm.sh
 node_modules/**/*
 node_modules
-npm.sh
+test.env
 #client/create-env-file.sh
 src/**/*
 src

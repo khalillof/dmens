@@ -35,7 +35,7 @@ export class AdminController extends DefaultController {
                 if(stringify) 
                 jsonObject = JSON.stringify(jsonObject)
 
-                let file_path = config.getSchemaUploadPath();
+                let file_path = config.getSchemaUploadPath(jsonObject.name);
                 fs.writeFile(file_path, jsonObject, 'utf8',(err)=>{
                 err ? this.log.err(err):this.log.log('New json file document created path: '+file_path)
                 }); 

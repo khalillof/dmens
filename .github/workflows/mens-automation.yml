@@ -63,10 +63,10 @@ jobs:
         run: mkdir ./ts-output
       - name: compile typescrept to ts-output folder 
         run: npm run tsc
-      - name: folder and move ts-output content to main directory for production
-        run: cp -r  ./ts-output/** ./
-      - name: delete ts-output folder
-        run: rm -rf  ./ts-output
+      #- name: folder and move ts-output content to main directory for production
+      #  run: cp -r  ./ts-output/** ./
+      #- name: delete ts-output folder
+      #  run: rm -rf  ./ts-output
 
   build-deploy:
     # Run this job when pull request merges
@@ -89,10 +89,10 @@ jobs:
         run: mkdir ./ts-output
       - name: compile typescrept to ts-output folder 
         run: npm run tsc
-      - name: folder and move ts-output content to main directory for production
-        run: cp -r  ./ts-output/** ./
-      - name: delete ts-output folder
-        run: rm -rf  ./ts-output
+      #- name: folder and move ts-output content to main directory for production
+      #  run: cp -r  ./ts-output/** ./
+      #- name: delete ts-output folder
+      #  run: rm -rf  ./ts-output
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 

@@ -10,6 +10,7 @@ admin_data.txt
 dist
 build
 .env
+test.env
 #purets/bin
 # Logs
 logs
