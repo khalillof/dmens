@@ -6,7 +6,10 @@ docker image push tuban/pro-react:latest
 docker run -it --rm --entrypoint sh tuban/mens
 docker run -it --rm -p 3000:3000 tuban/khalil:latest
 # run container with .env file variables
-docker run --env-file ./client/.env  -it --rm tuban:latest
+docker run --env-file ./dev-client/.env  -it --rm tuban/test:latest
+
+# run container with .env file variables and mounted volume
+docker run --env-file ./dev-client/.env -v C:\Users\Win_Ins_Mode\Desktop\github-apps\javascript\api-express\dev-client\models\schema:/home/node/app/models/schema -it --rm tuban/test:latest
 
 # print out container enviroments variables
  docker exec container-name-id /usr/bin/env

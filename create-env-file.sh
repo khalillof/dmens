@@ -1,0 +1,34 @@
+#!/bin/sh
+
+envFile=/home/node/app/.env
+
+touch $envFile
+
+cat << EOF > $envFile
+PORT=$PORT
+NODE_ENV=$NODE_ENV
+ADMIN_EMAIL=$ADMIN_EMAIL
+ADMIN_USERNAME=$ADMIN_USERNAME
+ADMIN_PASSWORD=$ADMIN_USERNAME
+SECRET_KEY=$SECRET_KEY
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRATION=$JWT_EXPIRATION
+JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION
+ISSUER=$ISSUER
+AUDIENCE=$AUDIENCE
+GCP_MAP_API_KEY=$GCP_MAP_API_KEY
+DATABASE_URL=$DATABASE_URL
+SCHEMA_DIR=$SCHEMA_DIR
+IMAGES_UPLOAD_DIR=$IMAGES_UPLOAD_DIR
+CORES_DMAINS=$CORES_DMAINS
+STATIC_URL=$STATIC_URL
+EOF
+sleep 2
+
+echo "printing the first two line from the .env file"
+head -2 $envFile
+#echo "moving env file to client directory"
+#mv .env ./client
+#echo  $envFile
+sleep 1
+npm run init

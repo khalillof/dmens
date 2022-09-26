@@ -15,6 +15,7 @@ import { menServer } from './bin/www.js';
 
 // connect to db and initialise db models then
 async function dmens(envpath?: string){
+
   if(!envpath && !fs.existsSync('.env')){
     throw new Error('enviroment not provided and found');
   }
@@ -114,4 +115,4 @@ if (dev_prod === 'production' && envpath && fs.existsSync(envpath!)){
   return app;
 };
 
-export { dmens };
+export {dmens};
