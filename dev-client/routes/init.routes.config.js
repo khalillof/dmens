@@ -1,7 +1,7 @@
 "use strict";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import  {initRouteStore} from '../../ts-output/routes/index.js';
+import  {initRouteStore} from '../../dmens/routes/index.js';
 
 const __dirname =path.dirname(fileURLToPath(import.meta.url));
 

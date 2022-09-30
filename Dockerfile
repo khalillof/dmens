@@ -24,7 +24,7 @@ WORKDIR ${appDir}
 
 #COPY --chown=userGroup:userGroup . . ## this feature is only supported in lunix containers otherwie use #RUN chown -R node:node  .
 #COPY --chown=node:node . .
-COPY --chown=node:node ts-output .
+COPY --chown=node:node dmens ./dmens
 COPY --chown=node:node create-env-file.sh .
 COPY --chown=node:node package-lock.json .
 COPY --chown=node:node package.json .

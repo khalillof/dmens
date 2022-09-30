@@ -1,0 +1,16 @@
+{
+    "name": "favorite",
+    "populates": ["user", "dishes"],
+    "schema": {
+        "user": {
+            "type": "ObjectId",
+            "ref": "account"
+        },
+        "dishes": [
+            {
+                "type": "ObjectId",
+                "ref": "dish"
+            }
+        ]
+    }
+}
