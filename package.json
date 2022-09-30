@@ -23,7 +23,7 @@
     "tsc": "tsc",
     "start": "tsc && node ./dmens/app.js",
     "dev-init": "node ./dmens/init.js",
-    "init": "node ./init.js",
+    "init": "node ./dmens/init.js",
     "trace": "tsc --traceResolution"
   },
   "dependencies": {
