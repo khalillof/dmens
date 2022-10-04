@@ -15,6 +15,22 @@ export class DefaultController {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);
     }
+    async search(req, res, next) {
+        if (!req.query) {
+            return this.responce(res).data([]);
+        }
+        // extract key value from request.query object
+        let key = Object.keys(req.query)[0];
+        let value = req.query[key];
+        // the following three lines validate the reqested Key is actually present in the model schema properties
+        let iskeyTypeInModel = this.db.model?.schema.pathType(key);
+        if ("real nested virtual".indexOf(iskeyTypeInModel) === -1) {
+            return this.responce(res).data([]);
+        }
+        const docs = await this.db.model?.find({ [key]: { $regex: value } });
+        docs.length && docs.map(doc => doc[key]).sort();
+        this.responce(res).data(docs);
+    }
     async list(req, res, next) {
         let items = await this.db.Tolist(20, 0, req.query);
         this.responce(res).data(items);

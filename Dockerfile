@@ -7,8 +7,10 @@ FROM node:18.9-alpine3.15 as builder
 
 WORKDIR /app
 
-COPY ./package.json .
-COPY ./package-lock.json .
+COPY  ./dmens ./dmens
+COPY  ./create-env-file.sh .
+COPY  ./package-lock.json .
+COPY  ./package.json .
 RUN npm ci  --only=production
 
 ################################### stage two
@@ -24,12 +26,9 @@ WORKDIR ${appDir}
 
 #COPY --chown=userGroup:userGroup . . ## this feature is only supported in lunix containers otherwie use #RUN chown -R node:node  .
 #COPY --chown=node:node . .
-COPY --chown=node:node dmens ./dmens
-COPY --chown=node:node create-env-file.sh .
-COPY --chown=node:node package-lock.json .
-COPY --chown=node:node package.json .
 
-COPY --from=builder /app/node_modules  ${appDir}/node_modules
+#COPY --from=builder /app/node_modules  ${appDir}/node_modules
+COPY --chown=node:node  --from=builder /app  .
 
 RUN chmod +x  ${appDir}/create-env-file.sh
 
