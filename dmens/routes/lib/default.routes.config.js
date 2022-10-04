@@ -48,6 +48,9 @@ export class DefaultRoutesConfig {
         return mdwares;
     }
     // custom routes
+    getSearcht(middlewares = null) {
+        return this.app.get(this.routeName + '/search', ...this.buildMdWares(middlewares, ...this.controller?.db?.checkAuth('search')), this.actions('search'));
+    }
     getCount(middlewares = null) {
         return this.app.get(this.routeName + '/count', ...this.buildMdWares(middlewares, ...this.controller?.db?.checkAuth('count')), this.actions('count'));
     }
@@ -83,6 +86,7 @@ export class DefaultRoutesConfig {
         });
     }
     defaultRoutes() {
+        this.getSearcht();
         this.getCount();
         this.getList();
         this.getId();
