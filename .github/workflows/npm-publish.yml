@@ -15,8 +15,8 @@ jobs:
           scope: '@tuban/dmens'
       - name: run npm install (ci) ===================
         run: npm ci
-      - name: create folder dmens
-        run: mkdir ./dmens
+      #- name: create folder dmens
+      #  run: mkdir ./dmens
       - name: compile typescrept to ts-output folder 
         run: npm run tsc
       - name: folder and move ts-output content to main directory for production
