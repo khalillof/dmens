@@ -21,7 +21,7 @@ export class AdminController extends DefaultController {
         jsonObj.schema.data = JSON.stringify(jsonObj.schema.data);
         // assign validated json object to body for process & save by supper create method
         req.body = jsonObj.schema;
-        await super.create(req, res, next);
+        await super.post(req, res, next);
         return objForFileCopy;
     }
     saveJsnoToFile(jsonObject, stringify = true) {
@@ -34,7 +34,7 @@ export class AdminController extends DefaultController {
         });
     }
     // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
-    async create(req, res, next) {
+    async post(req, res, next) {
         if (req.header('content-type') === 'application/json' && req.body) {
             // to save as file later
             let fileDataCopy = await this.schemaDataHandller(req, res, next);

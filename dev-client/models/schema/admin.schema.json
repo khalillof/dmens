@@ -1,8 +1,8 @@
 {
   "name": "admin",
   "populates":[],
-  "useAuth":["list","get","post","put","delete","count"], 
-  "useAdmin": ["list","get","post","put","delete","count"], 
+  "useAuth":["list","get","post","put","delete"], 
+  "useAdmin": ["list","get","post","put","delete"], 
   "schema": {
     "name": {
       "type": "String",

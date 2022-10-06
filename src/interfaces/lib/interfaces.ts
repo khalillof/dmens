@@ -65,12 +65,11 @@ export interface IController {
   responce: Iresponce;
   log: Ilogger;
   list(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  findById(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  findOne(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  create(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  getOne(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  post(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   patch(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   put(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  remove(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  delete(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   tryCatchActions(actionNam: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 
 };
@@ -86,12 +85,8 @@ export interface IDefaultRoutesConfig {
   //actions:Function;
   buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): any[];
   // custom routes
-  getCount(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
-  getList(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
-  getId(middlewares?: any, useAuth?: boolean,useAdmin?:boolean): express.Application;
-  post(middlewares?: any, useAuth?: boolean,useAdmin?:boolean ): express.Application;
-  put(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
-  delete(middlewares?: any, useAuth?: boolean, useAdmin?:boolean): express.Application;
+  buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null):any
+  
   options(routPath:string):void;
   param(): void;
   defaultRoutes(): void;

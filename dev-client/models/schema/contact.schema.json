@@ -1,8 +1,8 @@
 {
     "name":"contact",
     "populates":[],
-    "useAuth":["list","get","put","delete","count"], 
-    "useAdmin": ["list","get","put","delete","count"], 
+    "useAuth":["list","get","post","put","delete"], 
+    "useAdmin": ["list","get","post","put","delete"], 
     "schema":{  
         "contactType": {
             "type": "String",

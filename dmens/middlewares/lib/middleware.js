@@ -7,7 +7,7 @@ export class Middlewares {
         return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
     }
     validateRequiredUserBodyFields(req, res, next) {
-        if (req.body.email || req.body.username && req.body.password) {
+        if (req.body && req.body.email && req.body.username && req.body.password) {
             next();
         }
         else {
@@ -47,7 +47,7 @@ export class Middlewares {
     isInRole(roleName) {
         return async (req, res, next) => {
             if (!req.isAuthenticated()) {
-                responce(res).forbidden();
+                responce(res).forbidden('require authentication');
                 return;
             }
             let reqUser = req.user && req.user.roles ? req.user : await dbStore['account'].findById(req.user._id);
