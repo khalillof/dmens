@@ -15,6 +15,8 @@ jobs:
           scope: '@tuban/dmens'
       - name: run npm install (ci) ===================
         run: npm ci
+      - name: create folder dmens if not existed
+        run: mkdir -p ./dmens     
       - name: compile typescrept to dmens folder 
         run: npm run tsc
       - name: delete some folder
