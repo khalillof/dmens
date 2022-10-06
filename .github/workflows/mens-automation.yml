@@ -68,7 +68,7 @@ jobs:
   build-deploy:
     # Run this job when pull request merges
     if: ${{ github.event.pull_request.merged  == true }}
-    needs: test
+    needs: [analyze, test]
     runs-on: ubuntu-latest
     strategy:
       matrix:
