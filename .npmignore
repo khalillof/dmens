@@ -15,7 +15,7 @@ admin_data.txt
 #client/create-env-file.sh
 Dockerfile
 tsconfig.json
-ts-output/models/schema/**
+dmens/models/schema/**
 npm.sh
 test.env
 dist
