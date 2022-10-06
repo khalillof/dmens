@@ -15,15 +15,15 @@ jobs:
           scope: '@tuban/dmens'
       - name: run npm install (ci) ===================
         run: npm ci
-      #- name: create folder dmens
+      #- name: create folder publish
       #  run: mkdir ./dmens
-      - name: compile typescrept to ts-output folder 
+      - name: compile typescrept to dmens folder 
         run: npm run tsc
-      - name: folder and move ts-output content to main directory for production
-        run: cp -r  ./dmens/** ./
+      #- name: folder and move ts-output content to main directory for production
+      #  run: |
+      #   cp -r  ./dmens ./dmens
       - name: delete dmens folder
         run: |
-         rm -rf  ./dmens
          rm -rf  ./dev-client
          rm   ./create-env-file.sh
       - name: run publish to npm registery

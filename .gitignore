@@ -4,7 +4,6 @@ bin/certificate.pem
 bin/private.key
 npm.sh
 
-dmens
 admin_data.txt
 #client/create-env-file.sh
 dist
