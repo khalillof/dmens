@@ -23,8 +23,8 @@ export class DefaultController {
         let key = Object.keys(req.query)[0];
         let value = req.query[key];
         // the following three lines validate the reqested Key is actually present in the model schema properties
-        let iskeyTypeInModel = this.db.model?.schema.pathType(key);
-        if ("real nested virtual".indexOf(iskeyTypeInModel) === -1) {
+        let iskeyInModel = this.db.model?.schema.pathType(key);
+        if ("real nested virtual".indexOf(iskeyInModel) === -1) {
             return this.responce(res).data([]);
         }
         const docs = await this.db.model?.find({ [key]: { $regex: value } });
@@ -35,15 +35,15 @@ export class DefaultController {
         let items = await this.db.Tolist(20, 0, req.query);
         this.responce(res).data(items);
     }
-    async findById(req, res, next) {
-        let item = await this.db.findById(req.params['id']);
+    async getOne(req, res, next) {
+        let q = req.params['id'] ? { _id: req.params['id'] } : req.query;
+        if (!q) {
+            return this.responce(res).badRequest();
+        }
+        let item = await this.db.findOne(q);
         this.responce(res).data(item);
     }
-    async findOne(req, res, next) {
-        let item = await this.db.findOne(req.query);
-        this.responce(res).data(item);
-    }
-    async create(req, res, next) {
+    async post(req, res, next) {
         let item = await this.db.create(req.body);
         console.log('document Created :', item);
         this.responce(res).data(item);
@@ -56,7 +56,7 @@ export class DefaultController {
         await this.db.putById(req.params['id'], req.body);
         this.responce(res).success();
     }
-    async remove(req, res, next) {
+    async delete(req, res, next) {
         let item = await this.db.deleteById(req.params['id']);
         console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`);
         this.responce(res).success();

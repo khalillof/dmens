@@ -57,8 +57,8 @@ function authenticateUser(type, opts) {
             pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true };
         try {
             return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-                console.log('authenticate user :');
-                console.log(user || info || err);
+                console.log('authenticated user id :');
+                console.log((user && user._id) || info || err);
                 if (user) {
                     // handle local login
                     return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next);

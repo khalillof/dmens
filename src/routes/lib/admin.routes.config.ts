@@ -11,7 +11,8 @@ export async function AdminRoutes(app:express.Application){
     (self:IDefaultRoutesConfig):void=>{
 
  self.defaultRoutes()
- self.post([uploadSchema]);
+ self.buidRoute(self.routeName,'post','post',null,[uploadSchema])
+ //self.post([uploadSchema]);
 })) : console.log('Account model is not avaliable in dbStore No Schema routes configuered');;
 };
 

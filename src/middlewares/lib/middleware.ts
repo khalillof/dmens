@@ -1,6 +1,7 @@
 import express from 'express';
 import {isValidRole, dbStore, responce} from '../../common/index.js';
 import {IMiddlewares} from '../../interfaces/index.js';
+
 export class Middlewares implements IMiddlewares {
 
 
@@ -13,7 +14,7 @@ export class Middlewares implements IMiddlewares {
     }
     validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
 
-        if (req.body.email || req.body.username && req.body.password) {         
+        if (req.body && req.body.email && req.body.username && req.body.password) {         
             next();
         } else {
           responce(res).badRequest('Missing required body fields')
@@ -59,12 +60,13 @@ export class Middlewares implements IMiddlewares {
 isInRole(roleName:string){
   return async (req: any, res: express.Response, next: express.NextFunction)=>{
     if(!req.isAuthenticated()){
-      responce(res).forbidden()
+      responce(res).forbidden('require authentication')
     return;
   }
   let reqUser:any= req.user  && req.user.roles ? req.user : await  dbStore['account'].findById(req.user._id);
 
-let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }})
+  let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }});
+
           if(roles && roles.length > 0){
           for (let i = 0; i < roles.length; i++) {
             if (roles[i].name === roleName) {
@@ -72,10 +74,12 @@ let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }})
               return;
             }
           }
+
         }
 
-  responce(res).forbidden("Require Admin Role!" );
-          return;  
+      responce(res).forbidden("Require Admin Role!" );
+
+      return;  
 }
 }
 

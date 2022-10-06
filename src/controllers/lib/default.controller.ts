@@ -32,8 +32,8 @@ export class DefaultController implements IController {
     let value = req.query[key]
   
     // the following three lines validate the reqested Key is actually present in the model schema properties
-    let iskeyTypeInModel = this.db.model?.schema.pathType(key)
-    if("real nested virtual".indexOf(iskeyTypeInModel!) === -1){
+    let iskeyInModel = this.db.model?.schema.pathType(key)
+    if("real nested virtual".indexOf(iskeyInModel!) === -1){
     return this.responce(res).data([]);
   }
     const docs = await this.db.model?.find({ [key]: { $regex: value } });
@@ -49,15 +49,15 @@ export class DefaultController implements IController {
 
   }
 
-  async findById(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.findById(req.params['id']);
+  async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let q = req.params['id'] ? {_id:req.params['id']} : req.query;
+    if(!q ){
+    return this.responce(res).badRequest()
+    }
+    let item = await this.db.findOne(q);
     this.responce(res).data(item)
   }
-  async findOne(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.findOne(req.query);
-    this.responce(res).data(item)
-  }
-  async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.create(req.body);
     console.log('document Created :', item);
     this.responce(res).data(item)
@@ -72,7 +72,7 @@ export class DefaultController implements IController {
     await this.db.putById(req.params['id'],req.body);
     this.responce(res).success()
   }
-  async remove(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
    let item = await this.db.deleteById(req.params['id']);
    console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
     this.responce(res).success()

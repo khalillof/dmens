@@ -15,6 +15,7 @@ on:
 
 jobs:
   analyze:
+    if: ${{ github.event.pull_request.merged  == true }}
     name: Analyze - code security Analysis
     runs-on: ubuntu-latest
     permissions:
@@ -43,7 +44,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
 
   test:
-    needs: analyze
+    #needs: analyze
     runs-on: ubuntu-latest
 
     strategy:
@@ -63,10 +64,6 @@ jobs:
         run: mkdir ./ts-output
       - name: compile typescrept to ts-output folder 
         run: npm run tsc
-      #- name: folder and move ts-output content to main directory for production
-      #  run: cp -r  ./ts-output/** ./
-      #- name: delete ts-output folder
-      #  run: rm -rf  ./ts-output
 
   build-deploy:
     # Run this job when pull request merges
@@ -89,10 +86,7 @@ jobs:
         run: mkdir ./ts-output
       - name: compile typescrept to ts-output folder 
         run: npm run tsc
-      #- name: folder and move ts-output content to main directory for production
-      #  run: cp -r  ./ts-output/** ./
-      #- name: delete ts-output folder
-      #  run: rm -rf  ./ts-output
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 

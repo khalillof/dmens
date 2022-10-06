@@ -22,6 +22,7 @@ export class ClientSeedDatabase {
     async addAccounts() {
         this.countDb('account', async (Db) => {
             const roles = await dbStore['role'].model.find({ name: { $in: ["admin", "user"] } });
+            console.log(roles);
             if (roles) {
                 for (let i = 0; i < seeds.accounts.length; i++) {
                     let user = seeds.accounts[i];

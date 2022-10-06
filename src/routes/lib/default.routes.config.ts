@@ -43,40 +43,23 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
      return   Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))})
     }
 
-    buildMdWares(middlewares?:Array<Function>, useAuth=true, useAdmin=false){
+    buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){
       let mdwares:any[] = [];
-      if(useAuth)
+      if(useAuth === true)
         mdwares = [...mdwares,this.authenticate("jwt")];
-      if(useAdmin)
+      if(useAdmin === true)
       mdwares = [...mdwares,this.mware!.isInRole('admin')];
       if(middlewares)
-        mdwares.concat(middlewares);
-        return mdwares;
+        mdwares = [...mdwares,...middlewares];
+ 
+      return mdwares;
     }
     // custom routes
-    getSearcht(middlewares=null){
-      return this.app.get(this.routeName+'/search', ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('search')!),this.actions('search'))
-     }
-    getCount(middlewares=null){
-      return this.app.get(this.routeName+'/count', ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('count')!),this.actions('count'))
-     }
-    getList(middlewares=null){
-     
-     return this.app.get(this.routeName, ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('list')!),this.actions('list'))
+    buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null){
+      const url = secondRoute ? (routeName +'/'+secondRoute) : routeName;
+      return this.app[(method ==='list'?'get':method)](url, ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth(method)!),this.actions(actionName ?? method))
     }
-    getId(middlewares=null){
-     return this.app.get(this.routeParam, ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('get')!),this.actions('findById'))
-    }
-    post(middlewares=null){
-     return this.app.post(this.routeName, ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('post')!),this.actions('create'))
-    }
-    put(middlewares=null){
-     return this.app.put(this.routeParam, ...this.buildMdWares(middlewares!,...this.controller?.db?.checkAuth('put')!),this.actions('put'))
-    }
-    delete(middlewares=null){  
-      let mdl =  middlewares ? middlewares : [this.mware!.validateCurrentUserOwnParamId]
-      return this.app.delete(this.routeParam, ...this.buildMdWares(mdl,...this.controller?.db?.checkAuth('delete')!),this.actions('remove'))
-    }
+    
     options(routPath:string){
       this.app.options(routPath, corsWithOptions);
     }
@@ -92,16 +75,17 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
           }
       });
     }
-    defaultRoutes(){
-      this.getSearcht()
-      this.getCount();
-      this.getList(); 
-      this.getId();
-      this.post();
-      this.put();
-      this.delete();
-      this.param();
+    defaultRoutes(){ 
+     this.buidRoute(this.routeName,'list','search','search');// search
+     this.buidRoute(this.routeName,'list','count','count'); // count
+     this.buidRoute(this.routeName,'list','list'); // list
+     this.buidRoute(this.routeParam,'get','getOne') // get By id
+     this.buidRoute(this.routeName,'get','getOne') // getOne by filter parameter
+     this.buidRoute(this.routeName,'post')// post
+     this.buidRoute(this.routeParam,'put')// put
+     this.buidRoute(this.routeParam,'delete',null, null,[this.mware!.validateCurrentUserOwnParamId])// delete
 
+      this.param();
       this.options(this.routeName);
       this.options(this.routeParam);
     }

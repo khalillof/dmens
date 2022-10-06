@@ -57,14 +57,15 @@ function generateJwt(user: any) {
 //type = 'local' || 'jwt'|| 'facebook' || 'facebook-token'
 function authenticateUser(type: string, opts?: {}) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
     let loginOptions = { session: false };
     let pssportOptions = type === "jwt" ? loginOptions : {};
     if ('facebook facebook-token'.indexOf(type) !== -1)
       pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-          console.log('authenticate user :')
-          console.log(user || info || err )
+          console.log('authenticated user id :')
+          console.log((user && user._id) || info || err )
 
         if (user) {
           // handle local login

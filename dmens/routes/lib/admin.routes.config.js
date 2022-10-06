@@ -5,7 +5,8 @@ import { uploadSchema } from './uploads.js';
 export async function AdminRoutes(app) {
     return dbStore['account'] ? await Promise.resolve(await DefaultRoutesConfig.instance(app, 'admin', await AdminController.createInstance('admin'), (self) => {
         self.defaultRoutes();
-        self.post([uploadSchema]);
+        self.buidRoute(self.routeName, 'post', 'post', null, [uploadSchema]);
+        //self.post([uploadSchema]);
     })) : console.log('Account model is not avaliable in dbStore No Schema routes configuered');
     ;
 }
