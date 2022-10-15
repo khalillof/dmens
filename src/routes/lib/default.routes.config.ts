@@ -17,7 +17,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     routeName: string;
     routeParam: string;
     controller?:IController;
-    mware?:IMiddlewares ;
+    mware?:IMiddlewares;
     authenticate:Iauthenticate;
     //actions:Function;
     constructor(exp:express.Application,rName:string,controller?:IController,MWare?:IMiddlewares,callback?:Function) { 
@@ -40,7 +40,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       return  result;
     }
     static async createInstancesWithDefault(app:express.Application){
-     return   Object.keys(dbStore).forEach(async name =>  {if ('account admin'.indexOf(name) === -1 ) await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))})
+      for (let name of Object.keys(dbStore))
+       'account admin'.indexOf(name) === -1  && await DefaultRoutesConfig.instance(app,name,await DefaultController.createInstance(name))
     }
 
     buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){

@@ -8,116 +8,137 @@ type dbCallback = {
 export class ClientSeedDatabase {
 
     async init() {
-        await this.addRoles().then(() => console.log('finished seeding roles'))
-            .then(async () => await this.addAccounts().then(() => console.log('finished seeding Accounts'))
-                .then(async () => await this.addCateories().then(() => console.log('finished seeding categoriess'))))
+        console.log('started database seeding ...................................!');
 
-        await this.addContacts();
-        console.log('finished seeding contacts')
-
-        setTimeout(async () => await this.addPosts().then(() => console.log('finished seeding posts')), 2000)
-        setTimeout(async () => await this.addComments().then(() => console.log('finished seeding comments')), 3000)
-
-        setTimeout(async () => await this.addmessages().then(() => console.log('finished seeding messages'))
-            .then(() => console.log('finished database seeding .........!')), 4000)
-
+        await this.addRoles(),
+        await this.addCateories(),
+        await this.addAccounts(),
+        await this.addContacts()
+        await this.addmessages();
+        await this.addPosts()
+        await this.addComments(); 
+         
+        console.log('finished database seeding ...................................!');
     }
     accountsCache: any[] = [];
-    async getUsersIDs() {
-        return this.accountsCache.length && this.accountsCache || await this.getIDs('account');
-    }
+
     async addRoles() {
-        await this.countDb('role', async (Db) => await this.saver(seeds.roles, Db));
+        await this.saver('role', seeds.roles);
     }
     async addAccounts() {
-       this.countDb('account', async (Db: any) => {
 
-            const roles =  await dbStore['role'].model!.find( { name: { $in: ["admin", "user"] } } )
-            console.log(roles)
+        await this.countDb('account', async (Db: any) => {
+
+            const roles = await dbStore['role'].model!.find({ name: { $in: ["admin", "user"] } })
+
             if (roles) {
-                for (let i = 0; i < seeds.accounts.length; i++) {
-                    let user = seeds.accounts[i];
-                    user.roles = roles;
-                    let ut = await Db.register!(user, "password");
-                    this.accountsCache.push(ut._id);
-                }
+                await Promise.all(seeds.accounts.map(async (account: any) => {
+                    account.roles = roles;
+                    let ut = await Db.register!(account, "password");
+                    this.accountsCache.push(ut);
+                }))
+                console.log('finished seeding accounts')
             }
-            else
+            else {
                 console.log(' roles are not ready for accounts creations')
-
+            }
 
         })
     }
 
     async addContacts() {
-        let contacts = seeds.contacts.map((p) => { p.contactType = this.randomObject(seeds.contacttypes!); return p; })
-        await this.countDb('contact', async (Db) => await this.saver(contacts, Db))
+        return await this.saver('contact', seeds.contacts)
     }
     async addCateories() {
-        await this.countDb('category', async (Db) => await this.saver(seeds.categories, Db));
+        return await this.saver('category', seeds.categories);
     }
+
     async addPosts() {
-        const authors_Ids = await this.getUsersIDs();
-        const catIds = await this.getIDs('category');
 
-        if (authors_Ids.length && authors_Ids.length) {
-            let posts = seeds.posts.map((p) => {
-                p.publisheDate = new Date();
-                p.author = this.randomObject(authors_Ids!);
-                p.category = this.randomObject(catIds!);
-                return p;
+        const [authors_Ids, catIds] = await Promise.all([this.getUsersIDs(), this.getIDs('category')])
+        let ppps = seeds.posts;
+        if (authors_Ids && catIds) {
+            // loop over userids
+            this.loopOverSequence(authors_Ids.length, ppps.length, (IDindex: number, itemIndex: number) => {
+                ppps[itemIndex].author = authors_Ids![IDindex];
+                ppps[itemIndex].publisheDate = new Date()
             })
-
-            await this.countDb('post', async (Db) => await this.saver(posts, Db))
+            // loop over category ids
+            this.loopOverSequence(catIds.length, ppps.length, (IDindex: number, itemIndex: number) => {
+                ppps[itemIndex].category = catIds![IDindex];
+            })
         } else {
-            console.log(' errros no authors for posts seeds')
+            console.log('post seed did not succeed no authors ids or categoty ids')
         }
-
+        await this.saver('post', ppps)
 
     }
+
     async addComments() {
-        let authors_ids = await this.getUsersIDs();
-        let posts_ids = await this.getIDs('post');
+        const [authors_ids, posts_ids] = await Promise.all([this.getUsersIDs(), this.getIDs('post')])
 
-        if (authors_ids.length && posts_ids.length) {
-
-            seeds.comments.forEach(async comm => {
-                comm.author = this.randomObject(authors_ids!);
-                comm.post_id = this.randomObject(posts_ids!);
-                //return comm;
+        let comments = seeds.comments
+        if (authors_ids && posts_ids) {
+            // loop over autherIds
+            this.loopOverSequence(authors_ids.length, comments.length, (IDindex: number, itemIndex: number) => {
+                comments[itemIndex].author = authors_ids![IDindex];
             })
-            await this.countDb('comment', async (Db) => await this.saver(seeds.comments, Db));
+            // loop over post ids
+            this.loopOverSequence(posts_ids.length, comments.length, (IDindex: number, itemIndex: number) => {
+                comments[itemIndex].post_id = posts_ids[IDindex]
+            })
+
+
         } else {
             console.log('comments seed did not succeed no authors or posts')
         }
-    }
-    async addmessages() {
-        let authors_ids = await this.getUsersIDs();
 
-        seeds.messages.forEach(ms => {
-            ms.recipient = this.randomObject(authors_ids!);
-            ms.sender = this.randomObject(authors_ids!);
+        await this.saver('comment', comments);
+    }
+
+    addmessages() {
+        return new Promise(async (resolve) => {
+            let authors_ids = await this.getUsersIDs();
+
+            let mms = seeds.messages;
+            this.loopOverSequence(authors_ids.length, seeds.messages.length, (IDindex: number, itemIndex: number) => {
+
+                mms[itemIndex].recipient = authors_ids![IDindex];
+                mms[itemIndex].sender = authors_ids![IDindex];
+                //return ms
+            })
+            resolve(await this.saver('message', mms))
         })
-
-        await this.countDb('message', async (Db) => await this.saver(seeds.messages, Db));
     }
 
-    async countDb(dbName: string, callback: dbCallback) {
-        let Db = dbStore[dbName].model!;
-        Db.estimatedDocumentCount(async (err: any, count: number) => {
-            if (!err && count === 0) {
-                callback && await callback(Db)
-            } else if (err) {
-                console.log(err.stack)
-            }
-        });
 
+    countDb(dbName: string, callback: dbCallback) {
+        return new Promise(async (resolve) => {
+            let Db = dbStore[dbName].model!;
+            Db.estimatedDocumentCount(async (err: any, count: number) => {
+                if (!err && count === 0) {
+                    callback && resolve(await callback(Db))
+                } else if (err) {
+                    resolve(console.log(err.stack))
+                } else {
+                    resolve(console.log(dbName + ' : already on database'))
+                }
+            });
+        })
     }
+    async getUsersIDs() {
+        return this.accountsCache.length ? this.accountsCache.map((d: any) => d._id) : await this.getIDs('account');
+    }
+
     async getIDs(name: string, filter?: {}) {
-        return (await dbStore[name].model?.find(filter!))!.map((com: any) => com._id);
+        return (await dbStore[name].model?.find(filter!)!).map((md: any) => md._id);
     }
-    async saver(objArr: any[], db: Model<any>) {
-        objArr.forEach(async (obj) => await new db(obj).save(this.logger));
+
+    async saver(dbName: string, objArr: any[]) {
+        await this.countDb(dbName, async (db) => {
+            await Promise.all(objArr.map(async (obj: any) => await new db(obj).save()))
+            console.log('finished seeding ' + dbName)
+        })
     }
 
     logger(err: any, obj: any) {
@@ -125,15 +146,29 @@ export class ClientSeedDatabase {
     }
 
     randomObject(objs: any[]) {
-        if (objs.length === 0)
+        let len = objs.length
+        if (len === 0)
             return objs[0]
-        let i = this.randomInt(0, objs.length);
+
+        let i = Math.floor(Math.random() * len) + 1;
         return objs[i]
     }
-    randomInt(min: number, max: number) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min);
-    }
 
+    // infinate loop over sequence of IDs to be maped to length of items length
+    loopOverSequence(IdsLen: number, itemsLen: number, callback: Function) {
+        let index = 0;
+        let itemsIndex = 0;
+
+        if (!IdsLen || !itemsLen || IdsLen === 0 || itemsLen === 0)
+            return;
+
+        while (itemsIndex < itemsLen) {
+            callback(index, itemsIndex)
+            index++
+            itemsIndex++
+
+            if (index >= IdsLen)
+                index = 0
+        }
+    }
 }

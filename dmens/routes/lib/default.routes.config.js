@@ -34,8 +34,8 @@ export class DefaultRoutesConfig {
         return result;
     }
     static async createInstancesWithDefault(app) {
-        return Object.keys(dbStore).forEach(async (name) => { if ('account admin'.indexOf(name) === -1)
-            await DefaultRoutesConfig.instance(app, name, await DefaultController.createInstance(name)); });
+        for (let name of Object.keys(dbStore))
+            'account admin'.indexOf(name) === -1 && await DefaultRoutesConfig.instance(app, name, await DefaultController.createInstance(name));
     }
     buildMdWares(middlewares, useAuth = true, useAdmin = false) {
         let mdwares = [];

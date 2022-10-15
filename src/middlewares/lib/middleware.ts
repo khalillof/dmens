@@ -44,10 +44,10 @@ export class Middlewares implements IMiddlewares {
 
 }
  // roles
- isRolesExist(roles:[string]){
+ isRolesExist(roles:string[]){
     if (roles) {
-      for (let i = 0; i < roles.length; i++) {
-        if (!isValidRole(roles[i])) {
+      for (let r of roles) {
+        if (!isValidRole(r)) {
           return false;
         }
       }
@@ -67,9 +67,9 @@ isInRole(roleName:string){
 
   let roles = await dbStore['role'].model!.find({_id: { $in: reqUser.roles }});
 
-          if(roles && roles.length > 0){
-          for (let i = 0; i < roles.length; i++) {
-            if (roles[i].name === roleName) {
+          if(roles){
+          for (let r of roles) {
+            if (r.name === roleName) {
               next();
               return;
             }

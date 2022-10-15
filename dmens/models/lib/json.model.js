@@ -70,7 +70,9 @@ export class JsonModel {
     }
     #buildPopulates() {
         if (this.hasPopulate) {
-            this.populates.forEach(item => this.#populateQuery += ".populate('" + item + "')");
+            for (let item of this.populates) {
+                this.#populateQuery += ".populate('" + item + "')";
+            }
             this.#populateQuery += ".exec()";
         }
     }
