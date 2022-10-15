@@ -27,7 +27,8 @@ export class DefaultController {
         if ("real nested virtual".indexOf(iskeyInModel) === -1) {
             return this.responce(res).data([]);
         }
-        const docs = await this.db.model?.find({ [key]: { $regex: value } });
+        // const docs = await this.db.model?.find({ [key]: { $regex: value } });
+        const docs = await this.db.model?.find({ [key]: new RegExp(`${value}`, 'i') });
         docs.length && docs.map(doc => doc[key]).sort();
         this.responce(res).data(docs);
     }

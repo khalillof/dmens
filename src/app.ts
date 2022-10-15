@@ -24,7 +24,7 @@ async function dmens(envpath?: string) {
   } else if (envpath && !fs.existsSync(envpath!)) {
     throw new Error('enviroment file path provided dose not exist :' + envpath);
   }
-
+ 
   envpath ? dotenv.config({ path: envpath }) : dotenv.config();
   console.log('enviroment path provided : ' + envpath);
 
@@ -39,12 +39,14 @@ async function dmens(envpath?: string) {
   //app.set('views', path.join(config.baseDir, 'views'));
   //app.set('view engine', 'ejs');
 
-
+  const dev_prod = app.get('env');
+[].forEach
   // static urls
-  for (let url of config.static_urls()) {
-    app.use(express.static(path.join(config.baseDir, url)))
-  }
+  const urls = config.static_urls();
+  urls && urls.length && urls.forEach((url:string)=>app.use(express.static(path.join(config.baseDir, url))));
 
+    // request looger using a predefined format string
+    app.use(morgan(dev_prod === 'development' ? 'dev' : 'combined')) // dev|common|combined|short|tiny
   // create database models
   await dbInit()
  
@@ -76,7 +78,7 @@ async function dmens(envpath?: string) {
   // print routes
   printRoutesToString(app);
 
-  const dev_prod = app.get('env');
+  
 
   // handel 404 shoud be at the midlleware
   app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -89,13 +91,14 @@ async function dmens(envpath?: string) {
     console.error(err.stack)
   });
 
-  // request looger using a predefined format string
-  app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')) // dev|common|combined|short|tiny
-  console.log(' allowed cores are :' + config.allow_origins())
-
-
     // seed database
-    await new ClientSeedDatabase().init();
+    await new ClientSeedDatabase().init(); 
+    
+  
+
+
+  console.log('allowed cores are :' + config.allow_origins())
+
 
   dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
 
