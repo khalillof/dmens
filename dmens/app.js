@@ -34,10 +34,13 @@ async function dmens(envpath) {
     // view engine setup
     //app.set('views', path.join(config.baseDir, 'views'));
     //app.set('view engine', 'ejs');
+    const dev_prod = app.get('env');
+    [].forEach;
     // static urls
-    for (let url of config.static_urls()) {
-        app.use(express.static(path.join(config.baseDir, url)));
-    }
+    const urls = config.static_urls();
+    urls && urls.length && urls.forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
+    // request looger using a predefined format string
+    app.use(morgan(dev_prod === 'development' ? 'dev' : 'combined')); // dev|common|combined|short|tiny
     // create database models
     await dbInit();
     app.use(session({
@@ -62,7 +65,6 @@ async function dmens(envpath) {
     await Promise.all(initRouteStore.map((rout) => rout(app)));
     // print routes
     printRoutesToString(app);
-    const dev_prod = app.get('env');
     // handel 404 shoud be at the midlleware
     app.use((req, res, next) => {
         res.status(404).json({ success: false, message: "Sorry can't find that!" });
@@ -72,11 +74,9 @@ async function dmens(envpath) {
         res.status(err.status || 500).json({ success: false, error: dev_prod === 'development' ? err.message : "Ops! server error" });
         console.error(err.stack);
     });
-    // request looger using a predefined format string
-    app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')); // dev|common|combined|short|tiny
-    console.log(' allowed cores are :' + config.allow_origins());
     // seed database
     await new ClientSeedDatabase().init();
+    console.log('allowed cores are :' + config.allow_origins());
     dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
     // remove .env file if exist
     if (dev_prod === 'production' && envpath && fs.existsSync(envpath)) {
