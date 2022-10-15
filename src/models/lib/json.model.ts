@@ -82,7 +82,9 @@ export class JsonModel implements IJsonModel {
 
   #buildPopulates(){
     if(this.hasPopulate) {
-      this.populates.forEach(item=>  this.#populateQuery +=".populate('"+item+"')"); 
+      for(let item of this.populates){
+      this.#populateQuery +=".populate('"+item+"')"; 
+      }
       this.#populateQuery+=".exec()";
     }
   }

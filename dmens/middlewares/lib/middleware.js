@@ -35,8 +35,8 @@ export class Middlewares {
     // roles
     isRolesExist(roles) {
         if (roles) {
-            for (let i = 0; i < roles.length; i++) {
-                if (!isValidRole(roles[i])) {
+            for (let r of roles) {
+                if (!isValidRole(r)) {
                     return false;
                 }
             }
@@ -52,9 +52,9 @@ export class Middlewares {
             }
             let reqUser = req.user && req.user.roles ? req.user : await dbStore['account'].findById(req.user._id);
             let roles = await dbStore['role'].model.find({ _id: { $in: reqUser.roles } });
-            if (roles && roles.length > 0) {
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === roleName) {
+            if (roles) {
+                for (let r of roles) {
+                    if (r.name === roleName) {
                         next();
                         return;
                     }

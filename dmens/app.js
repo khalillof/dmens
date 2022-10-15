@@ -35,56 +35,54 @@ async function dmens(envpath) {
     //app.set('views', path.join(config.baseDir, 'views'));
     //app.set('view engine', 'ejs');
     // static urls
-    config.static_urls().forEach((url) => app.use(express.static(path.join(config.baseDir, url))));
+    for (let url of config.static_urls()) {
+        app.use(express.static(path.join(config.baseDir, url)));
+    }
+    // create database models
     await dbInit();
-    setTimeout(async () => {
-        app.use(session({
-            secret: config.secretKey(),
-            resave: true,
-            saveUninitialized: true,
-            cookie: {
-                maxAge: 1000 * 30,
-                secure: true,
-                httpOnly: true,
-            }
-        }));
-        app.use(passport.initialize());
-        app.use(passport.session());
-        app.use(helmet({
-            contentSecurityPolicy: false,
-            crossOriginResourcePolicy: { policy: "cross-origin" }
-        }));
-        // cors activation
-        app.use(corsWithOptions);
-        setTimeout(async () => {
-            initRouteStore.forEach(async (rout) => await rout(app));
-        }, 1000);
-        setTimeout(async () => {
-            printRoutesToString(app);
-            // seed database
-            // new SeedDatabase();
-            await new ClientSeedDatabase().init();
-            // handel 404 shoud be at the midlleware
-            app.use((req, res, next) => {
-                res.status(404).json({ success: false, message: "Sorry can't find that!" });
-            });
-        }, 1500);
-        const dev_prod = app.get('env');
-        // server error handller will print stacktrace
-        app.use(function (err, req, res, next) {
-            res.status(err.status || 500).json({ success: false, error: dev_prod === 'development' ? err.message : "Ops! server error" });
-            console.error(err.stack);
-        });
-        // request looger using a predefined format string
-        app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')); // dev|common|combined|short|tiny
-        console.log(' allowed cores are :' + config.allow_origins());
-        dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
-        // remove .env file if exist
-        if (dev_prod === 'production' && envpath && fs.existsSync(envpath)) {
-            fs.unlinkSync(envpath);
-            console.log('.env file will be removed' + envpath);
+    app.use(session({
+        secret: config.secretKey(),
+        resave: true,
+        saveUninitialized: true,
+        cookie: {
+            maxAge: 1000 * 30,
+            secure: true,
+            httpOnly: true,
         }
-    }, 3000);
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(helmet({
+        contentSecurityPolicy: false,
+        crossOriginResourcePolicy: { policy: "cross-origin" }
+    }));
+    // cors activation
+    app.use(corsWithOptions);
+    // create routes
+    await Promise.all(initRouteStore.map((rout) => rout(app)));
+    // print routes
+    printRoutesToString(app);
+    const dev_prod = app.get('env');
+    // handel 404 shoud be at the midlleware
+    app.use((req, res, next) => {
+        res.status(404).json({ success: false, message: "Sorry can't find that!" });
+    });
+    // server error handller will print stacktrace
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500).json({ success: false, error: dev_prod === 'development' ? err.message : "Ops! server error" });
+        console.error(err.stack);
+    });
+    // request looger using a predefined format string
+    app.use(morgan(dev_prod === 'development' ? 'dev' : 'common')); // dev|common|combined|short|tiny
+    console.log(' allowed cores are :' + config.allow_origins());
+    // seed database
+    await new ClientSeedDatabase().init();
+    dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
+    // remove .env file if exist
+    if (dev_prod === 'production' && envpath && fs.existsSync(envpath)) {
+        fs.unlinkSync(envpath);
+        console.log('.env file will be removed' + envpath);
+    }
     return app;
 }
 ;

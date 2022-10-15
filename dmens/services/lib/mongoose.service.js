@@ -8,31 +8,19 @@ const dbOptions = {
     useUnifiedTopology: true,
     retryWrites: false
 };
-/*
-export async function dbInit(){
-  console.log('db connction string :'+config.mongoUrl.cosmodb());
-
-  mongoose.connect(config.mongoUrl.cosmodb(), dbOptions, async function (err: any) {
-
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    else {
-      console.log("Successfully Connected to db!");
-      console.log('Numbers of models added to the database are :' + (await JsonLoad.loadDefaultDirectory()).length);
-    }
-  });
-}
-*/
-export async function dbInit() {
+export function dbInit() {
     console.log('db connction string :' + config.databaseUrl());
-    mongoose.connect(config.databaseUrl(), dbOptions).then(async () => (await JsonLoad.loadDefaultDirectory()).length).then((num) => {
-        console.log("Successfully Connected to db!");
-        console.log('Numbers of models added to the database are :' + num);
-        return num;
-    }).catch((err) => {
-        console.error(err);
-        process.exit(1);
+    return new Promise(async (resolve) => {
+        try {
+            await mongoose.connect(config.databaseUrl(), dbOptions);
+            console.log("Successfully Connected to db!");
+            let num = await JsonLoad.loadDefaultDirectory();
+            console.log('Numbers of models added to the database are :' + num.length);
+            resolve(num.length);
+        }
+        catch (err) {
+            console.error(err);
+            process.exit(1);
+        }
     });
 }

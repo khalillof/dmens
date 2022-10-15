@@ -12,8 +12,6 @@ export class JsonLoad {
     static validate(jsonSchema) {
         if (!jsonSchema.name)
             throw new Error(' schema validation faild ! property name is required');
-        //if (typeof jsonSchema.loadref !== 'boolean')
-        //   throw new Error(' schema validation faild ! property loadref is required')
         if (dbStore[jsonSchema.name.toLowerCase()])
             throw new Error(`schema validation faild ! name property : ${jsonSchema.name} already on db : `);
     }
@@ -49,25 +47,42 @@ export class JsonLoad {
         return await JsonLoad.loadDirectory(config.schemaDir());
     }
     static async loadDirectory(directory) {
-        const result = [];
+        let result = [];
         if (path.dirname(directory)) {
-            for (const fileName of fs.readdirSync(directory)) {
+            //=======================
+            result = await Promise.all(fs.readdirSync(directory).map(async (fileName) => {
                 let _file = path.join(directory, fileName);
                 if (JsonLoad.isJsonFile(_file)) {
                     let validschema = await JsonLoad.loadFile(_file);
-                    result.push(await JsonLoad.makeModel(validschema));
+                    let mdl = await JsonLoad.makeModel(validschema);
+                    return mdl;
                 }
-            }
+                return;
+            }));
         }
         else {
             throw new Error('directory Not Found : ' + directory);
         }
+        //====================
+        /*
+        for (const fileName of fs.readdirSync(directory)) {
+            let _file = path.join(directory, fileName);
+            if(JsonLoad.isJsonFile(_file)){
+                let validschema = await JsonLoad.loadFile(_file);
+                result.push(await JsonLoad.makeModel(validschema!));
+            }
+        }
+    }else{
+
+    throw new Error('directory Not Found : '+ directory)
+    }
+ */
         return result;
     }
     static async makeSchema(jschema) {
         JsonLoad.validate(jschema);
-        // convert json type to mongoose schema type
-        Object.entries(jschema.schema).forEach((item) => JsonLoad.deepSearch(item));
+        for (let item of Object.entries(jschema.schema))
+            await JsonLoad.deepSearch(item);
         return jschema;
     }
     static async makeModel(jschema) {
@@ -102,12 +117,12 @@ export class JsonLoad {
         return 'number,string,boolean'.indexOf(typeof value) !== -1;
     }
     // search item in object and map to mongoose schema
-    static deepSearch(item) {
+    static async deepSearch(item) {
         // loop over the item
         for (let [itemIndex, itemValue] of Object.entries(item)) {
             // check if item is object then call deepSearch agin recursively
             if (typeof itemValue === "object") {
-                JsonLoad.deepSearch(itemValue);
+                await JsonLoad.deepSearch(itemValue);
             }
             else {
                 // loop over typeMappings to map user schema string type to mongoose typings
