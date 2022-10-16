@@ -6,6 +6,7 @@ const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
 const validTypes = [Number, String, Object, Array, Boolean, Function]
 const unsafe_string = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/; 
+//const unsafe_search_string = /[@#$%^*()_+\-=\[\]{};:"\\|,<>\/]+/;  
 
 function isObject (v:any) {
   return v && (typeof v === 'object') && !Array.isArray(v)
