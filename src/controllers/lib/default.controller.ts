@@ -1,5 +1,5 @@
 import express from 'express';
-import { dbStore,logger, responce} from '../../common/index.js';
+import { dbStore,logger, responce, Assert} from '../../common/index.js';
 import{Ilogger,Iresponce,IController, IJsonModel} from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
@@ -22,6 +22,11 @@ export class DefaultController implements IController {
   this.responce(res).data(num!)
   }
 
+  isSafeString(str:string, res:any){ 
+        Assert.string(str)
+        Assert.safeString(str); 
+    }
+  
   async search(req: express.Request, res: express.Response, next: express.NextFunction){
 
     if(!req.query){
@@ -29,8 +34,9 @@ export class DefaultController implements IController {
     }
     // extract key value from request.query object
     let key=Object.keys(req.query)[0]
-    let value = req.query[key]
-  
+    let value = req.query[key] as string
+  // chech string is safe
+    this.isSafeString(value, res)
     // the following three lines validate the reqested Key is actually present in the model schema properties
     let iskeyInModel = this.db.model?.schema.pathType(key)
     if("real nested virtual".indexOf(iskeyInModel!) === -1){

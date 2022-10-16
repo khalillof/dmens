@@ -1,4 +1,4 @@
-import { dbStore, logger, responce } from '../../common/index.js';
+import { dbStore, logger, responce, Assert } from '../../common/index.js';
 export class DefaultController {
     db;
     responce;
@@ -15,6 +15,10 @@ export class DefaultController {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);
     }
+    isSafeString(str, res) {
+        Assert.string(str);
+        Assert.safeString(str);
+    }
     async search(req, res, next) {
         if (!req.query) {
             return this.responce(res).data([]);
@@ -22,6 +26,8 @@ export class DefaultController {
         // extract key value from request.query object
         let key = Object.keys(req.query)[0];
         let value = req.query[key];
+        // chech string is safe
+        this.isSafeString(value, res);
         // the following three lines validate the reqested Key is actually present in the model schema properties
         let iskeyInModel = this.db.model?.schema.pathType(key);
         if ("real nested virtual".indexOf(iskeyInModel) === -1) {
