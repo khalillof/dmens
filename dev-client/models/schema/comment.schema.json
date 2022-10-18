@@ -14,9 +14,8 @@
         "ref": "account",
         "required":true
     },
-    "post_id": {
+    "model_id": {
         "type": "ObjectId",
-        "ref": "post",
         "required":true
     }
 }
