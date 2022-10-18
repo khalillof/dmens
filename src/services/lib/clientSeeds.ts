@@ -85,7 +85,7 @@ export class ClientSeedDatabase {
             })
             // loop over post ids
             this.loopOverSequence(posts_ids.length, comments.length, (IDindex: number, itemIndex: number) => {
-                comments[itemIndex].post_id = posts_ids[IDindex]
+                comments[itemIndex].model_id = posts_ids[IDindex]
             })
 
 
