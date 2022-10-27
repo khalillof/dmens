@@ -16,7 +16,6 @@ export class DefaultController implements IController {
     return new this(svcName);
   }
 
-
   async count(req: express.Request, res: express.Response, next: express.NextFunction){
   let num =  await this.db.model?.countDocuments(req.query)
   this.responce(res).data(num!)
@@ -32,6 +31,7 @@ export class DefaultController implements IController {
     if(!req.query){
     return this.responce(res).data([]);
     }
+
     // extract key value from request.query object
     let key=Object.keys(req.query)[0]
     let value = req.query[key] as string
@@ -43,17 +43,36 @@ export class DefaultController implements IController {
     return this.responce(res).data([]);
   }
    // const docs = await this.db.model?.find({ [key]: { $regex: value } });
-   const docs = await this.db.model?.find({ [key]:  new RegExp(`${value}`,'i')  });
-    docs!.length && docs!.map(doc => doc[key]).sort();
+   const docs = await this.db.Tolist({ [key]:  new RegExp(`${value}`,'i')  });
  
      this.responce(res).data(docs!);  
 
       }
+getQueryData(req: any){
+
+if(req.query){
+  let filter:any = req.query;
+  const  limit = (filter && filter.limit) ? parseInt(filter.limit as string) : 10;
+  const  page = (filter && filter.page) ? parseInt(filter.page as string) : 1;
+  const  sort = (filter && filter.sort && (filter.sort === '1' || filter.sort === '-1')) ? parseInt(filter.sort as string) : 1;
+
+    page && (delete filter['page'])
+    page && (delete filter['limit'])
+    page && (delete filter['sort'])
+
+    return {filter,limit,page,sort};
+  
+  }else{
+    return {}
+  }
+}
+
 
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let items = await this.db.Tolist(20, 0, req.query);
-    this.responce(res).data(items)
+        const {filter,limit,page,sort} =this.getQueryData(req);
+        let items = await this.db.Tolist(filter,limit,page,sort)
 
+        this.responce(res).data(items)
   }
 
   async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {

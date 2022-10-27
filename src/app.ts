@@ -8,7 +8,7 @@ import fs from 'fs';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
-import { config, printRoutesToString } from './common/index.js';
+import { config, printRoutesToString, dbStore } from './common/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
 import { initRouteStore, corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
@@ -93,7 +93,9 @@ async function dmens(envpath?: string) {
 
     // seed database
     await new ClientSeedDatabase().init(); 
-    
+    // create on change event for documents
+    //for( let db in dbStore)
+    // await dbStore[db].initPostDatabaseSeeding()
   
 
 

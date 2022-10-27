@@ -14,7 +14,7 @@ export function dbInit() {
         try {
             await mongoose.connect(config.databaseUrl(), dbOptions);
             console.log("Successfully Connected to db!");
-            let num = await JsonLoad.loadDefaultDirectory();
+            let num = await JsonLoad.loadDirectory();
             console.log('Numbers of models added to the database are :' + num.length);
             resolve(num.length);
         }

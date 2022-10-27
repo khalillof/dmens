@@ -76,6 +76,9 @@ async function dmens(envpath) {
     });
     // seed database
     await new ClientSeedDatabase().init();
+    // create on change event for documents
+    //for( let db in dbStore)
+    // await dbStore[db].initPostDatabaseSeeding()
     console.log('allowed cores are :' + config.allow_origins());
     dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
     // remove .env file if exist

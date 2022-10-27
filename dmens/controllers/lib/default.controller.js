@@ -34,12 +34,27 @@ export class DefaultController {
             return this.responce(res).data([]);
         }
         // const docs = await this.db.model?.find({ [key]: { $regex: value } });
-        const docs = await this.db.model?.find({ [key]: new RegExp(`${value}`, 'i') });
-        docs.length && docs.map(doc => doc[key]).sort();
+        const docs = await this.db.Tolist({ [key]: new RegExp(`${value}`, 'i') });
         this.responce(res).data(docs);
     }
+    getQueryData(req) {
+        if (req.query) {
+            let filter = req.query;
+            const limit = (filter && filter.limit) ? parseInt(filter.limit) : 10;
+            const page = (filter && filter.page) ? parseInt(filter.page) : 1;
+            const sort = (filter && filter.sort && (filter.sort === '1' || filter.sort === '-1')) ? parseInt(filter.sort) : 1;
+            page && (delete filter['page']);
+            page && (delete filter['limit']);
+            page && (delete filter['sort']);
+            return { filter, limit, page, sort };
+        }
+        else {
+            return {};
+        }
+    }
     async list(req, res, next) {
-        let items = await this.db.Tolist(20, 0, req.query);
+        const { filter, limit, page, sort } = this.getQueryData(req);
+        let items = await this.db.Tolist(filter, limit, page, sort);
         this.responce(res).data(items);
     }
     async getOne(req, res, next) {

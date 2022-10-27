@@ -2,31 +2,29 @@ import express from 'express'
 import { Model, Schema } from 'mongoose';
 
 export interface JsonSchema {
-  name: string;
-  populates?:Array<string>,
-  useAuth?:Array<string>, 
-  useAdmin?: Array<string>,
-  schema: Schema
+ readonly name: string
+ readonly schema: Schema
+ readonly populates?:Array<string>
+ readonly useAuth?:Array<string> 
+ readonly useAdmin?: Array<string>
 };
-export interface IJsonModel {
 
-  readonly name: string
-  readonly schema?: Schema;
-  readonly useAuth?:Array<string>
-  readonly useAdmin?: Array<string>
+export interface IJsonModel extends JsonSchema {
+
   readonly model?: Model<any>;
-  readonly populates?:Array<string>
-  readonly hasPopulate: boolean
+  readonly hasPopulate: boolean 
+  count:number
   checkAuth(method:string):Array<boolean>
-  log(...data: any[]): void
-  Tolist(limit: number, page: number, query: {}): Promise<[any]>;
+  initPostDatabaseSeeding(): Promise<any>;
+
+  Tolist(filter?: Record<string,any>,limit?: number, page?: number, sort?: number ): Promise<any[]>;
   findById(id: string): Promise<any>
-  findOne(query: {}): Promise<any>;
+  findOne(filter: Record<string,any>): Promise<any>;
   create(obj: object): Promise<any>;
-  putById(id: string, objFields: object): Promise<any>;
+  putById(id: string, objFields: Record<string,any>): Promise<any>;
 
   deleteById(id: string): Promise<any>;
-  deleteByQuery(query: {}): Promise<any>;
+  deleteByQuery(filter: Record<string,any>): Promise<any>;
   patchById(id: string, objFields: object): Promise<any>;
 }
 

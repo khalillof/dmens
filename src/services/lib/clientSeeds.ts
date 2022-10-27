@@ -1,9 +1,9 @@
-import { Model } from 'mongoose'
-import { dbStore } from '../../common/index.js';
+import { IJsonModel } from '../../interfaces/index.js';
+import { dbStore} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
 
 type dbCallback = {
-    (db: Model<any>): Promise<any>;
+    (db: IJsonModel): Promise<any>;
 }
 export class ClientSeedDatabase {
 
@@ -34,7 +34,7 @@ export class ClientSeedDatabase {
             if (roles) {
                 await Promise.all(seeds.accounts.map(async (account: any) => {
                     account.roles = roles;
-                    let ut = await Db.register!(account, "password");
+                    let ut = await Db.model.register!(account, "password");
                     this.accountsCache.push(ut);
                 }))
                 console.log('finished seeding accounts')
@@ -114,8 +114,8 @@ export class ClientSeedDatabase {
 
     countDb(dbName: string, callback: dbCallback) {
         return new Promise(async (resolve) => {
-            let Db = dbStore[dbName].model!;
-            Db.estimatedDocumentCount(async (err: any, count: number) => {
+            let Db = dbStore[dbName];
+            Db.model!.estimatedDocumentCount(async (err: any, count: number) => {
                 if (!err && count === 0) {
                     callback && resolve(await callback(Db))
                 } else if (err) {
@@ -136,8 +136,8 @@ export class ClientSeedDatabase {
 
     async saver(dbName: string, objArr: any[]) {
         await this.countDb(dbName, async (db) => {
-            await Promise.all(objArr.map(async (obj: any) => await new db(obj).save()))
-            console.log('finished seeding ' + dbName)
+            await Promise.all(objArr.map(async (obj: any) => await new db.model!(obj).save()))
+            console.log('finished seeding ' + dbName)        
         })
     }
 
