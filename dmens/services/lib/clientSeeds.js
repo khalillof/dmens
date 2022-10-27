@@ -22,7 +22,7 @@ export class ClientSeedDatabase {
             if (roles) {
                 await Promise.all(seeds.accounts.map(async (account) => {
                     account.roles = roles;
-                    let ut = await Db.register(account, "password");
+                    let ut = await Db.model.register(account, "password");
                     this.accountsCache.push(ut);
                 }));
                 console.log('finished seeding accounts');
@@ -89,8 +89,8 @@ export class ClientSeedDatabase {
     }
     countDb(dbName, callback) {
         return new Promise(async (resolve) => {
-            let Db = dbStore[dbName].model;
-            Db.estimatedDocumentCount(async (err, count) => {
+            let Db = dbStore[dbName];
+            Db.model.estimatedDocumentCount(async (err, count) => {
                 if (!err && count === 0) {
                     callback && resolve(await callback(Db));
                 }
@@ -111,7 +111,7 @@ export class ClientSeedDatabase {
     }
     async saver(dbName, objArr) {
         await this.countDb(dbName, async (db) => {
-            await Promise.all(objArr.map(async (obj) => await new db(obj).save()));
+            await Promise.all(objArr.map(async (obj) => await new db.model(obj).save()));
             console.log('finished seeding ' + dbName);
         });
     }

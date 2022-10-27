@@ -4,63 +4,80 @@ import { dbStore } from '../../common/index.js';
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
-export class JsonModel {
+export class JsonObject {
+    constructor(jsonSchema) {
+        this.validate(jsonSchema);
+        this.name = jsonSchema.name.toLowerCase() || "";
+        this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true });
+        this.populates = jsonSchema.populates || [];
+        jsonSchema.useAdmin && (this.useAuth = jsonSchema.useAuth);
+        jsonSchema.useAdmin && (this.useAdmin = jsonSchema.useAdmin);
+    }
+    name;
+    schema;
+    populates;
+    useAuth;
+    useAdmin;
+    validate(jsonSchema) {
+        if (!jsonSchema)
+            throw new Error('jsonSchema id required parameter');
+        if (!jsonSchema.name)
+            throw new Error(' schema validation faild ! property name is required');
+        if (dbStore[jsonSchema.name.toLowerCase()])
+            throw new Error(`schema validation faild ! name property : ${jsonSchema.name} already on db : `);
+    }
+}
+export class JsonModel extends JsonObject {
     constructor(jsonSchema, callback) {
+        super(jsonSchema);
         let self = this;
-        if (jsonSchema) {
-            this.name = jsonSchema.name.toLowerCase() || "";
-            this.populates = jsonSchema.populates;
-            this.hasPopulate = jsonSchema.populates && jsonSchema.populates.length ? true : false;
-            jsonSchema.useAdmin && (this.useAuth = jsonSchema.useAuth);
-            jsonSchema.useAdmin && (this.useAdmin = jsonSchema.useAdmin);
-            if (dbStore[this.name]) {
-                throw new Error('there is already model on Db with this name : ' + this.name);
-            }
-            this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true });
-            if (this.name === 'account') {
-                this.schema.plugin(passportLocalMongoose);
-                const Account = mongoose.model(this.name, this.schema);
-                //passport.use(new Strategy(User.authenticate()));
-                passport.use(Account.createStrategy());
-                passport.serializeUser(Account.serializeUser());
-                passport.deserializeUser(Account.deserializeUser());
-                // extras
-                passport.use(PassportStrategies.FacebookToken());
-                passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
-                //passport.use(PassportStrategies.JwtQueryParameterStrategy());
-                // assign
-                this.model = Account;
-            }
-            else {
-                this.model = mongoose.model(this.name, this.schema);
-            }
-        }
-        else if (typeof callback === 'function') {
-            callback(this);
+        this.hasPopulate = this.populates.length ? true : false;
+        if (this.name === 'account') {
+            this.schema.plugin(passportLocalMongoose);
+            const Account = mongoose.model(this.name, this.schema);
+            //passport.use(new Strategy(User.authenticate()));
+            passport.use(Account.createStrategy());
+            passport.serializeUser(Account.serializeUser());
+            passport.deserializeUser(Account.deserializeUser());
+            // extras
+            passport.use(PassportStrategies.FacebookToken());
+            passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+            //passport.use(PassportStrategies.JwtQueryParameterStrategy());
+            // assign
+            this.model = Account;
         }
         else {
-            throw new Error('jsonSchema is required');
+            this.model = mongoose.model(this.name, this.schema);
         }
-        // add to db store
-        dbStore[this.name] = self;
-        console.log("added ( " + this.name + " ) to DbStore :");
         //this.#loadPopulates(jsonSchema?.schema); 
         if (this.hasPopulate) {
             this.#buildPopulates();
-            self.Tolist = new Function('limit=25', 'page=0', 'query={}', `return this.model.find(query).limit(limit).skip(limit * page)${this.#populateQuery}`);
+            self.Tolist = new Function('filter={}', 'limit=25', 'page=1', 'sort=1', `return this.model.find(filter).limit(limit).skip((page -1) * limit).sort({'createdAt': sort})${this.#populateQuery}`);
             self.findById = new Function('id', `return this.model.findById(id)${this.#populateQuery}`);
-            self.findOne = new Function('query', `return this.model.findOne(query)${this.#populateQuery}`);
+            self.findOne = new Function('filter', `return this.model.findOne(filter)${this.#populateQuery}`);
         }
+        // check callback
+        callback && typeof callback === 'function' && callback(this);
+        // add to db store
+        dbStore[this.name] = this;
+        console.log("added ( " + this.name + " ) to DbStore :");
     }
-    name = "";
-    schema;
     model;
-    populates = [];
-    useAuth;
-    useAdmin;
+    count = 0;
     hasPopulate = false;
     #populateQuery = "";
-    log = console.log;
+    async initPostDatabaseSeeding() {
+        // count
+        this.count = await this.model.count();
+        // create document watcher to notify you on document changes so you can update documents count property
+        this.model.watch().on('change', async (change) => {
+            this.count = await this.model?.count() ?? 0;
+            console.log('number of documents counted are :' + this.count);
+            //console.log(JSON.stringify(change))
+        });
+        //console.log(`Number of documents on database for :( ${this.name} ) is ${this.count}`)
+        console.log(`Finished creating databse event on change for model :( ${this.name} )`);
+    }
     //check useAuth and useAdmin
     checkAuth(method) {
         return [
@@ -73,8 +90,8 @@ export class JsonModel {
             for (let item of this.populates) {
                 this.#populateQuery += ".populate('" + item + "')";
             }
-            this.#populateQuery += ".exec()";
         }
+        this.#populateQuery += ".exec()";
     }
     #loadPopulates(_schema) {
         // check and load populates
@@ -99,14 +116,16 @@ export class JsonModel {
     }
     static async createInstance(jsonModel, callback) {
         let dbb = new JsonModel(jsonModel, callback);
-        return dbb;
+        return Promise.resolve(dbb);
     }
-    async Tolist(limit = 25, page = 0, query = {}) {
-        let self = this;
-        return await self.model.find(query)
+    // sort, use 1 for asc and -1 for dec
+    async Tolist(filter, limit, page, sort) {
+        return await this.model.find(filter)
             .limit(limit)
-            .skip(limit * page)
+            .skip((page - 1) * limit)
+            .sort({ 'createdAt': sort })
             .exec();
+        // .skip(settings.limit * settings.page)
     }
     async findById(id) {
         return await this.model.findById(id);

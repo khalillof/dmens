@@ -1,6 +1,6 @@
 import { DefaultController } from './default.controller.js';
 import fs from 'fs';
-import { JsonLoad } from '../../models/index.js';
+import { JsonLoad, JsonModel } from '../../models/index.js';
 import { config } from '../../common/index.js';
 export class AdminController extends DefaultController {
     constructor(name = 'admin') {
@@ -8,7 +8,7 @@ export class AdminController extends DefaultController {
     }
     async schemaDataHandller(req, res, next) {
         // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
-        JsonLoad.validate(req.body.data);
+        //JsonLoad.validate(req.body.data)
         let jsonObj = await JsonLoad.makeSchema(req.body);
         let user = req.user;
         jsonObj.schema.admin = user._id;
@@ -16,7 +16,7 @@ export class AdminController extends DefaultController {
         let objForFileCopy = jsonObj;
         //check for activation
         if (jsonObj.activate)
-            await JsonLoad.makeModel(jsonObj.schema.data);
+            await JsonModel.createInstance(jsonObj.schema.data);
         //stringify JSON schema feild to save on db
         jsonObj.schema.data = JSON.stringify(jsonObj.schema.data);
         // assign validated json object to body for process & save by supper create method

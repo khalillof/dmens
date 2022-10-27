@@ -2,6 +2,7 @@ import express from 'express';
 import { DefaultController } from './default.controller.js';
 import {authenticateUser, generateJwt} from '../../services/index.js';
 import { config} from '../../common/index.js';
+
 export class AuthController extends DefaultController {
 
     constructor(svc:string) {
