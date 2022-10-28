@@ -67,11 +67,9 @@ if(req.query){
   }
 }
 
-
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
         const {filter,limit,page,sort} =this.getQueryData(req);
         let items = await this.db.Tolist(filter,limit,page,sort)
-
         this.responce(res).data(items)
   }
 
