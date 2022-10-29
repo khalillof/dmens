@@ -101,13 +101,13 @@ export class Assert {
         if (value !== undefined && !value.trim().length && notEmpty)
             Assert.fail(value, 'Not empty string', message);
     }
-    static safeString(value, message = '') {
+    static iSafeString(value, message = '') {
         Assert.string(value, { required: true, notEmpty: true });
         if (unsafe_string.test(value))
             Assert.fail(value, 'unsafe charecters detected ', message);
     }
     static idString(value, len = 25, message = '') {
-        Assert.safeString(value, message);
+        Assert.iSafeString(value, message);
         if (value.length > len)
             Assert.fail(value, 'id string is too long', message);
     }

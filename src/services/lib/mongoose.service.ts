@@ -15,7 +15,7 @@ export function dbInit() {
 
   return new Promise(async (resolve) => {
     try {
-      await mongoose.connect(config.databaseUrl()!, dbOptions)
+      await mongoose.connect(config.databaseUrl())
       console.log("Successfully Connected to db!");
 
       let num = await JsonLoad.loadDirectory()

@@ -92,6 +92,6 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     }
 
   actions(actionName:string){
-   return this.controller!.tryCatchActions(actionName)
+   return this.controller!.tryCatch(actionName)
   }
   }

@@ -68,7 +68,7 @@ export interface IController {
   patch(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   put(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   delete(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  tryCatchActions(actionNam: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
+  tryCatch(actionNam: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 
 };
 
