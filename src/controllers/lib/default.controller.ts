@@ -20,11 +20,6 @@ export class DefaultController implements IController {
   let num =  await this.db.model?.countDocuments(req.query)
   this.responce(res).data(num!)
   }
-
-  isSafeString(str:string, res:any){ 
-        Assert.string(str)
-        Assert.safeString(str); 
-    }
   
   async search(req: express.Request, res: express.Response, next: express.NextFunction){
 
@@ -36,7 +31,7 @@ export class DefaultController implements IController {
     let key=Object.keys(req.query)[0]
     let value = req.query[key] as string
   // chech string is safe
-    this.isSafeString(value, res)
+  Assert.iSafeString(value)
     // the following three lines validate the reqested Key is actually present in the model schema properties
     let iskeyInModel = this.db.model?.schema.pathType(key)
     if("real nested virtual".indexOf(iskeyInModel!) === -1){
@@ -48,27 +43,31 @@ export class DefaultController implements IController {
      this.responce(res).data(docs!);  
 
       }
-getQueryData(req: any){
 
-if(req.query){
-  let filter:any = req.query;
-  const  limit = (filter && filter.limit) ? parseInt(filter.limit as string) : 10;
-  const  page = (filter && filter.page) ? parseInt(filter.page as string) : 1;
-  const  sort = (filter && filter.sort && (filter.sort === '1' || filter.sort === '-1')) ? parseInt(filter.sort as string) : 1;
+getQueryData(query: Record<string,string | any>){
 
-    page && (delete filter['page'])
-    page && (delete filter['limit'])
-    page && (delete filter['sort'])
-
-    return {filter,limit,page,sort};
+if(query){
+  let _limit = query['limit'];
+  let _page = query['page'];
+  let _sort = query['sort'];
   
+  const  limit = _limit ? Number(_limit) : 5;
+  const  page = _page ? Number(_page) : 1;
+  const  sort = _sort && "1-1".includes(_sort)  ? Number(_sort) : 1;
+
+  page && (delete query['page'])
+  page && (delete query['limit'])
+  page && (delete query['sort'])
+
+  return {filter: query,limit,page,sort};
+
   }else{
     return {}
   }
 }
 
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
-        const {filter,limit,page,sort} =this.getQueryData(req);
+        const {filter,limit,page,sort} =this.getQueryData(req.query);
         let items = await this.db.Tolist(filter,limit,page,sort)
         this.responce(res).data(items)
   }
@@ -102,7 +101,7 @@ if(req.query){
     this.responce(res).success()
   }
   ////// helpers ================================
-  tryCatchActions(actionName:string){
+  tryCatch(actionName:string){
     return async (req: express.Request, res: express.Response, next: express.NextFunction)=>{
       try{
         let self:any=this;

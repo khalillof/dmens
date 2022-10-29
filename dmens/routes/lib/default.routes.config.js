@@ -81,6 +81,6 @@ export class DefaultRoutesConfig {
         this.options(this.routeParam);
     }
     actions(actionName) {
-        return this.controller.tryCatchActions(actionName);
+        return this.controller.tryCatch(actionName);
     }
 }

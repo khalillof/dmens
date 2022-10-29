@@ -15,10 +15,6 @@ export class DefaultController {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);
     }
-    isSafeString(str, res) {
-        Assert.string(str);
-        Assert.safeString(str);
-    }
     async search(req, res, next) {
         if (!req.query) {
             return this.responce(res).data([]);
@@ -27,7 +23,7 @@ export class DefaultController {
         let key = Object.keys(req.query)[0];
         let value = req.query[key];
         // chech string is safe
-        this.isSafeString(value, res);
+        Assert.iSafeString(value);
         // the following three lines validate the reqested Key is actually present in the model schema properties
         let iskeyInModel = this.db.model?.schema.pathType(key);
         if ("real nested virtual".indexOf(iskeyInModel) === -1) {
@@ -37,23 +33,25 @@ export class DefaultController {
         const docs = await this.db.Tolist({ [key]: new RegExp(`${value}`, 'i') });
         this.responce(res).data(docs);
     }
-    getQueryData(req) {
-        if (req.query) {
-            let filter = req.query;
-            const limit = (filter && filter.limit) ? parseInt(filter.limit) : 10;
-            const page = (filter && filter.page) ? parseInt(filter.page) : 1;
-            const sort = (filter && filter.sort && (filter.sort === '1' || filter.sort === '-1')) ? parseInt(filter.sort) : 1;
-            page && (delete filter['page']);
-            page && (delete filter['limit']);
-            page && (delete filter['sort']);
-            return { filter, limit, page, sort };
+    getQueryData(query) {
+        if (query) {
+            let _limit = query['limit'];
+            let _page = query['page'];
+            let _sort = query['sort'];
+            const limit = _limit ? Number(_limit) : 5;
+            const page = _page ? Number(_page) : 1;
+            const sort = _sort && "1-1".includes(_sort) ? Number(_sort) : 1;
+            page && (delete query['page']);
+            page && (delete query['limit']);
+            page && (delete query['sort']);
+            return { filter: query, limit, page, sort };
         }
         else {
             return {};
         }
     }
     async list(req, res, next) {
-        const { filter, limit, page, sort } = this.getQueryData(req);
+        const { filter, limit, page, sort } = this.getQueryData(req.query);
         let items = await this.db.Tolist(filter, limit, page, sort);
         this.responce(res).data(items);
     }
@@ -84,7 +82,7 @@ export class DefaultController {
         this.responce(res).success();
     }
     ////// helpers ================================
-    tryCatchActions(actionName) {
+    tryCatch(actionName) {
         return async (req, res, next) => {
             try {
                 let self = this;
