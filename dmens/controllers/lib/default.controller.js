@@ -33,26 +33,22 @@ export class DefaultController {
         const docs = await this.db.Tolist({ [key]: new RegExp(`${value}`, 'i') });
         this.responce(res).data(docs);
     }
-    getQueryData(query) {
-        if (query) {
-            let _limit = query['limit'];
-            let _page = query['page'];
-            let _sort = query['sort'];
-            const limit = _limit ? Number(_limit) : 5;
-            const page = _page ? Number(_page) : 1;
-            const sort = _sort && "1-1".includes(_sort) ? Number(_sort) : 1;
-            page && (delete query['page']);
-            page && (delete query['limit']);
-            page && (delete query['sort']);
-            return { filter: query, limit, page, sort };
-        }
-        else {
+    getQueryData(filter) {
+        if (!filter) {
             return {};
         }
+        let _limit = filter['limit'], _page = filter['page'], _sort = filter['sort'];
+        const limit = _limit ? Number(_limit) : 5;
+        const page = _page ? Number(_page) : 1;
+        const sort = (_sort && (_sort === "1" || _sort === "-1")) ? Number(_sort) : 1;
+        limit && (delete filter['limit']);
+        page && (delete filter['page']);
+        sort && (delete filter['sort']);
+        return [filter, limit, page, sort];
     }
     async list(req, res, next) {
-        const { filter, limit, page, sort } = this.getQueryData(req.query);
-        let items = await this.db.Tolist(filter, limit, page, sort);
+        // const {filter, limit, page, sort } =this.getQueryData(req.query)
+        let items = await this.db.Tolist(...this.getQueryData(req.query));
         this.responce(res).data(items);
     }
     async getOne(req, res, next) {
