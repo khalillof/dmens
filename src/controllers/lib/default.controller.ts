@@ -32,6 +32,7 @@ export class DefaultController implements IController {
     let value = req.query[key] as string
   // chech string is safe
   Assert.iSafeString(value)
+
     // the following three lines validate the reqested Key is actually present in the model schema properties
     let iskeyInModel = this.db.model?.schema.pathType(key)
     if("real nested virtual".indexOf(iskeyInModel!) === -1){
@@ -44,31 +45,28 @@ export class DefaultController implements IController {
 
       }
 
-getQueryData(query: Record<string,string | any>){
+getQueryData(filter: Record<string,string | any>):any{
 
-if(query){
-  let _limit = query['limit'];
-  let _page = query['page'];
-  let _sort = query['sort'];
-  
+if(!filter){
+  return {}
+ }
+
+  let _limit = filter['limit'],_page = filter['page'],_sort = filter['sort'];
+
   const  limit = _limit ? Number(_limit) : 5;
   const  page = _page ? Number(_page) : 1;
-  const  sort = _sort && "1-1".includes(_sort)  ? Number(_sort) : 1;
+  const  sort = (_sort && (_sort === "1" || _sort === "-1"))  ? Number(_sort) : 1;
+  
+  limit && (delete filter['limit'])
+  page && (delete filter['page'])
+  sort && (delete filter['sort'])
 
-  page && (delete query['page'])
-  page && (delete query['limit'])
-  page && (delete query['sort'])
-
-  return {filter: query,limit,page,sort};
-
-  }else{
-    return {}
-  }
+  return [filter,limit,page,sort];
 }
 
-  async list(req: express.Request, res: express.Response, next: express.NextFunction) {
-        const {filter,limit,page,sort} =this.getQueryData(req.query);
-        let items = await this.db.Tolist(filter,limit,page,sort)
+  async list(req: express.Request, res: express.Response, next: express.NextFunction) { 
+   // const {filter, limit, page, sort } =this.getQueryData(req.query)
+        let items = await this.db.Tolist(...this.getQueryData(req.query))
         this.responce(res).data(items)
   }
 
