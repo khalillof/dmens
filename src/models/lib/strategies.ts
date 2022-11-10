@@ -17,7 +17,7 @@ export class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-        dbStore['account'].model!.findOne({ username: username },(err:any, user:any) => {
+        dbStore['account'].model!.findOne({ username: username }).populate('roles').exec((err:any, user:any) => {
                 if (err) { return cb(err); }
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
                   
@@ -29,9 +29,6 @@ export class PassportStrategies {
                   } else {
                       return cb(null, user);
                   }
-              })
-              .catch((err) => {   
-                  cb(err);
               });
   });
   }
@@ -45,8 +42,9 @@ export class PassportStrategies {
       audience: config.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
-      dbStore['account'].model?.findById(payload.user._id,(error: any, user?: any, info?:any)=>{
-      //if(user)
+      dbStore['account'].model?.findById(payload.user._id).populate('roles').exec((error: any, user?: any, info?:any)=>{
+      //console.log('JwtAuthHeaderAsBearerTokenStrategy')
+        //if(user)
         return user && done(false,user) || error && done(error,null) || info && done(false,null,info);
       //if(error)
       //return done(error,null)

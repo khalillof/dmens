@@ -60,6 +60,12 @@ function authenticateUser(type, opts) {
                 console.log('authenticated user id :');
                 console.log((user && user._id) || info || err);
                 if (user) {
+                    let _roles = [];
+                    for (let id of user.roles) {
+                        let r = await dbStore['role'].findById(id);
+                        _roles.push(r);
+                    }
+                    user.roles = _roles;
                     // handle local login
                     return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next);
                 }

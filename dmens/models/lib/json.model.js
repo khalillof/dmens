@@ -36,12 +36,14 @@ export class JsonModel extends JsonObject {
             this.schema.plugin(passportLocalMongoose);
             const Account = mongoose.model(this.name, this.schema);
             //passport.use(new Strategy(User.authenticate()));
+            //local strategy
             passport.use(Account.createStrategy());
             passport.serializeUser(Account.serializeUser());
             passport.deserializeUser(Account.deserializeUser());
             // extras
-            passport.use(PassportStrategies.FacebookToken());
+            // jwt strategy
             passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
+            passport.use(PassportStrategies.FacebookToken());
             //passport.use(PassportStrategies.JwtQueryParameterStrategy());
             // assign
             this.model = Account;
@@ -52,7 +54,7 @@ export class JsonModel extends JsonObject {
         //this.#loadPopulates(jsonSchema?.schema); 
         if (this.hasPopulate) {
             this.#buildPopulates();
-            self.Tolist = new Function('filter={}', 'limit=25', 'page=1', 'sort=1', `return this.model.find(filter).limit(limit).skip((page -1) * limit).sort({'createdAt': sort})${this.#populateQuery}`);
+            self.Tolist = new Function('filter={}', 'limit=5', 'page=1', 'sort=1', `return this.model.find(filter).limit(limit).skip((page -1) * limit).sort({'createdAt': sort})${this.#populateQuery}`);
             self.findById = new Function('id', `return this.model.findById(id)${this.#populateQuery}`);
             self.findOne = new Function('filter', `return this.model.findOne(filter)${this.#populateQuery}`);
         }

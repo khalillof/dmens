@@ -40,7 +40,7 @@ export interface Iresponces {
   forbidden: (msg?: string) => void;
   unAuthorized: (msg?: string) => void;
   error: (err: any) => void;
-  data: (item: {}, message?: string) => void;
+  data: (item: any, message?: string, total?:number,) => void;
   errCb: (err: any, cb: Function) => void;
   errSuccess: (err: any) => void;
   callback: (cb: Function, obj?: any) => void;
