@@ -42,7 +42,7 @@ export const responce = (res, cb) => {
         unAuthorized: (msg) => self.errStatus(401, msg ?? 'unAuthorized!'),
         forbidden: (msg) => self.errStatus(403, msg ?? 'forbidden!'),
         error: (err) => logger.resErr(res, err),
-        data: (data, message) => res.json({ success: true, message: message ?? successMsg, data: data }),
+        data: (data, message, total) => res.json({ success: true, message: message ?? successMsg, data, total }),
         errCb: (err, cb) => err ? self.error(err) : self.callback(cb),
         errSuccess: (err) => err ? self.error(err) : self.success(),
         callback: (cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,

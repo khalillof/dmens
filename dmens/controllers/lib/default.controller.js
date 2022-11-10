@@ -37,19 +37,23 @@ export class DefaultController {
         if (!filter) {
             return {};
         }
-        let _limit = filter['limit'], _page = filter['page'], _sort = filter['sort'];
+        let _limit = filter['limit'], _page = filter['page'], _sort = filter['sort'], _total = filter['total'];
         const limit = _limit ? Number(_limit) : 5;
         const page = _page ? Number(_page) : 1;
         const sort = (_sort && (_sort === "1" || _sort === "-1")) ? Number(_sort) : 1;
+        const total = _total ? Boolean(_total) : undefined;
         limit && (delete filter['limit']);
         page && (delete filter['page']);
         sort && (delete filter['sort']);
-        return [filter, limit, page, sort];
+        total && (delete filter['total']);
+        return { filter, limit, page, sort, total };
     }
     async list(req, res, next) {
-        // const {filter, limit, page, sort } =this.getQueryData(req.query)
-        let items = await this.db.Tolist(...this.getQueryData(req.query));
-        this.responce(res).data(items);
+        let { filter, limit, page, sort, total } = this.getQueryData(req.query);
+        let items = await this.db.Tolist(filter, limit, page, sort);
+        total && (total = await this.db.model?.countDocuments(filter));
+        // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
+        this.responce(res).data(items, undefined, total);
     }
     async getOne(req, res, next) {
         let q = req.params['id'] ? { _id: req.params['id'] } : req.query;

@@ -50,7 +50,7 @@ export const responce =(res:express.Response, cb?:Function)=>{
       unAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'unAuthorized!'),
       forbidden: (msg?: string)=> self.errStatus(403,msg ?? 'forbidden!'),
       error:(err:any)=> logger.resErr(res, err),
-      data:(data:any, message?:string)=> res.json({ success: true, message: message ?? successMsg, data: data }),
+      data:(data:any, message?:string, total?:number,)=> res.json({ success: true, message: message ?? successMsg, data,total}),
       errCb:(err:any, cb:Function)=> err ? self.error(err) : self.callback(cb),
       errSuccess:(err:any)=> err ? self.error(err) : self.success(),
       callback:(cb:Function, obj?:any) => cb && typeof cb === 'function' ? cb(obj) : false,

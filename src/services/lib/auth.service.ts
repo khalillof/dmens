@@ -1,4 +1,4 @@
-import passport from 'passport';
+import passport, { use } from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
 import { config, dbStore, logger } from "../../common/index.js";
@@ -63,11 +63,18 @@ function authenticateUser(type: string, opts?: {}) {
     if ('facebook facebook-token'.indexOf(type) !== -1)
       pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
     try {
-      return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
+      return await passport.authenticate(type, opts ?? pssportOptions, async (err:any, user:any, info:any) => {
           console.log('authenticated user id :')
           console.log((user && user._id) || info || err )
 
         if (user) {
+          let _roles = [];
+          for(let id of user.roles){
+          let r = await dbStore['role'].findById(id)
+          _roles.push(r)
+         }
+         user.roles =_roles;
+
           // handle local login
           return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next)
 
