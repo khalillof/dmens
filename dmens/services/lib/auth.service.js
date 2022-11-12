@@ -65,6 +65,8 @@ function authenticateUser(type, opts) {
                         let r = await dbStore['role'].findById(id);
                         _roles.push(r);
                     }
+                    user['hash'] = null;
+                    user['salt'] = null;
                     user.roles = _roles;
                     // handle local login
                     return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next);

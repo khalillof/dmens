@@ -38,7 +38,7 @@ export class DefaultController implements IController {
     if("real nested virtual".indexOf(iskeyInModel!) === -1){
     return this.responce(res).data([]);
   }
-   // const docs = await this.db.model?.find({ [key]: { $regex: value } });
+
    const docs = await this.db.Tolist({ [key]:  new RegExp(`${value}`,'i')  });
  
      this.responce(res).data(docs!);  
