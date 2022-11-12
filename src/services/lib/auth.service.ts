@@ -73,6 +73,8 @@ function authenticateUser(type: string, opts?: {}) {
           let r = await dbStore['role'].findById(id)
           _roles.push(r)
          }
+         user['hash']= null;
+         user['salt']=null;
          user.roles =_roles;
 
           // handle local login
