@@ -1,0 +1,32 @@
+{
+    "name":"like",
+    "populates":["author"],
+    "useAuth":["post","put","delete"], 
+    "useAdmin": [], 
+      "schema":{
+        "like":  {
+            "type":  "Boolean",
+            "default":false
+        },
+        "rate":  {
+            "type": "Number",
+            "default": 0,
+             "min": 0,
+             "max": 5
+        },
+        "comment":  {
+            "type": "String",
+            "minLength": 0,
+            "maxLength": 150
+        },
+        "author": {
+            "type": "ObjectId",
+            "ref": "account",
+            "required":true
+        },
+        "model_id": {
+            "type": "ObjectId",
+            "required":true
+        }
+    }
+    }
