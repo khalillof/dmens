@@ -1,5 +1,13 @@
-This is dynamic RESTful api server, using nodejs expressjs and mongodb, dynamiclly create schemas, routes and CRUD operations.
-the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever.
-It does exactly what the name imply, dynamiclly create schemas, routes and CRUD operations, just though json files on the fly.
+This is scalable dynamic RESTful api server.
+Core libraries used are nodejs, expressjs and mongodb.
 
-Fully functional api server just need to create your json files eithir upload them or post them as json content or file, which will be mapped to and create mongoose schema then to db model then we  use the model names to create routes populated them  with prebuild functions to create the basic cread read write update and delete operations.
+The name - dmens stand for dynamic | Mongodb | Expressjs | nodejs | srever.
+dynamically create scalable web api server, implement CRUD operation to a live server.
+
+features:
+dynamically create, read, update and delete routes ,schemas and models.
+security api with Json Web Token -- JWT 
+Docker image
+
+
+
