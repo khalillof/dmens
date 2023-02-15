@@ -15,9 +15,9 @@ export class JsonObject implements JsonSchema {
     this.name = jsonSchema.name.toLowerCase() || "";
 
     this.schema = new mongoose.Schema(jsonSchema.schema as any, { timestamps: true });
-
-    this.populates = jsonSchema.populates || [];
-
+    // check if populate not empty, then new Set() will get red of duplicate values
+    this.populates = (jsonSchema.populates && jsonSchema.populates.length) ? Array.from(new Set(jsonSchema.populates)) : [];
+  
     jsonSchema.useAdmin && (this.useAuth = jsonSchema.useAuth);
     jsonSchema.useAdmin && (this.useAdmin = jsonSchema.useAdmin);
 
@@ -122,7 +122,6 @@ export class JsonModel extends JsonObject implements IJsonModel {
   #loadPopulates(_schema?: any) {
     // check and load populates
     Object.entries(_schema ?? this.schema!.obj).forEach((item, indx, arr) => this.#deepSearch(item, indx, arr));
-
     this.#buildPopulates();
   }
 

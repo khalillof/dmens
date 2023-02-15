@@ -12,6 +12,7 @@ export function dbInit() {
     console.log('db connction string :' + config.databaseUrl());
     return new Promise(async (resolve) => {
         try {
+            //await mongoose.set('strictQuery', true).connect(config.databaseUrl())
             await mongoose.connect(config.databaseUrl());
             console.log("Successfully Connected to db!");
             let num = await JsonLoad.loadDirectory();

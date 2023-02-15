@@ -7,7 +7,7 @@ export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.Validatio
 export const logger = {
     log: console.log,
     err: (err) => console.error(err.stack),
-    resErrMsg: (res, ErorMsg) => res.status(400).json({ success: false, message: ErorMsg ? ErorMsg : 'operation faild!' }),
+    resErrMsg: (res, ErorMsg) => res.status(400).json({ success: false, error: ErorMsg || 'operation faild!' }),
     resErr: function (res, err) {
         if (err) {
             let errInstance = errStore.filter((errObj) => {
@@ -26,29 +26,33 @@ export const responce = (res, cb) => {
     let successMsg = 'operation Successful!';
     let errMsg = 'error operation faild!';
     let self = {
-        errObjInfo: (err, obj, info) => {
+        errObjInfo: (error, obj, info) => {
             if (obj) {
                 cb ? self.callback(cb) : self.success();
                 return;
             }
-            self.fail(err ? err.message : info.message);
-            logger.err(err ?? info);
+            self.fail(error ? error.message : info.message);
+            logger.err(error ?? info);
             return;
         },
         success: (msg) => res.json({ success: true, message: msg ?? successMsg }),
-        fail: (msg) => res.json({ success: false, message: msg ?? errMsg }),
-        errStatus: (status, msg) => res.status(status).json({ success: false, message: msg }),
+        fail: (error) => res.json({ success: false, error: (error ?? errMsg) }),
+        errStatus: (status, error) => res.status(status).json({ success: false, error }),
         badRequest: (msg) => self.errStatus(400, msg ?? 'bad Request!'),
         unAuthorized: (msg) => self.errStatus(401, msg ?? 'unAuthorized!'),
         forbidden: (msg) => self.errStatus(403, msg ?? 'forbidden!'),
-        error: (err) => logger.resErr(res, err),
-        data: (data, message, total) => res.json({ success: true, message: message ?? successMsg, data, total }),
-        errCb: (err, cb) => err ? self.error(err) : self.callback(cb),
-        errSuccess: (err) => err ? self.error(err) : self.success(),
+        error: (error) => logger.resErr(res, error),
+        data: (data, message, total) => res.json({ success: true, message, data, total }),
+        errCb: (error, cb) => error ? self.error(error) : self.callback(cb),
+        errSuccess: (error) => error ? self.error(error) : self.success(),
         callback: (cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,
         json: (obj) => res.json(obj)
     };
     return self;
+};
+export const sortArray = (itemsArray, propKey) => {
+    let sorted = itemsArray.sort((item1, item2) => (item1[propKey] > item2[propKey]) ? 1 : (item1[propKey] < item2[propKey]) ? -1 : 0);
+    return sorted;
 };
 export const Roles = ["user", "admin", "application"];
 export const isValidRole = (role) => role ? Roles.indexOf(role) !== -1 : false;

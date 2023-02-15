@@ -1,7 +1,7 @@
 "use strict";
 import dotenv from 'dotenv';
-import express from 'express';
 import compression from 'compression';
+import express from 'express';
 import session from 'express-session';
 import path from 'path';
 import fs from 'fs';
