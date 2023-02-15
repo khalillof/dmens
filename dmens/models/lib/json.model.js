@@ -9,7 +9,8 @@ export class JsonObject {
         this.validate(jsonSchema);
         this.name = jsonSchema.name.toLowerCase() || "";
         this.schema = new mongoose.Schema(jsonSchema.schema, { timestamps: true });
-        this.populates = jsonSchema.populates || [];
+        // check if populate not empty, then new Set() will get red of duplicate values
+        this.populates = (jsonSchema.populates && jsonSchema.populates.length) ? Array.from(new Set(jsonSchema.populates)) : [];
         jsonSchema.useAdmin && (this.useAuth = jsonSchema.useAuth);
         jsonSchema.useAdmin && (this.useAdmin = jsonSchema.useAdmin);
     }

@@ -14,7 +14,7 @@ export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.Validatio
 export const logger = {
     log:console.log,
     err:(err:any)=> console.error(err.stack),
-    resErrMsg:(res:express.Response, ErorMsg?:string)=> res.status(400).json({ success: false, message:ErorMsg ? ErorMsg: 'operation faild!' }),
+    resErrMsg:(res:express.Response, ErorMsg?:string)=> res.status(400).json({ success: false, error:ErorMsg ||'operation faild!' }),
     resErr:function(res:express.Response,err:any){
         if (err) {
            let errInstance= errStore.filter((errObj:any)=> {
@@ -34,25 +34,25 @@ export const responce =(res:express.Response, cb?:Function)=>{
     let  errMsg='error operation faild!';
 
     let self= { 
-      errObjInfo:(err:any, obj:any, info:any)=>{
+      errObjInfo:(error:any, obj:any, info:any)=>{
         if (obj) {
           cb ? self.callback(cb) : self.success();
           return;
         }
-        self.fail(err ? err.message : info.message);
-        logger.err(err ?? info)
+        self.fail(error ? error.message : info.message);
+        logger.err(error ?? info)
         return;
       },
       success:(msg?:string)=> res.json({success:true,message:msg ?? successMsg}),
-      fail:(msg?:string)=> res.json({success:false,message:msg ?? errMsg}),
-      errStatus:(status:number,msg:string)=> res.status(status).json({success:false,message:msg}),
+      fail:(error?:string)=> res.json({success:false,error:(error ?? errMsg)}),
+      errStatus:(status:number,error:string)=> res.status(status).json({success:false,error}),
       badRequest: (msg?: string)=> self.errStatus(400,msg ?? 'bad Request!'),
       unAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'unAuthorized!'),
       forbidden: (msg?: string)=> self.errStatus(403,msg ?? 'forbidden!'),
-      error:(err:any)=> logger.resErr(res, err),
-      data:(data:any, message?:string, total?:number,)=> res.json({ success: true, message: message ?? successMsg, data,total}),
-      errCb:(err:any, cb:Function)=> err ? self.error(err) : self.callback(cb),
-      errSuccess:(err:any)=> err ? self.error(err) : self.success(),
+      error:(error:any)=> logger.resErr(res, error),
+      data:(data:any, message?:string,total?:number)=> res.json({ success: true, message, data,total}),
+      errCb:(error:any, cb:Function)=> error ? self.error(error) : self.callback(cb),
+      errSuccess:(error:any)=> error ? self.error(error) : self.success(),
       callback:(cb:Function, obj?:any) => cb && typeof cb === 'function' ? cb(obj) : false,
       json:(obj:{}) => res.json(obj)
     }
@@ -60,6 +60,10 @@ export const responce =(res:express.Response, cb?:Function)=>{
     return self;
   };
 
+export const sortArray = (itemsArray: any[], propKey:string)=>{
+    let sorted = itemsArray.sort((item1, item2) => (item1[propKey] > item2[propKey]) ? 1 : (item1[propKey] < item2[propKey]) ? -1 : 0);
+    return sorted;
+}
 export const Roles =["user", "admin", "application"];
 export const isValidRole =(role:string)=> role ?  Roles.indexOf(role) !== -1 : false;
   

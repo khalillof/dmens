@@ -53,7 +53,7 @@ export class JsonLoad {
     static async makeModelFromJsonFile(filePath: string, callback?:Function) {
         if (path.isAbsolute(filePath) && JsonLoad.isJsonFile(filePath)) {
 
-            let data = fs.readFileSync(filePath, 'utf8');
+            let data =  fs.readFileSync(filePath, 'utf8');
             let jsobj = JSON.parse(data);
 
             return await JsonLoad.makeModel(jsobj), callback;
