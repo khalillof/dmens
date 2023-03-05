@@ -9,8 +9,8 @@ export async function AuthRoutes(app:express.Application){
     return dbStore['account'] ? await Promise.resolve( await DefaultRoutesConfig.instance(app,'/auth', await AuthController.createInstance('account'), 
     function(self:IDefaultRoutesConfig):void{
 
-        self.app.post('/auth/signup',self.mware!.validateRequiredUserBodyFields,self.actions('signup'));       
-        self.app.post('/auth/signin',self.mware!.validateRequiredUserBodyFields,self.actions('signin'));
+        self.app.post('/auth/signup',self.mware!.checkLoginUserFields,self.actions('signup'));       
+        self.app.post('/auth/signin',self.mware!.checkLoginUserFields,self.actions('signin'));
         self.app.get('/auth/logout',self.actions('logout'));
         self.app.get('/auth/facebook/token',self.authenticate('facebook'),self.actions('facebook'));
 

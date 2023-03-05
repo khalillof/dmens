@@ -61,7 +61,7 @@ function authenticateUser(type: string, opts?: {}) {
     let loginOptions = { session: false };
     let pssportOptions = type === "jwt" ? loginOptions : {};
     if ('facebook facebook-token'.indexOf(type) !== -1)
-      pssportOptions = { failureRedirect: '/accounts/login', failureMessage: true }
+      pssportOptions = { failureRedirect: '/auth/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err:any, user:any, info:any) => {
           console.log('authenticated user id :')
