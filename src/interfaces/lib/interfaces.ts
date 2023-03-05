@@ -95,7 +95,7 @@ export interface IMiddlewares {
 
 
   getUserFromReq(req: express.Request): Promise<any>;
-  validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction): void;
 
   validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction): void;
 

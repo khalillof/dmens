@@ -3,8 +3,8 @@ import { DefaultRoutesConfig } from './default.routes.config.js';
 import { dbStore } from '../../common/index.js';
 export async function AuthRoutes(app) {
     return dbStore['account'] ? await Promise.resolve(await DefaultRoutesConfig.instance(app, '/auth', await AuthController.createInstance('account'), function (self) {
-        self.app.post('/auth/signup', self.mware.validateRequiredUserBodyFields, self.actions('signup'));
-        self.app.post('/auth/signin', self.mware.validateRequiredUserBodyFields, self.actions('signin'));
+        self.app.post('/auth/signup', self.mware.checkLoginUserFields, self.actions('signup'));
+        self.app.post('/auth/signin', self.mware.checkLoginUserFields, self.actions('signin'));
         self.app.get('/auth/logout', self.actions('logout'));
         self.app.get('/auth/facebook/token', self.authenticate('facebook'), self.actions('facebook'));
         self.app.get('/auth/profile/:id', self.authenticate("jwt"), self.mware.validateCurrentUserOwnParamId, self.actions('findById'));

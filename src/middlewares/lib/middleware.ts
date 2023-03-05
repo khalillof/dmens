@@ -12,13 +12,19 @@ export class Middlewares implements IMiddlewares {
   async  getUserFromReq(req:express.Request){
     return req.body && req.body.email ? await dbStore['account'].findOne({email:req.body.email}) : null;
     }
-    validateRequiredUserBodyFields(req: express.Request, res: express.Response, next: express.NextFunction){
-
-        if (req.body && req.body.email && req.body.username && req.body.password) {         
+    checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction){
+      if(req.body){
+      let  {email, username , password} = req.body;
+           if(!username && email) {req.body.username = email};
+           if(!email && username) {req.body.email = username};
+           
+        if (req.body.email && req.body.password) {         
             next();
-        } else {
-          responce(res).badRequest('Missing required body fields')
+            return;
         }
+      }
+        responce(res).badRequest('Missing required body fields')  
+        return;
     }
 
  async validateSameEmailDoesntExist (req: express.Request, res: express.Response, next: express.NextFunction){
@@ -29,10 +35,10 @@ export class Middlewares implements IMiddlewares {
       req.user && String(req.user._id) === String(req.params['id']) ? next() :responce(res).unAuthorized();
       } 
    validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
-    req.user && req.body.email && req.body.email === req.user.email  ? next() :responce(res).unAuthorized();
+    (req.user &&  req.body.email === req.user.email)  ? next() :responce(res).unAuthorized();
     }
     validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction){
-      req.user && req.query.email && req.query.email === req.user.email  ? next() :responce(res).forbidden('not authorized, require valid email');
+      (req.user && req.query.email === req.user.email)  ? next() :responce(res).forbidden('not authorized, require valid email');
       }
 
   async  userExist(req: express.Request, res: express.Response, next: express.NextFunction){

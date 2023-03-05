@@ -6,13 +6,24 @@ export class Middlewares {
     async getUserFromReq(req) {
         return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
     }
-    validateRequiredUserBodyFields(req, res, next) {
-        if (req.body && req.body.email && req.body.username && req.body.password) {
-            next();
+    checkLoginUserFields(req, res, next) {
+        if (req.body) {
+            let { email, username, password } = req.body;
+            if (!username && email) {
+                req.body.username = email;
+            }
+            ;
+            if (!email && username) {
+                req.body.email = username;
+            }
+            ;
+            if (req.body.email && req.body.password) {
+                next();
+                return;
+            }
         }
-        else {
-            responce(res).badRequest('Missing required body fields');
-        }
+        responce(res).badRequest('Missing required body fields');
+        return;
     }
     async validateSameEmailDoesntExist(req, res, next) {
         await this.getUserFromReq(req) ? responce(res).badRequest('User email already exists') : next();
@@ -21,10 +32,10 @@ export class Middlewares {
         req.user && String(req.user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
     }
     validateBodyEmailBelongToCurrentUser(req, res, next) {
-        req.user && req.body.email && req.body.email === req.user.email ? next() : responce(res).unAuthorized();
+        (req.user && req.body.email === req.user.email) ? next() : responce(res).unAuthorized();
     }
     validateHasQueryEmailBelongToCurrentUser(req, res, next) {
-        req.user && req.query.email && req.query.email === req.user.email ? next() : responce(res).forbidden('not authorized, require valid email');
+        (req.user && req.query.email === req.user.email) ? next() : responce(res).forbidden('not authorized, require valid email');
     }
     async userExist(req, res, next) {
         await this.getUserFromReq(req) ? next() : responce(res).forbidden('User does not exist : ' + req.body.email);
