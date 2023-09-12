@@ -1,6 +1,7 @@
 import { IJsonModel } from '../../interfaces/index.js';
 import { dbStore} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
+import {posts} from './posts.js'
 
 type dbCallback = {
     (db: IJsonModel): Promise<any>;
@@ -56,7 +57,7 @@ export class ClientSeedDatabase {
     async addPosts() {
 
         const [authors_Ids, catIds] = await Promise.all([this.getUsersIDs(), this.getIDs('category')])
-        let ppps = seeds.posts;
+        let ppps = posts;
         if (authors_Ids && catIds) {
             // loop over userids
             this.loopOverSequence(authors_Ids.length, ppps.length, (IDindex: number, itemIndex: number) => {
@@ -115,15 +116,13 @@ export class ClientSeedDatabase {
     countDb(dbName: string, callback: dbCallback) {
         return new Promise(async (resolve) => {
             let Db = dbStore[dbName];
-            Db.model!.estimatedDocumentCount(async (err: any, count: number) => {
-                if (!err && count === 0) {
+            Db.model!.estimatedDocumentCount().then( async (count: number) => {
+                if (count === 0) {
                     callback && resolve(await callback(Db))
-                } else if (err) {
-                    resolve(console.log(err.stack))
-                } else {
+                } else if(count > 0) {
                     resolve(console.log(dbName + ' : already on database'))
                 }
-            });
+            }).catch((err:any)=> resolve(console.log(err.stack)));
         })
     }
     async getUsersIDs() {

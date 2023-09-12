@@ -1,5 +1,6 @@
 import { dbStore } from '../../common/index.js';
 import seeds from '../seeds.json' assert { type: 'json' };
+import { posts } from './posts.js';
 export class ClientSeedDatabase {
     async init() {
         console.log('started database seeding ...................................!');
@@ -40,7 +41,7 @@ export class ClientSeedDatabase {
     }
     async addPosts() {
         const [authors_Ids, catIds] = await Promise.all([this.getUsersIDs(), this.getIDs('category')]);
-        let ppps = seeds.posts;
+        let ppps = posts;
         if (authors_Ids && catIds) {
             // loop over userids
             this.loopOverSequence(authors_Ids.length, ppps.length, (IDindex, itemIndex) => {

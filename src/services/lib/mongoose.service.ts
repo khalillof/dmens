@@ -7,7 +7,7 @@ const dbOptions = {
   //rejectUnauthorized: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  retryWrites: false
+  //retryWrites: false
 };
 
 export function dbInit() {

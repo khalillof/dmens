@@ -3,7 +3,19 @@ import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import { config, dbStore } from "../../common/index.js";
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { BearerStrategy } from "passport-azure-ad";
+import azconfig from './az-config.json' assert { type: 'json' };
 import crypto from 'crypto';
+const azOptions = {
+    identityMetadata: `https://ktuban.b2clogin.com/ktuban.onmicrosoft.com/${azconfig.policies.policyName}/${azconfig.metadata.version}/${azconfig.metadata.discovery}`,
+    clientID: azconfig.credentials.clientID,
+    audience: azconfig.credentials.clientID,
+    policyName: azconfig.policies.policyName,
+    isB2C: azconfig.settings.isB2C,
+    validateIssuer: azconfig.settings.validateIssuer,
+    loggingLevel: azconfig.settings.loggingLevel,
+    passReqToCallback: azconfig.settings.passReqToCallback
+};
 export class PassportStrategies {
     // local 
     static LocalDefault() {
@@ -29,6 +41,13 @@ export class PassportStrategies {
             });
         });
     }
+    // azure active directory b2c
+    static azBearerStrategy = () => new BearerStrategy(azOptions, (payload, done) => {
+        // Send user info using the second argument
+        let user = { _id: payload.sub, firstname: payload.given_name, lastname: payload.family_name, username: payload.preferred_username, email: payload.preferred_username };
+        console.log('az payload:', payload);
+        done(false, user);
+    });
     // JWT stratigy
     static JwtAuthHeaderAsBearerTokenStrategy() {
         return new JwtStrategy({

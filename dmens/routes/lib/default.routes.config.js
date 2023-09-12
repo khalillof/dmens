@@ -40,7 +40,7 @@ export class DefaultRoutesConfig {
     buildMdWares(middlewares, useAuth = true, useAdmin = false) {
         let mdwares = [];
         if (useAuth === true)
-            mdwares = [...mdwares, this.authenticate("jwt")];
+            mdwares = [...mdwares, this.authenticate("oauth-bearer")]; //"jwt";
         if (useAdmin === true)
             mdwares = [...mdwares, this.mware.isInRole('admin')];
         if (middlewares)

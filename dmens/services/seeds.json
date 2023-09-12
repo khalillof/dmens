@@ -76,9 +76,9 @@
     ],
     "posts": [
         {
-            "title": "Award winning three-star Michelin chef",
-            "descriptions": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
-            "body": "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!,Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!",
+            "title": "**Deploying to Kubernetes Using CI/CD**",
+            "descriptions": "Kubernetes is a popular container orchestration platform that can be used to deploy and manage applications at scale. CI/CD, or Continuous Integration/Continuous Deployment, is a set of practices that automate the build, test, and deployment of software. By combining Kubernetes and CI/CD, you can automate the entire process of building, testing, and deploying your applications, which can save you time and money.",
+            "body": "In this blog post, we will discuss how to deploy to Kubernetes using CI/CD. We will cover the following topics: <br/>",
             "isPublished": true,
             "isfeatured": true,
             "publisheDate": {},

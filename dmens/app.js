@@ -79,7 +79,13 @@ async function dmens(envpath) {
     // create on change event for documents
     //for( let db in dbStore)
     // await dbStore[db].initPostDatabaseSeeding()
-    console.log('allowed cores are :' + config.allow_origins());
+    //console.log('allowed cores are :' + config.allow_origins())
+    //enable CORS (for testing only -remove in production/deployment)
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept');
+        next();
+    });
     dev_prod !== 'development' ? await menServer(app, false) : app.listen(config.port(), () => console.log(`${dev_prod} server is running on port: ${config.port()}`));
     // remove .env file if exist
     if (dev_prod === 'production' && envpath && fs.existsSync(envpath)) {

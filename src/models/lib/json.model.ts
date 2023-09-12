@@ -58,7 +58,8 @@ export class JsonModel extends JsonObject implements IJsonModel {
       // extras
       // jwt strategy
       passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy()); 
-      passport.use(PassportStrategies.FacebookToken());
+      passport.use(PassportStrategies.azBearerStrategy());
+      //passport.use(PassportStrategies.FacebookToken());
       //passport.use(PassportStrategies.JwtQueryParameterStrategy());
       // assign
       this.model = Account;
