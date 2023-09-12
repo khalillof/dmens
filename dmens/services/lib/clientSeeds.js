@@ -91,17 +91,14 @@ export class ClientSeedDatabase {
     countDb(dbName, callback) {
         return new Promise(async (resolve) => {
             let Db = dbStore[dbName];
-            Db.model.estimatedDocumentCount(async (err, count) => {
-                if (!err && count === 0) {
+            Db.model.estimatedDocumentCount().then(async (count) => {
+                if (count === 0) {
                     callback && resolve(await callback(Db));
                 }
-                else if (err) {
-                    resolve(console.log(err.stack));
-                }
-                else {
+                else if (count > 0) {
                     resolve(console.log(dbName + ' : already on database'));
                 }
-            });
+            }).catch((err) => resolve(console.log(err.stack)));
         });
     }
     async getUsersIDs() {

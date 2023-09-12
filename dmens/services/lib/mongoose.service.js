@@ -6,7 +6,7 @@ const dbOptions = {
     //rejectUnauthorized: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    retryWrites: false
+    //retryWrites: false
 };
 export function dbInit() {
     console.log('db connction string :' + config.databaseUrl());
