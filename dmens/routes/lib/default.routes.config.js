@@ -1,5 +1,5 @@
 import { corsWithOptions } from "./cors.config.js";
-import { routeStore, dbStore, pluralizeRoute, Assert } from '../../common/index.js';
+import { routeStore, dbStore, pluralizeRoute, Assert, config } from '../../common/index.js';
 import { Middlewares } from '../../middlewares/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { authenticateUser } from '../../services/index.js';
@@ -40,7 +40,7 @@ export class DefaultRoutesConfig {
     buildMdWares(middlewares, useAuth = true, useAdmin = false) {
         let mdwares = [];
         if (useAuth === true)
-            mdwares = [...mdwares, this.authenticate("oauth-bearer")]; //"jwt";
+            mdwares = [...mdwares, this.authenticate(config.authStrategy())]; //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
         if (useAdmin === true)
             mdwares = [...mdwares, this.mware.isInRole('admin')];
         if (middlewares)

@@ -25,6 +25,16 @@ export const config = {
     admin_userName: ()=> getOr('ADMIN_USERNAME',''),
     admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
     getSecret:getOr,
+    authStrategy:()=> {
+    let authStr =  getOr('AUTH_STRAtEGY', 'jwt').toLowerCase();
+
+    if("jwt az".indexOf(authStr) !== -1){
+      return authStr === 'az' ? 'oauth-bearer' :  authStr;     
+    }else{
+      throw new Error( `>>> ${authStr} : >>>  auth strategy does not exist`)
+    }
+    
+      },
     useAuth: ()=> getOr('AUTH', true),
     useCore: ()=> getOr('USE_CORES',true),
     secretKey: ()=>  getOr('SECRET_KEY', ' '),

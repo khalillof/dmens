@@ -23,7 +23,7 @@ export class PassportStrategies {
     }
     static Local2() {
         return new LocalStrategy(function (username, password, cb) {
-            dbStore['account'].model.findOne({ username: username }).populate('roles').then((user) => {
+            dbStore['account'].model.findOne({ username: username }).populate('roles').exec().then((user) => {
                 if (!user) {
                     return cb(null, false, { message: 'Incorrect username or password.' });
                 }
@@ -54,7 +54,7 @@ export class PassportStrategies {
             audience: config.audience(),
             // passReqToCallback:true
         }, async (payload, done) => {
-            dbStore['account'].model?.findById(payload.user._id).populate('roles').then((error, user, info) => {
+            dbStore['account'].model?.findById(payload.user._id).populate('roles').exec().then((error, user, info) => {
                 return user && done(false, user) || error && done(error, null) || info && done(false, null, info);
             });
         });
@@ -85,7 +85,7 @@ export class PassportStrategies {
                 if (err) {
                     return done(err, false);
                 }
-                if (user) {
+                else if (user) {
                     return done(null, user);
                 }
                 else {
@@ -113,7 +113,11 @@ export class PassportStrategies {
             });
         });
     }
+    static getAuthStrategy() {
+        return config.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
+    }
 }
+//####################################################################
 function validPassword(password, hash, salt) {
     var hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
     return hash === hashVerify;

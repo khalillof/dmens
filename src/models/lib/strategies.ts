@@ -28,7 +28,7 @@ export class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-        dbStore['account'].model!.findOne({ username: username }).populate('roles').then((user:any) => {
+        dbStore['account'].model!.findOne({ username: username }).populate('roles').exec().then((user:any) => {
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
                   
                   // Function defined at bottom of app.js
@@ -60,7 +60,7 @@ export class PassportStrategies {
       audience: config.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
-      dbStore['account'].model?.findById(payload.user._id).populate('roles').then((error: any, user?: any, info?:any)=>{
+      dbStore['account'].model?.findById(payload.user._id).populate('roles').exec().then((error: any, user?: any, info?:any)=>{
 
         return user && done(false,user) || error && done(error,null) || info && done(false,null,info);
      })
@@ -94,7 +94,7 @@ export class PassportStrategies {
         if (err) {
             return done(err, false);
         }
-        if (user) {
+        else if (user) {
             return done(null, user);
         } else {
             return done(null, false);
@@ -120,8 +120,12 @@ export class PassportStrategies {
     });
 }
 
+static getAuthStrategy(){
+    return config.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
+  }
 }
 
+//####################################################################
 
 function validPassword(password:string, hash:string, salt:any) {
   var hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');

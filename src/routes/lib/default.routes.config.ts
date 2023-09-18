@@ -47,7 +47,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){
       let mdwares:any[] = [];
       if(useAuth === true)
-        mdwares = [...mdwares,this.authenticate("oauth-bearer")] //"jwt";
+        mdwares = [...mdwares,this.authenticate(config.authStrategy())] //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
       if(useAdmin === true)
       mdwares = [...mdwares,this.mware!.isInRole('admin')];
       if(middlewares)

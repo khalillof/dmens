@@ -42,11 +42,8 @@ export class JsonModel extends JsonObject {
             passport.serializeUser(Account.serializeUser());
             passport.deserializeUser(Account.deserializeUser());
             // extras
-            // jwt strategy
-            passport.use(PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy());
-            passport.use(PassportStrategies.azBearerStrategy());
-            //passport.use(PassportStrategies.FacebookToken());
-            //passport.use(PassportStrategies.JwtQueryParameterStrategy());
+            // strategy jwt || az
+            passport.use(PassportStrategies.getAuthStrategy());
             // assign
             this.model = Account;
         }
