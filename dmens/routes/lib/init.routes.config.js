@@ -1,4 +1,5 @@
 "use strict";
+//import {config} from '../../common/index.js'
 export function IndexRoutes(app) {
     /*
     let index = {

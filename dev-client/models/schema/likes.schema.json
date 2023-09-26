@@ -1,9 +1,9 @@
-{
+{ 
     "name":"like",
-    "populates":["author"],
+    "active":true,
     "useAuth":["post","put","delete"], 
     "useAdmin": [], 
-      "schema":{
+      "schemaObj":{
         "like":  {
             "type":  "Boolean",
             "default":false
@@ -22,7 +22,8 @@
         "author": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required":true,
+            "autopopulate": true
         },
         "model_id": {
             "type": "ObjectId",

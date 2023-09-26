@@ -1,10 +1,10 @@
-import { IJsonModel } from '../../interfaces/index.js';
+import { IDbModel } from '../../interfaces/index.js';
 import { dbStore} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
 import {posts} from './posts.js'
 
 type dbCallback = {
-    (db: IJsonModel): Promise<any>;
+    (db: IDbModel): Promise<any>;
 }
 export class ClientSeedDatabase {
 

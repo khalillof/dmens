@@ -1,9 +1,9 @@
 {
     "name":"category",
-    "populates":[],
+    "active":true,
     "useAuth":["post","put","delete"], 
-    "useAdmin": ["post","put","delete"], 
-    "schema": {
+    "useAdmin": ["post","put","delete"],
+    "schemaObj": {
       "name": {
         "type": "String",
         "unique": true,

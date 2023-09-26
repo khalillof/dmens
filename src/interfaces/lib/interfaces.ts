@@ -1,19 +1,30 @@
 import express from 'express'
 import { Model, Schema } from 'mongoose';
 
-export interface JsonSchema {
- readonly name: string
- readonly schema: Schema
- readonly populates?:Array<string>
- readonly useAuth?:Array<string> 
- readonly useAdmin?: Array<string>
-};
+export interface IConfigPropsParameters {
+  readonly name: String
+  readonly active? : Boolean;
+  readonly useAuth?: String[]
+  readonly useAdmin?: String[]
+  readonly schemaObj: object
+  readonly schemaOptions?: Record<string,any>
+ };
 
-export interface IJsonModel extends JsonSchema {
+export interface IConfigProps {
+  readonly name: String
+  readonly active : Boolean;
+  readonly useAuth: String[]
+  readonly useAdmin: String[]
+  readonly schemaObj: object
+  readonly schemaOptions?: Record<string,any>
+ };
 
+export interface IDbModel{
+  
   readonly model?: Model<any>;
-  readonly hasPopulate: boolean 
   count:number
+
+  getConfigProps():IConfigProps
   checkAuth(method:string):Array<boolean>
   initPostDatabaseSeeding(): Promise<any>;
 
@@ -50,6 +61,16 @@ export interface Iresponces {
 export interface Iresponce {
   (res: express.Response, cb?: Function): Iresponces;
 }
+// function with parmeters interface 
+export interface IRouteCallback {
+  (this: IDefaultRoutesConfig): void;
+}
+// function with parmeters interface 
+export interface IRouteConfigCallback {
+  routeName:string
+  controller:IController
+  routeCallback?: IRouteCallback
+}
 export interface Ilogger {
   log: (msg: string) => void;
   err: (err: any) => void;
@@ -59,7 +80,7 @@ export interface Ilogger {
 
 export interface IController {
 
-  db: IJsonModel;
+  db: IDbModel;
   responce: Iresponce;
   log: Ilogger;
   list(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
@@ -81,13 +102,13 @@ export interface IDefaultRoutesConfig {
   mware?: IMiddlewares;
   authenticate: Iauthenticate;
   //actions:Function;
-  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): any[];
+  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): Promise<any[]>;
   // custom routes
-  buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null):any
+  buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null):Promise<any>
   
   options(routPath:string):void;
   param(): void;
-  defaultRoutes(): void;
+  defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }
 

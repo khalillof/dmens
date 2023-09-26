@@ -1,33 +1,36 @@
 "use strict";
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
 import dotenv from 'dotenv';
+
+export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'test.env');;
+
+dotenv.config({path:envPath});
+
 import compression from 'compression';
 import express from 'express';
 import session from 'express-session';
-import path from 'path';
-import fs from 'fs';
+
+
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
-import { config, printRoutesToString, dbStore } from './common/index.js';
+import { config, printRoutesToString} from './common/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
-import { initRouteStore, corsWithOptions } from './routes/index.js';
+import { corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
 
 // connect to db and initialise db models then
-async function dmens(envpath?: string) {
 
-  if (!envpath && !fs.existsSync('.env')) {
-    throw new Error('enviroment not provided and found');
-  }
-  else if (envpath && !path.isAbsolute(envpath)) {
-    throw new Error('enviroment path passed ashould be Absolute path :' + envpath);
-  } else if (envpath && !fs.existsSync(envpath!)) {
-    throw new Error('enviroment file path provided dose not exist :' + envpath);
+
+  if (!!fs.existsSync(envPath[0])) {
+    throw new Error('enviroment .env file not  found');
+    
   }
  
-  envpath ? dotenv.config({ path: envpath }) : dotenv.config();
-  console.log('enviroment path provided : ' + envpath);
-
+   dotenv.config()
 
   // Create the Express application
   const app = express();
@@ -48,7 +51,7 @@ async function dmens(envpath?: string) {
     // request looger using a predefined format string
     app.use(morgan(dev_prod === 'development' ? 'dev' : 'combined')) // dev|common|combined|short|tiny
   // create database models
-  await dbInit()
+  await dbInit(app);
  
   app.use(session({
     secret: config.secretKey(),
@@ -73,10 +76,15 @@ async function dmens(envpath?: string) {
   app.use(corsWithOptions);
 
   // create routes
-  await Promise.all(initRouteStore.map((rout: any) => rout(app)))
+  // await Promise.all(initRouteStore.map(async (rout: any) => await rout(app)));
+    // Create Configration and Account db models
+    //await  Configration.Create_Config_Account_models_routes(app)
+        
+      // then try Load default directory for extra model
+     // let num = await Configration.createModelsFromDirectory(app);
 
-  // print routes
-  printRoutesToString(app);
+    // print routes
+    await printRoutesToString(app);
 
   
 
@@ -111,12 +119,10 @@ app.use((req, res, next) => {
 
 
   // remove .env file if exist
-  if (dev_prod === 'production' && envpath && fs.existsSync(envpath!)) {
-    fs.unlinkSync(envpath)
-    console.log('.env file will be removed' + envpath)
+  if (dev_prod === 'production' && fs.existsSync(envPath)) {
+    fs.unlinkSync(envPath)
+    console.log('.env file will be removed')
   }
 
-  return app;
-};
 
-export { dmens };
+export { app };

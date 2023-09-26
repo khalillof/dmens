@@ -1,15 +1,10 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { config, dbStore, logger } from "../../common/index.js";
-import { randomBytes } from 'crypto';
-import { nanoid } from 'nanoid/async';
+import { randomUUID } from 'crypto';
+//import { nanoid } from 'nanoid/async';
 import { responce } from '../../common/index.js';
 const { verify, sign, TokenExpiredError } = jwt;
-// 16 | 48
-async function getRandomBytes(length = 16) {
-    let key = randomBytes(length).toString('hex');
-    return key;
-}
 function getExpiredAt(refersh) {
     let expiredAt = new Date();
     expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? config.jwtRefreshExpiration() : config.jwtExpiration()));
@@ -162,7 +157,7 @@ async function createRefershToken(user) {
         throw new Error('user object is required');
     }
     let expireAt = getExpiredAt(true);
-    let _token = await nanoid();
+    let _token = randomUUID();
     await dbStore['account'].putById(user._id, {
         refreshToken: _token,
         refreshTokenExpireAt: expireAt,
@@ -180,4 +175,4 @@ async function createRefershToken(user) {
 function isExpiredToken(expiryat) {
     return expiryat.getTime() < new Date().getTime();
 }
-export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, getRandomBytes, nanoid };
+export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };

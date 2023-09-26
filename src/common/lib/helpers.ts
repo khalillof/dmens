@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import {MongoServerError} from "mongodb";
 import {AssertionError} from '../lib/assertionError.js';
 import jwt from 'jsonwebtoken';
-import {IController,IJsonModel} from '../../interfaces/index.js';
+import {IController,IDbModel} from '../../interfaces/index.js';
 import {DefaultController} from '../../controllers/index.js';
 import {DefaultRoutesConfig} from '../../routes/index.js';
 import express from 'express';
@@ -67,7 +67,7 @@ export const sortArray = (itemsArray: any[], propKey:string)=>{
 export const Roles =["user", "admin", "application"];
 export const isValidRole =(role:string)=> role ?  Roles.indexOf(role) !== -1 : false;
   
-export function printRoutesToString(app:any){
+export async function printRoutesToString(app:any){
     let result = app._router!.stack
       .filter((r:any) => r.route)
       .map((r:any) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)
@@ -102,9 +102,9 @@ export function pluralizeRoute(routeName:string){
 export type Dic<Type>  = { [key: string] : Type };
 
 // db object
-export const dbStore : Dic<IJsonModel>={};
+export const dbStore : Dic<IDbModel>={};
 
-export function  getDb(url:string):IJsonModel{
+export function  getDb(url:string):IDbModel{
   for(let d in dbStore){
    if(url !== '/' && url.match(d.toLowerCase())){
    return dbStore[d];

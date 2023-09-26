@@ -19,11 +19,8 @@
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
     "test": "karma start",
-    "dev": "node ./dev-client/index.js",
     "ts": "tsc",
-    "start": "tsc && node ./dmens/app.js",
-    "dev-init": "node ./dmens/init.js",
-    "init": "node ./dmens/init.js",
+    "start": "node ./dmens/app.js",
     "trace": "tsc --traceResolution"
   },
   "dependencies": {
@@ -36,10 +33,9 @@
     "express-session": "^1.17.3",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose":"^7.5.1",
+    "mongoose": "^7.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "nanoid": "^4.0.2",
     "nodemailer": "^6.9.5",
     "passport": "^0.6.0",
     "passport-azure-ad": "^4.3.5",

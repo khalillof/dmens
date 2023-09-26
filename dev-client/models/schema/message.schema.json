@@ -1,9 +1,10 @@
 {
+
     "name":"message",
-    "populates":["sender","recipient"],
+    "active":true,
     "useAuth":["list","get","post","put","delete"], 
-    "useAdmin": ["list"], 
-      "schema":{
+    "useAdmin": ["list"],
+      "schemaObj":{
         "title":  {
             "type": "String",
             "required": true,
@@ -18,12 +19,14 @@
         "sender": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required":true,
+            "autopopulate": true
         },
         "recipient": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required":true,
+            "autopopulate": true
         }
     }
     }

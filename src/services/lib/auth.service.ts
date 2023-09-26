@@ -2,16 +2,11 @@ import passport, { use } from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
 import { config, dbStore, logger } from "../../common/index.js";
-import { randomBytes } from 'crypto';
-import { nanoid } from 'nanoid/async';
+import { randomUUID } from 'crypto';
+//import { nanoid } from 'nanoid/async';
 import { responce } from '../../common/index.js';
 
 const { verify, sign, TokenExpiredError } = jwt;
-// 16 | 48
-async function getRandomBytes(length = 16) {
-  let key = randomBytes(length).toString('hex');
-  return key;
-}
 
 function getExpiredAt(refersh?: boolean) {
   let expiredAt = new Date();
@@ -188,7 +183,7 @@ async function createRefershToken(user: any) {
   }
     let expireAt = getExpiredAt(true);
 
-    let _token = await nanoid();
+    let _token = randomUUID();
 
     await dbStore['account'].putById(user._id, {
       refreshToken: _token,
@@ -211,4 +206,4 @@ function isExpiredToken(expiryat: Date) {
 }
 
 
-export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, getRandomBytes, nanoid };
+export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };

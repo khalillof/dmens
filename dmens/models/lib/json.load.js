@@ -32,8 +32,9 @@ export class JsonLoad {
     static isJsonFile(file) {
         return path.extname(file) === '.json';
     }
-    static async makeModel(jsonSchema) {
-        let validSchema = await JsonLoad.makeSchema(jsonSchema);
+    static async makeModel(iconfig) {
+        let validSchema = await JsonLoad.makeSchema(iconfig);
+        console.log('makeSchema schema : ', validSchema);
         let model = await JsonModel.createInstance(validSchema);
         return Promise.resolve(model);
     }
@@ -75,10 +76,10 @@ export class JsonLoad {
             throw new Error('directory Not Found : ' + directory);
         }
     }
-    static async makeSchema(jschema) {
-        for (let item of Object.entries(jschema.schema))
+    static async makeSchema(iconfig) {
+        for (let item of Object.entries(iconfig.schema))
             await JsonLoad.deepSearch(item);
-        return jschema;
+        return iconfig;
     }
     // search item in object and map to mongoose schema
     static isValidType(value) {

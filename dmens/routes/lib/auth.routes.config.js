@@ -1,26 +1,26 @@
 import { AuthController } from '../../controllers/index.js';
-import { DefaultRoutesConfig } from './default.routes.config.js';
-import { dbStore } from '../../common/index.js';
-export async function AuthRoutes(app) {
-    return dbStore['account'] ? await Promise.resolve(await DefaultRoutesConfig.instance(app, '/auth', await AuthController.createInstance('account'), function (self) {
-        self.app.post('/auth/signup', self.mware.checkLoginUserFields, self.actions('signup'));
-        self.app.post('/auth/signin', self.mware.checkLoginUserFields, self.actions('signin'));
-        self.app.get('/auth/logout', self.actions('logout'));
-        self.app.get('/auth/facebook/token', self.authenticate('facebook'), self.actions('facebook'));
-        self.app.get('/auth/profile/:id', self.authenticate("jwt"), self.mware.validateCurrentUserOwnParamId, self.actions('findById'));
-        self.app.delete('/auth/profile/:id', self.authenticate("jwt"), self.mware.validateCurrentUserOwnParamId, self.actions('remove'));
-        self.app.put('/auth/profile/:id', self.authenticate("jwt"), self.mware.validateCurrentUserOwnParamId, self.actions('put'));
+// auth routes 
+export const AuthRoutes = {
+    routeName: '/auth',
+    controller: new AuthController('account'),
+    routeCallback: function () {
+        this.app.post('/auth/signup', this.mware.checkLoginUserFields, this.actions('signup'));
+        this.app.post('/auth/signin', this.mware.checkLoginUserFields, this.actions('signin'));
+        this.app.get('/auth/logout', this.actions('logout'));
+        this.app.get('/auth/facebook/token', this.authenticate('facebook'), this.actions('facebook'));
+        this.app.get('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('findById'));
+        this.app.delete('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('remove'));
+        this.app.put('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('put'));
         // get secrets form envirmoment variables
-        self.app.get('/auth/secure', self.authenticate("jwt"), self.mware.isInRole('admin'), self.actions('secure'));
-        self.param();
+        this.app.get('/auth/secure', this.authenticate("jwt"), this.mware.isInRole('admin'), this.actions('secure'));
+        this.param();
         // get profile require query string eg ==>  /auth/profile?email=user@user.co
-        self.app.get('/auth/profile', self.authenticate("jwt"), self.mware.validateHasQueryEmailBelongToCurrentUser, self.actions('profile'));
+        this.app.get('/auth/profile', this.authenticate("jwt"), this.mware.validateHasQueryEmailBelongToCurrentUser, this.actions('profile'));
         //self.options('/auth/signup')
         //self.options('/auth/signin')
         //self.options('/auth/logout')
         //self.options('/auth/facebook/token')
         //self.options('/auth/profile')
         //self.options('/auth/profile/:id')
-    })) : console.log('Account model is not avaliable in dbStore No Auth routes configuered');
-}
-;
+    }
+};

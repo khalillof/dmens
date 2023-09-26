@@ -8,9 +8,9 @@ export class DefaultController {
         this.responce = responce;
         this.log = logger;
     }
-    static async createInstance(svcName) {
-        return new this(svcName);
-    }
+    //public static async createInstance(svcName: string){
+    //   return new this(svcName);
+    //}
     async count(req, res, next) {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);

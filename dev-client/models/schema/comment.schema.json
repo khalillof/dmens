@@ -1,9 +1,9 @@
 {
 "name":"comment",
-"populates":["author"],
+"active":true,
 "useAuth":["post","put","delete"], 
 "useAdmin": [], 
-  "schema":{
+  "schemaObj":{
     "body":  {
         "type": "String",
         "required": true,
@@ -12,7 +12,8 @@
     "author": {
         "type": "ObjectId",
         "ref": "account",
-        "required":true
+        "required":true,
+        "autopopulate": true
     },
     "model_id": {
         "type": "ObjectId",

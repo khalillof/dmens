@@ -1,9 +1,9 @@
 {
     "name":"post",
-    "populates":["category","author","like_user_ids"],
+    "active":true,
     "useAuth":["post","put","delete"], 
     "useAdmin": ["post","put","delete"], 
-    "schema":{
+    "schemaObj":{
     "title": {
         "type": "String",
         "required": true,
@@ -39,12 +39,14 @@
     "category": {
         "type": "ObjectId",
         "ref": "category",
-        "required":true
+        "required":true,
+        "autopopulate": true
     },
     "author": {
         "type": "ObjectId",
         "ref": "account",
-        "required":true
+        "required":true,
+        "autopopulate": true
     },
     "likes":  {
         "type": "Number",

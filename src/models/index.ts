@@ -1,5 +1,5 @@
 import {PassportStrategies} from './lib/strategies.js';
-import {JsonLoad} from './lib/json.load.js';
-import {JsonModel} from './lib/json.model.js';
+import {DbModel} from './lib/json.model.js';
+import { ConfigProps } from './lib/ConfigProps.js';
 
-export {PassportStrategies,JsonLoad,JsonModel}
+export {PassportStrategies,DbModel, ConfigProps}

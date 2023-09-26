@@ -56,7 +56,7 @@ export const sortArray = (itemsArray, propKey) => {
 };
 export const Roles = ["user", "admin", "application"];
 export const isValidRole = (role) => role ? Roles.indexOf(role) !== -1 : false;
-export function printRoutesToString(app) {
+export async function printRoutesToString(app) {
     let result = app._router.stack
         .filter((r) => r.route)
         .map((r) => Object.keys(r.route.methods)[0].toUpperCase().padEnd(7) + r.route.path)

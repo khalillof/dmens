@@ -8,7 +8,7 @@ export class AuthController extends DefaultController {
     constructor(svc:string) {
         super(svc)
     }
-  
+    
     async secure(req: express.Request, res: express.Response, next: express.NextFunction){
       const data =config.getSecret(req.query['api'] as string) ;
        this.responce(res).data(data!)
