@@ -5,6 +5,6 @@ export const ConfigRoutes = {
     controller: new ConfigController('config'),
     routeCallback: function () {
         this.defaultRoutes();
-        this.buidRoute(this.routeName, 'post', 'post', null, [uploadSchema]);
+        this.buidRoute(this.routeName, 'post', 'post', null, [this.mware.isJson, uploadSchema]);
     }
 };

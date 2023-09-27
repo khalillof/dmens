@@ -1,5 +1,5 @@
 import { IDbModel } from '../../interfaces/index.js';
-import { dbStore} from '../../common/index.js';
+import { dbStore, envConfig} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
 import {posts} from './posts.js'
 
@@ -9,7 +9,7 @@ type dbCallback = {
 export class ClientSeedDatabase {
 
     async init() {
-        console.log('started database seeding ...................................!');
+        envConfig.logLine('started database seeding ..!');
 
         await this.addRoles(),
         await this.addCateories(),
@@ -19,7 +19,7 @@ export class ClientSeedDatabase {
         await this.addPosts()
         await this.addComments(); 
          
-        console.log('finished database seeding ...................................!');
+        envConfig.logLine('finished database seeding ..!');
     }
     accountsCache: any[] = [];
 

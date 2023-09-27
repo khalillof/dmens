@@ -24,4 +24,22 @@ export class ConfigProps {
     useAdmin;
     schemaObj;
     schemaOptions;
+    getConfigProps() {
+        return {
+            name: this.name,
+            active: this.active,
+            useAdmin: this.useAdmin,
+            useAuth: this.useAuth,
+            schemaObj: this.schemaObj,
+            schemaOptions: this.schemaOptions
+        };
+    }
+    setConfigProps(props) {
+        this.name = props.name;
+        this.active = props.active;
+        this.useAdmin = props.useAdmin;
+        this.useAuth = props.useAuth;
+        this.schemaObj = props.schemaObj;
+        (this.schemaOptions && props.schemaOptions) && (this.schemaOptions = props.schemaOptions);
+    }
 }

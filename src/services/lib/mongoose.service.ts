@@ -1,6 +1,5 @@
-import {Express} from 'express';
 import mongoose from 'mongoose';
-import { config, dbStore} from '../../common/index.js';
+import { dbStore, envConfig} from '../../common/index.js';
 import { Configration} from '../../operations/index.js';
 /////////////////
 const dbOptions = {
@@ -10,26 +9,23 @@ const dbOptions = {
   //retryWrites: false
 };
 
-export function dbInit(app: Express) {
-  console.log('db connction string :' + config.databaseUrl());
-
-  return new Promise(async (resolve) => {
+export async function dbInit() {
     try {
-      //await mongoose.set('strictQuery', true).connect(config.databaseUrl())
-      await mongoose.connect(config.databaseUrl())
+
+      envConfig.logLine('db connction string :' + envConfig.databaseUrl());
+
+      await mongoose.connect(envConfig.databaseUrl())
       console.log("Successfully Connected to db!");
 
       // Create Configration - Account - default directory  db models and routes
-    let num  = await  Configration.create_default_models_routes(app)
+    await  Configration.create_default_models_routes()
 
-      console.log('Numbers of models added to the database are :' + num.length);
-      resolve(num.length)
-      
+     envConfig.logLine(`Numbers of models on the database are : ${Object.keys(dbStore).length}`);
+
     } catch (err: any) {
       console.error(err);
       process.exit(1);
     }
-  })
 }
 
 

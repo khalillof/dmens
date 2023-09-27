@@ -2,24 +2,26 @@ import express from 'express'
 import { Model, Schema } from 'mongoose';
 
 export interface IConfigPropsParameters {
-  readonly name: String
-  readonly active? : Boolean;
-  readonly useAuth?: String[]
-  readonly useAdmin?: String[]
-  readonly schemaObj: object
-  readonly schemaOptions?: Record<string,any>
+    name: string
+   active? : Boolean;
+   useAuth?: String[]
+   useAdmin?: String[]
+   schemaObj: object
+   schemaOptions?: Record<string,any>
  };
 
 export interface IConfigProps {
-  readonly name: String
-  readonly active : Boolean;
-  readonly useAuth: String[]
-  readonly useAdmin: String[]
-  readonly schemaObj: object
-  readonly schemaOptions?: Record<string,any>
+   name: string
+   active : Boolean;
+   useAuth: String[]
+   useAdmin: String[]
+   schemaObj: object
+   schemaOptions?: Record<string,any>
+   getConfigProps?(): IConfigProps
+   setConfigProps?(props:IConfigProps): void
  };
 
-export interface IDbModel{
+export interface IDbModel extends IConfigProps {
   
   readonly model?: Model<any>;
   count:number
@@ -131,7 +133,7 @@ export interface IMiddlewares {
   isAuthenticated(req: any, res: express.Response, next: express.NextFunction): void;
   // roles
   isRolesExist(roles: [string]): boolean;
-
+  isJson(req:express.Request, res:express.Response,next:express.NextFunction):void;
 
   isInRole(roleName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }

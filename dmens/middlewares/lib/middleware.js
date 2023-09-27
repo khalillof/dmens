@@ -1,4 +1,5 @@
 import { isValidRole, dbStore, responce } from '../../common/index.js';
+import fs from 'fs';
 export class Middlewares {
     static async createInstance() {
         return await Promise.resolve(new Middlewares());
@@ -74,5 +75,27 @@ export class Middlewares {
             responce(res).forbidden("Require Admin Role!");
             return;
         };
+    }
+    isJson(req, res, next) {
+        const toJsonNext = (data) => {
+            req.body = JSON.parse(data);
+            next();
+        };
+        if (req.body && req.header('content-type') === 'application/json') {
+            toJsonNext(req.body);
+        }
+        else if (req.file && req.file.mimetype === 'application/json') {
+            fs.readFile(req.file.path, 'utf8', (err, data) => {
+                if (err) {
+                    responce(res).error(err);
+                }
+                else {
+                    toJsonNext(data);
+                }
+            });
+        }
+        else {
+            responce(res).badRequest('content must be valid application/json');
+        }
     }
 }

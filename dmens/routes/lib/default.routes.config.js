@@ -1,8 +1,9 @@
 import { corsWithOptions } from "./cors.config.js";
-import { routeStore, pluralizeRoute, Assert, config } from '../../common/index.js';
+import { routeStore, pluralizeRoute, Assert, envConfig } from '../../common/index.js';
 import { Middlewares } from '../../middlewares/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { authenticateUser } from '../../services/index.js';
+import { app } from '../../app.js';
 export function getMware() {
     let item = Object.values(routeStore).find(r => r.mware !== null);
     let result = item && item.mware ? item.mware : new Middlewares();
@@ -17,8 +18,8 @@ export class DefaultRoutesConfig {
     mware;
     authenticate;
     //actions:Function;
-    constructor(exp, rName, controller, callback) {
-        this.app = exp;
+    constructor(rName, controller, callback) {
+        this.app = app;
         this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName + '/:id';
         this.controller = controller || new DefaultController(rName);
@@ -27,12 +28,12 @@ export class DefaultRoutesConfig {
         typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
         // add instance to routeStore
         routeStore[this.routeName] = this;
-        console.log('Added ( ' + this.routeName + ' ) to routeStore');
+        envConfig.logLine('Added ( ' + this.routeName + ' ) to routeStore');
     }
     async buildMdWares(middlewares, useAuth = true, useAdmin = false) {
         let mdwares = [];
         if (useAuth === true)
-            mdwares = [...mdwares, this.authenticate(config.authStrategy())]; //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
+            mdwares = [...mdwares, this.authenticate(envConfig.authStrategy())]; //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
         if (useAdmin === true)
             mdwares = [...mdwares, this.mware.isInRole('admin')];
         if (middlewares)
@@ -57,7 +58,7 @@ export class DefaultRoutesConfig {
             }
             catch (err) {
                 res.json({ success: false, error: err.message });
-                console.log(err.stack);
+                envConfig.logLine(err.stack);
             }
         });
     }

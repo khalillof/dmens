@@ -1,11 +1,11 @@
-import express from 'express';
 import {corsWithOptions } from "./cors.config.js";
-import {routeStore, pluralizeRoute, Assert, config} from '../../common/index.js'
+import {routeStore, pluralizeRoute, Assert, envConfig} from '../../common/index.js'
 import {Middlewares} from '../../middlewares/index.js';
 import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate} from '../../interfaces/index.js';
 import { DefaultController} from '../../controllers/index.js';
 import {authenticateUser} from '../../services/index.js' ;
 import { IRouteCallback } from 'src/interfaces/lib/interfaces.js';
+import {app} from '../../app.js'
 
 export  function getMware():IMiddlewares{
   let item= Object.values(routeStore).find(r =>  r.mware !== null );
@@ -22,8 +22,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     mware?:IMiddlewares;
     authenticate:Iauthenticate;
     //actions:Function;
-    constructor(exp:express.Application,rName:string,controller?:IController,callback?:IRouteCallback) { 
-        this.app = exp;
+    constructor(rName:string,controller?:IController,callback?:IRouteCallback) { 
+        this.app = app;
         this.routeName = pluralizeRoute(rName);
         this.routeParam = this.routeName+'/:id';
         this.controller = controller || new DefaultController(rName);
@@ -33,13 +33,13 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         
         // add instance to routeStore
         routeStore[this.routeName]=this;
-        console.log('Added ( ' +this.routeName+ ' ) to routeStore');
+        envConfig.logLine('Added ( ' +this.routeName+ ' ) to routeStore');
     }
 
    async buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){
       let mdwares:any[] = [];
       if(useAuth === true)
-        mdwares = [...mdwares,this.authenticate(config.authStrategy())] //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
+        mdwares = [...mdwares,this.authenticate(envConfig.authStrategy())] //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
       if(useAdmin === true)
       mdwares = [...mdwares,this.mware!.isInRole('admin')];
       if(middlewares)
@@ -66,7 +66,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
           next()
           }catch(err:any){
             res.json({success:false, error:err.message})
-            console.log(err.stack)
+            envConfig.logLine(err.stack)
           }
       });
     }

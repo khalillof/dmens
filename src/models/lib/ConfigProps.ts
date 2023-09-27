@@ -27,11 +27,29 @@ export class ConfigProps implements IConfigProps {
     // this.validateSchema()
   }
 
-  readonly name: string
-  readonly active: Boolean
-  readonly useAuth: String[]
-  readonly useAdmin: String[]
-  readonly schemaObj: object
-  readonly schemaOptions: Record<string,any>
+   name: string 
+   active: Boolean
+   useAuth: String[]
+   useAdmin: String[]
+   schemaObj: object
+   schemaOptions: Record<string,any>
 
+   getConfigProps(): IConfigProps {
+    return {
+      name: this.name,
+      active: this.active,
+      useAdmin: this.useAdmin,
+      useAuth: this.useAuth,
+      schemaObj: this.schemaObj,
+      schemaOptions:this.schemaOptions
+    }
+  }
+    setConfigProps(props:IConfigProps): void {
+    this.name = props.name;
+    this.active = props.active;
+    this.useAdmin = props.useAdmin;
+    this.useAuth = props.useAuth;
+    this.schemaObj = props.schemaObj;
+    (this.schemaOptions && props.schemaOptions) && (this.schemaOptions = props.schemaOptions);
+  }
 }

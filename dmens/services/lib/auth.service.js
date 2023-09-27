@@ -1,13 +1,13 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { config, dbStore, logger } from "../../common/index.js";
+import { envConfig, dbStore, logger } from "../../common/index.js";
 import { randomUUID } from 'crypto';
 //import { nanoid } from 'nanoid/async';
 import { responce } from '../../common/index.js';
 const { verify, sign, TokenExpiredError } = jwt;
 function getExpiredAt(refersh) {
     let expiredAt = new Date();
-    expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? config.jwtRefreshExpiration() : config.jwtExpiration()));
+    expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? envConfig.jwtRefreshExpiration() : envConfig.jwtExpiration()));
     return expiredAt;
 }
 const extractors = {
@@ -35,8 +35,8 @@ function generateJwt(user) {
         //console.log('jwtExpiration: '+config.jwtExpiration())
         const body = { _id: user._id, email: user.email };
         const accessTokenExpireAt = getExpiredAt().getTime();
-        const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
-        const accessToken = sign({ user: body }, config.secretKey(), ops);
+        const ops = { expiresIn: envConfig.jwtExpiration(), issuer: envConfig.issuer(), audience: envConfig.audience() };
+        const accessToken = sign({ user: body }, envConfig.secretKey(), ops);
         return { accessToken, accessTokenExpireAt };
     }
     catch (err) {
@@ -137,7 +137,7 @@ function reqLogin(user, options = { session: false }, both_tokens_required = fal
 }
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req, res, next) {
-    verify(req.token, config.jwtSecret(), function (err, decoded) {
+    verify(req.token, envConfig.jwtSecret(), function (err, decoded) {
         if (err) {
             /*
               err = {

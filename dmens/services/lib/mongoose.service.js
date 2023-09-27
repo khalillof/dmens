@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { config } from '../../common/index.js';
+import { dbStore, envConfig } from '../../common/index.js';
 import { Configration } from '../../operations/index.js';
 /////////////////
 const dbOptions = {
@@ -8,21 +8,17 @@ const dbOptions = {
     useUnifiedTopology: true,
     //retryWrites: false
 };
-export function dbInit(app) {
-    console.log('db connction string :' + config.databaseUrl());
-    return new Promise(async (resolve) => {
-        try {
-            //await mongoose.set('strictQuery', true).connect(config.databaseUrl())
-            await mongoose.connect(config.databaseUrl());
-            console.log("Successfully Connected to db!");
-            // Create Configration - Account - default directory  db models and routes
-            let num = await Configration.create_default_models_routes(app);
-            console.log('Numbers of models added to the database are :' + num.length);
-            resolve(num.length);
-        }
-        catch (err) {
-            console.error(err);
-            process.exit(1);
-        }
-    });
+export async function dbInit() {
+    try {
+        envConfig.logLine('db connction string :' + envConfig.databaseUrl());
+        await mongoose.connect(envConfig.databaseUrl());
+        console.log("Successfully Connected to db!");
+        // Create Configration - Account - default directory  db models and routes
+        await Configration.create_default_models_routes();
+        envConfig.logLine(`Numbers of models on the database are : ${Object.keys(dbStore).length}`);
+    }
+    catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 }

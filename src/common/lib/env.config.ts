@@ -16,7 +16,7 @@ function getOr(key:string, or:any=null){
 function getAbsolutePath(p:string){
   return path.join(baseDir,p)
 }
-export const config = {
+export const envConfig = {
     isDevelopment,
     baseDir,
     getAbsolutePath,
@@ -44,7 +44,7 @@ export const config = {
     issuer:  ()=> getOr('ISSUER'),//'accounts.examplesoft.com',
     audience: ()=> getOr('AUDIENCE'), //'yoursite.net'
     schemaDir: ()=> getOr('SCHEMA_DIR',getAbsolutePath('models/schema')),
-    getSchemaUploadPath: (name:string | any)=> path.join(config.schemaDir(),`${name}.${Date.now()}.json`),
+    getSchemaUploadPath: (name:string | any)=> path.join(envConfig.schemaDir(),`${name}.${Date.now()}.json`),
     imagesUploadDir: ()=> getOr('IMAGES_UPLOAD_DIR',getAbsolutePath('public/images')),
     allow_origins:()=>  getOr('CORES_DMAINS', [])?.split(',').map((e:string) => e.trim()),
     static_urls:()=>  getOr('STATIC_URL',[])?.split(',').map((e:string) => e.trim()),
@@ -53,7 +53,14 @@ export const config = {
         'clientId': ()=> getOr('FACEBOOK_CLIENT_ID', ' '),
         'clientSecret':()=> getOr('FACEBOOK_CLIENT_SECRET', ' '),
         'callbackUrl': ()=> getOr('FACEBOOK_CALLBACK_URL', ''),
-    }
+    },
+  logLine:(...args: any[])=>{
+    console.log('>>>================================================>>>')
+    console.log(...args);
+  },
+  throwErr:(msg:string="unknown error")=>{
+         throw new Error(msg);
+  }
 };
 
 

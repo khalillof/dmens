@@ -1,13 +1,13 @@
 "use strict";
-import { DbModel } from '../models/lib/json.model.js';
+import { DbModel } from '../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
-import { config } from '../common/index.js';
+import { dbStore, envConfig } from '../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../routes/index.js';
 import { confSchema, accConfgSchema, typeMappings } from './help.js';
 //=============================================
 export class Configration {
-    static async create_default_models_routes(app) {
+    static async create_default_models_routes() {
         // create config model
         const _configProp = {
             name: "config",
@@ -19,43 +19,57 @@ export class Configration {
         };
         // create config model and routes
         await Configration.createModelInstance(_configProp);
-        await Configration.createInstanceWithRouteConfigCallback(app, ConfigRoutes);
+        await Configration.createInstanceWithRouteConfigCallback(ConfigRoutes);
         // create account model config and routes
-        await Configration.createModelWithConfigAndRoutes(app, accConfgSchema);
+        await Configration.createModelConfigRoute(accConfgSchema);
         // auth routes
-        await Configration.createInstanceWithRouteConfigCallback(app, AuthRoutes);
+        await Configration.createInstanceWithRouteConfigCallback(AuthRoutes);
         // load models routes from default directory
-        return await Configration.createModelsRoutesFromDirectory(app);
+        return await Configration.createModelsRoutesFromDirectory();
     }
     // ============ DbModel
     static async createModelInstance(_config, callback) {
         return Promise.resolve(new DbModel(_config, callback));
     }
-    static async createModelWithConfigAndRoutes(app, _config, controller, routeCallback) {
+    static async createModelConfigRoute(_config, controller, routeCallback) {
         let _model = await Configration.createModelInstance(_config);
         await _model.createConfig();
-        return await Configration.createRouteInstance(app, _model.name, controller, routeCallback);
+        return await Configration.createRouteInstance(_model.name, controller, routeCallback);
     }
-    static async createModelFromJsonString(app, jsonString) {
+    // create or override model config route
+    static async createOverrideModelConfigRoute(_config) {
+        let dbName = _config.name;
+        if (!dbName) {
+            envConfig.throwErr(' db model name not found');
+        }
+        // delete model if exists
+        if (dbStore[dbName])
+            delete dbStore[dbName];
+        let _model = await Configration.createModelInstance(_config);
+        await _model.createConfig();
+        await Configration.createRouteInstance(_model.name);
+        return _model;
+    }
+    static async createModelFromJsonString(jsonString) {
         if (typeof jsonString === 'string') {
             let _conf = JSON.parse(jsonString);
-            return await Configration.createModelWithConfigAndRoutes(app, _conf);
+            return await Configration.createModelConfigRoute(_conf);
         }
         else {
             throw new Error('this method makeModelFromJsonString require json data as string');
         }
     }
-    static async createModelFromJsonFile(app, filePath) {
+    static async createModelFromJsonFile(filePath) {
         if (path.isAbsolute(filePath) && Configration.isJsonFile(filePath)) {
             let data = fs.readFileSync(filePath, 'utf8');
             let jsobj = JSON.parse(data);
-            return await Configration.createModelWithConfigAndRoutes(app, jsobj);
+            return await Configration.createModelConfigRoute(jsobj);
         }
         else {
             // handel dirNames within files
             if (path.dirname(filePath)) {
                 console.log(' found dir name in : ' + path.dirname(filePath));
-                await Configration.createModelsRoutesFromDirectory(app, filePath);
+                await Configration.createModelsRoutesFromDirectory(filePath);
             }
             else {
                 throw new Error('file should be json and absolute' + filePath);
@@ -64,12 +78,12 @@ export class Configration {
         throw new Error('file should be json and absolute' + filePath);
     }
     // if no directory provided will use default directory
-    static async createModelsRoutesFromDirectory(app, directory = config.schemaDir()) {
+    static async createModelsRoutesFromDirectory(directory = envConfig.schemaDir()) {
         if (path.dirname(directory)) {
             return await Promise.all(fs.readdirSync(directory).map(async (fileName) => {
                 let _file = path.join(directory, fileName);
                 if (Configration.isJsonFile(_file)) {
-                    return await Configration.createModelFromJsonFile(app, _file);
+                    return await Configration.createModelFromJsonFile(_file);
                 }
                 return;
             }));
@@ -79,14 +93,11 @@ export class Configration {
         }
     }
     // ===================== Routes
-    static async createRouteInstance(exp, rName, controller, callback) {
-        return Promise.resolve(new DefaultRoutesConfig(exp, rName, controller, callback));
+    static async createRouteInstance(rName, controller, callback) {
+        return Promise.resolve(new DefaultRoutesConfig(rName, controller, callback));
     }
-    static async createInstanceRouteWithDefault(app, name) {
-        return await Configration.createRouteInstance(app, name);
-    }
-    static async createInstanceWithRouteConfigCallback(app, routeCb) {
-        return await Configration.createRouteInstance(app, routeCb.routeName, routeCb.controller, routeCb.routeCallback);
+    static async createInstanceWithRouteConfigCallback(routeCb) {
+        return await Configration.createRouteInstance(routeCb.routeName, routeCb.controller, routeCb.routeCallback);
     }
     // helpers :.............................................
     static isJsonFile(file) {

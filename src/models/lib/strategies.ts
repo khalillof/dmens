@@ -1,6 +1,6 @@
 import FacebookTokenStrategy from 'passport-facebook-token';
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
-import { config, dbStore } from "../../common/index.js";
+import { envConfig, dbStore } from "../../common/index.js";
 import { Strategy as LocalStrategy } from  'passport-local';
 import {Strategy as FacebookStrategy} from 'passport-facebook';
 import {BearerStrategy,OIDCStrategy, ITokenPayload} from "passport-azure-ad";
@@ -55,9 +55,9 @@ export class PassportStrategies {
   static JwtAuthHeaderAsBearerTokenStrategy() {
     return new JwtStrategy({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.secretKey(),
-      issuer: config.issuer(),
-      audience: config.audience(),
+      secretOrKey: envConfig.secretKey(),
+      issuer: envConfig.issuer(),
+      audience: envConfig.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
       dbStore['account'].model?.findById(payload.user._id).populate('roles').exec().then((error: any, user?: any, info?:any)=>{
@@ -69,9 +69,9 @@ export class PassportStrategies {
   static JwtQueryParameterStrategy() {
     return new JwtStrategy(
       {
-        secretOrKey: config.jwtSecret(),
-        issuer: config.issuer(),
-         audience: config.audience(),
+        secretOrKey: envConfig.jwtSecret(),
+        issuer: envConfig.issuer(),
+         audience: envConfig.audience(),
         jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
       },
       async (token, done) => {
@@ -87,8 +87,8 @@ export class PassportStrategies {
   //passport facebook Token strategy
   static FacebookToken() {
     return new FacebookTokenStrategy({
-      clientID: config.facebook.clientId(),
-      clientSecret: config.facebook.clientSecret()
+      clientID: envConfig.facebook.clientId(),
+      clientSecret: envConfig.facebook.clientSecret()
     }, (accessToken, refreshToken, profile, done)=>{
       dbStore['account'].model!.findOne({ facebookId: profile.id }, async function(err:any, user:any) {
         if (err) {
@@ -106,9 +106,9 @@ export class PassportStrategies {
    // type VerifyFunction = (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any, info?: any) => void) => void
   static facebook(){
     return new FacebookStrategy({
-      clientID: config.facebook.clientId(),
-      clientSecret: config.facebook.clientSecret(),
-      callbackURL: config.facebook.callbackUrl()
+      clientID: envConfig.facebook.clientId(),
+      clientSecret: envConfig.facebook.clientSecret(),
+      callbackURL: envConfig.facebook.callbackUrl()
     },
     function(accessToken:string, refreshToken:string, profile:any, done:Function) {
       dbStore['account'].model!.findOne({ facebookId: profile.id }, function(err:any, user:any,info?: any) {
@@ -121,7 +121,7 @@ export class PassportStrategies {
 }
 
 static getAuthStrategy(){
-    return config.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
+    return envConfig.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
   }
 }
 

@@ -36,16 +36,6 @@ export class DbModel extends ConfigProps {
     //readonly config: IConfigration
     model;
     count = 0;
-    getConfigProps() {
-        return {
-            name: this.name,
-            active: this.active,
-            useAdmin: this.useAdmin,
-            useAuth: this.useAuth,
-            schemaObj: this.schemaObj,
-            schemaOptions: this.schemaOptions
-        };
-    }
     //check useAuth and useAdmin
     checkAuth(method) {
         return [
@@ -71,11 +61,12 @@ export class DbModel extends ConfigProps {
         }
         let _configDb = dbStore['config'];
         if (!_configDb) {
-            throw new Error(`config model not present on the database, could not create config entry for model :${this.name}`);
+            envConfig.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`);
         }
         let one = await _configDb.findOne({ name: this.name });
         if (one) {
-            console.log('config entery already on database');
+            await _configDb.putById(one._id, this.getConfigProps());
+            envConfig.logLine('config entery already on database so it has been updated : name: ' + this.name);
         }
         else {
             let rst = await _configDb.create(this.getConfigProps());

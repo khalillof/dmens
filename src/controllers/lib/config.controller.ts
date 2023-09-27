@@ -1,68 +1,26 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
-import fs from 'fs';
-import { DbModel} from '../../models/index.js';
-import {config} from '../../common/index.js'
+import { envConfig } from '../../common/index.js'
+import { IConfigPropsParameters } from '../../interfaces/index.js';
+import { Configration } from '../../operations/index.js';
 
 export class ConfigController extends DefaultController {
 
-    constructor(name ='admin') {
+    constructor(name = 'config') {
         super(name)
     }
-    async schemaDataHandller(req: express.Request, res: express.Response, next: express.NextFunction){
-        // validate inner data schema property shoud have valid schema to be saved on db, outer schema will be validated next
-        //JsonLoad.validate(req.body.data)
-        let jsonObj :any =  {} //await JsonLoad.validateSchema(req.body);
-        let user : any = req.user;
-        jsonObj.schema.admin = user._id;
-        // to save as file later
-        let objForFileCopy = jsonObj;
 
-        //check for activation
-        if(jsonObj.active)
-      //  await DbModel.createInstance(jsonObj.schema.data)
-        //stringify JSON schema feild to save on db
-        jsonObj.schema.data = JSON.stringify(jsonObj.schema.data);
 
-        // assign validated json object to body for process & save by supper create method
-        req.body = jsonObj.schema;
-        await super.post(req, res, next);
+    override  async post(req: express.Request, res: express.Response) {
+        let conf: IConfigPropsParameters = req.body;
+        let result = await Configration.createOverrideModelConfigRoute(conf);
 
-        return objForFileCopy
+        envConfig.logLine('document created or Overrided :', result.name);
+        this.responce(res).success();
     }
-    saveJsnoToFile(jsonObject:any,stringify=true){
-                //stringify jsonContent 
-                if(stringify) 
-                jsonObject = JSON.stringify(jsonObject)
 
-                let file_path = config.getSchemaUploadPath(jsonObject.name);
-                fs.writeFile(file_path, jsonObject, 'utf8',(err)=>{
-                err ? this.log.err(err):this.log.log('New json file document created path: '+file_path)
-                }); 
-    }
-    // was moved here to resolve the issue of module exports inside circular dependency between DefaultController and DefaultRoutesConfig
-  override  async  post(req: express.Request, res: express.Response, next: express.NextFunction) {
-        if (req.header('content-type') ==='application/json' && req.body) {
-                // to save as file later
-                let fileDataCopy = await this.schemaDataHandller(req,res,next);
 
-                // save data to file
-                this.saveJsnoToFile(fileDataCopy); 
-
-        } else if(req.file && req.file.mimetype === 'application/json') {
-
-            fs.readFile(req.file.path, 'utf8', async (err, data)=> {
-                if (err) {
-                    this.responce(res).error(err);
-                }else {
-                    req.body = JSON.parse(data);
-                     await this.schemaDataHandller(req,res,next)
-                    }
-              });
-        }else{
-            
-            this.responce(res).badRequest('content must be valid json');
-        }
-
+    override  async put(req: express.Request, res: express.Response, next: express.NextFunction) {
+        this.post(req,res)
     }
 }
