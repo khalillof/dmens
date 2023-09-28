@@ -1,9 +1,6 @@
 import { isValidRole, dbStore, responce } from '../../common/index.js';
 import fs from 'fs';
-export class Middlewares {
-    static async createInstance() {
-        return await Promise.resolve(new Middlewares());
-    }
+class Middlewares {
     async getUserFromReq(req) {
         return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
     }
@@ -99,3 +96,4 @@ export class Middlewares {
         }
     }
 }
+export default new Middlewares();

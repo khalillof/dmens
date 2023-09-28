@@ -49,11 +49,7 @@ export const envConfig = {
     allow_origins:()=>  getOr('CORES_DMAINS', [])?.split(',').map((e:string) => e.trim()),
     static_urls:()=>  getOr('STATIC_URL',[])?.split(',').map((e:string) => e.trim()),
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
-    facebook: {
-        'clientId': ()=> getOr('FACEBOOK_CLIENT_ID', ' '),
-        'clientSecret':()=> getOr('FACEBOOK_CLIENT_SECRET', ' '),
-        'callbackUrl': ()=> getOr('FACEBOOK_CALLBACK_URL', ''),
-    },
+
   logLine:(...args: any[])=>{
     console.log('>>>================================================>>>')
     console.log(...args);

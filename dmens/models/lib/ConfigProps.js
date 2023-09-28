@@ -1,5 +1,5 @@
 "use strict";
-import { dbStore } from '../../common/index.js';
+import { dbStore, pluralizeRoute } from '../../common/index.js';
 export class ConfigProps {
     constructor(_config) {
         // basic validation
@@ -10,6 +10,7 @@ export class ConfigProps {
             throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
         }
         this.name = _config.name.toLowerCase();
+        this.routeName = _config.routeName ? pluralizeRoute(_config.routeName) : pluralizeRoute(_config.name);
         this.active = _config.active || false;
         this.useAuth = _config.useAuth || [];
         this.useAdmin = _config.useAdmin || [];
@@ -19,6 +20,7 @@ export class ConfigProps {
         // this.validateSchema()
     }
     name;
+    routeName;
     active;
     useAuth;
     useAdmin;
@@ -27,6 +29,7 @@ export class ConfigProps {
     getConfigProps() {
         return {
             name: this.name,
+            routeName: this.routeName,
             active: this.active,
             useAdmin: this.useAdmin,
             useAuth: this.useAuth,
@@ -41,5 +44,12 @@ export class ConfigProps {
         this.useAuth = props.useAuth;
         this.schemaObj = props.schemaObj;
         (this.schemaOptions && props.schemaOptions) && (this.schemaOptions = props.schemaOptions);
+    }
+    //check useAuth and useAdmin
+    checkAuth(method) {
+        return [
+            (this.useAuth && this.useAuth.length ? this.useAuth.indexOf(method) !== -1 : false),
+            (this.useAdmin && this.useAdmin.length ? this.useAdmin.indexOf(method) !== -1 : false)
+        ];
     }
 }

@@ -1,33 +1,32 @@
 import {corsWithOptions } from "./cors.config.js";
-import {routeStore, pluralizeRoute, Assert, envConfig} from '../../common/index.js'
-import {Middlewares} from '../../middlewares/index.js';
-import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate} from '../../interfaces/index.js';
+import {routeStore, Assert, envConfig} from '../../common/index.js'
+import {middlewares} from '../../middlewares/index.js';
+import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IConfigProps, IRouteCallback} from '../../interfaces/index.js';
 import { DefaultController} from '../../controllers/index.js';
 import {authenticateUser} from '../../services/index.js' ;
-import { IRouteCallback } from 'src/interfaces/lib/interfaces.js';
 import {app} from '../../app.js'
+import { ConfigProps } from "../../models/index.js";
 
-export  function getMware():IMiddlewares{
-  let item= Object.values(routeStore).find(r =>  r.mware !== null );
-  let result:IMiddlewares = item && item.mware ? item.mware : new Middlewares();
-    return result;
-}
-const mdwr = new Middlewares();
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     app:any;
+    configProp:IConfigProps
     routeName: string;
     routeParam: string;
     controller?:IController;
     mware?:IMiddlewares;
     authenticate:Iauthenticate;
     //actions:Function;
-    constructor(rName:string,controller?:IController,callback?:IRouteCallback) { 
+    constructor(configProp:IConfigProps,controller?:IController,callback?:IRouteCallback) { 
+      if(!(configProp instanceof ConfigProps)){
+        envConfig.throwErr('route configration require instance of class ConfigProp')
+      }
+        this.configProp = configProp;  
         this.app = app;
-        this.routeName = pluralizeRoute(rName);
+        this.routeName = configProp.routeName;
         this.routeParam = this.routeName+'/:id';
-        this.controller = controller || new DefaultController(rName);
-        this.mware = mdwr;
+        this.controller = controller || new DefaultController(configProp.name);
+        this.mware = middlewares;
         this.authenticate =authenticateUser;
         typeof callback === 'function' ? callback.call(this): this.defaultRoutes();
         
@@ -35,6 +34,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         routeStore[this.routeName]=this;
         envConfig.logLine('Added ( ' +this.routeName+ ' ) to routeStore');
     }
+
 
    async buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){
       let mdwares:any[] = [];
@@ -50,7 +50,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     // custom routes
    async buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null){
       const url = secondRoute ? (routeName +'/'+secondRoute) : routeName;
-      let aut:boolean[] = this.controller?.db?.checkAuth(method) || [true,false];
+      let aut:boolean[] = this.configProp.checkAuth!(method) || [true,false];
       let  mdwr = await this.buildMdWares(middlewares!,...aut);
       return this.app[(method ==='list'?'get':method)](url, ...mdwr,this.actions(actionName ?? method))
     }

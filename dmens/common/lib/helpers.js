@@ -38,6 +38,7 @@ export const responce = (res, cb) => {
         success: (msg) => res.json({ success: true, message: msg ?? successMsg }),
         fail: (error) => res.json({ success: false, error: (error ?? errMsg) }),
         errStatus: (status, error) => res.status(status).json({ success: false, error }),
+        notFound: (msg) => self.errStatus(404, msg ?? 'NotFound!'),
         badRequest: (msg) => self.errStatus(400, msg ?? 'bad Request!'),
         unAuthorized: (msg) => self.errStatus(401, msg ?? 'unAuthorized!'),
         forbidden: (msg) => self.errStatus(403, msg ?? 'forbidden!'),

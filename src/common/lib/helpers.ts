@@ -46,6 +46,7 @@ export const responce =(res:express.Response, cb?:Function)=>{
       success:(msg?:string)=> res.json({success:true,message:msg ?? successMsg}),
       fail:(error?:string)=> res.json({success:false,error:(error ?? errMsg)}),
       errStatus:(status:number,error:string)=> res.status(status).json({success:false,error}),
+      notFound: (msg?: string) => self.errStatus(404,msg ?? 'NotFound!'),
       badRequest: (msg?: string)=> self.errStatus(400,msg ?? 'bad Request!'),
       unAuthorized: (msg?: string)=> self.errStatus(401,msg ?? 'unAuthorized!'),
       forbidden: (msg?: string)=> self.errStatus(403,msg ?? 'forbidden!'),

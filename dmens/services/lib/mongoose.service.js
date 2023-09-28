@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { dbStore, envConfig } from '../../common/index.js';
-import { Configration } from '../../operations/index.js';
+import { Operations } from '../../operations/index.js';
 /////////////////
 const dbOptions = {
     //rejectUnauthorized: true,
@@ -14,7 +14,7 @@ export async function dbInit() {
         await mongoose.connect(envConfig.databaseUrl());
         console.log("Successfully Connected to db!");
         // Create Configration - Account - default directory  db models and routes
-        await Configration.create_default_models_routes();
+        await Operations.create_default_models_routes();
         envConfig.logLine(`Numbers of models on the database are : ${Object.keys(dbStore).length}`);
     }
     catch (err) {

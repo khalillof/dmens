@@ -1,19 +1,18 @@
 "use strict";
-import express from 'express';
-import { IConfigProps, IConfigPropsParameters, IController } from '../interfaces/index.js';
-import { DbModel } from '../models/lib/db.model.js';
+import { IConfigProps, IConfigPropsParameters, IController } from '../../interfaces/index.js';
+import { DbModel } from '../../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
-import { dbStore, envConfig } from '../common/index.js';
-import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../routes/index.js';
-import { IRouteConfigCallback } from '../interfaces/index.js';
+import { dbStore, envConfig } from '../../common/index.js';
+import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../../routes/index.js';
+import { IRouteConfigCallback } from '../../interfaces/index.js';
 import { IRouteCallback } from 'src/interfaces/lib/interfaces.js';
 import { confSchema, accConfgSchema, typeMappings } from './help.js';
 
 //=============================================
 
 
-export class Configration {
+export class Operations {
 
   static async create_default_models_routes() {
     // create config model
@@ -26,16 +25,16 @@ export class Configration {
       schemaObj: confSchema
     };
     // create config model and routes
-    await Configration.createModelInstance(_configProp);
-    await Configration.createInstanceWithRouteConfigCallback(ConfigRoutes);
+    await Operations.createModelInstance(_configProp);
+    await Operations.createInstanceWithRouteConfigCallback(ConfigRoutes);
 
     // create account model config and routes
-    await Configration.createModelConfigRoute(accConfgSchema);
+    await Operations.createModelConfigRoute(accConfgSchema);
 
     // auth routes
-    await Configration.createInstanceWithRouteConfigCallback(AuthRoutes);
+    await Operations.createInstanceWithRouteConfigCallback(AuthRoutes);
     // load models routes from default directory
-    return await Configration.createModelsRoutesFromDirectory();
+    return await Operations.createModelsRoutesFromDirectory();
 
   }
 
@@ -47,51 +46,46 @@ export class Configration {
 
   static async createModelConfigRoute(_config: IConfigPropsParameters, controller?: IController, routeCallback?: any) {
 
-    let _model = await Configration.createModelInstance(_config);
+    let _model = await Operations.createModelInstance(_config);
     await _model.createConfig();
 
-    return await Configration.createRouteInstance(_model.name, controller, routeCallback);
+    return await Operations.createRouteInstance(_model.config, controller, routeCallback);
 
   }
   // create or override model config route
-  static async createOverrideModelConfigRoute(_config: IConfigPropsParameters) {
+  static async overrideModelConfigRoute(_config: IConfigPropsParameters) {
     let dbName = _config.name;
-    if (!dbName) {
+    if (!dbName || !dbStore[dbName]) {
       envConfig.throwErr(' db model name not found')
     }
 
     // delete model if exists
-    if (dbStore[dbName])
-      delete dbStore[dbName];
+    delete dbStore[dbName];
 
-    let _model = await Configration.createModelInstance(_config);
-    await _model.createConfig();
-
-    await Configration.createRouteInstance(_model.name);
-    return _model;
+    return await Operations.createModelConfigRoute(_config);
   }
 
   static async createModelFromJsonString(jsonString: string) {
     if (typeof jsonString === 'string') {
       let _conf: IConfigPropsParameters = JSON.parse(jsonString);
-      return await Configration.createModelConfigRoute(_conf);
+      return await Operations.createModelConfigRoute(_conf);
     } else {
       throw new Error('this method makeModelFromJsonString require json data as string');
     }
   }
 
   static async createModelFromJsonFile(filePath: string) {
-    if (path.isAbsolute(filePath) && Configration.isJsonFile(filePath)) {
+    if (path.isAbsolute(filePath) && Operations.isJsonFile(filePath)) {
 
       let data = fs.readFileSync(filePath, 'utf8');
       let jsobj: IConfigProps = JSON.parse(data);
 
-      return await Configration.createModelConfigRoute(jsobj);
+      return await Operations.createModelConfigRoute(jsobj);
     } else {
       // handel dirNames within files
       if (path.dirname(filePath)) {
         console.log(' found dir name in : ' + path.dirname(filePath));
-        await Configration.createModelsRoutesFromDirectory(filePath);
+        await Operations.createModelsRoutesFromDirectory(filePath);
       } else {
         throw new Error('file should be json and absolute' + filePath);
       }
@@ -104,8 +98,8 @@ export class Configration {
     if (path.dirname(directory)) {
       return await Promise.all(fs.readdirSync(directory).map(async (fileName: string) => {
         let _file = path.join(directory, fileName);
-        if (Configration.isJsonFile(_file)) {
-          return await Configration.createModelFromJsonFile(_file);
+        if (Operations.isJsonFile(_file)) {
+          return await Operations.createModelFromJsonFile(_file);
         }
         return;
       }));
@@ -115,12 +109,12 @@ export class Configration {
   }
 
   // ===================== Routes
-  static async createRouteInstance(rName: string, controller?: IController, callback?: IRouteCallback) {
-    return Promise.resolve(new DefaultRoutesConfig(rName, controller, callback));
+  static async createRouteInstance(config: IConfigProps, controller?: IController, callback?: IRouteCallback) {
+    return Promise.resolve(new DefaultRoutesConfig(config, controller, callback));
   }
 
   static async createInstanceWithRouteConfigCallback(routeCb: IRouteConfigCallback) {
-    return await Configration.createRouteInstance(routeCb.routeName, routeCb.controller, routeCb.routeCallback);
+    return await Operations.createRouteInstance(routeCb.config, routeCb.controller(), routeCb.routeCallback);
   }
 
 

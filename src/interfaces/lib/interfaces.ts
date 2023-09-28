@@ -2,7 +2,8 @@ import express from 'express'
 import { Model, Schema } from 'mongoose';
 
 export interface IConfigPropsParameters {
-    name: string
+   name: string
+   routeName?:string
    active? : Boolean;
    useAuth?: String[]
    useAdmin?: String[]
@@ -12,6 +13,7 @@ export interface IConfigPropsParameters {
 
 export interface IConfigProps {
    name: string
+   routeName:string
    active : Boolean;
    useAuth: String[]
    useAdmin: String[]
@@ -19,15 +21,16 @@ export interface IConfigProps {
    schemaOptions?: Record<string,any>
    getConfigProps?(): IConfigProps
    setConfigProps?(props:IConfigProps): void
+   //check useAuth and useAdmin
+   checkAuth?(method: string): Array<boolean>
  };
 
-export interface IDbModel extends IConfigProps {
-  
+export interface IDbModel {
+  name:string
+  config:IConfigProps
   readonly model?: Model<any>;
   count:number
 
-  getConfigProps():IConfigProps
-  checkAuth(method:string):Array<boolean>
   initPostDatabaseSeeding(): Promise<any>;
 
   Tolist(filter?: Record<string,any>,limit?: number, page?: number, sort?: number ): Promise<any[]>;
@@ -52,6 +55,7 @@ export interface Iresponces {
   badRequest: (msg?: string) => void;
   forbidden: (msg?: string) => void;
   unAuthorized: (msg?: string) => void;
+  notFound: (msg?: string) => void;
   error: (err: any) => void;
   data: (item: any, message?: string, total?:number,) => void;
   errCb: (err: any, cb: Function) => void;
@@ -69,8 +73,8 @@ export interface IRouteCallback {
 }
 // function with parmeters interface 
 export interface IRouteConfigCallback {
-  routeName:string
-  controller:IController
+  config:IConfigProps
+  controller:()=>IController
   routeCallback?: IRouteCallback
 }
 export interface Ilogger {
@@ -98,6 +102,7 @@ export interface IController {
 
 export interface IDefaultRoutesConfig {
   app: express.Router;
+  configProp:IConfigProps
   routeName: string;
   routeParam: string;
   controller?: IController;

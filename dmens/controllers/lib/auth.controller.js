@@ -2,7 +2,7 @@ import { DefaultController } from './default.controller.js';
 import { authenticateUser, generateJwt } from '../../services/index.js';
 import { envConfig } from '../../common/index.js';
 export class AuthController extends DefaultController {
-    constructor(svc) {
+    constructor(svc = 'account') {
         super(svc);
     }
     async secure(req, res, next) {

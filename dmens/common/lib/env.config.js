@@ -45,11 +45,6 @@ export const envConfig = {
     allow_origins: () => getOr('CORES_DMAINS', [])?.split(',').map((e) => e.trim()),
     static_urls: () => getOr('STATIC_URL', [])?.split(',').map((e) => e.trim()),
     databaseUrl: () => getOr('DATABASE_URL'),
-    facebook: {
-        'clientId': () => getOr('FACEBOOK_CLIENT_ID', ' '),
-        'clientSecret': () => getOr('FACEBOOK_CLIENT_SECRET', ' '),
-        'callbackUrl': () => getOr('FACEBOOK_CALLBACK_URL', ''),
-    },
     logLine: (...args) => {
         console.log('>>>================================================>>>');
         console.log(...args);

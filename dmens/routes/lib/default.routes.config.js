@@ -1,29 +1,29 @@
 import { corsWithOptions } from "./cors.config.js";
-import { routeStore, pluralizeRoute, Assert, envConfig } from '../../common/index.js';
-import { Middlewares } from '../../middlewares/index.js';
+import { routeStore, Assert, envConfig } from '../../common/index.js';
+import { middlewares } from '../../middlewares/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { authenticateUser } from '../../services/index.js';
 import { app } from '../../app.js';
-export function getMware() {
-    let item = Object.values(routeStore).find(r => r.mware !== null);
-    let result = item && item.mware ? item.mware : new Middlewares();
-    return result;
-}
-const mdwr = new Middlewares();
+import { ConfigProps } from "../../models/index.js";
 export class DefaultRoutesConfig {
     app;
+    configProp;
     routeName;
     routeParam;
     controller;
     mware;
     authenticate;
     //actions:Function;
-    constructor(rName, controller, callback) {
+    constructor(configProp, controller, callback) {
+        if (!(configProp instanceof ConfigProps)) {
+            envConfig.throwErr('route configration require instance of class ConfigProp');
+        }
+        this.configProp = configProp;
         this.app = app;
-        this.routeName = pluralizeRoute(rName);
+        this.routeName = configProp.routeName;
         this.routeParam = this.routeName + '/:id';
-        this.controller = controller || new DefaultController(rName);
-        this.mware = mdwr;
+        this.controller = controller || new DefaultController(configProp.name);
+        this.mware = middlewares;
         this.authenticate = authenticateUser;
         typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
         // add instance to routeStore
@@ -43,7 +43,7 @@ export class DefaultRoutesConfig {
     // custom routes
     async buidRoute(routeName, method, actionName, secondRoute, middlewares) {
         const url = secondRoute ? (routeName + '/' + secondRoute) : routeName;
-        let aut = this.controller?.db?.checkAuth(method) || [true, false];
+        let aut = this.configProp.checkAuth(method) || [true, false];
         let mdwr = await this.buildMdWares(middlewares, ...aut);
         return this.app[(method === 'list' ? 'get' : method)](url, ...mdwr, this.actions(actionName ?? method));
     }

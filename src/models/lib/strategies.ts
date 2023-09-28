@@ -1,9 +1,7 @@
-import FacebookTokenStrategy from 'passport-facebook-token';
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
 import { envConfig, dbStore } from "../../common/index.js";
 import { Strategy as LocalStrategy } from  'passport-local';
-import {Strategy as FacebookStrategy} from 'passport-facebook';
-import {BearerStrategy,OIDCStrategy, ITokenPayload} from "passport-azure-ad";
+import {BearerStrategy,ITokenPayload} from "passport-azure-ad";
 import  azconfig from './az-config.json' assert {type: 'json'};
 import crypto from 'crypto';
 
@@ -83,42 +81,6 @@ export class PassportStrategies {
       }
     );
   }
-
-  //passport facebook Token strategy
-  static FacebookToken() {
-    return new FacebookTokenStrategy({
-      clientID: envConfig.facebook.clientId(),
-      clientSecret: envConfig.facebook.clientSecret()
-    }, (accessToken, refreshToken, profile, done)=>{
-      dbStore['account'].model!.findOne({ facebookId: profile.id }, async function(err:any, user:any) {
-        if (err) {
-            return done(err, false);
-        }
-        else if (user) {
-            return done(null, user);
-        } else {
-            return done(null, false);
-            // or you could create a new account
-        }
-      });
-     } );
-    } 
-   // type VerifyFunction = (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any, info?: any) => void) => void
-  static facebook(){
-    return new FacebookStrategy({
-      clientID: envConfig.facebook.clientId(),
-      clientSecret: envConfig.facebook.clientSecret(),
-      callbackURL: envConfig.facebook.callbackUrl()
-    },
-    function(accessToken:string, refreshToken:string, profile:any, done:Function) {
-      dbStore['account'].model!.findOne({ facebookId: profile.id }, function(err:any, user:any,info?: any) {
-        if (err) { return done(err, false); }
-        if (!user) { return done(null, false); }
-        return done(null, user);
-        
-      });
-    });
-}
 
 static getAuthStrategy(){
     return envConfig.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 

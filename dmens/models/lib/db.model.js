@@ -6,10 +6,11 @@ import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
 import { ConfigProps } from './ConfigProps.js';
 import { autopopulatePlugin } from './autopopulate.js';
-export class DbModel extends ConfigProps {
+export class DbModel {
     constructor(_config, callback) {
-        super(_config);
-        let _schema = new mongoose.Schema(this.schemaObj, this.schemaOptions).plugin(autopopulatePlugin);
+        this.config = (_config instanceof ConfigProps) ? _config : new ConfigProps(_config);
+        this.name = this.config.name;
+        let _schema = new mongoose.Schema(this.config.schemaObj, this.config.schemaOptions).plugin(autopopulatePlugin);
         if (this.name === 'account') {
             _schema?.plugin(passportLocalMongoose);
             const Account = mongoose.model(this.name, _schema);
@@ -33,16 +34,11 @@ export class DbModel extends ConfigProps {
         dbStore[this.name] = this;
         envConfig.logLine("added ( " + this.name + " ) to DbStore :");
     }
+    name;
+    config;
     //readonly config: IConfigration
     model;
     count = 0;
-    //check useAuth and useAdmin
-    checkAuth(method) {
-        return [
-            (this.useAuth && this.useAuth.length ? this.useAuth.indexOf(method) !== -1 : false),
-            (this.useAdmin && this.useAdmin.length ? this.useAdmin.indexOf(method) !== -1 : false)
-        ];
-    }
     async initPostDatabaseSeeding() {
         // count
         this.count = await this.model.count();
@@ -65,11 +61,11 @@ export class DbModel extends ConfigProps {
         }
         let one = await _configDb.findOne({ name: this.name });
         if (one) {
-            await _configDb.putById(one._id, this.getConfigProps());
+            await _configDb.putById(one._id, this.config.getConfigProps());
             envConfig.logLine('config entery already on database so it has been updated : name: ' + this.name);
         }
         else {
-            let rst = await _configDb.create(this.getConfigProps());
+            let rst = await _configDb.create(this.config.getConfigProps());
             envConfig.logLine(`created config entry for model name : ${rst.name}`);
         }
     }

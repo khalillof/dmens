@@ -1,5 +1,6 @@
 "use strict";
-import { dbStore } from '../../common/index.js';
+import { dbStore , pluralizeRoute} from '../../common/index.js';
+
 import { IConfigProps, IConfigPropsParameters } from '../../interfaces/index.js';
 
 export class ConfigProps implements IConfigProps {
@@ -17,6 +18,7 @@ export class ConfigProps implements IConfigProps {
 
 
     this.name = _config.name.toLowerCase();
+    this.routeName = _config.routeName ? pluralizeRoute(_config.routeName): pluralizeRoute(_config.name);
     this.active = _config.active || false;
 
     this.useAuth = _config.useAuth || [];
@@ -28,6 +30,7 @@ export class ConfigProps implements IConfigProps {
   }
 
    name: string 
+   routeName:string
    active: Boolean
    useAuth: String[]
    useAdmin: String[]
@@ -37,6 +40,7 @@ export class ConfigProps implements IConfigProps {
    getConfigProps(): IConfigProps {
     return {
       name: this.name,
+      routeName:this.routeName,
       active: this.active,
       useAdmin: this.useAdmin,
       useAuth: this.useAuth,
@@ -52,4 +56,12 @@ export class ConfigProps implements IConfigProps {
     this.schemaObj = props.schemaObj;
     (this.schemaOptions && props.schemaOptions) && (this.schemaOptions = props.schemaOptions);
   }
+
+    //check useAuth and useAdmin
+    checkAuth(method: string): Array<boolean> {
+      return [
+        (this.useAuth && this.useAuth.length ? this.useAuth.indexOf(method) !== -1 : false),
+        (this.useAdmin && this.useAdmin.length ? this.useAdmin.indexOf(method) !== -1 : false)
+      ]
+    }
 }

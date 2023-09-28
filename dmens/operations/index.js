@@ -1,2 +1,2 @@
-import { Configration } from '../operations/Configration.js';
-export { Configration };
+import { Operations } from './lib/operations.js';
+export { Operations };

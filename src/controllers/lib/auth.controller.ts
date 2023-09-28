@@ -5,7 +5,7 @@ import { envConfig} from '../../common/index.js';
 
 export class AuthController extends DefaultController {
 
-    constructor(svc:string) {
+    constructor(svc:string = 'account') {
         super(svc)
     }
     

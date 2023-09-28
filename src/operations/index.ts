@@ -1,5 +1,5 @@
 
-import { Configration } from '../operations/Configration.js';
+import { Operations } from './lib/operations.js';
 
 
-export {Configration}
+export {Operations}

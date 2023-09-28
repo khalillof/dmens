@@ -3,12 +3,7 @@ import { isValidRole, dbStore, responce } from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import fs from 'fs';
 
-export class Middlewares implements IMiddlewares {
-
-
-  static async createInstance() {
-    return await Promise.resolve(new Middlewares())
-  }
+ class Middlewares implements IMiddlewares {
 
   async getUserFromReq(req: express.Request) {
     return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
@@ -115,3 +110,4 @@ export class Middlewares implements IMiddlewares {
     }
   }
 }
+ export default new Middlewares()
