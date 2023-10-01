@@ -1,12 +1,12 @@
 import express from 'express';
-import { isValidRole, dbStore, responce } from '../../common/index.js';
+import { isValidRole, Svc, responce} from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import fs from 'fs';
 
  class Middlewares implements IMiddlewares {
 
   async getUserFromReq(req: express.Request) {
-    return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
+    return req.body && req.body.email ? await Svc.db.get('account')!.findOne({ email: req.body.email }) : null;
   }
   checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction) {
     if (req.body) {
@@ -60,14 +60,15 @@ import fs from 'fs';
 
 
   isInRole(roleName: string) {
+    let db = Svc.db.get('account')!;
     return async (req: any, res: express.Response, next: express.NextFunction) => {
       if (!req.isAuthenticated()) {
         responce(res).forbidden('require authentication')
         return;
       }
-      let reqUser: any = req.user && req.user.roles ? req.user : await dbStore['account'].findById(req.user._id);
+      let reqUser: any = req.user && req.user.roles ? req.user : await db.findById(req.user._id);
 
-      let roles = await dbStore['role'].model!.find({ _id: { $in: reqUser.roles } });
+      let roles = await db.model!.find({ _id: { $in: reqUser.roles } });
 
       if (roles) {
         for (let r of roles) {
@@ -88,13 +89,13 @@ import fs from 'fs';
  isJson(req: express.Request, res: express.Response, next: express.NextFunction): void {
 
     const toJsonNext = (data: any) => {
-      req.body = JSON.parse(data);
+      req.body =  JSON.parse(data);
       next()
     }
 
     if (req.body && req.header('content-type') === 'application/json') {
-      toJsonNext(req.body);
-
+     // toJsonNext(req.body);
+       next();
     } else if (req.file && req.file.mimetype === 'application/json') {
 
       fs.readFile(req.file.path, 'utf8', (err: any, data: any) => {
@@ -110,4 +111,4 @@ import fs from 'fs';
     }
   }
 }
- export default new Middlewares()
+ export default new Middlewares();

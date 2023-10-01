@@ -15,7 +15,7 @@ export async function dbInit() {
         console.log("Successfully Connected to db!");
         // Create Configration - Account - default directory  db models and routes
         await Operations.create_default_models_routes();
-        envConfig.logLine(`Numbers of models on the database are : ${Object.keys(dbStore).length}`);
+        envConfig.logLine(`Numbers of models on the database are : ${dbStore.length}`);
     }
     catch (err) {
         console.error(err);

@@ -1,4 +1,4 @@
-import { dbStore, envConfig } from '../../common/index.js';
+import { Svc, envConfig } from '../../common/index.js';
 import seeds from '../seeds.json' assert { type: 'json' };
 import { posts } from './posts.js';
 export class ClientSeedDatabase {
@@ -19,7 +19,7 @@ export class ClientSeedDatabase {
     }
     async addAccounts() {
         await this.countDb('account', async (Db) => {
-            const roles = await dbStore['role'].model.find({ name: { $in: ["admin", "user"] } });
+            const roles = await Svc.db.get('role').model.find({ name: { $in: ["admin", "user"] } });
             if (roles) {
                 await Promise.all(seeds.accounts.map(async (account) => {
                     account.roles = roles;
@@ -90,7 +90,7 @@ export class ClientSeedDatabase {
     }
     countDb(dbName, callback) {
         return new Promise(async (resolve) => {
-            let Db = dbStore[dbName];
+            let Db = Svc.db.get(dbName);
             Db.model.estimatedDocumentCount().then(async (count) => {
                 if (count === 0) {
                     callback && resolve(await callback(Db));
@@ -105,7 +105,7 @@ export class ClientSeedDatabase {
         return this.accountsCache.length ? this.accountsCache.map((d) => d._id) : await this.getIDs('account');
     }
     async getIDs(name, filter) {
-        return (await dbStore[name].model?.find(filter)).map((md) => md._id);
+        return (await Svc.db.get(name).model?.find(filter)).map((md) => md._id);
     }
     async saver(dbName, objArr) {
         await this.countDb(dbName, async (db) => {

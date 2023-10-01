@@ -1,10 +1,8 @@
-import passport, { use } from 'passport';
+import passport from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
-import { envConfig, dbStore, logger } from "../../common/index.js";
+import {responce, envConfig, Svc, logger } from "../../common/index.js";
 import { randomUUID } from 'crypto';
-//import { nanoid } from 'nanoid/async';
-import { responce } from '../../common/index.js';
 
 const { verify, sign, TokenExpiredError } = jwt;
 
@@ -59,13 +57,14 @@ function authenticateUser(type: string, opts?: {}) {
       pssportOptions = { failureRedirect: '/auth/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err:any, user:any, info:any) => {
+        let db = Svc.db.get('role')!;
           console.log('authenticated user id :')
           console.log((user && user._id) || info || err )
 
         if (user) {
           let _roles = [];
           for(let id of user.roles){
-          let r = await dbStore['role'].findById(id)
+          let r = await db!.findById(id)
           _roles.push(r)
          }
          user['hash']= null;
@@ -89,7 +88,7 @@ function authenticateUser(type: string, opts?: {}) {
             }
 
             // refresh token found in header
-            let refUser = await dbStore['account'].findOne({ refreshToken: _refToken });
+            let refUser = await db.findOne({ refreshToken: _refToken });
 
             if (!refUser) {
               responce(res).badRequest('refresh token provided not found');
@@ -185,7 +184,7 @@ async function createRefershToken(user: any) {
 
     let _token = randomUUID();
 
-    await dbStore['account'].putById(user._id, {
+    await Svc.db.get('role')!.putById(user._id, {
       refreshToken: _token,
       refreshTokenExpireAt: expireAt,
     });

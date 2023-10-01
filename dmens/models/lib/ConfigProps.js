@@ -1,19 +1,19 @@
 "use strict";
-import { dbStore, pluralizeRoute } from '../../common/index.js';
+import { Svc } from '../../common/index.js';
 export class ConfigProps {
     constructor(_config) {
         // basic validation
         if (!_config || !_config.name || !_config.schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
         }
-        if (dbStore[_config.name.toLowerCase()]) {
+        if (Svc.db.exist(_config.name.toLowerCase())) {
             throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
         }
         this.name = _config.name.toLowerCase();
-        this.routeName = _config.routeName ? pluralizeRoute(_config.routeName) : pluralizeRoute(_config.name);
+        this.routeName = _config.routeName || Svc.routes.pluralizeRoute(_config.name);
         this.active = _config.active || false;
-        this.useAuth = _config.useAuth || [];
-        this.useAdmin = _config.useAdmin || [];
+        this.useAuth = this.removeDiplicates(_config.useAuth);
+        this.useAdmin = this.removeDiplicates(_config.useAdmin);
         this.schemaObj = _config.schemaObj || {};
         this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions };
         // validate schema
@@ -26,6 +26,10 @@ export class ConfigProps {
     useAdmin;
     schemaObj;
     schemaOptions;
+    removeDiplicates(arr) {
+        // Set will remove diblicate
+        return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
+    }
     getConfigProps() {
         return {
             name: this.name,
@@ -47,9 +51,7 @@ export class ConfigProps {
     }
     //check useAuth and useAdmin
     checkAuth(method) {
-        return [
-            (this.useAuth && this.useAuth.length ? this.useAuth.indexOf(method) !== -1 : false),
-            (this.useAdmin && this.useAdmin.length ? this.useAdmin.indexOf(method) !== -1 : false)
+        return [(this.useAuth.indexOf(method) !== -1), (this.useAdmin.indexOf(method) !== -1)
         ];
     }
 }

@@ -2,7 +2,7 @@
 import { DbModel } from '../../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
-import { dbStore, envConfig } from '../../common/index.js';
+import { Svc, envConfig } from '../../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../../routes/index.js';
 import { confSchema, accConfgSchema, typeMappings } from './help.js';
 //=============================================
@@ -39,11 +39,11 @@ export class Operations {
     // create or override model config route
     static async overrideModelConfigRoute(_config) {
         let dbName = _config.name;
-        if (!dbName || !dbStore[dbName]) {
+        if (!dbName || !Svc.db.exist(dbName)) {
             envConfig.throwErr(' db model name not found');
         }
         // delete model if exists
-        delete dbStore[dbName];
+        Svc.db.delete(dbName);
         return await Operations.createModelConfigRoute(_config);
     }
     static async createModelFromJsonString(jsonString) {

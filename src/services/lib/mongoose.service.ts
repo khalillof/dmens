@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { dbStore, envConfig} from '../../common/index.js';
+import {dbStore, envConfig} from '../../common/index.js';
 import { Operations} from '../../operations/index.js';
 /////////////////
 const dbOptions = {
@@ -20,7 +20,7 @@ export async function dbInit() {
       // Create Configration - Account - default directory  db models and routes
     await  Operations.create_default_models_routes()
 
-     envConfig.logLine(`Numbers of models on the database are : ${Object.keys(dbStore).length}`);
+     envConfig.logLine(`Numbers of models on the database are : ${dbStore.length}`);
 
     } catch (err: any) {
       console.error(err);

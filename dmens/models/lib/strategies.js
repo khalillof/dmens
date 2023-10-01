@@ -1,5 +1,5 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
-import { envConfig, dbStore } from "../../common/index.js";
+import { envConfig, Svc } from "../../common/index.js";
 import { Strategy as LocalStrategy } from 'passport-local';
 import { BearerStrategy } from "passport-azure-ad";
 import azconfig from './az-config.json' assert { type: 'json' };
@@ -21,7 +21,7 @@ export class PassportStrategies {
     }
     static Local2() {
         return new LocalStrategy(function (username, password, cb) {
-            dbStore['account'].model.findOne({ username: username }).populate('roles').exec().then((user) => {
+            Svc.db.get('account').model.findOne({ username: username }).populate('roles').exec().then((user) => {
                 if (!user) {
                     return cb(null, false, { message: 'Incorrect username or password.' });
                 }
@@ -52,7 +52,7 @@ export class PassportStrategies {
             audience: envConfig.audience(),
             // passReqToCallback:true
         }, async (payload, done) => {
-            dbStore['account'].model?.findById(payload.user._id).populate('roles').exec().then((error, user, info) => {
+            Svc.db.get('account').model?.findById(payload.user._id).populate('roles').exec().then((error, user, info) => {
                 return user && done(false, user) || error && done(error, null) || info && done(false, null, info);
             });
         });
@@ -83,7 +83,7 @@ function validPassword(password, hash, salt) {
     return hash === hashVerify;
 }
 function verifyPasswordSafe(username, password, cb) {
-    dbStore['account'].model.findOne({ username: username }, (err, user) => {
+    Svc.db.get('account').model.findOne({ username: username }, (err, user) => {
         if (err) {
             return cb(err);
         }

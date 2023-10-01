@@ -3,7 +3,7 @@ import { IConfigProps, IConfigPropsParameters, IController } from '../../interfa
 import { DbModel } from '../../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
-import { dbStore, envConfig } from '../../common/index.js';
+import { Svc, envConfig } from '../../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../../routes/index.js';
 import { IRouteConfigCallback } from '../../interfaces/index.js';
 import { IRouteCallback } from 'src/interfaces/lib/interfaces.js';
@@ -55,12 +55,12 @@ export class Operations {
   // create or override model config route
   static async overrideModelConfigRoute(_config: IConfigPropsParameters) {
     let dbName = _config.name;
-    if (!dbName || !dbStore[dbName]) {
+    if (!dbName || !Svc.db.exist(dbName)) {
       envConfig.throwErr(' db model name not found')
     }
 
     // delete model if exists
-    delete dbStore[dbName];
+    Svc.db.delete(dbName);
 
     return await Operations.createModelConfigRoute(_config);
   }

@@ -18,13 +18,15 @@ import session from 'express-session';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
-import { envConfig, printRoutesToString } from './common/index.js';
+import { envConfig, Svc} from './common/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
 import { corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
 
 // Create the Express application
 export  const app = express();
+export const appRouter = express.Router();
+
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ limit: "20mb", extended: true }));
 // compress all responses
@@ -66,14 +68,21 @@ app.use(helmet({
 // cors activation
 app.use(corsWithOptions);
 
-// print routes
-await printRoutesToString(app);
+//console.log('allowed cores are :' + config.allow_origins())
+//enable CORS (for testing only -remove in production/deployment)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
+// app routes
+app.use('/api',appRouter);
 
 
 // handel 404 shoud be at the midlleware
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.status(404).json({ success: false, message: "Sorry can't find that!" })
+  res.status(404).json({ success: false, message: "Not Found" })
 })
 
 // server error handller will print stacktrace
@@ -82,16 +91,12 @@ app.use(function (err: any, req: express.Request, res: express.Response, next: e
   console.error(err.stack)
 });
 
+// print routes
+Svc.routes.getAllRoutesToString();
+
 // seed database
 await new ClientSeedDatabase().init();
 
-//console.log('allowed cores are :' + config.allow_origins())
-//enable CORS (for testing only -remove in production/deployment)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
 
 dev_prod !== 'development' ? await menServer(app, false) : app.listen(envConfig.port(), () => envConfig.logLine(`${dev_prod} server is running on port: ${envConfig.port()}`));
 
@@ -102,3 +107,7 @@ if (dev_prod === 'production' && fs.existsSync(envPath)) {
   console.log('.env file will be removed')
 }
 
+//console.log(Svc.routes.getRoutesToString('/messages'))
+//Svc.routes.deleteAppRoute('/messages')
+
+//console.log('testing ........: ',ddd)

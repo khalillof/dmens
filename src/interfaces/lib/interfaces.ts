@@ -1,6 +1,30 @@
-import express from 'express'
-import { Model, Schema } from 'mongoose';
+import express, { Application, IRouter } from 'express'
+import { Model} from 'mongoose';
 
+export interface ISvc {
+  db:ISvcIntance<IDbModel>
+  routes:IRouteSvc
+}
+export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig>{
+  //getAppRoutes(routePath: string) : string[]
+  deleteAppRoute(routePath:string):void
+  
+  getRoutesToString(routeName: string): string
+  getAllRoutesToString():string
+
+  getRoutesToJsonString(routeName: string): string
+  getAllRoutesToJsonString():void
+
+  pluralizeRoute(routeName: string):string
+}
+export interface ISvcIntance<T> {
+  obj() :T[]
+  get(keyValue: string): T | null 
+  add(obj: T | any): void
+  delete(keyValue: string): void
+  len():number
+  exist(keyValue:string):boolean
+}
 export interface IConfigPropsParameters {
    name: string
    routeName?:string
@@ -101,7 +125,8 @@ export interface IController {
 
 
 export interface IDefaultRoutesConfig {
-  app: express.Router;
+  app: Application;
+  router:IRouter
   configProp:IConfigProps
   routeName: string;
   routeParam: string;
@@ -113,7 +138,8 @@ export interface IDefaultRoutesConfig {
   // custom routes
   buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null):Promise<any>
   
-  options(routPath:string):void;
+  setOptions(routPath:string):void;
+  options():void;
   param(): void;
   defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;

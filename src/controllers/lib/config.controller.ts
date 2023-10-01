@@ -1,6 +1,6 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
-import { dbStore, envConfig, routeStore } from '../../common/index.js'
+import { Svc, envConfig } from '../../common/index.js'
 import { IConfigProps, IConfigPropsParameters } from '../../interfaces/index.js';
 import { Operations } from '../../operations/index.js';
 
@@ -39,13 +39,11 @@ export class ConfigController extends DefaultController {
             // delete config record on database
             await this.db.deleteById(id);
             // if there is db deleted
-            if (dbStore[item.name]) {
-                delete dbStore[item.name]
-            }
+            Svc.db.delete(item.name) 
+     
             // delete route
-            if (routeStore[item.routeName]) {
-                delete routeStore[item.routeName];
-            }
+            Svc.db.delete(item.routeName) 
+
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
             this.responce(res).success()
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { dbStore,logger, responce, Assert} from '../../common/index.js';
+import { logger, responce, Assert, Svc} from '../../common/index.js';
 import{Ilogger,Iresponce,IController, IDbModel} from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
@@ -7,14 +7,10 @@ export class DefaultController implements IController {
   responce:Iresponce;
   log:Ilogger;
   constructor(name: string) {
-    this.db = dbStore[name];
+    this.db = Svc.db.get(name)!;
     this.responce = responce;
     this.log = logger;
   }
-
- //public static async createInstance(svcName: string){
- //   return new this(svcName);
-  //}
 
   async count(req: express.Request, res: express.Response, next: express.NextFunction){
   let num =  await this.db.model?.countDocuments(req.query)
@@ -71,6 +67,7 @@ if(!filter){
         let items = await this.db.Tolist(filter, limit, page, sort);
          total && (total = await this.db.model?.countDocuments(filter));
        // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
+
         this.responce(res).data(items, undefined, total)
   }
 

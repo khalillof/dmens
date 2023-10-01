@@ -1,9 +1,7 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { envConfig, dbStore, logger } from "../../common/index.js";
+import { responce, envConfig, Svc, logger } from "../../common/index.js";
 import { randomUUID } from 'crypto';
-//import { nanoid } from 'nanoid/async';
-import { responce } from '../../common/index.js';
 const { verify, sign, TokenExpiredError } = jwt;
 function getExpiredAt(refersh) {
     let expiredAt = new Date();
@@ -52,12 +50,13 @@ function authenticateUser(type, opts) {
             pssportOptions = { failureRedirect: '/auth/login', failureMessage: true };
         try {
             return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
+                let db = Svc.db.get('role');
                 console.log('authenticated user id :');
                 console.log((user && user._id) || info || err);
                 if (user) {
                     let _roles = [];
                     for (let id of user.roles) {
-                        let r = await dbStore['role'].findById(id);
+                        let r = await db.findById(id);
                         _roles.push(r);
                     }
                     user['hash'] = null;
@@ -76,7 +75,7 @@ function authenticateUser(type, opts) {
                             return;
                         }
                         // refresh token found in header
-                        let refUser = await dbStore['account'].findOne({ refreshToken: _refToken });
+                        let refUser = await db.findOne({ refreshToken: _refToken });
                         if (!refUser) {
                             responce(res).badRequest('refresh token provided not found');
                             return;
@@ -158,7 +157,7 @@ async function createRefershToken(user) {
     }
     let expireAt = getExpiredAt(true);
     let _token = randomUUID();
-    await dbStore['account'].putById(user._id, {
+    await Svc.db.get('role').putById(user._id, {
         refreshToken: _token,
         refreshTokenExpireAt: expireAt,
     });

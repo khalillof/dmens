@@ -51,8 +51,7 @@ export const envConfig = {
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
 
   logLine:(...args: any[])=>{
-    console.log('>>>================================================>>>')
-    console.log(...args);
+    console.log('>>>================================================>>> \n',...args)
   },
   throwErr:(msg:string="unknown error")=>{
          throw new Error(msg);

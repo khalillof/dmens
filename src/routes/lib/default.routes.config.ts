@@ -1,15 +1,18 @@
 import {corsWithOptions } from "./cors.config.js";
-import {routeStore, Assert, envConfig} from '../../common/index.js'
+import {Svc, Assert, envConfig} from '../../common/index.js'
 import {middlewares} from '../../middlewares/index.js';
 import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IConfigProps, IRouteCallback} from '../../interfaces/index.js';
 import { DefaultController} from '../../controllers/index.js';
 import {authenticateUser} from '../../services/index.js' ;
-import {app} from '../../app.js'
+import  {Application, IRouter, Router } from "express";
+import {app, appRouter} from '../../app.js'
 import { ConfigProps } from "../../models/index.js";
 
 
+
 export class DefaultRoutesConfig implements IDefaultRoutesConfig{
-    app:any;
+    app:Application;
+    router:IRouter | any
     configProp:IConfigProps
     routeName: string;
     routeParam: string;
@@ -21,8 +24,11 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       if(!(configProp instanceof ConfigProps)){
         envConfig.throwErr('route configration require instance of class ConfigProp')
       }
+      
         this.configProp = configProp;  
         this.app = app;
+        this.router = appRouter;
+
         this.routeName = configProp.routeName;
         this.routeParam = this.routeName+'/:id';
         this.controller = controller || new DefaultController(configProp.name);
@@ -31,8 +37,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
         typeof callback === 'function' ? callback.call(this): this.defaultRoutes();
         
         // add instance to routeStore
-        routeStore[this.routeName]=this;
-        envConfig.logLine('Added ( ' +this.routeName+ ' ) to routeStore');
+        Svc.routes.add(this);
+       // this.app.use(this.router)
     }
 
 
@@ -52,13 +58,16 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       const url = secondRoute ? (routeName +'/'+secondRoute) : routeName;
       let aut:boolean[] = this.configProp.checkAuth!(method) || [true,false];
       let  mdwr = await this.buildMdWares(middlewares!,...aut);
-      return this.app[(method ==='list'?'get':method)](url, ...mdwr,this.actions(actionName ?? method))
+      return this.router[((method ==='list')?'get':method)](url, ...mdwr,this.actions(actionName ?? method))
     }
     
-    options(routPath:string){
-      this.app.options(routPath, corsWithOptions);
+    setOptions(routPath:string){
+      this.router.options(this.routeName, corsWithOptions);
     }
-
+    options(){
+      this.setOptions(this.routeName);
+      this.setOptions(this.routeParam);
+    }
     param(){
       return this.app.param('id', async (req:any,res:any,next:any, id:string)=>{ 
         try{
@@ -71,6 +80,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       });
     }
    async defaultRoutes(){ 
+
    await  this.buidRoute(this.routeName,'list','search','search');// search
    await  this.buidRoute(this.routeName,'list','count','count'); // count
    await  this.buidRoute(this.routeName,'list','list'); // list
@@ -81,8 +91,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
    await   this.buidRoute(this.routeParam,'delete',null, null,[this.mware!.validateCurrentUserOwnParamId])// delete
 
       this.param();
-      this.options(this.routeName);
-      this.options(this.routeParam);
+      this.options();
     }
 
   actions(actionName:string){

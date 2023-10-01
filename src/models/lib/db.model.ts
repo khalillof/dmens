@@ -1,6 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
-import { dbStore, envConfig } from '../../common/index.js'
+import { Svc, envConfig } from '../../common/index.js'
 import { IConfigProps, IConfigPropsParameters, IDbModel } from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
@@ -39,8 +39,7 @@ export class DbModel implements IDbModel {
     callback && typeof callback === 'function' && callback(this);
 
     // add to db store
-    dbStore[this.name] = this;
-    envConfig.logLine("added ( " + this.name + " ) to DbStore :");
+     Svc.db.add(this);
 
   }
 
@@ -70,7 +69,7 @@ export class DbModel implements IDbModel {
       return;
     }
 
-    let _configDb = dbStore['config'];
+    let _configDb = Svc.db.get('config')!;
 
     if (!_configDb) {
       envConfig.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`)

@@ -1,8 +1,8 @@
 import { IDbModel } from '../../interfaces/index.js';
-import { dbStore, envConfig} from '../../common/index.js';
+import { Svc, envConfig} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
 import {posts} from './posts.js'
-
+//import {app} from '../../app.js'
 type dbCallback = {
     (db: IDbModel): Promise<any>;
 }
@@ -30,7 +30,7 @@ export class ClientSeedDatabase {
 
         await this.countDb('account', async (Db: any) => {
 
-            const roles = await dbStore['role'].model!.find({ name: { $in: ["admin", "user"] } })
+            const roles = await Svc.db.get('role')!.model!.find({ name: { $in: ["admin", "user"] } })
 
             if (roles) {
                 await Promise.all(seeds.accounts.map(async (account: any) => {
@@ -115,7 +115,7 @@ export class ClientSeedDatabase {
 
     countDb(dbName: string, callback: dbCallback) {
         return new Promise(async (resolve) => {
-            let Db = dbStore[dbName];
+            let Db = Svc.db.get(dbName)!;
             Db.model!.estimatedDocumentCount().then( async (count: number) => {
                 if (count === 0) {
                     callback && resolve(await callback(Db))
@@ -130,7 +130,7 @@ export class ClientSeedDatabase {
     }
 
     async getIDs(name: string, filter?: {}) {
-        return (await dbStore[name].model?.find(filter!)!).map((md: any) => md._id);
+        return (await Svc.db.get(name)!.model?.find(filter!)!).map((md: any) => md._id);
     }
 
     async saver(dbName: string, objArr: any[]) {
