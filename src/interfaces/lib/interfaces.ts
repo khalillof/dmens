@@ -1,4 +1,4 @@
-import express, { Application, IRouter } from 'express'
+import express, { Application, IRoute, IRouter } from 'express'
 import { Model} from 'mongoose';
 
 export interface ISvc {
@@ -6,7 +6,9 @@ export interface ISvc {
   routes:IRouteSvc
 }
 export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig>{
-  //getAppRoutes(routePath: string) : string[]
+  print():void
+  getRoutes(routePath?: string): IRoute[]
+  getRoutesPathMethods(routeName?:string):{method:string,path:string}[]
   deleteAppRoute(routePath:string):void
   
   getRoutesToString(routeName: string): string

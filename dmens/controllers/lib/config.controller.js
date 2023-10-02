@@ -27,7 +27,7 @@ export class ConfigController extends DefaultController {
             // if there is db deleted
             Svc.db.delete(item.name);
             // delete route
-            Svc.db.delete(item.routeName);
+            Svc.routes.delete(item.routeName);
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`);
             this.responce(res).success();
         }

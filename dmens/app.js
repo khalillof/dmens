@@ -57,13 +57,12 @@ app.use(helmet({
 }));
 // cors activation
 app.use(corsWithOptions);
-//console.log('allowed cores are :' + config.allow_origins())
 //enable CORS (for testing only -remove in production/deployment)
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
+//app.use((req, res, next) => {
+//  res.header('Access-Control-Allow-Origin', '*');
+//  res.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept');
+//  next();
+//});
 // app routes
 app.use('/api', appRouter);
 // handel 404 shoud be at the midlleware
@@ -76,7 +75,7 @@ app.use(function (err, req, res, next) {
     console.error(err.stack);
 });
 // print routes
-Svc.routes.getAllRoutesToString();
+Svc.routes.print();
 // seed database
 await new ClientSeedDatabase().init();
 dev_prod !== 'development' ? await menServer(app, false) : app.listen(envConfig.port(), () => envConfig.logLine(`${dev_prod} server is running on port: ${envConfig.port()}`));

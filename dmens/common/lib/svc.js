@@ -39,6 +39,9 @@ class RouteSvc extends SvcInstance {
     constructor() {
         super('routeName');
     }
+    print() {
+        envConfig.logLine(" ***** All app routes *******: \n", this.getAllRoutesToString());
+    }
     deleteAppRoute(routePath) {
         let self = this;
         this.routesLoop(routePath, function (item, index) {
@@ -48,37 +51,30 @@ class RouteSvc extends SvcInstance {
         });
     }
     getRoutesToString(routeName) {
-        let result = this.getAppRoutes(routeName)
-            .map((r) => this.getMethod(r).padEnd(7) + " : " + r.path)
-            .join("\n");
-        return result;
+        return routeName ? this.ToString(this.getRoutesPathMethods(routeName)) : "";
     }
     getRoutesToJsonString(routeName) {
-        let result = this.getAppRoutes(routeName)
-            .map((r) => {
-            return {
-                method: this.getMethod(r),
-                path: r.path
-            };
-        });
-        return JSON.stringify(result, null, 2);
+        return routeName ? this.ToJson(this.getRoutesPathMethods(routeName)) : "";
     }
     getAllRoutesToString() {
-        let result = appRouter.stack.filter((r) => r.route)
-            .map((r) => this.getMethod(r.route).padEnd(7) + r.route.path).join("\n");
-        console.log('================= All Routes avaliable ================ \n' + result);
-        return result;
+        return this.ToString(this.getRoutesPathMethods());
     }
     getAllRoutesToJsonString() {
-        let result = appRouter.stack.filter((r) => r.route)
-            .map((r) => {
+        return this.ToJson(this.getRoutesPathMethods());
+    }
+    getRoutesPathMethods(routeName) {
+        return this.getRoutes(routeName)
+            .map((route) => {
             return {
-                method: this.getMethod(r.route),
-                path: r.route.path
+                method: this.getMethod(route),
+                path: route.path
             };
         });
-        console.log('================= All Routes avaliable ================ \n' + JSON.stringify(result, null, 2));
-        return result;
+    }
+    getRoutes(routePath) {
+        if (routePath)
+            return appRouter.stack.filter((r) => r.route && r.route.path.startsWith(routePath)).map((r) => r.route);
+        return appRouter.stack.filter((r) => r.route).map((r) => r.route);
     }
     pluralizeRoute(routeName) {
         routeName = routeName.toLowerCase();
@@ -89,8 +85,12 @@ class RouteSvc extends SvcInstance {
             return routeName;
         }
     }
-    getAppRoutes(routePath) {
-        return appRouter.stack.filter((r) => r.route && r.route.path.startsWith(routePath)).map((r) => r.route);
+    //========================================================================================
+    ToString(obj) {
+        return obj.map((r) => r.method + " :" + r.path).join("\n");
+    }
+    ToJson(obj) {
+        return JSON.stringify(obj, null, 2);
     }
     getMethod(routeObj) {
         return Object.keys(routeObj.methods)[0].toUpperCase();

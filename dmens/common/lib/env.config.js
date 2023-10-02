@@ -46,7 +46,7 @@ export const envConfig = {
     static_urls: () => getOr('STATIC_URL', [])?.split(',').map((e) => e.trim()),
     databaseUrl: () => getOr('DATABASE_URL'),
     logLine: (...args) => {
-        console.log('>>>================================================>>> \n', ...args);
+        console.log('================================================>>> \n', ...args);
     },
     throwErr: (msg = "unknown error") => {
         throw new Error(msg);
