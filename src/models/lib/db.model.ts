@@ -1,21 +1,22 @@
 "use strict";
 import mongoose from 'mongoose';
 import { Svc, envConfig } from '../../common/index.js'
-import { IConfigProps, IConfigPropsParameters, IDbModel } from '../../interfaces/index.js'
+import { IConfigProps, IConfigPropsParameters, IDbModel} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
 import { ConfigProps } from './ConfigProps.js';
 import { autopopulatePlugin } from './autopopulate.js';
 
-
 export class DbModel implements IDbModel {
 
   constructor(_config: IConfigPropsParameters | IConfigProps, callback?: any) {
     this.config = (_config instanceof ConfigProps) ? _config: new ConfigProps(_config);
-    this.name = this.config.name;
+    const {name,schemaObj,schemaOptions} =this.config;
+    
+    this.name = name;
 
-    let _schema = new mongoose.Schema(this.config.schemaObj,this.config.schemaOptions ).plugin(autopopulatePlugin);
+    let _schema = new mongoose.Schema(schemaObj,schemaOptions ).plugin(autopopulatePlugin);
 
     if (this.name === 'account') {
       _schema?.plugin(passportLocalMongoose);
@@ -43,11 +44,11 @@ export class DbModel implements IDbModel {
 
   }
 
-  name:string
-  config:IConfigProps
-  //readonly config: IConfigration
+  readonly name:string
+  readonly config:IConfigProps
   readonly model?: mongoose.Model<any>;
   count: number = 0;
+
 
   async initPostDatabaseSeeding() {
     // count

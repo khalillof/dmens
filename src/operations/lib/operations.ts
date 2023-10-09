@@ -19,10 +19,10 @@ export class Operations {
     const _configProp: IConfigPropsParameters = {
       name: "config",
       active: true,
+      schemaOptions: { timestamps: true, strict: true },
+      schemaObj: confSchema,
       useAuth: ["list", "get", "post", "put", "delete"],
       useAdmin: ["list", "get", "post", "put", "delete"],
-      schemaOptions: { timestamps: true, strict: true },
-      schemaObj: confSchema
     };
     // create config model and routes
     await Operations.createModelInstance(_configProp);

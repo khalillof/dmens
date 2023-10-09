@@ -37,6 +37,20 @@ export const confSchema = {
         "type": Boolean,
         "default": false
     },
+    schemaOptions: {
+        "type": Object,
+    },
+    schemaObj: {
+        "type": Object,
+        "required": true
+    },
+    routeName: {
+        "type": String,
+        "unique": true,
+        "lowercase": true,
+        "minLength": 3,
+        "maxLength": 30
+    },
     useAuth: {
         "type": [String],
         "default": []
@@ -45,19 +59,10 @@ export const confSchema = {
         "type": [String],
         "default": []
     },
-    schemaOptions: {
-        "type": Object,
-    },
-    schemaObj: {
-        "type": Object,
-        "required": true
-    }
 };
 export const accConfgSchema = {
     name: "account",
     active: true,
-    useAuth: ["list", "get", "post", "put", "delete"],
-    useAdmin: ["list"],
     schemaOptions: { timestamps: true, strict: true },
     schemaObj: {
         username: {
@@ -116,5 +121,7 @@ export const accConfgSchema = {
                 "autopopulate": true
             }
         ]
-    }
+    },
+    useAuth: ["list", "get", "post", "put", "delete"],
+    useAdmin: ["list"]
 };

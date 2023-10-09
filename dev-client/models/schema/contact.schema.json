@@ -1,39 +1,64 @@
 {
-    "name":"contact",
-    "active":true,
-    "useAuth":["list","get","post","put","delete"], 
-    "useAdmin": ["list","get","post","put","delete"]
-, 
-    "schemaObj":{  
-        "contactType": {
-            "type": "String",
-            "required":true,
-            "enum": ["consultation","query","hireme","contact"]
-          }
-        ,
+  "name": "contact",
+  "active": true,
+  "useAuth": [
+    "list",
+    "get",
+    "post",
+    "put",
+    "delete"
+  ],
+  "useAdmin": [
+    "list",
+    "get",
+    "post",
+    "put",
+    "delete"
+  ],
+  "schemaObj": {
+    "contactType": {
+      "type": "String",
+      "required": true,
+      "enum": [
+        "consultation",
+        "query",
+        "hireme",
+        "contact"
+      ]
+    },
     "fullname": {
-        "type": "String",
-        "required": true,
-        "minLength":3,
-        "maxLength": 50
+      "type": "String",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 50,
+      "tagName": "input",
+      "className":"form-control"
     },
     "email": {
-        "type": "String",
-        "lowercase": true,
-        "required": true,
-        "minLength": 3,
-        "maxLength": 30
-      },
+      "type": "String",
+      "lowercase": true,
+      "required": true,
+      "minLength": 3,
+      "maxLength": 30,
+      "tagName": "input",
+      "inputtype": "email",
+      "className":"form-control"
+    },
     "telphone": {
-        "type": "string",
-        "lowercase": true,
-        "minLength": 3,
-        "maxLength": 30
-      },
+      "type": "string",
+      "lowercase": true,
+      "minLength": 3,
+      "maxLength": 30,
+      "tagName": "input",
+      "inputtype": "telphone",
+      "className":"form-control"
+    },
     "message": {
-        "type": "String",
-        "required": true,
-        "minLength": 5
+      "type": "String",
+      "required": true,
+      "minLength": 5,
+      "tagName": "textarea",
+      "className":"form-control"
     }
-}
+  }
 }

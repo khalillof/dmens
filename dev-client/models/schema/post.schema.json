@@ -1,63 +1,91 @@
 {
-    "name":"post",
-    "active":true,
-    "useAuth":["post","put","delete"], 
-    "useAdmin": ["post","put","delete"], 
-    "schemaObj":{
-    "title": {
-        "type": "String",
-        "required": true,
-        "unique": true,
-        "minLength": 5,
-        "maxLength": 150
-    },
-    "image": {
-        "type": "String",
-        "minLength": 5,
-        "maxLength": 150
-    },
-    "descriptions": {
-        "type": "String",
-        "minLength": 5
-    },
-    "body": {
-        "type": "String",
-        "required": true,
-        "minLength": 5
-    },
-    "isfeatured": {
-        "type": "Boolean",
-        "default": false
-    },
-    "isPublished": {
-        "type": "Boolean",
-        "default": false
-    },
-    "publisheDate": {
-        "type": "Date"
-    },
-    "category": {
-        "type": "ObjectId",
-        "ref": "category",
-        "required":true,
-        "autopopulate": true
-    },
-    "author": {
-        "type": "ObjectId",
-        "ref": "account",
-        "required":true,
-        "autopopulate": true
-    },
-    "likes":  {
-        "type": "Number",
-        "default": 0
-        
-    },
-    "like_user_ids": [
-        {
-          "type": "ObjectId",
-          "ref": "account"
-        }
-      ]
-}
+    "name": "post",
+    "active": true,
+    "useAuth": [
+        "post",
+        "put",
+        "delete"
+    ],
+    "useAdmin": [
+        "post",
+        "put",
+        "delete"
+    ],
+    "schemaOptions": {},
+    "schemaObj": {
+        "title": {
+            "type": "String",
+            "required": true,
+            "unique": true,
+            "minLength": 5,
+            "maxLength": 150,
+            "tagName": "input",
+            "className":"form-control"
+        },
+        "image": {
+            "type": "String",
+            "minLength": 5,
+            "maxLength": 150,
+            "tagName": "input",
+            "className":"form-control"
+        },
+        "descriptions": {
+            "type": "String",
+            "minLength": 5,
+            "tagName": "textarea",
+            "className":"form-control"
+        },
+        "body": {
+            "type": "String",
+            "required": true,
+            "minLength": 5,
+            "tagName": "textarea",
+            "className":"form-control"
+        },
+        "isfeatured": {
+            "type": "Boolean",
+            "default": false,
+            "tagName": "input",
+            "inputtype": "checkbox",
+            "className":"form-check-input"
+        },
+        "isPublished": {
+            "type": "Boolean",
+            "default": false,
+            "tagName": "input",
+            "inputtype": "checkbox",
+            "className":"form-check-input"
+        },
+        "publisheDate": {
+            "type": "Date",
+            "tagName": "input",
+            "inputtype": "date",
+            "className":"form-control"
+        },
+        "category": {
+            "type": "ObjectId",
+            "ref": "category",
+            "required": true,
+            "autopopulate": true,
+            "tagName": "select",
+            "optionkey": "name",
+            "className":"form-select"
+        },
+        "author": {
+            "type": "ObjectId",
+            "ref": "account",
+            "required": true,
+            "autopopulate": true
+        },
+        "likes": {
+            "type": "Number",
+            "default": 0
+        },
+        "like_user_ids": [
+            {
+                "type": "ObjectId",
+                "ref": "account"
+            }
+        ]
+    }
 }

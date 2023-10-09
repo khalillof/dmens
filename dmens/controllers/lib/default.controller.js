@@ -12,6 +12,14 @@ export class DefaultController {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);
     }
+    async form(req, res, next) {
+        let _form = await this.db.config.genForm();
+        this.responce(res).data(_form);
+    }
+    async route(req, res, next) {
+        let routes = this.db.config.getRoutes();
+        this.responce(res).data(routes);
+    }
     async search(req, res, next) {
         if (!req.query) {
             return this.responce(res).data([]);

@@ -1,72 +1,84 @@
 import express, { Application, IRoute, IRouter } from 'express'
-import { Model} from 'mongoose';
+import { Model } from 'mongoose';
 
-export interface ISvc {
-  db:ISvcIntance<IDbModel>
-  routes:IRouteSvc
+export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+export interface IForm {
+  formId: string
+  formName: string
+  routeName: string
+  elements: Record<string, [Record<string, any>, Record<string, any>]>
 }
-export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig>{
-  print():void
+export interface ISvc {
+  db: ISvcIntance<IDbModel>
+  routes: IRouteSvc
+}
+export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
+  print(): void
   getRoutes(routePath?: string): IRoute[]
-  getRoutesPathMethods(routeName?:string):{method:string,path:string}[]
-  deleteAppRoute(routePath:string):void
-  
+  getRoutesPathMethods(routeName?: string): { method: string, path: string }[]
+  deleteAppRoute(routePath: string): void
+
   getRoutesToString(routeName: string): string
-  getAllRoutesToString():string
+  getAllRoutesToString(): string
 
   getRoutesToJsonString(routeName: string): string
-  getAllRoutesToJsonString():void
+  getAllRoutesToJsonString(): void
 
-  pluralizeRoute(routeName: string):string
+  pluralizeRoute(routeName: string): string
 }
 export interface ISvcIntance<T> {
-  obj() :T[]
-  get(keyValue: string): T | null 
+  obj(): T[]
+  get(keyValue: string): T | null
   add(obj: T | any): void
   delete(keyValue: string): void
-  len():number
-  exist(keyValue:string):boolean
+  len(): number
+  exist(keyValue: string): boolean
 }
+
 export interface IConfigPropsParameters {
-   name: string
-   routeName?:string
-   active? : Boolean;
-   useAuth?: String[]
-   useAdmin?: String[]
-   schemaObj: object
-   schemaOptions?: Record<string,any>
- };
+  name: string
+  active?: Boolean
+  schemaObj: object
+  schemaOptions?: Record<string, any>
+  routeName?: string
+  useAuth?: String[]
+  useAdmin?: String[]
+
+};
+
+
 
 export interface IConfigProps {
-   name: string
-   routeName:string
-   active : Boolean;
-   useAuth: String[]
-   useAdmin: String[]
-   schemaObj: object
-   schemaOptions?: Record<string,any>
-   getConfigProps?(): IConfigProps
-   setConfigProps?(props:IConfigProps): void
-   //check useAuth and useAdmin
-   checkAuth?(method: string): Array<boolean>
- };
+  name: string
+  active: Boolean
+  schemaObj: object
+  schemaOptions?: Record<string, any>
+  routeName: string
+  useAuth: String[]
+  useAdmin: String[]
+  getRoutes?(): { method: string; path: string;}[]
+  getConfigProps?(): IConfigProps
+  genForm?(): Promise<IForm>
+  //check useAuth and useAdmin
+  checkAuth?(method: string): Array<boolean>
+};
 
 export interface IDbModel {
-  name:string
-  config:IConfigProps
+  readonly name: string
+  readonly config: IConfigProps
   readonly model?: Model<any>;
-  count:number
+  count: number
 
   initPostDatabaseSeeding(): Promise<any>;
 
-  Tolist(filter?: Record<string,any>,limit?: number, page?: number, sort?: number ): Promise<any[]>;
+  Tolist(filter?: Record<string, any>, limit?: number, page?: number, sort?: number): Promise<any[]>;
   findById(id: string): Promise<any>
-  findOne(filter: Record<string,any>): Promise<any>;
+  findOne(filter: Record<string, any>): Promise<any>;
   create(obj: object): Promise<any>;
-  putById(id: string, objFields: Record<string,any>): Promise<any>;
+  putById(id: string, objFields: Record<string, any>): Promise<any>;
 
   deleteById(id: string): Promise<any>;
-  deleteByQuery(filter: Record<string,any>): Promise<any>;
+  deleteByQuery(filter: Record<string, any>): Promise<any>;
   patchById(id: string, objFields: object): Promise<any>;
 }
 
@@ -76,14 +88,14 @@ export interface IConstructor<T> {
 export interface Iresponces {
   errObjInfo: (err: any, obj: any, info: any) => void;
   success: (msg?: string) => void;
-  fail:(msg?:string)=> void;
+  fail: (msg?: string) => void;
   errStatus: (status: number, msg: string) => void;
   badRequest: (msg?: string) => void;
   forbidden: (msg?: string) => void;
   unAuthorized: (msg?: string) => void;
   notFound: (msg?: string) => void;
   error: (err: any) => void;
-  data: (item: any, message?: string, total?:number,) => void;
+  data: (item: any, message?: string, total?: number,) => void;
   errCb: (err: any, cb: Function) => void;
   errSuccess: (err: any) => void;
   callback: (cb: Function, obj?: any) => void;
@@ -99,8 +111,8 @@ export interface IRouteCallback {
 }
 // function with parmeters interface 
 export interface IRouteConfigCallback {
-  config:IConfigProps
-  controller:()=>IController
+  config: IConfigProps
+  controller: () => IController
   routeCallback?: IRouteCallback
 }
 export interface Ilogger {
@@ -128,20 +140,20 @@ export interface IController {
 
 export interface IDefaultRoutesConfig {
   app: Application;
-  router:IRouter
-  configProp:IConfigProps
+  router: IRouter
+  configProp: IConfigProps
   routeName: string;
   routeParam: string;
   controller?: IController;
   mware?: IMiddlewares;
   authenticate: Iauthenticate;
   //actions:Function;
-  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?:boolean): Promise<any[]>;
+  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?: boolean): Promise<any[]>;
   // custom routes
-  buidRoute(routeName:string,method:string,actionName?:string | null,secondRoute?:string | null,middlewares?:Array<Function> |null):Promise<any>
-  
-  setOptions(routPath:string):void;
-  options():void;
+  buidRoute(routeName: string, method: string, actionName?: string | null, secondRoute?: string | null, middlewares?: Array<Function> | null): Promise<any>
+
+  setOptions(routPath: string): void;
+  options(): void;
   param(): void;
   defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
@@ -156,17 +168,17 @@ export interface IMiddlewares {
   validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction): void;
 
   validateCurrentUserOwnParamId(req: express.Request, res: express.Response, next: express.NextFunction): void;
-  
-  validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction):void;
 
-  validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction):void ;
+  validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction): void;
+
+  validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction): void;
 
   userExist(req: express.Request, res: express.Response, next: express.NextFunction): Promise<any>;
 
   isAuthenticated(req: any, res: express.Response, next: express.NextFunction): void;
   // roles
   isRolesExist(roles: [string]): boolean;
-  isJson(req:express.Request, res:express.Response,next:express.NextFunction):void;
+  isJson(req: express.Request, res: express.Response, next: express.NextFunction): void;
 
   isInRole(roleName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }

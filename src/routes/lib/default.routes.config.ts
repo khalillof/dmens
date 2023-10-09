@@ -83,6 +83,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
 
    await  this.buidRoute(this.routeName,'list','search','search');// search
    await  this.buidRoute(this.routeName,'list','count','count'); // count
+   await  this.buidRoute(this.routeName,'list','form','form'); // get form elements
+   await  this.buidRoute(this.routeName,'list','route','route'); // get form elements
    await  this.buidRoute(this.routeName,'list','list'); // list
    await   this.buidRoute(this.routeParam,'get','getOne') // get By id
    await   this.buidRoute(this.routeName,'get','getOne') // getOne by filter parameter

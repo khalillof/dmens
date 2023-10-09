@@ -4,7 +4,7 @@ import { IDefaultRoutesConfig, IRouteConfigCallback } from '../../interfaces/ind
 
 // auth routes 
 export const AuthRoutes: IRouteConfigCallback = {
-    config: new ConfigProps({name:'auth', routeName:'auth', active:true,schemaObj:{}}),
+    config: new ConfigProps({name:'auth', active:true,schemaObj:{},routeName:'auth'}),
     controller: ()=> new AuthController(),
     routeCallback: function (this: IDefaultRoutesConfig): void {
         this.router.post('/auth/signup', this.mware!.checkLoginUserFields, this.actions('signup'));

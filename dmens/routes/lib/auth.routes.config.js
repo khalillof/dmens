@@ -2,7 +2,7 @@ import { ConfigProps } from '../../models/index.js';
 import { AuthController } from '../../controllers/index.js';
 // auth routes 
 export const AuthRoutes = {
-    config: new ConfigProps({ name: 'auth', routeName: 'auth', active: true, schemaObj: {} }),
+    config: new ConfigProps({ name: 'auth', active: true, schemaObj: {}, routeName: 'auth' }),
     controller: () => new AuthController(),
     routeCallback: function () {
         this.router.post('/auth/signup', this.mware.checkLoginUserFields, this.actions('signup'));

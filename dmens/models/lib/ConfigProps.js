@@ -1,31 +1,31 @@
 "use strict";
 import { Svc } from '../../common/index.js';
+import { Form } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
+        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin } = _config;
         // basic validation
-        if (!_config || !_config.name || !_config.schemaObj) {
+        if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
         }
-        if (Svc.db.exist(_config.name.toLowerCase())) {
-            throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
+        if (Svc.db.exist(name.toLowerCase())) {
+            throw new Error(`ConfigProps basic schema validation faild ! name property : ${name} already on db.`);
         }
-        this.name = _config.name.toLowerCase();
-        this.routeName = _config.routeName || Svc.routes.pluralizeRoute(_config.name);
-        this.active = _config.active || false;
-        this.useAuth = this.removeDiplicates(_config.useAuth);
-        this.useAdmin = this.removeDiplicates(_config.useAdmin);
-        this.schemaObj = _config.schemaObj || {};
-        this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions };
-        // validate schema
-        // this.validateSchema()
+        this.name = name.toLowerCase(),
+            this.active = active || false,
+            this.schemaObj = schemaObj || {},
+            this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
+        this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
+            this.useAuth = this.removeDiplicates(useAuth),
+            this.useAdmin = this.removeDiplicates(useAdmin);
     }
     name;
-    routeName;
     active;
-    useAuth;
-    useAdmin;
     schemaObj;
     schemaOptions;
+    routeName;
+    useAuth;
+    useAdmin;
     removeDiplicates(arr) {
         // Set will remove diblicate
         return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
@@ -33,21 +33,19 @@ export class ConfigProps {
     getConfigProps() {
         return {
             name: this.name,
-            routeName: this.routeName,
             active: this.active,
-            useAdmin: this.useAdmin,
-            useAuth: this.useAuth,
             schemaObj: this.schemaObj,
-            schemaOptions: this.schemaOptions
+            schemaOptions: this.schemaOptions,
+            routeName: this.routeName,
+            useAuth: this.useAuth,
+            useAdmin: this.useAdmin
         };
     }
-    setConfigProps(props) {
-        this.name = props.name;
-        this.active = props.active;
-        this.useAdmin = props.useAdmin;
-        this.useAuth = props.useAuth;
-        this.schemaObj = props.schemaObj;
-        (this.schemaOptions && props.schemaOptions) && (this.schemaOptions = props.schemaOptions);
+    getRoutes() {
+        return Svc.routes.getRoutesPathMethods(this.routeName);
+    }
+    async genForm() {
+        return await new Form(this).genElements(this);
     }
     //check useAuth and useAdmin
     checkAuth(method) {

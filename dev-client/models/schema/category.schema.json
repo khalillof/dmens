@@ -1,16 +1,26 @@
 {
-    "name":"category",
-    "active":true,
-    "useAuth":["post","put","delete"], 
-    "useAdmin": ["post","put","delete"],
-    "schemaObj": {
-      "name": {
-        "type": "String",
-        "unique": true,
-        "lowercase": true,
-        "required": true,
-        "minLength": 3,
-        "maxLength": 30
-     }
-     }
+  "name": "category",
+  "active": true,
+  "useAuth": [
+    "post",
+    "put",
+    "delete"
+  ],
+  "useAdmin": [
+    "post",
+    "put",
+    "delete"
+  ],
+  "schemaObj": {
+    "name": {
+      "type": "String",
+      "unique": true,
+      "lowercase": true,
+      "required": true,
+      "minLength": 3,
+      "maxLength": 30,
+      "tagName": "input",
+      "className":"form-control"
     }
+  }
+}

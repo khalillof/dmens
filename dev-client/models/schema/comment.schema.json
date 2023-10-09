@@ -1,23 +1,29 @@
 {
-"name":"comment",
-"active":true,
-"useAuth":["post","put","delete"], 
-"useAdmin": [], 
-  "schemaObj":{
-    "body":  {
-        "type": "String",
-        "required": true,
-        "minLength": 3
-    },
-    "author": {
-        "type": "ObjectId",
-        "ref": "account",
-        "required":true,
-        "autopopulate": true
-    },
-    "model_id": {
-        "type": "ObjectId",
-        "required":true
+    "name": "comment",
+    "active": true,
+    "useAuth": [
+        "post",
+        "put",
+        "delete"
+    ],
+    "useAdmin": [],
+    "schemaObj": {
+        "body": {
+            "type": "String",
+            "required": true,
+            "minLength": 3,
+            "tagName": "textarea",
+            "className":"form-control"
+        },
+        "author": {
+            "type": "ObjectId",
+            "ref": "account",
+            "required": true,
+            "autopopulate": true
+        },
+        "model_id": {
+            "type": "ObjectId",
+            "required": true
+        }
     }
-}
 }

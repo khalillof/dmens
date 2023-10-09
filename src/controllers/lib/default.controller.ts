@@ -17,6 +17,15 @@ export class DefaultController implements IController {
   this.responce(res).data(num!)
   }
   
+  async form(req: express.Request, res: express.Response, next: express.NextFunction){
+    let _form =  await this.db.config.genForm!()
+    this.responce(res).data(_form)
+    }
+
+    async route(req: express.Request, res: express.Response, next: express.NextFunction){
+      let routes = this.db.config.getRoutes!()
+      this.responce(res).data(routes)
+      }
   async search(req: express.Request, res: express.Response, next: express.NextFunction){
 
     if(!req.query){

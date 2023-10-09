@@ -9,8 +9,9 @@ import { autopopulatePlugin } from './autopopulate.js';
 export class DbModel {
     constructor(_config, callback) {
         this.config = (_config instanceof ConfigProps) ? _config : new ConfigProps(_config);
-        this.name = this.config.name;
-        let _schema = new mongoose.Schema(this.config.schemaObj, this.config.schemaOptions).plugin(autopopulatePlugin);
+        const { name, schemaObj, schemaOptions } = this.config;
+        this.name = name;
+        let _schema = new mongoose.Schema(schemaObj, schemaOptions).plugin(autopopulatePlugin);
         if (this.name === 'account') {
             _schema?.plugin(passportLocalMongoose);
             const Account = mongoose.model(this.name, _schema);
@@ -35,7 +36,6 @@ export class DbModel {
     }
     name;
     config;
-    //readonly config: IConfigration
     model;
     count = 0;
     async initPostDatabaseSeeding() {

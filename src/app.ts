@@ -106,7 +106,5 @@ if (dev_prod === 'production' && fs.existsSync(envPath)) {
   console.log('.env file will be removed')
 }
 
-//console.log(Svc.routes.getRoutesToString('/messages'))
-//Svc.routes.deleteAppRoute('/messages')
-
-//console.log('testing ........: ',ddd)
+ //let ddd = await Svc.db.get('post')!.config.genForm!()
+ //console.log('first object ..............\n',ddd.elements['category'])
