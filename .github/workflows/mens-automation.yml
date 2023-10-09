@@ -63,7 +63,7 @@ jobs:
       - name: create folder ./dmens
         run: mkdir -p ./dmens
       - name: compile typescrept to ts-output folder 
-        run: npm run tsc
+        run: npm run ts
 
   build-deploy:
     # Run this job when pull request merges
@@ -85,7 +85,7 @@ jobs:
       - name: create folder dmens if not existed
         run: mkdir -p ./dmens
       - name: compile typescrept to ts-output folder 
-        run: npm run tsc
+        run: npm run ts
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
