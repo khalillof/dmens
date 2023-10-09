@@ -1,2 +1,2 @@
-import { Middlewares } from './lib/middleware.js';
-export { Middlewares };
+import middlewares from './lib/middleware.js';
+export { middlewares };

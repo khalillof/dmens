@@ -1,5 +1,5 @@
 import  Cors  from 'cors';
-import {config} from '../../common/index.js'
+import {envConfig} from '../../common/index.js'
 
 //const corsOptions = (req:any, callback:Function)=> callback(null, {origin: config.cores_domains().indexOf(req.header('Origin')) !== -1});
     const getOptions=(origin:boolean)=> ({
@@ -12,7 +12,7 @@ import {config} from '../../common/index.js'
 function corsOptionsDelegate(req:any, callback:any) {
   
     let origin = req.header('Origin'); 
-    const whiteList = config.allow_origins();
+    const whiteList = envConfig.allow_origins();
 
     let corsOptions;
     if (whiteList.indexOf(origin) !== -1) {

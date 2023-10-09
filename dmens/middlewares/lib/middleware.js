@@ -1,10 +1,8 @@
-import { isValidRole, dbStore, responce } from '../../common/index.js';
-export class Middlewares {
-    static async createInstance() {
-        return await Promise.resolve(new Middlewares());
-    }
+import { isValidRole, Svc, responce } from '../../common/index.js';
+import fs from 'fs';
+class Middlewares {
     async getUserFromReq(req) {
-        return req.body && req.body.email ? await dbStore['account'].findOne({ email: req.body.email }) : null;
+        return req.body && req.body.email ? await Svc.db.get('account').findOne({ email: req.body.email }) : null;
     }
     checkLoginUserFields(req, res, next) {
         if (req.body) {
@@ -56,13 +54,14 @@ export class Middlewares {
     }
     ;
     isInRole(roleName) {
+        let db = Svc.db.get('account');
         return async (req, res, next) => {
             if (!req.isAuthenticated()) {
                 responce(res).forbidden('require authentication');
                 return;
             }
-            let reqUser = req.user && req.user.roles ? req.user : await dbStore['account'].findById(req.user._id);
-            let roles = await dbStore['role'].model.find({ _id: { $in: reqUser.roles } });
+            let reqUser = req.user && req.user.roles ? req.user : await db.findById(req.user._id);
+            let roles = await db.model.find({ _id: { $in: reqUser.roles } });
             if (roles) {
                 for (let r of roles) {
                     if (r.name === roleName) {
@@ -75,4 +74,28 @@ export class Middlewares {
             return;
         };
     }
+    isJson(req, res, next) {
+        const toJsonNext = (data) => {
+            req.body = JSON.parse(data);
+            next();
+        };
+        if (req.body && req.header('content-type') === 'application/json') {
+            // toJsonNext(req.body);
+            next();
+        }
+        else if (req.file && req.file.mimetype === 'application/json') {
+            fs.readFile(req.file.path, 'utf8', (err, data) => {
+                if (err) {
+                    responce(res).error(err);
+                }
+                else {
+                    toJsonNext(data);
+                }
+            });
+        }
+        else {
+            responce(res).badRequest('content must be valid application/json');
+        }
+    }
 }
+export default new Middlewares();

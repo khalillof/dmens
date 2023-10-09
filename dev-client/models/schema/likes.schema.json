@@ -1,32 +1,44 @@
 {
-    "name":"like",
-    "populates":["author"],
-    "useAuth":["post","put","delete"], 
-    "useAdmin": [], 
-      "schema":{
-        "like":  {
-            "type":  "Boolean",
-            "default":false
+    "name": "like",
+    "active": true,
+    "useAuth": [
+        "post",
+        "put",
+        "delete"
+    ],
+    "useAdmin": [],
+    "schemaObj": {
+        "like": {
+            "type": "Boolean",
+            "default": false,
+            "tagName": "input",
+            "className":"form-control"
         },
-        "rate":  {
+        "rate": {
             "type": "Number",
             "default": 0,
-             "min": 0,
-             "max": 5
+            "min": 0,
+            "max": 5,
+            "tagName": "input",
+            "inputtype": "Number",
+            "className":"form-control"
         },
-        "comment":  {
+        "comment": {
             "type": "String",
             "minLength": 0,
-            "maxLength": 150
+            "maxLength": 150,
+            "tagName": "textarea",
+            "className":"form-control"
         },
         "author": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required": true,
+            "autopopulate": true
         },
         "model_id": {
             "type": "ObjectId",
-            "required":true
+            "required": true
         }
     }
-    }
+}

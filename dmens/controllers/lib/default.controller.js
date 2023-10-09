@@ -1,19 +1,24 @@
-import { dbStore, logger, responce, Assert } from '../../common/index.js';
+import { logger, responce, Assert, Svc } from '../../common/index.js';
 export class DefaultController {
     db;
     responce;
     log;
     constructor(name) {
-        this.db = dbStore[name];
+        this.db = Svc.db.get(name);
         this.responce = responce;
         this.log = logger;
-    }
-    static async createInstance(svcName) {
-        return new this(svcName);
     }
     async count(req, res, next) {
         let num = await this.db.model?.countDocuments(req.query);
         this.responce(res).data(num);
+    }
+    async form(req, res, next) {
+        let _form = await this.db.config.genForm();
+        this.responce(res).data(_form);
+    }
+    async route(req, res, next) {
+        let routes = this.db.config.getRoutes();
+        this.responce(res).data(routes);
     }
     async search(req, res, next) {
         if (!req.query) {

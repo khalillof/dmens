@@ -11,7 +11,8 @@ src
 .git
 views/**/*
 views
-
+dmens/.env
+dmens/test.env
 admin_data.txt
 tsconfig.json
 README.md

@@ -10,6 +10,9 @@ src
 .dockerignore
 .env
 **/.env
+**/old.env
+dmens/.env
+dmens/test.env
 gitignore
 admin_data.txt
 #client/create-env-file.sh

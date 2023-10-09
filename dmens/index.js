@@ -1,2 +1,2 @@
-import { dmens } from './app.js';
-export { dmens };
+import { app } from './app.js';
+export { app };

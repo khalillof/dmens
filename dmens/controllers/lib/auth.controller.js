@@ -1,12 +1,12 @@
 import { DefaultController } from './default.controller.js';
 import { authenticateUser, generateJwt } from '../../services/index.js';
-import { config } from '../../common/index.js';
+import { envConfig } from '../../common/index.js';
 export class AuthController extends DefaultController {
-    constructor(svc) {
+    constructor(svc = 'account') {
         super(svc);
     }
     async secure(req, res, next) {
-        const data = config.getSecret(req.query['api']);
+        const data = envConfig.getSecret(req.query['api']);
         this.responce(res).data(data);
     }
     async signup(req, res, next) {

@@ -1,29 +1,43 @@
 {
-    "name":"message",
-    "populates":["sender","recipient"],
-    "useAuth":["list","get","post","put","delete"], 
-    "useAdmin": ["list"], 
-      "schema":{
-        "title":  {
+    "name": "message",
+    "active": true,
+    "useAuth": [
+        "list",
+        "get",
+        "post",
+        "put",
+        "delete"
+    ],
+    "useAdmin": [
+        "list"
+    ],
+    "schemaObj": {
+        "title": {
             "type": "String",
             "required": true,
             "minLength": 3,
-            "maxLength": 150
+            "maxLength": 150,
+            "tagName": "input",
+            "className":"form-control"
         },
-        "body":  {
+        "body": {
             "type": "String",
             "required": true,
-            "minLength": 3
+            "minLength": 3,
+            "tagName": "textarea",
+            "className":"form-control"
         },
         "sender": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required": true,
+            "autopopulate": true
         },
         "recipient": {
             "type": "ObjectId",
             "ref": "account",
-            "required":true
+            "required": true,
+            "autopopulate": true
         }
     }
-    }
+}

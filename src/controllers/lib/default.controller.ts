@@ -1,19 +1,15 @@
 import express from 'express';
-import { dbStore,logger, responce, Assert} from '../../common/index.js';
-import{Ilogger,Iresponce,IController, IJsonModel} from '../../interfaces/index.js';
+import { logger, responce, Assert, Svc} from '../../common/index.js';
+import{Ilogger,Iresponce,IController, IDbModel} from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
-  db: IJsonModel;
+  db: IDbModel;
   responce:Iresponce;
   log:Ilogger;
   constructor(name: string) {
-    this.db = dbStore[name];
+    this.db = Svc.db.get(name)!;
     this.responce = responce;
     this.log = logger;
-  }
-
- public static async createInstance(svcName: string){
-    return new this(svcName);
   }
 
   async count(req: express.Request, res: express.Response, next: express.NextFunction){
@@ -21,6 +17,15 @@ export class DefaultController implements IController {
   this.responce(res).data(num!)
   }
   
+  async form(req: express.Request, res: express.Response, next: express.NextFunction){
+    let _form =  await this.db.config.genForm!()
+    this.responce(res).data(_form)
+    }
+
+    async route(req: express.Request, res: express.Response, next: express.NextFunction){
+      let routes = this.db.config.getRoutes!()
+      this.responce(res).data(routes)
+      }
   async search(req: express.Request, res: express.Response, next: express.NextFunction){
 
     if(!req.query){
@@ -71,6 +76,7 @@ if(!filter){
         let items = await this.db.Tolist(filter, limit, page, sort);
          total && (total = await this.db.model?.countDocuments(filter));
        // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
+
         this.responce(res).data(items, undefined, total)
   }
 

@@ -3,11 +3,13 @@ bin/cert.csr
 bin/certificate.pem
 bin/private.key
 npm.sh
-
+**/old.env
 admin_data.txt
 #client/create-env-file.sh
 dist
 build
+dmens/.env
+dmens/test.env
 .env
 test.env
 #purets/bin

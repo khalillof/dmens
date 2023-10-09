@@ -1,9 +1,19 @@
-import FacebookTokenStrategy from 'passport-facebook-token';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
-import { config, dbStore } from "../../common/index.js";
+import { envConfig, Svc } from "../../common/index.js";
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { BearerStrategy } from "passport-azure-ad";
+import azconfig from './az-config.json' assert { type: 'json' };
 import crypto from 'crypto';
+const azOptions = {
+    identityMetadata: `https://ktuban.b2clogin.com/ktuban.onmicrosoft.com/${azconfig.policies.policyName}/${azconfig.metadata.version}/${azconfig.metadata.discovery}`,
+    clientID: azconfig.credentials.clientID,
+    audience: azconfig.credentials.clientID,
+    policyName: azconfig.policies.policyName,
+    isB2C: azconfig.settings.isB2C,
+    validateIssuer: azconfig.settings.validateIssuer,
+    loggingLevel: azconfig.settings.loggingLevel,
+    passReqToCallback: azconfig.settings.passReqToCallback
+};
 export class PassportStrategies {
     // local 
     static LocalDefault() {
@@ -11,10 +21,7 @@ export class PassportStrategies {
     }
     static Local2() {
         return new LocalStrategy(function (username, password, cb) {
-            dbStore['account'].model.findOne({ username: username }).populate('roles').exec((err, user) => {
-                if (err) {
-                    return cb(err);
-                }
+            Svc.db.get('account').model.findOne({ username: username }).populate('roles').exec().then((user) => {
                 if (!user) {
                     return cb(null, false, { message: 'Incorrect username or password.' });
                 }
@@ -26,36 +33,36 @@ export class PassportStrategies {
                 else {
                     return cb(null, user);
                 }
-            });
+            }).catch((err) => cb(err));
         });
     }
+    // azure active directory b2c
+    static azBearerStrategy = () => new BearerStrategy(azOptions, (payload, done) => {
+        // Send user info using the second argument
+        let user = { _id: payload.sub, firstname: payload.given_name, lastname: payload.family_name, username: payload.preferred_username, email: payload.preferred_username };
+        console.log('az payload:', payload);
+        done(false, user);
+    });
     // JWT stratigy
     static JwtAuthHeaderAsBearerTokenStrategy() {
         return new JwtStrategy({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: config.secretKey(),
-            issuer: config.issuer(),
-            audience: config.audience(),
+            secretOrKey: envConfig.secretKey(),
+            issuer: envConfig.issuer(),
+            audience: envConfig.audience(),
             // passReqToCallback:true
         }, async (payload, done) => {
-            dbStore['account'].model?.findById(payload.user._id).populate('roles').exec((error, user, info) => {
-                //console.log('JwtAuthHeaderAsBearerTokenStrategy')
-                //if(user)
+            Svc.db.get('account').model?.findById(payload.user._id).populate('roles').exec().then((error, user, info) => {
                 return user && done(false, user) || error && done(error, null) || info && done(false, null, info);
-                //if(error)
-                //return done(error,null)
-                //if(info)
-                //return done(false,null,info)
             });
-            //return done(_user);
         });
     }
     // JWT stratigy
     static JwtQueryParameterStrategy() {
         return new JwtStrategy({
-            secretOrKey: config.jwtSecret(),
-            issuer: config.issuer(),
-            audience: config.audience(),
+            secretOrKey: envConfig.jwtSecret(),
+            issuer: envConfig.issuer(),
+            audience: envConfig.audience(),
             jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
         }, async (token, done) => {
             try {
@@ -66,51 +73,17 @@ export class PassportStrategies {
             }
         });
     }
-    //passport facebook Token strategy
-    static FacebookToken() {
-        return new FacebookTokenStrategy({
-            clientID: config.facebook.clientId(),
-            clientSecret: config.facebook.clientSecret()
-        }, (accessToken, refreshToken, profile, done) => {
-            dbStore['account'].model.findOne({ facebookId: profile.id }, async function (err, user) {
-                if (err) {
-                    return done(err, false);
-                }
-                if (user) {
-                    return done(null, user);
-                }
-                else {
-                    return done(null, false);
-                    // or you could create a new account
-                }
-            });
-        });
-    }
-    // type VerifyFunction = (accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any, info?: any) => void) => void
-    static facebook() {
-        return new FacebookStrategy({
-            clientID: config.facebook.clientId(),
-            clientSecret: config.facebook.clientSecret(),
-            callbackURL: config.facebook.callbackUrl()
-        }, function (accessToken, refreshToken, profile, done) {
-            dbStore['account'].model.findOne({ facebookId: profile.id }, function (err, user, info) {
-                if (err) {
-                    return done(err, false);
-                }
-                if (!user) {
-                    return done(null, false);
-                }
-                return done(null, user);
-            });
-        });
+    static getAuthStrategy() {
+        return envConfig.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
     }
 }
+//####################################################################
 function validPassword(password, hash, salt) {
     var hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
     return hash === hashVerify;
 }
 function verifyPasswordSafe(username, password, cb) {
-    dbStore['account'].model.findOne({ username: username }, (err, user) => {
+    Svc.db.get('account').model.findOne({ username: username }, (err, user) => {
         if (err) {
             return cb(err);
         }
@@ -136,25 +109,3 @@ function genHashedPassword(password) {
         hash: genHash
     };
 }
-/**
- * This function is used in conjunction with the `passport.authenticate()` method.  See comments in
- * `passport.use()` above ^^ for explanation
-
- passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
-});
- */
-/**
-* This function is used in conjunction with the `app.use(passport.session())` middleware defined below.
-* Scroll down and read the comments in the PASSPORT AUTHENTICATION section to learn how this works.
-*
-* In summary, this method is "set" on the passport object and is passed the user ID stored in the `req.session.passport`
-* object later on.
-
-passport.deserializeUser(function(id, cb) {
-  dbStore['account'].findById(id, function (err, user) {
-      if (err) { return cb(err); }
-      cb(null, user);
-  });
-});
-*/ 

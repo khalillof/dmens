@@ -1,21 +1,14 @@
-import passport, { use } from 'passport';
+import passport from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
-import { config, dbStore, logger } from "../../common/index.js";
-import { randomBytes } from 'crypto';
-import { nanoid } from 'nanoid/async';
-import { responce } from '../../common/index.js';
+import {responce, envConfig, Svc, logger } from "../../common/index.js";
+import { randomUUID } from 'crypto';
 
 const { verify, sign, TokenExpiredError } = jwt;
-// 16 | 48
-async function getRandomBytes(length = 16) {
-  let key = randomBytes(length).toString('hex');
-  return key;
-}
 
 function getExpiredAt(refersh?: boolean) {
   let expiredAt = new Date();
-  expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? config.jwtRefreshExpiration() : config.jwtExpiration()));
+  expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? envConfig.jwtRefreshExpiration() : envConfig.jwtExpiration()));
   return expiredAt;
 }
 
@@ -45,9 +38,9 @@ function generateJwt(user: any) {
     //console.log('jwtExpiration: '+config.jwtExpiration())
     const body = { _id: user._id, email: user.email };
     const accessTokenExpireAt = getExpiredAt().getTime();
-    const ops = { expiresIn: config.jwtExpiration(), issuer: config.issuer(), audience: config.audience() };
+    const ops = { expiresIn: envConfig.jwtExpiration(), issuer: envConfig.issuer(), audience: envConfig.audience() };
 
-    const accessToken = sign({ user: body }, config.secretKey(), ops);
+    const accessToken = sign({ user: body }, envConfig.secretKey(), ops);
     return { accessToken, accessTokenExpireAt };
   } catch (err) {
     throw err;
@@ -64,13 +57,14 @@ function authenticateUser(type: string, opts?: {}) {
       pssportOptions = { failureRedirect: '/auth/login', failureMessage: true }
     try {
       return await passport.authenticate(type, opts ?? pssportOptions, async (err:any, user:any, info:any) => {
+        let db = Svc.db.get('role')!;
           console.log('authenticated user id :')
           console.log((user && user._id) || info || err )
 
         if (user) {
           let _roles = [];
           for(let id of user.roles){
-          let r = await dbStore['role'].findById(id)
+          let r = await db!.findById(id)
           _roles.push(r)
          }
          user['hash']= null;
@@ -94,7 +88,7 @@ function authenticateUser(type: string, opts?: {}) {
             }
 
             // refresh token found in header
-            let refUser = await dbStore['account'].findOne({ refreshToken: _refToken });
+            let refUser = await db.findOne({ refreshToken: _refToken });
 
             if (!refUser) {
               responce(res).badRequest('refresh token provided not found');
@@ -165,7 +159,7 @@ function reqLogin(user: any, options = { session: false }, both_tokens_required 
 
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req: any, res: express.Response, next: express.NextFunction) {
-  verify(req.token, config.jwtSecret(), function (err: any, decoded: any) {
+  verify(req.token, envConfig.jwtSecret(), function (err: any, decoded: any) {
     if (err) {
       /*
         err = {
@@ -188,9 +182,9 @@ async function createRefershToken(user: any) {
   }
     let expireAt = getExpiredAt(true);
 
-    let _token = await nanoid();
+    let _token = randomUUID();
 
-    await dbStore['account'].putById(user._id, {
+    await Svc.db.get('role')!.putById(user._id, {
       refreshToken: _token,
       refreshTokenExpireAt: expireAt,
     });
@@ -211,4 +205,4 @@ function isExpiredToken(expiryat: Date) {
 }
 
 
-export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, getRandomBytes, nanoid };
+export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };
