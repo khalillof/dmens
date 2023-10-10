@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { MongoServerError } from "mongodb";
 import { AssertionError } from '../lib/assertionError.js';
 import jwt from 'jsonwebtoken';
-export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.ValidationError, AssertionError, MongoServerError, jwt.TokenExpiredError];
+export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.ValidationError, mongoose.Error.CastError, AssertionError, MongoServerError, jwt.TokenExpiredError];
 export const logger = {
     log: console.log,
     err: (err) => console.error(err.stack),

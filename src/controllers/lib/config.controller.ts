@@ -10,6 +10,10 @@ export class ConfigController extends DefaultController {
         super(name)
     }
 
+    async routes(req: express.Request, res: express.Response, next: express.NextFunction){
+        let routes = Svc.routes.getRoutesPathMethods()
+        this.responce(res).data(routes)
+        }
 
     override  async post(req: express.Request, res: express.Response) {
         let conf: IConfigPropsParameters = req.body;

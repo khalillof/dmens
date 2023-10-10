@@ -59,6 +59,10 @@ export const confSchema = {
         "type": [String],
         "default": []
     },
+    middlewares: {
+        "type": [String],
+        "default": []
+    },
 };
 export const accConfgSchema = {
     name: "account",

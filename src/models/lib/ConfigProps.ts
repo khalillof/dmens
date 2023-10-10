@@ -7,7 +7,7 @@ import { Form } from '../index.js';
 export class ConfigProps implements IConfigProps {
 
   constructor(_config: IConfigPropsParameters) {
-    let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin } = _config;
+    let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, middlewares } = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -27,6 +27,7 @@ export class ConfigProps implements IConfigProps {
     this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
       this.useAuth = this.removeDiplicates(useAuth),
       this.useAdmin = this.removeDiplicates(useAdmin)
+      this.middlewares = this.removeDiplicates(middlewares)
 
   }
 
@@ -35,8 +36,9 @@ export class ConfigProps implements IConfigProps {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName: string
-  useAuth: String[]
-  useAdmin: String[]
+  useAuth: string[]
+  useAdmin: string[]
+  middlewares: string[] // used for post put actions
 
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
@@ -50,7 +52,8 @@ export class ConfigProps implements IConfigProps {
       schemaOptions: this.schemaOptions,
       routeName: this.routeName,
       useAuth: this.useAuth,
-      useAdmin: this.useAdmin
+      useAdmin: this.useAdmin,
+      middlewares:this.middlewares
     }
   }
 

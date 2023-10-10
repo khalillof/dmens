@@ -5,18 +5,16 @@ export const AuthRoutes = {
     config: new ConfigProps({ name: 'auth', active: true, schemaObj: {}, routeName: 'auth' }),
     controller: () => new AuthController(),
     routeCallback: function () {
-        this.router.post('/auth/signup', this.mware.checkLoginUserFields, this.actions('signup'));
-        this.router.post('/auth/signin', this.mware.checkLoginUserFields, this.actions('signin'));
-        this.router.get('/auth/logout', this.actions('logout'));
-        //this.router.get('/auth/facebook/token', this.authenticate('facebook'), this.actions('facebook'));
-        this.router.get('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('findById'));
-        this.router.delete('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('remove'));
-        this.router.put('/auth/profile/:id', this.authenticate("jwt"), this.mware.validateCurrentUserOwnParamId, this.actions('put'));
+        this.buidRoute('/auth/signup', 'post', 'signup', ['checkLoginUserFields']);
+        this.buidRoute('/auth/signin', 'post', 'signin', ['checkLoginUserFields']);
+        this.buidRoute('/auth/logout', 'get', 'logout');
+        this.buidRoute('/auth/profile/:id', 'get', 'findById', ['isAuthenticated', 'validateCurrentUserOwnParamId']);
+        this.buidRoute('/auth/profile/:id', 'delete', 'remove', ['isAuthenticated', 'validateCurrentUserOwnParamId']);
+        this.buidRoute('/auth/profile/:id', 'put', 'put', ['isAuthenticated', 'validateCurrentUserOwnParamId']);
         // get secrets form envirmoment variables
-        this.router.get('/auth/secure', this.authenticate("jwt"), this.mware.isInRole('admin'), this.actions('secure'));
-        this.param();
+        this.buidRoute('/auth/secure', 'get', 'secure', ['isAuthenticated', 'isAdmin']);
         // get profile require query string eg ==>  /auth/profile?email=user@user.co
-        this.router.get('/auth/profile', this.authenticate("jwt"), this.mware.validateHasQueryEmailBelongToCurrentUser, this.actions('profile'));
+        this.buidRoute('/auth/profile', 'get', 'profile', ['isAuthenticated', 'validateHasQueryEmailBelongToCurrentUser']);
         this.param();
         this.options();
     }

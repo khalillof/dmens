@@ -1,6 +1,5 @@
 
 import { AdminController as ConfigController } from '../../controllers/index.js';
-import { uploadSchema } from './uploads.js';
 import { IRouteConfigCallback, IDefaultRoutesConfig} from '../../interfaces/index.js';
 import { ConfigProps } from '../../models/index.js';
 
@@ -9,8 +8,9 @@ export const ConfigRoutes: IRouteConfigCallback = {
     controller: ()=> new ConfigController(),
     routeCallback: function (this:IDefaultRoutesConfig) {
         this.defaultRoutes()
-        this.buidRoute(this.routeName, 'post', 'post', null, [this.mware!.isJson,uploadSchema])
-        this.buidRoute(this.routeName, 'put', 'put', null, [this.mware!.isJson,uploadSchema])
+        this.buidRoute(this.routeName, 'post', 'post', this.configProp.middlewares) 
+        this.buidRoute(this.routeName, 'put', 'put', this.configProp.middlewares)
+        this.buidRoute(this.routeName+'/routes', 'list', 'routes', ['isAuthenticated', 'isAdmin'])
     }
 }
 

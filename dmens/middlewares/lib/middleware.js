@@ -1,4 +1,5 @@
 import { isValidRole, Svc, responce } from '../../common/index.js';
+import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
 class Middlewares {
     async getUserFromReq(req) {
@@ -38,8 +39,14 @@ class Middlewares {
     async userExist(req, res, next) {
         await this.getUserFromReq(req) ? next() : responce(res).forbidden('User does not exist : ' + req.body.email);
     }
+    async uploadSchema(req, res, next) {
+        return uploadSchema;
+    }
     isAuthenticated(req, res, next) {
         req.isAuthenticated() ? next() : responce(res).unAuthorized();
+    }
+    async isAdmin(req, res, next) {
+        return this.isInRole('admin');
     }
     // roles
     isRolesExist(roles) {

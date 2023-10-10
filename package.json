@@ -16,6 +16,8 @@
   ],
   "author": "Khalil Tuban",
   "license": "ISC",
+  "private": true,
+  "main": "./app.js",
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
     "test": "karma start",
@@ -24,7 +26,6 @@
     "trace": "tsc --traceResolution"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.11",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -46,7 +47,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.17",
-    "@babel/preset-env": "^7.22.15",
     "@types/compression": "^1.7.3",
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",
@@ -54,17 +54,14 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/morgan": "^1.9.5",
     "@types/multer": "^1.4.7",
-    "@types/node": "^20.6.0",
     "@types/passport": "^1.0.12",
     "@types/passport-azure-ad": "^4.3.1",
     "@types/passport-jwt": "^3.0.9",
     "@types/passport-local": "^1.0.35",
     "@types/passport-local-mongoose": "^6.1.1",
     "@types/pluralize": "^0.0.30",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2"
+    "tslib": "^2.6.2"
   },
-  "main": "app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Khalillof/dmens.git"
