@@ -10,7 +10,6 @@ src
 .git/**/*
 .git
 views/**/*
-views
 dmens/.env
 dmens/test.env
 admin_data.txt
