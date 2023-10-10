@@ -16,6 +16,7 @@ export class Operations {
             schemaObj: confSchema,
             useAuth: ["list", "get", "post", "put", "delete"],
             useAdmin: ["list", "get", "post", "put", "delete"],
+            middlewares: ['isJson', 'uploadSchema']
         };
         // create config model and routes
         await Operations.createModelInstance(_configProp);

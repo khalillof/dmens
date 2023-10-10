@@ -5,6 +5,10 @@ export class ConfigController extends DefaultController {
     constructor(name = 'config') {
         super(name);
     }
+    async routes(req, res, next) {
+        let routes = Svc.routes.getRoutesPathMethods();
+        this.responce(res).data(routes);
+    }
     async post(req, res) {
         let conf = req.body;
         let result = await Operations.createModelConfigRoute(conf);

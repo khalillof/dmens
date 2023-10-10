@@ -1,6 +1,7 @@
 import express from 'express';
 import { isValidRole, Svc, responce} from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
+import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
 
  class Middlewares implements IMiddlewares {
@@ -40,9 +41,18 @@ import fs from 'fs';
   async userExist(req: express.Request, res: express.Response, next: express.NextFunction) {
     await this.getUserFromReq(req) ? next() : responce(res).forbidden('User does not exist : ' + req.body.email);
   }
+  async uploadSchema(req: any, res: express.Response, next: express.NextFunction) {
+    return uploadSchema
+
+  }
 
   isAuthenticated(req: any, res: express.Response, next: express.NextFunction) {
     req.isAuthenticated() ? next() : responce(res).unAuthorized();
+
+  }
+
+ async isAdmin(req: any, res: express.Response, next: express.NextFunction) {
+    return this.isInRole('admin');
 
   }
   // roles

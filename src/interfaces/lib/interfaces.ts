@@ -41,8 +41,9 @@ export interface IConfigPropsParameters {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName?: string
-  useAuth?: String[]
-  useAdmin?: String[]
+  useAuth?: string[]
+  useAdmin?: string[]
+  middlewares?:string[]
 
 };
 
@@ -54,8 +55,9 @@ export interface IConfigProps {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName: string
-  useAuth: String[]
-  useAdmin: String[]
+  useAuth: string[]
+  useAdmin: string[]
+  middlewares: string[]
   getRoutes?(): { method: string; path: string;}[]
   getConfigProps?(): IConfigProps
   genForm?(): Promise<IForm>
@@ -148,9 +150,9 @@ export interface IDefaultRoutesConfig {
   mware?: IMiddlewares;
   authenticate: Iauthenticate;
   //actions:Function;
-  buildMdWares(middlewares?: Array<Function>, useAuth?: boolean, useAdmin?: boolean): Promise<any[]>;
+  //buildMdWares(middlewares?: string[], useAuth?: boolean, useAdmin?: boolean): Promise<any[]>;
   // custom routes
-  buidRoute(routeName: string, method: string, actionName?: string | null, secondRoute?: string | null, middlewares?: Array<Function> | null): Promise<any>
+  buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
 
   setOptions(routPath: string): void;
   options(): void;
@@ -174,13 +176,14 @@ export interface IMiddlewares {
   validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction): void;
 
   userExist(req: express.Request, res: express.Response, next: express.NextFunction): Promise<any>;
-
+  uploadSchema(req: any, res: express.Response, next: express.NextFunction): void;
   isAuthenticated(req: any, res: express.Response, next: express.NextFunction): void;
   // roles
   isRolesExist(roles: [string]): boolean;
   isJson(req: express.Request, res: express.Response, next: express.NextFunction): void;
 
   isInRole(roleName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
+  isAdmin(req: any, res: express.Response, next: express.NextFunction): void;
 }
 export interface Iauthenticate {
   (type: any, opts?: any): (req: any, res: any, next: any) => Promise<any>

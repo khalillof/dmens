@@ -4,7 +4,6 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'test.env');
-;
 if (!fs.existsSync(envPath)) {
     throw new Error('enviroment file not  found');
 }

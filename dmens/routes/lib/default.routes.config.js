@@ -32,22 +32,26 @@ export class DefaultRoutesConfig {
         Svc.routes.add(this);
         // this.app.use(this.router)
     }
-    async buildMdWares(middlewares, useAuth = true, useAdmin = false) {
+    async buildMdWares(middlewares, useAuth = false, useAdmin = false) {
         let mdwares = [];
         if (useAuth === true)
             mdwares = [...mdwares, this.authenticate(envConfig.authStrategy())]; //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
         if (useAdmin === true)
-            mdwares = [...mdwares, this.mware.isInRole('admin')];
+            mdwares = [...mdwares, this.mware.isAdmin];
         if (middlewares)
             mdwares = [...mdwares, ...middlewares];
         return mdwares;
     }
     // custom routes
-    async buidRoute(routeName, method, actionName, secondRoute, middlewares) {
-        const url = secondRoute ? (routeName + '/' + secondRoute) : routeName;
+    async buidRoute(routeName, method, actionName, middlewares) {
+        if (!routeName)
+            throw new Error('buildRoute method require url or routeName');
         let aut = this.configProp.checkAuth(method) || [true, false];
-        let mdwr = await this.buildMdWares(middlewares, ...aut);
-        return this.router[((method === 'list') ? 'get' : method)](url, ...mdwr, this.actions(actionName ?? method));
+        // map middlewares string fuction names to actual functions
+        let mdwrs = this.mware;
+        let mdwares = middlewares ? middlewares.map((m) => mdwrs[m]) : [];
+        let mdwr = await this.buildMdWares(mdwares, ...aut);
+        return this.router[((method === 'list') ? 'get' : method)](routeName, ...mdwr, this.actions(actionName ?? method));
     }
     setOptions(routPath) {
         this.router.options(this.routeName, corsWithOptions);
@@ -69,16 +73,16 @@ export class DefaultRoutesConfig {
         });
     }
     async defaultRoutes() {
-        await this.buidRoute(this.routeName, 'list', 'search', 'search'); // search
-        await this.buidRoute(this.routeName, 'list', 'count', 'count'); // count
-        await this.buidRoute(this.routeName, 'list', 'form', 'form'); // get form elements
-        await this.buidRoute(this.routeName, 'list', 'route', 'route'); // get form elements
+        await this.buidRoute(this.routeName + '/search', 'list', 'search'); // search
+        await this.buidRoute(this.routeName + '/count', 'list', 'count'); // count
+        await this.buidRoute(this.routeName + '/form', 'list', 'form'); // get form elements
+        await this.buidRoute(this.routeName + '/route', 'list', 'route'); // get form elements
         await this.buidRoute(this.routeName, 'list', 'list'); // list
         await this.buidRoute(this.routeParam, 'get', 'getOne'); // get By id
         await this.buidRoute(this.routeName, 'get', 'getOne'); // getOne by filter parameter
         await this.buidRoute(this.routeName, 'post'); // post
         await this.buidRoute(this.routeParam, 'put'); // put
-        await this.buidRoute(this.routeParam, 'delete', null, null, [this.mware.validateCurrentUserOwnParamId]); // delete
+        await this.buidRoute(this.routeParam, 'delete', null, ['validateCurrentUserOwnParamId']); // delete
         this.param();
         this.options();
     }

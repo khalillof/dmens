@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { Form } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
-        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin } = _config;
+        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, middlewares } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -18,6 +18,7 @@ export class ConfigProps {
         this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
             this.useAuth = this.removeDiplicates(useAuth),
             this.useAdmin = this.removeDiplicates(useAdmin);
+        this.middlewares = this.removeDiplicates(middlewares);
     }
     name;
     active;
@@ -26,6 +27,7 @@ export class ConfigProps {
     routeName;
     useAuth;
     useAdmin;
+    middlewares; // used for post put actions
     removeDiplicates(arr) {
         // Set will remove diblicate
         return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
@@ -38,7 +40,8 @@ export class ConfigProps {
             schemaOptions: this.schemaOptions,
             routeName: this.routeName,
             useAuth: this.useAuth,
-            useAdmin: this.useAdmin
+            useAdmin: this.useAdmin,
+            middlewares: this.middlewares
         };
     }
     getRoutes() {

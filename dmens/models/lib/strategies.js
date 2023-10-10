@@ -14,7 +14,7 @@ const azOptions = {
     loggingLevel: azconfig.settings.loggingLevel,
     passReqToCallback: azconfig.settings.passReqToCallback
 };
-export class PassportStrategies {
+class PassportStrategies {
     // local 
     static LocalDefault() {
         return new LocalStrategy(verifyPasswordSafe);
@@ -77,6 +77,7 @@ export class PassportStrategies {
         return envConfig.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
     }
 }
+export { PassportStrategies };
 //####################################################################
 function validPassword(password, hash, salt) {
     var hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
