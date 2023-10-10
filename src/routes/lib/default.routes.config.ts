@@ -42,7 +42,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     }
 
 
-   async buildMdWares(middlewares?:Array<Function> |null, useAuth=true, useAdmin=false){
+   async buildMdWares(middlewares?:Array<Function> |null, useAuth=false, useAdmin=false){
       let mdwares:any[] = [];
       if(useAuth === true)
         mdwares = [...mdwares,this.authenticate(envConfig.authStrategy())] //  authStr === 'az' ? 'oauth-bearer' :  jwt; ;
