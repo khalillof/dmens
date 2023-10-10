@@ -1,7 +1,7 @@
 {
   "name": "@tuban/dmens",
-  "version": "1.0.9",
-  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas, routes and CRUD operations, the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever",
+  "version": "2.0",
+  "description": "This is dynamic RESTful api server, using nodejs expressjs and mongodb. dynamiclly create schemas,models, routes, forms and CRUD operations, the name - dynamic-mens - stand for dynamic | Mongodb | Expressjs | nodejs | srever",
   "type": "module",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
