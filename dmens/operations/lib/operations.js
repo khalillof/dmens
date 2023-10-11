@@ -3,28 +3,27 @@ import { DbModel } from '../../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
 import { Svc, envConfig } from '../../common/index.js';
-import { DefaultRoutesConfig, ConfigRoutes, AuthRoutes } from '../../routes/index.js';
+import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
 import { confSchema, accConfgSchema, typeMappings } from './help.js';
+import { DefaultController } from '../../controllers/index.js';
 //=============================================
+export const configConfigProp = {
+    name: "config",
+    active: true,
+    schemaOptions: { timestamps: true, strict: true },
+    schemaObj: confSchema,
+    useAuth: ["list", "get", "post", "put", "delete"],
+    useAdmin: ["list", "get", "post", "put", "delete"],
+    middlewares: ['isJson', 'uploadSchema']
+};
 export class Operations {
     static async create_default_models_routes() {
-        // create config model
-        const _configProp = {
-            name: "config",
-            active: true,
-            schemaOptions: { timestamps: true, strict: true },
-            schemaObj: confSchema,
-            useAuth: ["list", "get", "post", "put", "delete"],
-            useAdmin: ["list", "get", "post", "put", "delete"],
-            middlewares: ['isJson', 'uploadSchema']
-        };
         // create config model and routes
-        await Operations.createModelInstance(_configProp);
-        await Operations.createInstanceWithRouteConfigCallback(ConfigRoutes);
+        await Operations.createModelInstance(configConfigProp);
+        await ConfigRoutes();
         // create account model config and routes
-        await Operations.createModelConfigRoute(accConfgSchema);
-        // auth routes
-        await Operations.createInstanceWithRouteConfigCallback(AuthRoutes);
+        await Operations.createModelInstance(accConfgSchema);
+        await AccountRoutes();
         // load models routes from default directory
         return await Operations.createModelsRoutesFromDirectory();
     }
@@ -35,7 +34,7 @@ export class Operations {
     static async createModelConfigRoute(_config, controller, routeCallback) {
         let _model = await Operations.createModelInstance(_config);
         await _model.createConfig();
-        return await Operations.createRouteInstance(_model.config, controller, routeCallback);
+        return await Operations.createRouteInstance(controller ?? new DefaultController(_model.name), routeCallback);
     }
     // create or override model config route
     static async overrideModelConfigRoute(_config) {
@@ -90,11 +89,8 @@ export class Operations {
         }
     }
     // ===================== Routes
-    static async createRouteInstance(config, controller, callback) {
-        return Promise.resolve(new DefaultRoutesConfig(config, controller, callback));
-    }
-    static async createInstanceWithRouteConfigCallback(routeCb) {
-        return await Operations.createRouteInstance(routeCb.config, routeCb.controller(), routeCb.routeCallback);
+    static async createRouteInstance(controller, callback) {
+        return Promise.resolve(new DefaultRoutesConfig(controller, callback));
     }
     // helpers :.............................................
     static isJsonFile(file) {

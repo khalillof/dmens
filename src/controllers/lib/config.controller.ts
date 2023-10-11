@@ -20,7 +20,7 @@ export class ConfigController extends DefaultController {
         let result = await Operations.createModelConfigRoute(conf);
 
         envConfig.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).data(result.configProp.getConfigProps!())
+        this.responce(res).data(result.controller.db.config.getConfigProps!())
     }
 
 

@@ -77,7 +77,7 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
         return this.getRoutes(routeName)
             .map((route: any) => {
                 return {
-                    method: this.getMethod(route),
+                    method : this.getMethod(route),
                     path: route.path
                 };
             });
@@ -101,7 +101,7 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
     //========================================================================================
 
     private ToString(obj:{method:string,path:string}[]){
-        return obj.map((r: any) => r.method + " :"+ r.path).join("\n");
+        return obj.map((r: any) => r.method + " => "+ r.path).join("\n");
       }
       private ToJson(obj:{method:string,path:string}[]){
               return JSON.stringify(obj, null, 2);

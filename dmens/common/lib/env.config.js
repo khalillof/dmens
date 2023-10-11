@@ -4,15 +4,8 @@ import { fileURLToPath } from 'url';
 const __dirname = fileURLToPath(import.meta.url);
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib', '').replace('common', ''));
 const isDevelopment = () => env['NODE_ENV'] === 'development';
-function devOrProd(dev, prod, or = baseDir) {
-    return isDevelopment() ? getOr(dev, or) : getOr(prod, or);
-}
-function getOr(key, or = null) {
-    return env[key] ?? or;
-}
-function getAbsolutePath(p) {
-    return path.join(baseDir, p);
-}
+const getOr = (key, or = null) => env[key] ?? or;
+const getAbsolutePath = (p) => path.join(baseDir, p);
 export const envConfig = {
     isDevelopment,
     baseDir,
@@ -31,7 +24,6 @@ export const envConfig = {
             throw new Error(`>>> ${authStr} : >>>  auth strategy does not exist`);
         }
     },
-    useAuth: () => getOr('AUTH', true),
     useCore: () => getOr('USE_CORES', true),
     secretKey: () => getOr('SECRET_KEY', ' '),
     jwtSecret: () => getOr('JWT_SECRET', ' '),

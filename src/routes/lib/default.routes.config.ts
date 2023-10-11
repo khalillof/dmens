@@ -4,34 +4,27 @@ import {middlewares} from '../../middlewares/index.js';
 import {IController, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IConfigProps, IRouteCallback} from '../../interfaces/index.js';
 import { DefaultController} from '../../controllers/index.js';
 import {authenticateUser} from '../../services/index.js' ;
-import  {Application, IRouter} from "express";
-import {app, appRouter} from '../../app.js'
-import { ConfigProps } from "../../models/index.js";
+import {appRouter} from '../../app.js'
 
 
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig{
-    app:Application;
-    router:IRouter | any
-    configProp:IConfigProps
+    router:any
     routeName: string;
     routeParam: string;
-    controller?:IController;
+    controller:IController;
     mware?:IMiddlewares;
     authenticate:Iauthenticate;
     //actions:Function;
-    constructor(configProp:IConfigProps,controller?:IController,callback?:IRouteCallback) { 
-      if(!(configProp instanceof ConfigProps)){
-        envConfig.throwErr('route configration require instance of class ConfigProp')
+    constructor(controller:IController,callback?:IRouteCallback) { 
+      if(!(controller instanceof DefaultController)){
+        envConfig.throwErr('route configration require instance of class DefaultController')
       }
-      
-        this.configProp = configProp;  
-        this.app = app;
+      this.controller = controller
         this.router = appRouter;
 
-        this.routeName = configProp.routeName;
+        this.routeName = this.controller.db.config.routeName;
         this.routeParam = this.routeName+'/:id';
-        this.controller = controller || new DefaultController(configProp.name);
         this.mware = middlewares;
         this.authenticate =authenticateUser;
         typeof callback === 'function' ? callback.call(this): this.defaultRoutes();
@@ -58,7 +51,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
       if(!routeName)
       throw new Error('buildRoute method require url or routeName')
     
-      let aut:boolean[] = this.configProp.checkAuth!(method) || [true,false];
+      let aut:boolean[] = this.controller?.db.config.checkAuth!(method) || [true,false];
 
       // map middlewares string fuction names to actual functions
       let mdwrs:any = this.mware!;
@@ -69,14 +62,14 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
     }
     
     setOptions(routPath:string){
-      this.router.options(this.routeName, corsWithOptions);
+      this.router.options(routPath, corsWithOptions);
     }
     options(){
       this.setOptions(this.routeName);
       this.setOptions(this.routeParam);
     }
     param(){
-      return this.app.param('id', async (req:any,res:any,next:any, id:string)=>{ 
+      return this.router.param('id', async (req:any,res:any,next:any, id:string)=>{ 
         try{
           Assert.idString(id); 
           next()
@@ -95,8 +88,9 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig{
    await  this.buidRoute(this.routeName,'list','list'); // list
    await   this.buidRoute(this.routeParam,'get','getOne') // get By id
    await   this.buidRoute(this.routeName,'get','getOne') // getOne by filter parameter
-   await   this.buidRoute(this.routeName,'post')// post
-   await   this.buidRoute(this.routeParam,'put')// put
+   await   this.buidRoute(this.routeName,'post', null,this.controller?.db.config.middlewares)// post
+   await   this.buidRoute(this.routeParam,'put',null, this.controller?.db.config.middlewares)// put
+
    await   this.buidRoute(this.routeParam,'delete',null,['validateCurrentUserOwnParamId'])// delete
 
       this.param();

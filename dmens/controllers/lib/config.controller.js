@@ -13,7 +13,7 @@ export class ConfigController extends DefaultController {
         let conf = req.body;
         let result = await Operations.createModelConfigRoute(conf);
         envConfig.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).data(result.configProp.getConfigProps());
+        this.responce(res).data(result.controller.db.config.getConfigProps());
     }
     async put(req, res, next) {
         let id = req.params['id'];
