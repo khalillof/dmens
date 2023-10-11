@@ -111,12 +111,7 @@ export interface Iresponce {
 export interface IRouteCallback {
   (this: IDefaultRoutesConfig): void;
 }
-// function with parmeters interface 
-export interface IRouteConfigCallback {
-  config: IConfigProps
-  controller: () => IController
-  routeCallback?: IRouteCallback
-}
+
 export interface Ilogger {
   log: (msg: string) => void;
   err: (err: any) => void;
@@ -141,17 +136,13 @@ export interface IController {
 
 
 export interface IDefaultRoutesConfig {
-  app: Application;
   router: IRouter
-  configProp: IConfigProps
   routeName: string;
   routeParam: string;
-  controller?: IController;
+  controller: IController;
   mware?: IMiddlewares;
+
   authenticate: Iauthenticate;
-  //actions:Function;
-  //buildMdWares(middlewares?: string[], useAuth?: boolean, useAdmin?: boolean): Promise<any[]>;
-  // custom routes
   buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
 
   setOptions(routPath: string): void;

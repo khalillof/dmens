@@ -24,7 +24,7 @@ export async function menServer(app, isHttps = false) {
         app.set('port', port);
         server = http.createServer(app);
     }
-    server.listen(port, () => console.log(`mens ${app.get('env')} server is listening on port: ${port}`));
+    server.listen(port, () => console.log(`dmens ${app.get('env')} server is listening on port: ${port}`));
     server.on('error', onError);
     //server.on('listening', onListening);
     return server;

@@ -1,16 +1,14 @@
 
-import { AdminController as ConfigController } from '../../controllers/index.js';
-import { IRouteConfigCallback, IDefaultRoutesConfig} from '../../interfaces/index.js';
-import { ConfigProps } from '../../models/index.js';
+import { ConfigController } from '../../controllers/index.js';
+import { IDefaultRoutesConfig} from '../../interfaces/index.js';
+import { DefaultRoutesConfig } from './default.routes.config.js';
 
-export const ConfigRoutes: IRouteConfigCallback = {
-    config:  new ConfigProps({name:'config', active:true,schemaObj:{}}),
-    controller: ()=> new ConfigController(),
-    routeCallback: function (this:IDefaultRoutesConfig) {
-        this.defaultRoutes()
-        this.buidRoute(this.routeName, 'post', 'post', this.configProp.middlewares) 
-        this.buidRoute(this.routeName, 'put', 'put', this.configProp.middlewares)
-        this.buidRoute(this.routeName+'/routes', 'list', 'routes', ['isAuthenticated', 'isAdmin'])
+export async function ConfigRoutes(){
+    return  new DefaultRoutesConfig(new ConfigController(),
+   async function (this:IDefaultRoutesConfig) {
+      await  this.buidRoute(this.routeName+'/routes', 'list', 'routes', ['isAuthenticated', 'isAdmin'])
+       await this.defaultRoutes()
+        
     }
+)
 }
-

@@ -87,7 +87,7 @@ class RouteSvc extends SvcInstance {
     }
     //========================================================================================
     ToString(obj) {
-        return obj.map((r) => r.method + " :" + r.path).join("\n");
+        return obj.map((r) => r.method + " => " + r.path).join("\n");
     }
     ToJson(obj) {
         return JSON.stringify(obj, null, 2);

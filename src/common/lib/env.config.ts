@@ -1,21 +1,13 @@
 import {env} from 'process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 const __dirname =fileURLToPath(import.meta.url);
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib','').replace('common',''));
-
 const isDevelopment = ()=> env['NODE_ENV'] === 'development';
+const getOr = (key:string, or:any=null)=> env[key] ??  or ;
+const getAbsolutePath =(p:string)=> path.join(baseDir,p);
 
-function devOrProd(dev:string, prod:any, or:string | any =baseDir){
-  return  isDevelopment() ? getOr(dev, or) : getOr(prod,or);
-}
-
-function getOr(key:string, or:any=null){
-    return  env[key] ??  or ;
-  }
-function getAbsolutePath(p:string){
-  return path.join(baseDir,p)
-}
 export const envConfig = {
     isDevelopment,
     baseDir,
@@ -35,7 +27,6 @@ export const envConfig = {
     }
     
       },
-    useAuth: ()=> getOr('AUTH', true),
     useCore: ()=> getOr('USE_CORES',true),
     secretKey: ()=>  getOr('SECRET_KEY', ' '),
     jwtSecret:()=> getOr('JWT_SECRET', ' '),

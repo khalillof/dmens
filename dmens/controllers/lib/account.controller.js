@@ -1,9 +1,9 @@
 import { DefaultController } from './default.controller.js';
-import { authenticateUser, generateJwt } from '../../services/index.js';
+import { authenticateUser } from '../../services/index.js';
 import { envConfig } from '../../common/index.js';
-export class AuthController extends DefaultController {
-    constructor(svc = 'account') {
-        super(svc);
+export class AccountController extends DefaultController {
+    constructor() {
+        super('account');
     }
     async secure(req, res, next) {
         const data = envConfig.getSecret(req.query['api']);
@@ -71,62 +71,4 @@ export class AuthController extends DefaultController {
             this.responce(res).success("You are not logged in!");
         }
     }
-    facebook(req, res, next) {
-        if (req.user) {
-            var token = generateJwt(req.user);
-            res.json({ success: true, token: token, status: 'You are successfully logged in!' });
-        }
-    }
 }
-/**
-   // check both Bearer tokens accessToken and refeshToken and return both new tokens;
-    async  checkAccessRefershTokensAndCreate(req: express.Request, res: express.Response, next: express.NextFunction) {
-      let token = this.getToken("x-access-token", req);
-      let refersh_token = this.getToken("refersh_token", req);
-
-      if(token && refersh_token){
-      verify(token, config.jwtSecret(),async (err:any, user:any) => {
-        // prcess if token expired
-        if (err) {
-          if(err.name === 'TokenExpiredError' || err.message === 'jwt expired'){
-           
-          await this.check_refresh_create_tokens(user,refersh_token!,res);
-          //return logger.resErr(res,err)
-          }else{
-            return this.responce(res).notAuthorized("not authorized need to sigin!");
-          }
-        }else{
-          // process if token still valid
-          await this.check_refresh_create_tokens(user,refersh_token!,res);
-          return;
-        }
-      });
-      }else{
-        return this.responce(res).notAuthorized("token not provided!");
-      }
-    };
-
-  private  async  check_refresh_create_tokens(user:any,refersh_token:string, res:express.Response){
-      let db_refToken = await dbStore['token'].model?.findOne({ owner: user._id, token:refersh_token});
-      if(db_refToken && !isExpiredToken(db_refToken.token)){
-           let neRefersh_token = await createRefershToken(user);
-           let newSccessToken = generateJwt(user);
-           res.json({ success: true, message: "Authentication successful", accessToken: newSccessToken, refershToken: neRefersh_token });
-           // update delete old token
-           await dbStore['token'].deleteById(db_refToken._id)
-           return;
-      }else{
-        return this.responce(res).notAuthorized("not authorized need to sigin!");
-      }
-    }
-
-    private getToken(tokenFeild:string,req:express.Request){
-      let token = req.headers[tokenFeild];
-      if(token && typeof token === 'string'){
-        return token;
-      }else{
-      return null;
-      }
-    }
-
-  **/ 

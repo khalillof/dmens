@@ -29,13 +29,12 @@ app.use(compression());
 // view engine setup
 //app.set('views', path.join(config.baseDir, 'views'));
 //app.set('view engine', 'ejs');
-const dev_prod = app.get('env');
-[].forEach;
+const isDevelopment = envConfig.isDevelopment();
 // static urls
 const urls = envConfig.static_urls();
 urls && urls.length && urls.forEach((url) => app.use(express.static(path.join(envConfig.baseDir, url))));
 // request looger using a predefined format string
-app.use(morgan(dev_prod === 'development' ? 'dev' : 'combined')); // dev|common|combined|short|tiny
+app.use(morgan(isDevelopment ? 'dev' : 'combined')); // dev|common|combined|short|tiny
 // create database models
 await dbInit();
 app.use(session({
@@ -70,16 +69,16 @@ app.use((req, res, next) => {
 });
 // server error handller will print stacktrace
 app.use(function (err, req, res, next) {
-    res.status(err.status || 500).json({ success: false, error: dev_prod === 'development' ? err.message : "Ops! server error" });
+    res.status(err.status || 500).json({ success: false, error: isDevelopment ? err.message : "Ops! server error" });
     console.error(err.stack);
 });
 // print routes
 Svc.routes.print();
 // seed database
 await new ClientSeedDatabase().init();
-dev_prod !== 'development' ? await menServer(app, false) : app.listen(envConfig.port(), () => envConfig.logLine(`${dev_prod} server is running on port: ${envConfig.port()}`));
+!isDevelopment ? await menServer(app, false) : app.listen(envConfig.port(), () => envConfig.logLine(`development server is running on port: ${envConfig.port()}`));
 // remove .env file if exist
-if (dev_prod === 'production' && fs.existsSync(envPath)) {
+if (!isDevelopment && fs.existsSync(envPath)) {
     fs.unlinkSync(envPath);
     console.log('.env file will be removed');
 }
