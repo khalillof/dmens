@@ -16,7 +16,6 @@
   ],
   "author": "Khalil Tuban",
   "license": "ISC",
-  "private": false,
   "main": "./app.js",
   "scripts": {
     "debug": "export DEBUG=* && npm  dev",
