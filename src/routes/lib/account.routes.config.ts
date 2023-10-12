@@ -6,8 +6,8 @@ import { DefaultRoutesConfig } from './default.routes.config.js';
 export async function AccountRoutes(){
   return new DefaultRoutesConfig(new AccountController(),
      function (this: IDefaultRoutesConfig): void {
-        this.buidRoute(this.routeName+'/signup','post', 'signup',['checkLoginUserFields'])
-        this.buidRoute(this.routeName+'/signin','post', 'signin',['checkLoginUserFields'])
+        this.buidRoute(this.routeName+'/signup','post', 'signup',['checkLoginUserFields','authenticate'])
+        this.buidRoute(this.routeName+'/signin','post', 'signin',['checkLoginUserFields','authenticate'])
         this.buidRoute(this.routeName+'/logout','get', 'logout')
         this.buidRoute(this.routeParam,'get','findById', ['isAuthenticated', 'validateCurrentUserOwnParamId']);
         this.buidRoute(this.routeParam,'delete','remove', ['isAuthenticated','validateCurrentUserOwnParamId']);

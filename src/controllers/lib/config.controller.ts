@@ -1,6 +1,6 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
-import { Svc, envConfig } from '../../common/index.js'
+import { Svc, envs } from '../../common/index.js'
 import { IConfigProps, IConfigPropsParameters } from '../../interfaces/index.js';
 import { Operations } from '../../operations/index.js';
 
@@ -19,7 +19,7 @@ export class ConfigController extends DefaultController {
         let conf: IConfigPropsParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
-        envConfig.logLine('document created or Overrided :', result.controller?.db.name);
+        envs.logLine('document created or Overrided :', result.controller?.db.name);
         this.responce(res).data(result.controller.db.config.getConfigProps!())
     }
 
@@ -31,7 +31,7 @@ export class ConfigController extends DefaultController {
 
         let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
 
-        envConfig.logLine('document created or Overrided :', result.controller?.db.name);
+        envs.logLine('document created or Overrided :', result.controller?.db.name);
         this.responce(res).success();
     }
 

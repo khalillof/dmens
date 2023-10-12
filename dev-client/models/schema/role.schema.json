@@ -1,19 +1,9 @@
 {
   "name": "role",
   "active": true,
-  "useAuth": [
-    "list",
-    "get",
-    "post",
-    "put",
-    "delete"
+  "useAuth": ["search","count","form","route","list","get","post","put","delete"
   ],
-  "useAdmin": [
-    "list",
-    "get",
-    "post",
-    "put",
-    "delete"
+  "useAdmin": ["search","count","form","route","list","get","post","put","delete"
   ],
   "schemaObj": {
     "name": {

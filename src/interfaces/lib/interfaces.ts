@@ -62,7 +62,7 @@ export interface IConfigProps {
   getConfigProps?(): IConfigProps
   genForm?(): Promise<IForm>
   //check useAuth and useAdmin
-  checkAuth?(method: string): Array<boolean>
+  checkAuth?(method: string): string[]
 };
 
 export interface IDbModel {
@@ -142,9 +142,7 @@ export interface IDefaultRoutesConfig {
   controller: IController;
   mware?: IMiddlewares;
 
-  authenticate: Iauthenticate;
   buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
-
   setOptions(routPath: string): void;
   options(): void;
   param(): void;
@@ -154,7 +152,7 @@ export interface IDefaultRoutesConfig {
 
 export interface IMiddlewares {
 
-
+  authenticate:(req: any, res: any, next: any) => Promise<any>
   getUserFromReq(req: express.Request): Promise<any>;
   checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction): void;
 

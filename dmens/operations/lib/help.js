@@ -64,6 +64,15 @@ export const confSchema = {
         "default": []
     },
 };
+export const configConfigProp = {
+    name: "config",
+    active: true,
+    schemaOptions: { timestamps: true, strict: true },
+    schemaObj: confSchema,
+    useAuth: ['search', 'count', 'list', 'get', 'post', 'put', 'delete'],
+    useAdmin: ['search', 'count', 'form', 'list', 'get', 'post', 'put', 'delete'],
+    middlewares: ['isJson', 'uploadSchema']
+};
 export const accConfgSchema = {
     name: "account",
     active: true,
@@ -126,6 +135,7 @@ export const accConfgSchema = {
             }
         ]
     },
-    useAuth: ["list", "get", "post", "put", "delete"],
-    useAdmin: ["list"]
+    // useAuth: ["list", "get", "post", "put", "delete"],
+    useAuth: ['search', 'count', 'form', 'route', 'list', 'get', 'post', 'put', 'delete'],
+    useAdmin: ["list", 'search', 'count']
 };

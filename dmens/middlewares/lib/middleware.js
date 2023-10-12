@@ -1,7 +1,9 @@
-import { isValidRole, Svc, responce } from '../../common/index.js';
+import { isValidRole, Svc, responce, envs } from '../../common/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
+import { authenticateUser } from '../../services/index.js';
 class Middlewares {
+    authenticate = authenticateUser(envs.authStrategy());
     async getUserFromReq(req) {
         return req.body && req.body.email ? await Svc.db.get('account').findOne({ email: req.body.email }) : null;
     }

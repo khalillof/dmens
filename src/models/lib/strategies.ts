@@ -1,5 +1,5 @@
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
-import { envConfig, Svc } from "../../common/index.js";
+import { envs, Svc } from "../../common/index.js";
 import { Strategy as LocalStrategy } from  'passport-local';
 import {BearerStrategy,ITokenPayload} from "passport-azure-ad";
 import  azconfig from './az-config.json' assert {type: 'json'};
@@ -53,9 +53,9 @@ export class PassportStrategies {
   static JwtAuthHeaderAsBearerTokenStrategy() {
     return new JwtStrategy({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: envConfig.secretKey(),
-      issuer: envConfig.issuer(),
-      audience: envConfig.audience(),
+      secretOrKey: envs.secretKey(),
+      issuer: envs.issuer(),
+      audience: envs.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
       Svc.db.get('account')!.model?.findById(payload.user._id).populate('roles').exec().then((error: any, user?: any, info?:any)=>{
@@ -67,9 +67,9 @@ export class PassportStrategies {
   static JwtQueryParameterStrategy() {
     return new JwtStrategy(
       {
-        secretOrKey: envConfig.jwtSecret(),
-        issuer: envConfig.issuer(),
-         audience: envConfig.audience(),
+        secretOrKey: envs.jwtSecret(),
+        issuer: envs.issuer(),
+         audience: envs.audience(),
         jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
       },
       async (token, done) => {
@@ -83,7 +83,7 @@ export class PassportStrategies {
   }
 
 static getAuthStrategy(){
-    return envConfig.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
+    return envs.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
   }
 }
 

@@ -1,10 +1,14 @@
 import express from 'express';
-import { isValidRole, Svc, responce} from '../../common/index.js';
+import { isValidRole, Svc, responce, envs } from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
+import { authenticateUser } from '../../services/index.js';
 
- class Middlewares implements IMiddlewares {
+class Middlewares implements IMiddlewares {
+
+  authenticate = authenticateUser(envs.authStrategy());
+
 
   async getUserFromReq(req: express.Request) {
     return req.body && req.body.email ? await Svc.db.get('account')!.findOne({ email: req.body.email }) : null;
@@ -51,7 +55,7 @@ import fs from 'fs';
 
   }
 
- async isAdmin(req: any, res: express.Response, next: express.NextFunction) {
+  async isAdmin(req: any, res: express.Response, next: express.NextFunction) {
     return this.isInRole('admin');
 
   }
@@ -96,16 +100,16 @@ import fs from 'fs';
     }
   }
 
- isJson(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  isJson(req: express.Request, res: express.Response, next: express.NextFunction): void {
 
     const toJsonNext = (data: any) => {
-      req.body =  JSON.parse(data);
+      req.body = JSON.parse(data);
       next()
     }
 
     if (req.body && req.header('content-type') === 'application/json') {
-     // toJsonNext(req.body);
-       next();
+      // toJsonNext(req.body);
+      next();
     } else if (req.file && req.file.mimetype === 'application/json') {
 
       fs.readFile(req.file.path, 'utf8', (err: any, data: any) => {
@@ -121,4 +125,4 @@ import fs from 'fs';
     }
   }
 }
- export default new Middlewares();
+export default new Middlewares();

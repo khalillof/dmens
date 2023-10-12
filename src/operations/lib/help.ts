@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+import { IConfigPropsParameters } from '../../interfaces/index.js';
 
 export const typeMappings = {
   "String": mongoose.SchemaTypes.String,
@@ -69,6 +70,16 @@ export const confSchema = {
   },
 };
 
+export const configConfigProp: IConfigPropsParameters = {
+  name: "config",
+  active: true,
+  schemaOptions: { timestamps: true, strict: true },
+  schemaObj: confSchema,
+  useAuth:['search','count','list','get','post','put','delete'],
+  useAdmin: ['search','count','form','list','get','post','put','delete'],
+  middlewares: ['isJson', 'uploadSchema']
+};
+
 export const accConfgSchema = {
   name: "account",
   active: true,
@@ -132,8 +143,9 @@ export const accConfgSchema = {
       }
     ]
   },
-  useAuth: ["list", "get", "post", "put", "delete"],
-  useAdmin: ["list"]
+ // useAuth: ["list", "get", "post", "put", "delete"],
+  useAuth:['search','count','form','route','list','get','post','put','delete'],
+  useAdmin: ["list",'search','count']
 };
 
 

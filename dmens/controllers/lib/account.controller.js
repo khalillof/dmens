@@ -1,12 +1,12 @@
 import { DefaultController } from './default.controller.js';
 import { authenticateUser } from '../../services/index.js';
-import { envConfig } from '../../common/index.js';
+import { envs } from '../../common/index.js';
 export class AccountController extends DefaultController {
     constructor() {
         super('account');
     }
     async secure(req, res, next) {
-        const data = envConfig.getSecret(req.query['api']);
+        const data = envs.getSecret(req.query['api']);
         this.responce(res).data(data);
     }
     async signup(req, res, next) {

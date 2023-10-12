@@ -8,7 +8,7 @@ const isDevelopment = ()=> env['NODE_ENV'] === 'development';
 const getOr = (key:string, or:any=null)=> env[key] ??  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
 
-export const envConfig = {
+export const envs = {
     isDevelopment,
     baseDir,
     getAbsolutePath,
@@ -35,7 +35,7 @@ export const envConfig = {
     issuer:  ()=> getOr('ISSUER'),//'accounts.examplesoft.com',
     audience: ()=> getOr('AUDIENCE'), //'yoursite.net'
     schemaDir: ()=> getOr('SCHEMA_DIR',getAbsolutePath('models/schema')),
-    getSchemaUploadPath: (name:string | any)=> path.join(envConfig.schemaDir(),`${name}.${Date.now()}.json`),
+    getSchemaUploadPath: (name:string | any)=> path.join(envs.schemaDir(),`${name}.${Date.now()}.json`),
     imagesUploadDir: ()=> getOr('IMAGES_UPLOAD_DIR',getAbsolutePath('public/images')),
     allow_origins:()=>  getOr('CORES_DMAINS', [])?.split(',').map((e:string) => e.trim()),
     static_urls:()=>  getOr('STATIC_URL',[])?.split(',').map((e:string) => e.trim()),

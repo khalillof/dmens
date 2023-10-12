@@ -1,9 +1,9 @@
-import { Svc, envConfig } from '../../common/index.js';
+import { Svc, envs } from '../../common/index.js';
 import seeds from '../seeds.json' assert { type: 'json' };
 import { posts } from './posts.js';
 export class ClientSeedDatabase {
     async init() {
-        envConfig.logLine('started database seeding ..!');
+        envs.logLine('started database seeding ..!');
         await this.addRoles(),
             await this.addCateories(),
             await this.addAccounts(),
@@ -11,7 +11,7 @@ export class ClientSeedDatabase {
         await this.addmessages();
         await this.addPosts();
         await this.addComments();
-        envConfig.logLine('finished database seeding ..!');
+        envs.logLine('finished database seeding ..!');
     }
     accountsCache = [];
     async addRoles() {

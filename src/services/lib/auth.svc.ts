@@ -1,14 +1,14 @@
 import passport from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
-import {responce, envConfig, Svc, logger } from "../../common/index.js";
+import {responce, envs, Svc, logger } from "../../common/index.js";
 import { randomUUID } from 'crypto';
 
 const { verify, sign, TokenExpiredError } = jwt;
 
 function getExpiredAt(refersh?: boolean) {
   let expiredAt = new Date();
-  expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? envConfig.jwtRefreshExpiration() : envConfig.jwtExpiration()));
+  expiredAt.setSeconds(expiredAt.getSeconds() + (refersh ? envs.jwtRefreshExpiration() : envs.jwtExpiration()));
   return expiredAt;
 }
 
@@ -38,9 +38,9 @@ function generateJwt(user: any) {
     //console.log('jwtExpiration: '+config.jwtExpiration())
     const body = { _id: user._id, email: user.email };
     const accessTokenExpireAt = getExpiredAt().getTime();
-    const ops = { expiresIn: envConfig.jwtExpiration(), issuer: envConfig.issuer(), audience: envConfig.audience() };
+    const ops = { expiresIn: envs.jwtExpiration(), issuer: envs.issuer(), audience: envs.audience() };
 
-    const accessToken = sign({ user: body }, envConfig.secretKey(), ops);
+    const accessToken = sign({ user: body }, envs.secretKey(), ops);
     return { accessToken, accessTokenExpireAt };
   } catch (err) {
     throw err;
@@ -159,7 +159,7 @@ function reqLogin(user: any, options = { session: false }, both_tokens_required 
 
 // no need for this function just use authenticateUser('jwt)
 function validateJWT(req: any, res: express.Response, next: express.NextFunction) {
-  verify(req.token, envConfig.jwtSecret(), function (err: any, decoded: any) {
+  verify(req.token, envs.jwtSecret(), function (err: any, decoded: any) {
     if (err) {
       /*
         err = {
