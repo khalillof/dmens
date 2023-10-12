@@ -6,7 +6,7 @@
         "put",
         "delete"
     ],
-    "useAdmin": [],
+    "useAdmin": ["list"],
     "schemaObj": {
         "body": {
             "type": "String",

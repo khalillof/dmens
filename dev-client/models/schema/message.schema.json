@@ -6,10 +6,10 @@
         "get",
         "post",
         "put",
-        "delete"
+        "delete","search","count","route"
     ],
     "useAdmin": [
-        "list"
+        "list","search"
     ],
     "schemaObj": {
         "title": {

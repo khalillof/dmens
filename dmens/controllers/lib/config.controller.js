@@ -1,5 +1,5 @@
 import { DefaultController } from './default.controller.js';
-import { Svc, envConfig } from '../../common/index.js';
+import { Svc, envs } from '../../common/index.js';
 import { Operations } from '../../operations/index.js';
 export class ConfigController extends DefaultController {
     constructor(name = 'config') {
@@ -12,14 +12,14 @@ export class ConfigController extends DefaultController {
     async post(req, res) {
         let conf = req.body;
         let result = await Operations.createModelConfigRoute(conf);
-        envConfig.logLine('document created or Overrided :', result.controller?.db.name);
+        envs.logLine('document created or Overrided :', result.controller?.db.name);
         this.responce(res).data(result.controller.db.config.getConfigProps());
     }
     async put(req, res, next) {
         let id = req.params['id'];
         let config = (id && await this.db.findById(id)) || req.body.name && await this.db.findOne({ name: req.body.name });
         let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
-        envConfig.logLine('document created or Overrided :', result.controller?.db.name);
+        envs.logLine('document created or Overrided :', result.controller?.db.name);
         this.responce(res).success();
     }
     async delete(req, res, next) {

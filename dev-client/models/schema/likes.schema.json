@@ -6,7 +6,7 @@
         "put",
         "delete"
     ],
-    "useAdmin": [],
+    "useAdmin": ["list","search"],
     "schemaObj": {
         "like": {
             "type": "Boolean",

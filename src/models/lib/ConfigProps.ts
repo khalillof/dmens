@@ -44,7 +44,7 @@ export class ConfigProps implements IConfigProps {
     // Set will remove diblicate
     return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : []
   }
-  getConfigProps(): IConfigProps {
+  getConfigProps(): IConfigProps { 
     return {
       name: this.name,
       active: this.active,
@@ -60,13 +60,19 @@ export class ConfigProps implements IConfigProps {
   getRoutes(){
   return Svc.routes.getRoutesPathMethods(this.routeName)
   }
+
   async genForm(): Promise<IForm> {
     return await new Form(this).genElements(this)
   }
 
   //check useAuth and useAdmin
-  checkAuth(method: string): Array<boolean> {
-    return [(this.useAuth.indexOf(method) !== -1), (this.useAdmin.indexOf(method) !== -1)
-    ]
+  checkAuth(method: string): string[] {
+    let auths = [];
+    if (this.useAuth.indexOf(method) !== -1)
+        auths.push('isAuthenticated')
+    if (this.useAdmin.indexOf(method) !== -1)
+        auths.push('isAdmin')
+
+    return auths;
   }
 }

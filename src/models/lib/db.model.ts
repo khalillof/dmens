@@ -1,6 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
-import { Svc, envConfig } from '../../common/index.js'
+import { Svc, envs } from '../../common/index.js'
 import { IConfigProps, IConfigPropsParameters, IDbModel} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
@@ -10,7 +10,7 @@ import { autopopulatePlugin } from './autopopulate.js';
 
 export class DbModel implements IDbModel {
 
-  constructor(_config: IConfigPropsParameters | IConfigProps, callback?: any) {
+  constructor(_config: IConfigPropsParameters | IConfigProps ) {
     this.config = (_config instanceof ConfigProps) ? _config: new ConfigProps(_config);
     const {name,schemaObj,schemaOptions} =this.config;
     
@@ -35,9 +35,6 @@ export class DbModel implements IDbModel {
     } else {
       this.model = mongoose.model(this.name, _schema);
     }
-
-    // check callback
-    callback && typeof callback === 'function' && callback(this);
 
     // add to db store
      Svc.db.add(this);
@@ -73,16 +70,16 @@ export class DbModel implements IDbModel {
     let _configDb = Svc.db.get('config')!;
 
     if (!_configDb) {
-      envConfig.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`)
+      envs.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`)
     }
     let one = await _configDb.findOne({ name: this.name });
 
     if (one) {
       await _configDb.putById(one._id,this.config.getConfigProps!());
-      envConfig.logLine('config entery already on database so it has been updated : name: '+ this.name)
+      envs.logLine('config entery already on database so it has been updated : name: '+ this.name)
     } else {
       let rst = await _configDb.create(this.config.getConfigProps!());
-      envConfig.logLine(`created config entry for model name : ${rst.name}`)
+      envs.logLine(`created config entry for model name : ${rst.name}`)
     }
   }
 

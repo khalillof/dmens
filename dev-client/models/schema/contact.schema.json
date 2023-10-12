@@ -6,14 +6,18 @@
     "get",
     "post",
     "put",
-    "delete"
+    "delete",
+    "search",
+    "count"
   ],
   "useAdmin": [
     "list",
     "get",
     "post",
     "put",
-    "delete"
+    "delete",
+    "search",
+    "count"
   ],
   "schemaObj": {
     "contactType": {

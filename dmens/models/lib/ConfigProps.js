@@ -52,7 +52,11 @@ export class ConfigProps {
     }
     //check useAuth and useAdmin
     checkAuth(method) {
-        return [(this.useAuth.indexOf(method) !== -1), (this.useAdmin.indexOf(method) !== -1)
-        ];
+        let auths = [];
+        if (this.useAuth.indexOf(method) !== -1)
+            auths.push('isAuthenticated');
+        if (this.useAdmin.indexOf(method) !== -1)
+            auths.push('isAdmin');
+        return auths;
     }
 }

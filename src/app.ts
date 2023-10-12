@@ -18,7 +18,7 @@ import session from 'express-session';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
-import { envConfig, Svc} from './common/index.js';
+import { envs, Svc} from './common/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
 import { corsWithOptions } from './routes/index.js';
 import { menServer } from './bin/www.js';
@@ -36,11 +36,11 @@ app.use(compression())
 //app.set('views', path.join(config.baseDir, 'views'));
 //app.set('view engine', 'ejs');
 
-const isDevelopment  = envConfig.isDevelopment();
+const isDevelopment  = envs.isDevelopment();
 
 // static urls
-const urls = envConfig.static_urls();
-urls && urls.length && urls.forEach((url: string) => app.use(express.static(path.join(envConfig.baseDir, url))));
+const urls = envs.static_urls();
+urls && urls.length && urls.forEach((url: string) => app.use(express.static(path.join(envs.baseDir, url))));
 
 // request looger using a predefined format string
 app.use(morgan(isDevelopment ? 'dev' : 'combined')) // dev|common|combined|short|tiny
@@ -50,7 +50,7 @@ app.use(morgan(isDevelopment ? 'dev' : 'combined')) // dev|common|combined|short
 await dbInit();
 
 app.use(session({
-  secret: envConfig.secretKey(),
+  secret: envs.secretKey(),
   resave: true,
   saveUninitialized: true,
   cookie: {
@@ -100,7 +100,7 @@ Svc.routes.print();
 await new ClientSeedDatabase().init();
 
 
-!isDevelopment ? await menServer(app, false) : app.listen(envConfig.port(), () => envConfig.logLine(`development server is running on port: ${envConfig.port()}`));
+!isDevelopment ? await menServer(app, false) : app.listen(envs.port(), () => envs.logLine(`development server is running on port: ${envs.port()}`));
 
 
 // remove .env file if exist

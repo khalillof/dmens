@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { dbStore, envConfig } from '../../common/index.js';
+import { dbStore, envs } from '../../common/index.js';
 import { Operations } from '../../operations/index.js';
 /////////////////
 const dbOptions = {
@@ -10,12 +10,12 @@ const dbOptions = {
 };
 export async function dbInit() {
     try {
-        envConfig.logLine('db connction string :' + envConfig.databaseUrl());
-        await mongoose.connect(envConfig.databaseUrl());
+        envs.logLine('db connction string :' + envs.databaseUrl());
+        await mongoose.connect(envs.databaseUrl());
         console.log("Successfully Connected to db!");
         // Create Configration - Account - default directory  db models and routes
         await Operations.create_default_models_routes();
-        envConfig.logLine(`Numbers of models on the database are : ${dbStore.length}`);
+        envs.logLine(`Numbers of models on the database are : ${dbStore.length}`);
     }
     catch (err) {
         console.error(err);

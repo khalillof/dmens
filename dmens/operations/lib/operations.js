@@ -2,45 +2,42 @@
 import { DbModel } from '../../models/lib/db.model.js';
 import path from 'path';
 import fs from 'fs';
-import { Svc, envConfig } from '../../common/index.js';
+import { Svc, envs } from '../../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
-import { confSchema, accConfgSchema, typeMappings } from './help.js';
+import { accConfgSchema, typeMappings, configConfigProp } from './help.js';
 import { DefaultController } from '../../controllers/index.js';
 //=============================================
-export const configConfigProp = {
-    name: "config",
-    active: true,
-    schemaOptions: { timestamps: true, strict: true },
-    schemaObj: confSchema,
-    useAuth: ["list", "get", "post", "put", "delete"],
-    useAdmin: ["list", "get", "post", "put", "delete"],
-    middlewares: ['isJson', 'uploadSchema']
-};
 export class Operations {
     static async create_default_models_routes() {
         // create config model and routes
-        await Operations.createModelInstance(configConfigProp);
+        await Operations.createModelWithConfig(configConfigProp);
         await ConfigRoutes();
         // create account model config and routes
-        await Operations.createModelInstance(accConfgSchema);
+        await Operations.createModelWithConfig(accConfgSchema);
         await AccountRoutes();
         // load models routes from default directory
         return await Operations.createModelsRoutesFromDirectory();
     }
     // ============ DbModel
-    static async createModelInstance(_config, callback) {
-        return Promise.resolve(new DbModel(_config, callback));
+    static async createModelWithConfig(_config) {
+        let _model = new DbModel(_config);
+        await _model.createConfig();
+        return Promise.resolve(_model);
+    }
+    // ===================== Routes
+    static async createRouteInstance(controller, callback) {
+        return Promise.resolve(new DefaultRoutesConfig(controller, callback));
     }
     static async createModelConfigRoute(_config, controller, routeCallback) {
-        let _model = await Operations.createModelInstance(_config);
-        await _model.createConfig();
+        let _model = await Operations.createModelWithConfig(_config);
+        // await _model.createConfig();
         return await Operations.createRouteInstance(controller ?? new DefaultController(_model.name), routeCallback);
     }
     // create or override model config route
     static async overrideModelConfigRoute(_config) {
         let dbName = _config.name;
         if (!dbName || !Svc.db.exist(dbName)) {
-            envConfig.throwErr(' db model name not found');
+            envs.throwErr(' db model name not found');
         }
         // delete model if exists
         Svc.db.delete(dbName);
@@ -74,7 +71,7 @@ export class Operations {
         throw new Error('file should be json and absolute' + filePath);
     }
     // if no directory provided will use default directory
-    static async createModelsRoutesFromDirectory(directory = envConfig.schemaDir()) {
+    static async createModelsRoutesFromDirectory(directory = envs.schemaDir()) {
         if (path.dirname(directory)) {
             return await Promise.all(fs.readdirSync(directory).map(async (fileName) => {
                 let _file = path.join(directory, fileName);
@@ -87,10 +84,6 @@ export class Operations {
         else {
             throw new Error('directory Not Found : ' + directory);
         }
-    }
-    // ===================== Routes
-    static async createRouteInstance(controller, callback) {
-        return Promise.resolve(new DefaultRoutesConfig(controller, callback));
     }
     // helpers :.............................................
     static isJsonFile(file) {

@@ -1,7 +1,7 @@
-import { envConfig } from "../index.js";
-import { dbStore, routeStore } from "./helpers.js";
-import { appRouter } from '../../app.js';
-import pluralize from './pluralize.js';
+import { envs } from "../common/index.js";
+import { dbStore, routeStore } from "../common/lib/helpers.js";
+import { appRouter } from '../app.js';
+import pluralize from '../common/lib/pluralize.js';
 class SvcInstance {
     key;
     objName;
@@ -24,7 +24,7 @@ class SvcInstance {
     add(obj) {
         if (!this.exist(obj.name)) {
             this.obj().push(obj);
-            envConfig.logLine(`just added ( " ${obj[this.key]} " ) to ${this.objName} :`);
+            envs.logLine(`just added ( " ${obj[this.key]} " ) to ${this.objName} :`);
         }
     }
     delete(keyValue) {
@@ -32,7 +32,7 @@ class SvcInstance {
         if (index !== -1)
             this.obj().splice(index, 1);
         ;
-        envConfig.logLine(`just deleted ( " ${this.key} ) from ${this.objName} :`);
+        envs.logLine(`just deleted ( " ${this.key} ) from ${this.objName} :`);
     }
 }
 class RouteSvc extends SvcInstance {
@@ -40,14 +40,14 @@ class RouteSvc extends SvcInstance {
         super('routeName');
     }
     print() {
-        envConfig.logLine(" ***** All app routes *******: \n", this.getAllRoutesToString());
+        envs.logLine(" ***** All app routes *******: \n", this.getAllRoutesToString());
     }
     deleteAppRoute(routePath) {
         let self = this;
         this.routesLoop(routePath, function (item, index) {
             appRouter.stack.splice(index, 1);
             let msg = `route deleted : ${self.getMethod(item.route)} : ${item.route.path} `;
-            envConfig.logLine(msg);
+            envs.logLine(msg);
         });
     }
     getRoutesToString(routeName) {

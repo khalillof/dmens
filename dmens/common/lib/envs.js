@@ -4,16 +4,9 @@ import { fileURLToPath } from 'url';
 const __dirname = fileURLToPath(import.meta.url);
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib', '').replace('common', ''));
 const isDevelopment = () => env['NODE_ENV'] === 'development';
-function devOrProd(dev, prod, or = baseDir) {
-    return isDevelopment() ? getOr(dev, or) : getOr(prod, or);
-}
-function getOr(key, or = null) {
-    return env[key] ?? or;
-}
-function getAbsolutePath(p) {
-    return path.join(baseDir, p);
-}
-export const config = {
+const getOr = (key, or = null) => env[key] ?? or;
+const getAbsolutePath = (p) => path.join(baseDir, p);
+export const envs = {
     isDevelopment,
     baseDir,
     getAbsolutePath,
@@ -31,7 +24,6 @@ export const config = {
             throw new Error(`>>> ${authStr} : >>>  auth strategy does not exist`);
         }
     },
-    useAuth: () => getOr('AUTH', true),
     useCore: () => getOr('USE_CORES', true),
     secretKey: () => getOr('SECRET_KEY', ' '),
     jwtSecret: () => getOr('JWT_SECRET', ' '),
@@ -40,14 +32,15 @@ export const config = {
     issuer: () => getOr('ISSUER'),
     audience: () => getOr('AUDIENCE'),
     schemaDir: () => getOr('SCHEMA_DIR', getAbsolutePath('models/schema')),
-    getSchemaUploadPath: (name) => path.join(config.schemaDir(), `${name}.${Date.now()}.json`),
+    getSchemaUploadPath: (name) => path.join(envs.schemaDir(), `${name}.${Date.now()}.json`),
     imagesUploadDir: () => getOr('IMAGES_UPLOAD_DIR', getAbsolutePath('public/images')),
     allow_origins: () => getOr('CORES_DMAINS', [])?.split(',').map((e) => e.trim()),
     static_urls: () => getOr('STATIC_URL', [])?.split(',').map((e) => e.trim()),
     databaseUrl: () => getOr('DATABASE_URL'),
-    facebook: {
-        'clientId': () => getOr('FACEBOOK_CLIENT_ID', ' '),
-        'clientSecret': () => getOr('FACEBOOK_CLIENT_SECRET', ' '),
-        'callbackUrl': () => getOr('FACEBOOK_CALLBACK_URL', ''),
+    logLine: (...args) => {
+        console.log('================================================>>> \n', ...args);
+    },
+    throwErr: (msg = "unknown error") => {
+        throw new Error(msg);
     }
 };

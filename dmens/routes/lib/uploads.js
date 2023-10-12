@@ -1,5 +1,5 @@
 import path from 'path';
-import { envConfig } from '../../common/index.js';
+import { envs } from '../../common/index.js';
 import multer from 'multer';
 function setMulter(uploadDir, filterCallback, fieldsNum = 1) {
     return multer({
@@ -35,11 +35,11 @@ function errCallback(req, res, err) {
     }
 }
 function uploadSchema(req, res, next) {
-    return setMulter(envConfig.schemaDir(), schemaFilter).single('schema')(req, res, (err) => err ? errCallback(req, res, err) : next());
+    return setMulter(envs.schemaDir(), schemaFilter).single('schema')(req, res, (err) => err ? errCallback(req, res, err) : next());
 }
 ;
 function uploadImages(req, res, next) {
-    return setMulter(envConfig.imagesUploadDir(), imagesFilter, 10).array('photos', 10)(req, res, (err) => err ? errCallback(req, res, err) : next());
+    return setMulter(envs.imagesUploadDir(), imagesFilter, 10).array('photos', 10)(req, res, (err) => err ? errCallback(req, res, err) : next());
 }
 ;
 export { uploadImages, uploadSchema };
