@@ -2,6 +2,17 @@ name: Publish Package to npmjs
 on:
   release:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'log level manual'
+        required: true
+        default: warning
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
 jobs:
   build:
     runs-on: ubuntu-latest
