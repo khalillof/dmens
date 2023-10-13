@@ -24,15 +24,15 @@ export class DefaultRoutesConfig {
         // this.app.use(this.router)
     }
     // custom routes
-    async buidRoute(routeName, method, actionName, middlewares = []) {
-        if (!routeName)
+    async buidRoute(route_name, method, actionName, middlewares = []) {
+        if (!route_name)
             throw new Error('buildRoute method require url or routeName');
         // add auth methods to the end of middlewares
         middlewares = [...middlewares, ...this.controller?.db.config.checkAuth(method ?? actionName)];
         // map middlewares string fuction names to actual functions
         let mdwrs = this.mware;
         let mdwares = middlewares.map((m) => mdwrs[m]);
-        return this.router[((method === 'list') ? 'get' : method)](routeName, ...mdwares, this.actions(actionName ?? method));
+        return this.router[((method === 'list') ? 'get' : method)](route_name, ...mdwares, this.actions(actionName ?? method));
     }
     setOptions(routPath) {
         this.router.options(routPath, corsWithOptions);

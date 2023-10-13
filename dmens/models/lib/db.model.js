@@ -4,7 +4,7 @@ import { Svc, envs } from '../../common/index.js';
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
-import { ConfigProps } from './ConfigProps.js';
+import { ConfigProps } from './config.props.js';
 import { autopopulatePlugin } from './autopopulate.js';
 export class DbModel {
     constructor(_config) {
