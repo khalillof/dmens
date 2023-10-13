@@ -34,8 +34,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
 
   // custom routes
-  async buidRoute(routeName: string, method: string, actionName?: string | null, middlewares: string[] = []) {
-    if (!routeName)
+  async buidRoute(route_name: string, method: string, actionName?: string | null, middlewares: string[] = []) {
+    if (!route_name)
       throw new Error('buildRoute method require url or routeName')
     
     // add auth methods to the end of middlewares
@@ -45,7 +45,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     let mdwrs: any = this.mware!;
     let mdwares: Function[] = middlewares.map((m) => mdwrs[m]);
 
-    return this.router[((method === 'list') ? 'get' : method)](routeName, ...mdwares, this.actions(actionName ?? method))
+    
+    return this.router[((method === 'list') ? 'get' : method)](route_name, ...mdwares, this.actions(actionName ?? method))
   }
 
   setOptions(routPath: string) {

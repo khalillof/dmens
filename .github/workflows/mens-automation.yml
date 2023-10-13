@@ -11,7 +11,17 @@ on:
     types:
       - closed
   # Allow mannually trigger 
-  #workflow_dispatch:      
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'workflow dispatch log level manual'
+        required: true
+        default: warning
+        type: choice
+        options:
+          - info
+          - warning
+          - debug      
 
 jobs:
   analyze:
