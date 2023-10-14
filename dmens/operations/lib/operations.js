@@ -73,7 +73,7 @@ export class Operations {
     }
     // if no directory provided will use default directory
     static async createModelsRoutesFromDirectory(directory = envs.schemaDir()) {
-        if (path.dirname(directory)) {
+        if (fs.existsSync(directory)) {
             return await Promise.all(fs.readdirSync(directory).map(async (fileName) => {
                 let _file = path.join(directory, fileName);
                 if (Operations.isJsonFile(_file)) {
@@ -83,7 +83,9 @@ export class Operations {
             }));
         }
         else {
-            throw new Error('directory Not Found : ' + directory);
+            //throw new Error('directory Not Found : ' + directory);
+            envs.logLine(`(( createModelsRoutesFromDirectory )) => Directory not found : ${directory}`);
+            return null;
         }
     }
     // helpers :.............................................
