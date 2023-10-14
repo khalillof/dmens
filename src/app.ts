@@ -1,13 +1,17 @@
 "use strict";
+import {env} from 'process';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import dotenv from 'dotenv';
 
-export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'test.env');
+const envFileName = env['NODE_ENV'] === 'production' ? '.env' : 'test.env';
+
+export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), envFileName);
+
 if (!fs.existsSync(envPath)) {
-  throw new Error('enviroment file not  found');
+  throw new Error('enviroment file not  found :'+envFileName);
 }
 // load envirmoment vars
 dotenv.config({ path: envPath });
