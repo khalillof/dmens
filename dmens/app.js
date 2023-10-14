@@ -75,7 +75,7 @@ app.use(function (err, req, res, next) {
 // print routes
 Svc.routes.print();
 // seed database
-await new ClientSeedDatabase().init();
+await new ClientSeedDatabase().init(isDevelopment);
 !isDevelopment ? await menServer(app, false) : app.listen(envs.port(), () => envs.logLine(`development server is running on port: ${envs.port()}`));
 // remove .env file if exist
 if (!isDevelopment && fs.existsSync(envPath)) {

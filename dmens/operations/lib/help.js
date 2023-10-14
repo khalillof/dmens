@@ -73,6 +73,26 @@ export const configConfigProp = {
     useAdmin: ['search', 'count', 'form', 'list', 'get', 'post', 'put', 'delete'],
     middlewares: ['isJson', 'uploadSchema']
 };
+export const roleConfigSchema = {
+    name: "role",
+    active: true,
+    useAuth: ["search", "count", "form", "route", "list", "get", "post", "put", "delete"
+    ],
+    useAdmin: ["search", "count", "form", "route", "list", "get", "post", "put", "delete"
+    ],
+    schemaObj: {
+        "name": {
+            "type": "String",
+            "unique": true,
+            "lowercase": true,
+            "required": true,
+            "minLength": 3,
+            "maxLength": 30,
+            "tagName": "input",
+            "className": "form-control"
+        }
+    }
+};
 export const accConfgSchema = {
     name: "account",
     active: true,

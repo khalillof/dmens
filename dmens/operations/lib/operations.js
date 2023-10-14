@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { Svc, envs } from '../../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
-import { accConfgSchema, typeMappings, configConfigProp } from './help.js';
+import { accConfgSchema, typeMappings, configConfigProp, roleConfigSchema } from './help.js';
 import { DefaultController } from '../../controllers/index.js';
 //=============================================
 export class Operations {
@@ -12,6 +12,8 @@ export class Operations {
         // create config model and routes
         await Operations.createModelWithConfig(configConfigProp);
         await ConfigRoutes();
+        // create account roles
+        await Operations.createModelConfigRoute(roleConfigSchema);
         // create account model config and routes
         await Operations.createModelWithConfig(accConfgSchema);
         await AccountRoutes();
@@ -30,7 +32,6 @@ export class Operations {
     }
     static async createModelConfigRoute(_config, controller, routeCallback) {
         let _model = await Operations.createModelWithConfig(_config);
-        // await _model.createConfig();
         return await Operations.createRouteInstance(controller ?? new DefaultController(_model.name), routeCallback);
     }
     // create or override model config route

@@ -8,17 +8,20 @@ type dbCallback = {
 }
 export class ClientSeedDatabase {
 
-    async init() {
+    async init(dev=true) {
         envs.logLine('started database seeding ..!');
-
-        await this.addRoles(),
-        await this.addCateories(),
-        await this.addAccounts(),
-        await this.addContacts()
+       if(dev){
+        await this.addRoles();
+        await this.addAccounts();
+        await this.addCateories();
+        await this.addContacts();
         await this.addmessages();
-        await this.addPosts()
+        await this.addPosts();
         await this.addComments(); 
-         
+       }else{
+        await this.addRoles();
+        await this.addAccounts();
+       }
         envs.logLine('finished database seeding ..!');
     }
     accountsCache: any[] = [];
