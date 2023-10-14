@@ -1,6 +1,6 @@
 #!/bin/sh
 
-envFile=/home/node/app/.env
+envFile=/home/node/app/dmens/.env
 
 touch $envFile
 

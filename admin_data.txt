@@ -10,7 +10,7 @@ docker run --env-file ./dev-client/.env  -it --rm tuban/test:latest
 
 # run container with .env file variables and mounted volume
 docker run --env-file ./dev-client/.env -v C:\Users\Win_Ins_Mode\Desktop\github-apps\javascript\api-express\dev-client\models\schema:/home/node/app/models/schema -it --rm tuban/test:latest
-
+docker run --env-file ./dev-client/.env -v C:\Users\Win_Ins_Mode\Desktop\javascript\api-express\dev-client\models\schema:/home/node/app/models/schema -it --rm tuban/dmens:latest
 # print out container enviroments variables
  docker exec container-name-id /usr/bin/env
 
