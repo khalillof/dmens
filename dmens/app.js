@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 const envFileName = env['NODE_ENV'] === 'production' ? '.env' : 'test.env';
 export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), envFileName);
 if (!fs.existsSync(envPath)) {
-    throw new Error('enviroment file not  found :' + env['NODE_ENV']);
+    throw new Error('enviroment file not  found :' + envFileName);
 }
 // load envirmoment vars
 dotenv.config({ path: envPath });

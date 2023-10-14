@@ -54,7 +54,7 @@ export class ConfigProps {
     checkAuth(method) {
         let auths = [];
         if (this.useAuth.indexOf(method) !== -1)
-            auths.push('isAuthenticated');
+            auths.push('authenticate');
         if (this.useAdmin.indexOf(method) !== -1)
             auths.push('isAdmin');
         return auths;
