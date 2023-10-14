@@ -1,6 +1,6 @@
 import express from 'express';
 import { logger, responce, Assert, Svc } from '../../common/index.js';
-import { Ilogger, Iresponce, IController, IDbModel } from '../../interfaces/index.js';
+import { Ilogger, Iresponce, IController, IDbModel, IRequestFilter } from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
   db: IDbModel;
@@ -51,10 +51,10 @@ export class DefaultController implements IController {
 
   }
 
-  getQueryData(filter: Record<string, string | any>): any {
+  getQueryData(filter: Record<string, any>): IRequestFilter {
 
     if (!filter) {
-      return {}
+      return {};
     }
 
     let _limit = filter['limit'], _page = filter['page'], _sort = filter['sort'], _total = filter['total'];
@@ -68,17 +68,18 @@ export class DefaultController implements IController {
     page && (delete filter['page'])
     sort && (delete filter['sort'])
     total && (delete filter['total'])
-
+   
     return { filter, limit, page, sort, total };
   }
 
   async list(req: express.Request, res: express.Response, next: express.NextFunction) {
     let { filter, limit, page, sort, total } = this.getQueryData(req.query)
     let items = await this.db.Tolist(filter, limit, page, sort);
-    total && (total = await this.db.model?.countDocuments(filter));
+    let _total = total ? await this.db.model?.countDocuments(filter) : undefined;
+
     // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
 
-    this.responce(res).data(items, undefined, total)
+    this.responce(res).data(items, undefined, _total)
   }
 
   async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {

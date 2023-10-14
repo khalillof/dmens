@@ -55,9 +55,9 @@ export class DefaultController {
     async list(req, res, next) {
         let { filter, limit, page, sort, total } = this.getQueryData(req.query);
         let items = await this.db.Tolist(filter, limit, page, sort);
-        total && (total = await this.db.model?.countDocuments(filter));
+        let _total = total ? await this.db.model?.countDocuments(filter) : undefined;
         // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
-        this.responce(res).data(items, undefined, total);
+        this.responce(res).data(items, undefined, _total);
     }
     async getOne(req, res, next) {
         let q = req.params['id'] ? { _id: req.params['id'] } : req.query;
