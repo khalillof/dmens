@@ -33,4 +33,4 @@ head -2 $envFile
 #mv .env ./client
 #echo  $envFile
 sleep 1
-npm run init
+npm start

@@ -1,5 +1,13 @@
-import express, { Application, IRoute, IRouter } from 'express'
+import express, { IRoute, IRouter } from 'express'
 import { Model } from 'mongoose';
+
+export interface IRequestFilter { 
+  filter?:Record<string, any> 
+  limit?:number
+  page?:number
+  sort?:number
+  total?:boolean 
+}
 
 export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 export interface IForm {
