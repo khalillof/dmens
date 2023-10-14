@@ -97,7 +97,7 @@ app.use(function (err: any, req: express.Request, res: express.Response, next: e
 Svc.routes.print();
 
 // seed database
-await new ClientSeedDatabase().init();
+ await new ClientSeedDatabase().init(isDevelopment);
 
 
 !isDevelopment ? await menServer(app, false) : app.listen(envs.port(), () => envs.logLine(`development server is running on port: ${envs.port()}`));
