@@ -70,7 +70,7 @@ export interface IConfigProps {
   getConfigProps?(): IConfigProps
   genForm?(): Promise<IForm>
   //check useAuth and useAdmin
-  checkAuth?(method: string): string[]
+  checkAuthGetMiddlewares?(actionName: string): string[]
 };
 
 export interface IDbModel {
@@ -80,7 +80,8 @@ export interface IDbModel {
   count: number
 
   initPostDatabaseSeeding(): Promise<any>;
-
+  createConfig(): Promise<any>;
+  
   Tolist(filter?: Record<string, any>, limit?: number, page?: number, sort?: number): Promise<any[]>;
   findById(id: string): Promise<any>
   findOne(filter: Record<string, any>): Promise<any>;

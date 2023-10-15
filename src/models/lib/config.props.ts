@@ -65,14 +65,15 @@ export class ConfigProps implements IConfigProps {
     return await new Form(this).genElements(this)
   }
 
-  //check useAuth and useAdmin
-  checkAuth(method: string): string[] {
-    let auths = [];
-    if (this.useAuth.indexOf(method) !== -1)
-        auths.push('authenticate')
-    if (this.useAdmin.indexOf(method) !== -1)
-        auths.push('isAdmin')
+  //check useAuth and useAdmin and return full list of middlewares
+  checkAuthGetMiddlewares(actionName: string): string[] {
 
-    return auths;
+    if (this.useAuth.indexOf(actionName) !== -1)
+        this.middlewares.push('authenticate')
+    if (this.useAdmin.indexOf(actionName) !== -1)
+        this.middlewares.push('isAdmin')
+
+    return this.middlewares;
   }
+
 }

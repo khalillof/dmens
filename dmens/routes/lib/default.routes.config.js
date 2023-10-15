@@ -21,18 +21,17 @@ export class DefaultRoutesConfig {
         typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
         // add instance to routeStore
         Svc.routes.add(this);
-        // this.app.use(this.router)
     }
     // custom routes
-    async buidRoute(route_name, method, actionName, middlewares = []) {
-        if (!route_name)
+    async buidRoute(route_path, method, actionName, middlewares = []) {
+        if (!route_path)
             throw new Error('buildRoute method require url or routeName');
-        // add auth methods to the end of middlewares
-        middlewares = [...middlewares, ...this.controller?.db.config.checkAuth(method ?? actionName)];
-        // map middlewares string fuction names to actual functions
+        // remove diplicates
+        middlewares = Array.from(new Set([...middlewares, ...this.controller?.db.config.checkAuthGetMiddlewares(actionName ?? method)]));
         let mdwrs = this.mware;
+        // map middlewares string fuction names to actual functions
         let mdwares = middlewares.map((m) => mdwrs[m]);
-        return this.router[((method === 'list') ? 'get' : method)](route_name, ...mdwares, this.actions(actionName ?? method));
+        return this.router[((method === 'list') ? 'get' : method)](route_path, ...mdwares, this.actions(actionName ?? method));
     }
     setOptions(routPath) {
         this.router.options(routPath, corsWithOptions);
