@@ -69,16 +69,16 @@ export const configConfigProp = {
     active: true,
     schemaOptions: { timestamps: true, strict: true },
     schemaObj: confSchema,
-    useAuth: ['search', 'count', 'list', 'get', 'post', 'put', 'delete'],
-    useAdmin: ['search', 'count', 'form', 'list', 'get', 'post', 'put', 'delete'],
+    useAuth: ['search', 'count', 'routes', 'list', 'get', 'post', 'put', 'delete'],
+    useAdmin: ['search', 'count', 'routes', 'list', 'get', 'post', 'put', 'delete'],
     middlewares: ['isJson', 'uploadSchema']
 };
 export const roleConfigSchema = {
     name: "role",
     active: true,
-    useAuth: ["search", "count", "form", "route", "list", "get", "post", "put", "delete"
+    useAuth: ["search", "count", "list", "get", "post", "put", "delete"
     ],
-    useAdmin: ["search", "count", "form", "route", "list", "get", "post", "put", "delete"
+    useAdmin: ["search", "count", "list", "get", "post", "put", "delete"
     ],
     schemaObj: {
         "name": {
@@ -155,7 +155,6 @@ export const accConfgSchema = {
             }
         ]
     },
-    // useAuth: ["list", "get", "post", "put", "delete"],
     useAuth: ['search', 'count', 'form', 'route', 'list', 'get', 'post', 'put', 'delete'],
     useAdmin: ["list", 'search', 'count']
 };

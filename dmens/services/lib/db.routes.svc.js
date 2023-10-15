@@ -1,7 +1,7 @@
-import { envs } from "../common/index.js";
-import { dbStore, routeStore } from "../common/lib/helpers.js";
-import { appRouter } from '../app.js';
-import pluralize from '../common/lib/pluralize.js';
+import { envs } from "../../common/index.js";
+import { dbStore, routeStore } from "../../common/lib/helpers.js";
+import { appRouter } from '../../app.js';
+import pluralize from '../../common/lib/pluralize.js';
 class SvcInstance {
     key;
     objName;

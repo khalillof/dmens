@@ -1,8 +1,8 @@
-import { IDbModel, IDefaultRoutesConfig, ISvc, ISvcIntance, IRouteSvc } from "../interfaces/index.js";
-import { envs } from "../common/index.js";
-import { dbStore, routeStore } from "../common/lib/helpers.js";
-import { appRouter } from '../app.js'
-import pluralize from '../common/lib/pluralize.js';
+import { IDbModel, IDefaultRoutesConfig, ISvc, ISvcIntance, IRouteSvc } from "../../interfaces/index.js";
+import { envs } from "../../common/index.js";
+import { dbStore, routeStore } from "../../common/lib/helpers.js";
+import { appRouter } from '../../app.js'
+import pluralize from '../../common/lib/pluralize.js';
 import { IRoute } from "express";
 
 class SvcInstance<T> implements ISvcIntance<T> {

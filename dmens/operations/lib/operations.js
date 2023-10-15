@@ -18,13 +18,23 @@ export class Operations {
         await Operations.createModelWithConfig(accConfgSchema);
         await AccountRoutes();
         // load models routes from default directory
-        return await Operations.createModelsRoutesFromDirectory();
+        await Operations.createModelsRoutesFromDirectory();
+        // create models routes from default db
+        await Operations.createModelsRoutesFromDb();
     }
     // ============ DbModel
-    static async createModelWithConfig(_config) {
+    static async createModelInstance(_config) {
         let _model = new DbModel(_config);
-        await _model.createConfig();
         return Promise.resolve(_model);
+    }
+    static async createModelWithConfig(_config) {
+        let _model = await Operations.createModelInstance(_config);
+        await Operations.createConfig(_model);
+        return _model;
+    }
+    // ============ Config
+    static async createConfig(db) {
+        return await db.createConfig();
     }
     // ===================== Routes
     static async createRouteInstance(controller, callback) {
@@ -33,6 +43,17 @@ export class Operations {
     static async createModelConfigRoute(_config, controller, routeCallback) {
         let _model = await Operations.createModelWithConfig(_config);
         return await Operations.createRouteInstance(controller ?? new DefaultController(_model.name), routeCallback);
+    }
+    // create model route from config 
+    static async createModelsRoutesFromDb() {
+        let allDbConfigs = await Svc.db.get('config').model.find();
+        allDbConfigs = allDbConfigs.filter((p) => !Svc.db.exist(p.name));
+        if (allDbConfigs.length)
+            for await (let config of allDbConfigs) {
+                await Operations.createModelInstance(config);
+                await Operations.createRouteInstance(new DefaultController(config.name));
+            }
+        ;
     }
     // create or override model config route
     static async overrideModelConfigRoute(_config) {

@@ -29,24 +29,23 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
     // add instance to routeStore
     Svc.routes.add(this);
-    // this.app.use(this.router)
+
   }
 
 
   // custom routes
-  async buidRoute(route_name: string, method: string, actionName?: string | null, middlewares: string[] = []) {
-    if (!route_name)
+  async buidRoute(route_path: string, method: string, actionName?: string | null, middlewares: string[] = []) {
+    if (!route_path)
       throw new Error('buildRoute method require url or routeName')
-    
-    // add auth methods to the end of middlewares
-    middlewares = [...middlewares,...this.controller?.db.config.checkAuth!(method ?? actionName)]
 
-    // map middlewares string fuction names to actual functions
+   // remove diplicates
+    middlewares = Array.from(new Set([...middlewares,...this.controller?.db.config.checkAuthGetMiddlewares!(actionName ?? method)]));
+    
     let mdwrs: any = this.mware!;
+     // map middlewares string fuction names to actual functions
     let mdwares: Function[] = middlewares.map((m) => mdwrs[m]);
 
-    
-    return this.router[((method === 'list') ? 'get' : method)](route_name, ...mdwares, this.actions(actionName ?? method))
+    return this.router[((method === 'list') ? 'get' : method)](route_path, ...mdwares, this.actions(actionName ?? method))
   }
 
   setOptions(routPath: string) {

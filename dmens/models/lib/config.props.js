@@ -50,13 +50,12 @@ export class ConfigProps {
     async genForm() {
         return await new Form(this).genElements(this);
     }
-    //check useAuth and useAdmin
-    checkAuth(method) {
-        let auths = [];
-        if (this.useAuth.indexOf(method) !== -1)
-            auths.push('authenticate');
-        if (this.useAdmin.indexOf(method) !== -1)
-            auths.push('isAdmin');
-        return auths;
+    //check useAuth and useAdmin and return full list of middlewares
+    checkAuthGetMiddlewares(actionName) {
+        if (this.useAuth.indexOf(actionName) !== -1)
+            this.middlewares.push('authenticate');
+        if (this.useAdmin.indexOf(actionName) !== -1)
+            this.middlewares.push('isAdmin');
+        return this.middlewares;
     }
 }
