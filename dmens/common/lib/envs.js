@@ -35,7 +35,7 @@ export const envs = {
     getSchemaUploadPath: (name) => path.join(envs.schemaDir(), `${name}.${Date.now()}.json`),
     imagesUploadDir: () => getOr('IMAGES_UPLOAD_DIR', getAbsolutePath('public/images')),
     allow_origins: () => getOr('CORES_DMAINS', [])?.split(',').map((e) => e.trim()),
-    static_urls: () => getOr('STATIC_URL', [])?.split(',').map((e) => e.trim()),
+    static_url: () => getOr('STATIC_URL', undefined),
     databaseUrl: () => getOr('DATABASE_URL'),
     logLine: (...args) => {
         console.log('================================================>>> \n', ...args);

@@ -5,10 +5,10 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import dotenv from 'dotenv';
-
+const baseUrl = path.dirname(fileURLToPath(import.meta.url));
 const envFileName = env['NODE_ENV'] === 'production' ? '.env' : 'test.env';
 
-export const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), envFileName);
+export const envPath = path.join(baseUrl, envFileName);
 
 if (!fs.existsSync(envPath)) {
   throw new Error('enviroment file not  found :'+envFileName);
@@ -43,9 +43,19 @@ app.use(compression())
 const isDevelopment  = envs.isDevelopment();
 
 // static urls
-const urls = envs.static_urls();
-urls && urls.length && urls.forEach((url: string) => app.use(express.static(path.join(envs.baseDir, url))));
+let staticUrl = envs.static_url();
 
+if(staticUrl){
+  let staticBaseUrl = path.join(baseUrl,staticUrl)
+ app.use(express.static(staticBaseUrl))
+// handel spa fallback
+
+app.get(' ',(req, res, next) => {
+  
+  res.sendFile(path.join(staticBaseUrl,'/index.html'));
+});
+
+}
 // request looger using a predefined format string
 app.use(morgan(isDevelopment ? 'dev' : 'combined')) // dev|common|combined|short|tiny
 
