@@ -38,7 +38,7 @@ export const envs = {
     getSchemaUploadPath: (name:string | any)=> path.join(envs.schemaDir(),`${name}.${Date.now()}.json`),
     imagesUploadDir: ()=> getOr('IMAGES_UPLOAD_DIR',getAbsolutePath('public/images')),
     allow_origins:()=>  getOr('CORES_DMAINS', [])?.split(',').map((e:string) => e.trim()),
-    static_urls:()=>  getOr('STATIC_URL',[])?.split(',').map((e:string) => e.trim()),
+    static_url:()=>  getOr('STATIC_URL',undefined),
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
 
   logLine:(...args: any[])=>{

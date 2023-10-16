@@ -11,7 +11,7 @@ COPY  ./dmens ./dmens
 COPY  ./create-env-file.sh .
 COPY  ./package-lock.json .
 COPY  ./package.json .
-RUN npm ci  --only=production
+RUN npm ci  --only=production --omit=dev
 
 ################################### stage two
 FROM node:18.9-alpine3.15

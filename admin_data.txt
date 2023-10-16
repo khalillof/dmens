@@ -11,6 +11,10 @@ docker run --env-file ./dev-client/.env  -it --rm tuban/test:latest
 # run container with .env file variables and mounted volume
 docker run --env-file ./dev-client/.env -v C:\Users\Win_Ins_Mode\Desktop\github-apps\javascript\api-express\dev-client\models\schema:/home/node/app/models/schema -it --rm tuban/test:latest
 docker run --env-file ./dev-client/.env -v C:\Users\Win_Ins_Mode\Desktop\javascript\api-express\dev-client\models\schema:/home/node/app/models/schema -it --rm tuban/dmens:latest
+docker image build ./  --tag tuban/local/dmens:latest
+# docker run with host
+docker run --env-file ./.env --add-host="mongodb:192.168.1.6" -p 8000:8000 -it --rm tuban/client/dmens:latest
+
 # print out container enviroments variables
  docker exec container-name-id /usr/bin/env
 
