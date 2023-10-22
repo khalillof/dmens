@@ -52,7 +52,8 @@ export const responce = (res: express.Response, cb?: Function) => {
     errCb: (error: any, cb: Function) => error ? self.error(error) : self.callback(cb),
     errSuccess: (error: any) => error ? self.error(error) : self.success(),
     callback: (cb: Function, obj?: any) => cb && typeof cb === 'function' ? cb(obj) : false,
-    json: (obj: {}) => res.json(obj)
+    json: (obj: {}) => res.json(obj),
+    ok:()=> res.status(200)
   }
 
   return self;

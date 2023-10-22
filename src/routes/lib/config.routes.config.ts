@@ -7,6 +7,7 @@ export async function ConfigRoutes(){
     return  new DefaultRoutesConfig(new ConfigController(),
    async function (this:IDefaultRoutesConfig) {
       await  this.buidRoute(this.routeName+'/routes', 'list', 'routes', ['authenticate', 'isAdmin'])
+      await  this.buidRoute(this.routeName+'/delete/route', 'delete', 'deleteRoute', ['authenticate', 'isAdmin'])
        await this.defaultRoutes()
         
     }

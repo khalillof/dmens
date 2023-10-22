@@ -10,11 +10,18 @@ export class ConfigController extends DefaultController {
         super(name)
     }
 
-    async routes(req: express.Request, res: express.Response, next: express.NextFunction){
+    async routes(req: express.Request, res: express.Response, next: express.NextFunction) {
         let routes = Svc.routes.getRoutesPathMethods()
         this.responce(res).data(routes)
+    }
+    async deleteRoute(req: express.Request, res: express.Response, next: express.NextFunction) {
+        if (!req.query && !req.query['path'] && !(typeof req.query['path'] === 'string')) {
+            return this.responce(res).badRequest('require query string path');
         }
-
+        let routes = Svc.routes.deleteRoutePath(req.query['path'] as string)
+        this.responce(res).success()
+    }
+    
     override  async post(req: express.Request, res: express.Response) {
         let conf: IConfigPropsParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
@@ -43,10 +50,10 @@ export class ConfigController extends DefaultController {
             // delete config record on database
             await this.db.deleteById(id);
             // if there is db deleted
-            Svc.db.delete(item.name) 
-     
-            // delete route
-            Svc.routes.delete(item.routeName) 
+            Svc.db.delete(item.name)
+
+            // delete app route
+            Svc.routes.deleteAppRoute(item.routeName)
 
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
             this.responce(res).success()
