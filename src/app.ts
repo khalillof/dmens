@@ -123,5 +123,5 @@ if (!isDevelopment && fs.existsSync(envPath)) {
   console.log('.env file will be removed')
 }
 
- //let ddd = await Svc.db.get('post')!.config.genForm!()
- //console.log('first object ..............\n',ddd.elements['category'])
+  //Svc.routes.deleteAppRoute('/roles')
+

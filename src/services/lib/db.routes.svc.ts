@@ -51,15 +51,28 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
     print(){
     envs.logLine(" ***** All app routes *******: \n",this.getAllRoutesToString())
     }
-    deleteAppRoute(routePath: string) { // '/roles'
-        let self = this;
-        this.routesLoop(routePath, function (item: any, index: number) {
-            appRouter.stack.splice(index, 1);
-            let msg =`route deleted : ${self.getMethod(item.route)} : ${item.route.path} `
+    deleteAppRoute(routeName: string, ) { // '/roles'
+        this.routesLoop(routeName,  (item: any, index: number)=> {
+            appRouter.stack.splice(index, 1); 
+            let msg =`route deleted : ${this.getMethod(item.route)} : ${item.route.path} `
             envs.logLine(msg)
+        })
+        
+        // delete route object Default.ConfigRoute
+        this.delete(routeName)
+    }
+
+    deleteRoutePath(routePath: string) { // '/roles'
+        this.routesLoop(routePath,  (item: any, index: number)=> {
+            if (item && item.route.path === routePath) {
+                appRouter.stack.splice(index, 1); 
+                let msg =`route path deleted : ${this.getMethod(item.route)} : ${item.route.path} `
+                envs.logLine(msg)
+            }
         })
 
     }
+
     getRoutesToString(routeName: string): string {
         return routeName ? this.ToString(this.getRoutesPathMethods(routeName)) : "";
     }
@@ -118,8 +131,8 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
                 callback(item, index)
             }
         }
-
-    }
+  
+    } 
 }
 
 class Svc implements ISvc {

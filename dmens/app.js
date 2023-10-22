@@ -42,9 +42,6 @@ if (staticUrl) {
     app.get(' ', (req, res, next) => {
         res.sendFile(path.join(staticBaseUrl, '/index.html'));
     });
-    console.log('staticUrl :', staticUrl);
-    console.log('baseUrl :', baseUrl);
-    console.log('staticBaseUrl :', staticBaseUrl);
 }
 // request looger using a predefined format string
 app.use(morgan(isDevelopment ? 'dev' : 'combined')); // dev|common|combined|short|tiny

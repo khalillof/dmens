@@ -42,12 +42,22 @@ class RouteSvc extends SvcInstance {
     print() {
         envs.logLine(" ***** All app routes *******: \n", this.getAllRoutesToString());
     }
-    deleteAppRoute(routePath) {
-        let self = this;
-        this.routesLoop(routePath, function (item, index) {
+    deleteAppRoute(routeName) {
+        this.routesLoop(routeName, (item, index) => {
             appRouter.stack.splice(index, 1);
-            let msg = `route deleted : ${self.getMethod(item.route)} : ${item.route.path} `;
+            let msg = `route deleted : ${this.getMethod(item.route)} : ${item.route.path} `;
             envs.logLine(msg);
+        });
+        // delete route object Default.ConfigRoute
+        this.delete(routeName);
+    }
+    deleteRoutePath(routePath) {
+        this.routesLoop(routePath, (item, index) => {
+            if (item && item.route.path === routePath) {
+                appRouter.stack.splice(index, 1);
+                let msg = `route path deleted : ${this.getMethod(item.route)} : ${item.route.path} `;
+                envs.logLine(msg);
+            }
         });
     }
     getRoutesToString(routeName) {

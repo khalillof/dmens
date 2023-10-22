@@ -24,7 +24,9 @@ export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
   print(): void
   getRoutes(routePath?: string): IRoute[]
   getRoutesPathMethods(routeName?: string): { method: string, path: string }[]
+
   deleteAppRoute(routePath: string): void
+  deleteRoutePath(routePath: string):void 
 
   getRoutesToString(routeName: string): string
   getAllRoutesToString(): string
@@ -106,11 +108,12 @@ export interface Iresponces {
   unAuthorized: (msg?: string) => void;
   notFound: (msg?: string) => void;
   error: (err: any) => void;
-  data: (item: any, message?: string, total?: number,) => void;
+  data: (item: any, message?: string, total?: number) => void;
   errCb: (err: any, cb: Function) => void;
   errSuccess: (err: any) => void;
   callback: (cb: Function, obj?: any) => void;
   json: (obj: object) => void;
+  ok:()=> void;
 };
 // function with parmeters interface 
 export interface Iresponce {

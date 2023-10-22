@@ -46,7 +46,8 @@ export const responce = (res, cb) => {
         errCb: (error, cb) => error ? self.error(error) : self.callback(cb),
         errSuccess: (error) => error ? self.error(error) : self.success(),
         callback: (cb, obj) => cb && typeof cb === 'function' ? cb(obj) : false,
-        json: (obj) => res.json(obj)
+        json: (obj) => res.json(obj),
+        ok: () => res.status(200)
     };
     return self;
 };
