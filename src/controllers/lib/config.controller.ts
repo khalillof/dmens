@@ -18,7 +18,7 @@ export class ConfigController extends DefaultController {
         if (!req.query && !req.query['path'] && !(typeof req.query['path'] === 'string')) {
             return this.responce(res).badRequest('require query string path');
         }
-        let routes = Svc.routes.deleteRoutePath(req.query['path'] as string)
+        Svc.routes.deleteRoutePath(req.query['path'] as string)
         this.responce(res).success()
     }
     
