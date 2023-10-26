@@ -75,10 +75,10 @@ export class DbModel implements IDbModel {
     let one = await _configDb.findOne({ name: this.name });
 
     if (one) {
-      await _configDb.putById(one._id,this.config.getConfigProps!());
+      await _configDb.putById(one._id,this.config.getProps!());
       envs.logLine('config entery already on database so it has been updated : name: '+ this.name)
     } else {
-      let rst = await _configDb.create(this.config.getConfigProps!());
+      let rst = await _configDb.create(this.config.getProps!());
       envs.logLine(`created config entry for model name : ${rst.name}`)
     }
   }

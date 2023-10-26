@@ -22,12 +22,16 @@ export class ConfigController extends DefaultController {
         this.responce(res).success()
     }
     
+    async forms(req: express.Request, res: express.Response, next: express.NextFunction) {
+       let _forms =  await Promise.all(Svc.db.obj().map(async (d)=>  await d.config.genForm!()));
+        this.responce(res).data(_forms)
+      }
     override  async post(req: express.Request, res: express.Response) {
         let conf: IConfigPropsParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
         envs.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).data(result.controller.db.config.getConfigProps!())
+        this.responce(res).data(result.controller.db.config.getProps!())
     }
 
 

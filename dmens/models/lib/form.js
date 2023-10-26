@@ -4,15 +4,21 @@ export class Form {
     constructor(props) {
         if (!(props instanceof ConfigProps))
             throw new Error('Form class require instance of configProp class');
-        const { name, routeName } = props;
+        const { name, routeName, displayName } = props;
         this.formId = name;
         this.formName = name;
-        this.routeName = '/api' + routeName;
+        this.routePath = routeName;
         this.elements = {};
+        this.displayName = displayName;
+        this.auth = props.inAuth('post') || props.inAuth('put');
+        this.admin = props.inAdmin('post') || props.inAdmin('put');
     }
     formId;
     formName;
-    routeName;
+    routePath;
+    displayName;
+    auth;
+    admin;
     elements;
     async genElements(config) {
         for (let [key, value] of Object.entries(config.schemaObj)) {

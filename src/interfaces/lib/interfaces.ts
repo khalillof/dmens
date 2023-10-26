@@ -10,10 +10,14 @@ export interface IRequestFilter {
 }
 
 export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+
 export interface IForm {
   formId: string
   formName: string
-  routeName: string
+  routePath: string
+  displayName: string
+  auth:boolean
+  admin:boolean
   elements: Record<string, [Record<string, any>, Record<string, any>]>
 }
 export interface ISvc {
@@ -51,9 +55,10 @@ export interface IConfigPropsParameters {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName?: string
+  displayName?:string
   useAuth?: string[]
   useAdmin?: string[]
-  middlewares?:string[]
+  postPutMiddlewares?:string[]
 
 };
 
@@ -67,12 +72,15 @@ export interface IConfigProps {
   routeName: string
   useAuth: string[]
   useAdmin: string[]
-  middlewares: string[]
+  postPutMiddlewares: string[]
+  displayName:string
   getRoutes?(): { method: string; path: string;}[]
-  getConfigProps?(): IConfigProps
+  getProps?(): IConfigProps
   genForm?(): Promise<IForm>
   //check useAuth and useAdmin
-  checkAuthGetMiddlewares?(actionName: string): string[]
+  authAdminMiddlewares?(actionName: string): string[]
+  inAuth?(action:string):boolean
+  inAdmin?(action:string):boolean
 };
 
 export interface IDbModel {

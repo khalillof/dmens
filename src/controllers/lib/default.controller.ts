@@ -83,6 +83,7 @@ export class DefaultController implements IController {
   }
 
   async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {
+    //console.log('hello paramas :',req.params)
     let q = req.params['id'] ? { _id: req.params['id'] } : req.query;
     if (!q) {
       return this.responce(res).badRequest()

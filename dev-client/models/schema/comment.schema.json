@@ -15,13 +15,13 @@
             "tagName": "textarea",
             "className":"form-control"
         },
-        "author": {
+        "user": {
             "type": "ObjectId",
             "ref": "account",
             "required": true,
             "autopopulate": true
         },
-        "model_id": {
+        "modelid": {
             "type": "ObjectId",
             "required": true
         }

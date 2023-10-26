@@ -70,11 +70,11 @@ export class ClientSeedDatabase {
         if (authors_ids && posts_ids) {
             // loop over autherIds
             this.loopOverSequence(authors_ids.length, comments.length, (IDindex, itemIndex) => {
-                comments[itemIndex].author = authors_ids[IDindex];
+                comments[itemIndex].user = authors_ids[IDindex];
             });
             // loop over post ids
             this.loopOverSequence(posts_ids.length, comments.length, (IDindex, itemIndex) => {
-                comments[itemIndex].model_id = posts_ids[IDindex];
+                comments[itemIndex].modelid = posts_ids[IDindex];
             });
         }
         else {
