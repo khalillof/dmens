@@ -12,7 +12,6 @@ class Post {
     isfeatured : boolean = true
     publisheDate:object= {}
     category:string =""
-    likes:number= 5
     author:string =""
 };
 

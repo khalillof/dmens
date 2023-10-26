@@ -39,7 +39,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
       throw new Error('buildRoute method require url or routeName')
 
    // remove diplicates
-    middlewares = Array.from(new Set([...middlewares,...this.controller?.db.config.checkAuthGetMiddlewares!(actionName ?? method)]));
+    middlewares = Array.from(new Set([...middlewares,...this.controller?.db.config.authAdminMiddlewares!(actionName ?? method)]));
     
     let mdwrs: any = this.mware!;
      // map middlewares string fuction names to actual functions
@@ -69,15 +69,14 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   async defaultRoutes() {
 
     await this.buidRoute(this.routeName + '/search', 'list', 'search');// search
-    await this.buidRoute(this.routeName + '/count', 'list', 'count'); // count
-    await this.buidRoute(this.routeName + '/form', 'list', 'form'); // get form elements
-    await this.buidRoute(this.routeName + '/route', 'list', 'route'); // get form elements
+    await this.buidRoute(this.routeName + '/count', 'get', 'count'); // count
+    await this.buidRoute(this.routeName + '/form', 'get', 'form'); // get form elements
+    await this.buidRoute(this.routeName + '/route', 'get', 'route'); // get form elements
     await this.buidRoute(this.routeName, 'list', 'list'); // list
-    await this.buidRoute(this.routeParam, 'get', 'getOne') // get By id
+    await this.buidRoute(this.routeParam, 'get', 'getOne') // get by id
     await this.buidRoute(this.routeName, 'get', 'getOne') // getOne by filter parameter
-    await this.buidRoute(this.routeName, 'post', null, this.controller?.db.config.middlewares)// post
-    await this.buidRoute(this.routeParam, 'put', null, this.controller?.db.config.middlewares)// put
-
+    await this.buidRoute(this.routeName, 'post', null, this.controller?.db.config.postPutMiddlewares)// post
+    await this.buidRoute(this.routeParam, 'put', null, this.controller?.db.config.postPutMiddlewares)// put
     await this.buidRoute(this.routeParam, 'delete', null, ['validateCurrentUserOwnParamId'])// delete
 
     this.param();

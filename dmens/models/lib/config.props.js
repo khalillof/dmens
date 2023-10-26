@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { Form } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
-        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, middlewares } = _config;
+        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, postPutMiddlewares, displayName } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -18,21 +18,23 @@ export class ConfigProps {
         this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
             this.useAuth = this.removeDiplicates(useAuth),
             this.useAdmin = this.removeDiplicates(useAdmin);
-        this.middlewares = this.removeDiplicates(middlewares);
+        this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
+        this.displayName = displayName || this.routeName.replace('/', '');
     }
     name;
     active;
     schemaObj;
     schemaOptions;
     routeName;
+    displayName;
     useAuth;
     useAdmin;
-    middlewares; // used for post put actions
+    postPutMiddlewares; // used for post put actions
     removeDiplicates(arr) {
         // Set will remove diblicate
         return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
     }
-    getConfigProps() {
+    getProps() {
         return {
             name: this.name,
             active: this.active,
@@ -41,7 +43,8 @@ export class ConfigProps {
             routeName: this.routeName,
             useAuth: this.useAuth,
             useAdmin: this.useAdmin,
-            middlewares: this.middlewares
+            displayName: this.displayName,
+            postPutMiddlewares: this.postPutMiddlewares
         };
     }
     getRoutes() {
@@ -51,11 +54,16 @@ export class ConfigProps {
         return await new Form(this).genElements(this);
     }
     //check useAuth and useAdmin and return full list of middlewares
-    checkAuthGetMiddlewares(actionName) {
-        if (this.useAuth.indexOf(actionName) !== -1)
-            this.middlewares.push('authenticate');
-        if (this.useAdmin.indexOf(actionName) !== -1)
-            this.middlewares.push('isAdmin');
-        return this.middlewares;
+    authAdminMiddlewares(actionName) {
+        let result = [];
+        this.inAuth(actionName) && result.push('authenticate');
+        this.inAdmin(actionName) && result.push('isAdmin');
+        return result;
+    }
+    inAuth(action) {
+        return this.useAuth.indexOf(action) !== -1;
+    }
+    inAdmin(action) {
+        return this.useAdmin.indexOf(action) !== -1;
     }
 }

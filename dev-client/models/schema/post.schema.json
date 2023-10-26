@@ -11,6 +11,7 @@
         "put",
         "delete"
     ],
+    "displayName":"Blog",
     "schemaOptions": {},
     "schemaObj": {
         "title": {
@@ -76,16 +77,6 @@
             "ref": "account",
             "required": true,
             "autopopulate": true
-        },
-        "likes": {
-            "type": "Number",
-            "default": 0
-        },
-        "like_user_ids": [
-            {
-                "type": "ObjectId",
-                "ref": "account"
-            }
-        ]
+        }
     }
 }

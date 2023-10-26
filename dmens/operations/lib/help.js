@@ -59,19 +59,25 @@ export const confSchema = {
         "type": [String],
         "default": []
     },
-    middlewares: {
-        "type": [String],
-        "default": []
+    displayName: {
+        "type": String,
+        "minLength": 3,
+        "maxLength": 50
     },
+    // middlewares: {
+    //  "type": [String],
+    //   "default": []
+    // },
 };
 export const configConfigProp = {
     name: "config",
     active: true,
+    displayName: "Configrations",
     schemaOptions: { timestamps: true, strict: true },
     schemaObj: confSchema,
     useAuth: ['search', 'count', 'routes', 'list', 'get', 'post', 'put', 'delete'],
     useAdmin: ['search', 'count', 'routes', 'list', 'get', 'post', 'put', 'delete'],
-    middlewares: ['isJson', 'uploadSchema']
+    postPutMiddlewares: ['isJson', 'uploadSchema']
 };
 export const roleConfigSchema = {
     name: "role",
@@ -96,6 +102,7 @@ export const roleConfigSchema = {
 export const accConfgSchema = {
     name: "account",
     active: true,
+    displayName: "Accounts",
     schemaOptions: { timestamps: true, strict: true },
     schemaObj: {
         username: {

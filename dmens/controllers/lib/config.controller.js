@@ -13,14 +13,18 @@ export class ConfigController extends DefaultController {
         if (!req.query && !req.query['path'] && !(typeof req.query['path'] === 'string')) {
             return this.responce(res).badRequest('require query string path');
         }
-        let routes = Svc.routes.deleteRoutePath(req.query['path']);
+        Svc.routes.deleteRoutePath(req.query['path']);
         this.responce(res).success();
+    }
+    async forms(req, res, next) {
+        let _forms = await Promise.all(Svc.db.obj().map(async (d) => await d.config.genForm()));
+        this.responce(res).data(_forms);
     }
     async post(req, res) {
         let conf = req.body;
         let result = await Operations.createModelConfigRoute(conf);
         envs.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).data(result.controller.db.config.getConfigProps());
+        this.responce(res).data(result.controller.db.config.getProps());
     }
     async put(req, res, next) {
         let id = req.params['id'];

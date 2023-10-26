@@ -7,7 +7,7 @@ import { Form } from '../index.js';
 export class ConfigProps implements IConfigProps {
 
   constructor(_config: IConfigPropsParameters) {
-    let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, middlewares } = _config;
+    let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, postPutMiddlewares, displayName } = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -20,14 +20,15 @@ export class ConfigProps implements IConfigProps {
 
 
     this.name = name.toLowerCase(),
-      this.active = active || false,
-      this.schemaObj = schemaObj || {},
-      this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
+    this.active = active || false,
+    this.schemaObj = schemaObj || {},
+    this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
 
     this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
-      this.useAuth = this.removeDiplicates(useAuth),
-      this.useAdmin = this.removeDiplicates(useAdmin)
-      this.middlewares = this.removeDiplicates(middlewares)
+    this.useAuth = this.removeDiplicates(useAuth),
+    this.useAdmin = this.removeDiplicates(useAdmin)
+    this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares)
+    this.displayName = displayName || this.routeName.replace('/','')
 
   }
 
@@ -36,15 +37,16 @@ export class ConfigProps implements IConfigProps {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName: string
+  displayName:string
   useAuth: string[]
   useAdmin: string[]
-  middlewares: string[] // used for post put actions
+  postPutMiddlewares: string[] // used for post put actions
 
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
     return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : []
   }
-  getConfigProps(): IConfigProps { 
+  getProps(): IConfigProps { 
     return {
       name: this.name,
       active: this.active,
@@ -53,7 +55,8 @@ export class ConfigProps implements IConfigProps {
       routeName: this.routeName,
       useAuth: this.useAuth,
       useAdmin: this.useAdmin,
-      middlewares:this.middlewares
+      displayName:this.displayName,
+      postPutMiddlewares:this.postPutMiddlewares
     }
   }
 
@@ -66,14 +69,19 @@ export class ConfigProps implements IConfigProps {
   }
 
   //check useAuth and useAdmin and return full list of middlewares
-  checkAuthGetMiddlewares(actionName: string): string[] {
+  authAdminMiddlewares(actionName: string): string[] {
+    let result:string[]= [];
+    this.inAuth(actionName) &&  result.push('authenticate')
+    this.inAdmin(actionName) && result.push('isAdmin')
 
-    if (this.useAuth.indexOf(actionName) !== -1)
-        this.middlewares.push('authenticate')
-    if (this.useAdmin.indexOf(actionName) !== -1)
-        this.middlewares.push('isAdmin')
-
-    return this.middlewares;
+    return result;
   }
 
+
+  inAuth(action:string):boolean{
+   return this.useAuth.indexOf(action) !== -1
+  }
+  inAdmin(action:string):boolean{
+   return this.useAdmin.indexOf(action) !== -1
+  }
 }

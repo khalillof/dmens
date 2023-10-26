@@ -123,5 +123,10 @@ if (!isDevelopment && fs.existsSync(envPath)) {
   console.log('.env file will be removed')
 }
 
-  //Svc.routes.deleteAppRoute('/roles')
+//let _forms:any[] = await Promise.all(Svc.db.obj().map(async (d)=>  await d.config.genForm!()));
+//envs.logLine(_forms)
+ // Svc.routes.deleteAppRoute('/roles')
+
+ //let r = Svc.routes.getRoutesPathMethods('/configs');
+ //envs.logLine(r)
 

@@ -6,7 +6,7 @@
         "put",
         "delete"
     ],
-    "useAdmin": ["list","search"],
+    "useAdmin": [],
     "schemaObj": {
         "like": {
             "type": "Boolean",
@@ -30,13 +30,13 @@
             "tagName": "textarea",
             "className":"form-control"
         },
-        "author": {
+        "userid": {
             "type": "ObjectId",
             "ref": "account",
             "required": true,
             "autopopulate": true
         },
-        "model_id": {
+        "modelid": {
             "type": "ObjectId",
             "required": true
         }

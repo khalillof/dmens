@@ -11,6 +11,7 @@
     "useAdmin": [
         "list","search"
     ],
+    "displayName":"Messages",
     "schemaObj": {
         "title": {
             "type": "String",

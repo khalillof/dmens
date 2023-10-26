@@ -11,7 +11,6 @@ class Post {
     isfeatured = true;
     publisheDate = {};
     category = "";
-    likes = 5;
     author = "";
 }
 ;

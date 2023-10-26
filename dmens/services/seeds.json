@@ -83,7 +83,6 @@
             "isfeatured": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -93,7 +92,6 @@
             "isPublished": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -104,7 +102,7 @@
             "publisheDate": {},
             "isfeatured": true,
             "category": "",
-            "likes": 5
+            "author": ""
         },
         {
             "title": "Put together all the knowledge",
@@ -113,7 +111,6 @@
             "isPublished": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -124,7 +121,6 @@
             "publisheDate": {},
             "isfeatured": true,
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -135,7 +131,6 @@
             "isfeatured": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -145,7 +140,6 @@
             "isPublished": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -156,7 +150,7 @@
             "publisheDate": {},
             "isfeatured": true,
             "category": "",
-            "likes": 5
+            "author": ""
         },
         {
             "title": "Put together all the knowledge2",
@@ -165,7 +159,6 @@
             "isPublished": true,
             "publisheDate": {},
             "category": "",
-            "likes": 5,
             "author": ""
         },
         {
@@ -176,35 +169,34 @@
             "publisheDate": {},
             "isfeatured": true,
             "category": "",
-            "likes": 5,
             "author": ""
         }
     ],
     "comments": [
         {
             "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
-            "author": "",
-            "model_id": "111"
+            "user": "",
+            "modelid": "111"
         },
         {
             "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
-            "author": "",
-            "model_id": "111"
+            "user": "",
+            "modelid": "111"
         },
         {
             "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
-            "author": "",
-            "model_id": "111"
+            "user": "",
+            "modelid": "111"
         },
         {
             "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
-            "author": "",
-            "model_id": "111"
+            "user": "",
+            "modelid": "111"
         },
         {
             "body": "He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia",
-            "author": "",
-            "model_id": "111"
+            "user": "",
+            "modelid": "111"
         }
     ],
     "messages": [

@@ -60,6 +60,7 @@ export class DefaultController {
         this.responce(res).data(items, undefined, _total);
     }
     async getOne(req, res, next) {
+        //console.log('hello paramas :',req.params)
         let q = req.params['id'] ? { _id: req.params['id'] } : req.query;
         if (!q) {
             return this.responce(res).badRequest();

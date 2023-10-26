@@ -19,6 +19,7 @@
     "search",
     "count"
   ],
+  "displayName":"Contacts",
   "schemaObj": {
     "contactType": {
       "type": "String",
