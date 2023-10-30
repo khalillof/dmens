@@ -11,14 +11,30 @@ export interface IRequestFilter {
 
 export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 
+export interface IModelFormConfigData {
+  name: string
+  active: Boolean
+  routeName: string
+  param:string
+  routeParam:string
+  searchKey?:string
+  queryName?:string
+  pagesPerPage:number
+  useAuth: string[]
+  useAdmin: string[]
+  displayName:string
+  useComment?: boolean
+  uselikes?: boolean
+};
 export interface IForm {
-  formId: string
-  formName: string
-  routePath: string
-  displayName: string
-  auth:boolean
-  admin:boolean
+  config:IModelFormConfigData
   elements: Record<string, [Record<string, any>, Record<string, any>]>
+
+  listAuth :boolean[]
+  getAuth :boolean[]
+  postAuth :boolean[]
+  putAuth :boolean[]
+  searchAuth :boolean[]
 }
 export interface ISvc {
   db: ISvcIntance<IDbModel>
@@ -40,6 +56,7 @@ export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
 
   pluralizeRoute(routeName: string): string
 }
+
 export interface ISvcIntance<T> {
   obj(): T[]
   get(keyValue: string): T | null
@@ -55,14 +72,18 @@ export interface IConfigPropsParameters {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName?: string
+  param?:string
   displayName?:string
+  pagesPerPage?:number
+  queryName?:string
+  searchKey?:string
   useAuth?: string[]
   useAdmin?: string[]
   postPutMiddlewares?:string[]
+  useComment?: boolean
+  uselikes?: boolean
 
 };
-
-
 
 export interface IConfigProps {
   name: string
@@ -70,10 +91,17 @@ export interface IConfigProps {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName: string
+  param:string
+  routeParam:string
+  searchKey?:string
+  queryName?:string
+  pagesPerPage:number
   useAuth: string[]
   useAdmin: string[]
   postPutMiddlewares: string[]
   displayName:string
+  useComment?: boolean
+  uselikes?: boolean
   getRoutes?(): { method: string; path: string;}[]
   getProps?(): IConfigProps
   genForm?(): Promise<IForm>
@@ -154,24 +182,22 @@ export interface IController {
 
 };
 
-
 export interface IDefaultRoutesConfig {
   router: IRouter
-  routeName: string;
-  routeParam: string;
+  config:IConfigProps
   controller: IController;
   mware?: IMiddlewares;
-
+  
+  addRoutePath(name:string):string
   buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
   setOptions(routPath: string): void;
   options(): void;
-  param(): void;
+  setParam(): void;
   defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }
 
 export interface IMiddlewares {
-
   authenticate:(req: any, res: any, next: any) => Promise<any>
   getUserFromReq(req: express.Request): Promise<any>;
   checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction): void;

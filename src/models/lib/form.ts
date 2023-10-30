@@ -2,8 +2,6 @@ import { IConfigProps, IForm, IElement } from "../../interfaces/index.js";
 import { ConfigProps } from "../index.js";
 import { Svc } from '../../common/index.js'
 
-
-
 export interface ILable {
     label: string,
     htmlFor: string,
@@ -23,25 +21,31 @@ export class Form implements IForm {
     constructor(props: IConfigProps) {
         if (!(props instanceof ConfigProps))
             throw new Error('Form class require instance of configProp class')
-        const { name, routeName, displayName} = props;
-        this.formId = name;
-        this.formName = name;
-        this.routePath = routeName
+        let data: any = props.getProps();
+        delete data['postPutMiddlewares'];
+
+        this.config = data;
+
         this.elements = {}
-        this.displayName = displayName;
-        this.auth = props.inAuth('post') || props.inAuth('put')
-        this.admin = props.inAdmin('post') || props.inAdmin('put')
+        let isIn = (action: string) => [props.inAdmin(action), props.inAuth(action)];
+
+        this.listAuth = isIn('list');
+        this.getAuth = isIn('get');
+        this.postAuth = isIn('post');
+        this.putAuth = isIn('put');
+        this.searchAuth = isIn('search')
+
     }
 
-    formId: string
-    formName: string
-    routePath: string
-    displayName: string
-    auth:boolean
-    admin:boolean
-    elements: Record<string ,[Record<string, any>, Record<string, any> ]>
+    config: IConfigProps
+    elements: Record<string, [Record<string, any>, Record<string, any>]>
 
-    
+    listAuth: boolean[]
+    getAuth: boolean[]
+    postAuth: boolean[]
+    putAuth: boolean[]
+    searchAuth: boolean[]
+
     async genElements(config: IConfigProps): Promise<IForm> {
 
         for (let [key, value] of Object.entries(config.schemaObj)) {
@@ -67,7 +71,7 @@ export class Form implements IForm {
 
                         if (optionkey && ref && Svc.db.exist(ref)) {
 
-                            options = (await Svc.db.get(ref)?.model?.find())!.map((item: any, i:number) => { return {tagName:'option', key:i, title: item[optionkey], value: item._id.toString() } });
+                            options = (await Svc.db.get(ref)?.model?.find())!.map((item: any, i: number) => { return { tagName: 'option', key: i, title: item[optionkey], value: item._id.toString() } });
 
                             this.addElemLable(key, value, { options });
                         } else {
@@ -83,11 +87,11 @@ export class Form implements IForm {
         return this;
     }
 
-    private addElemLable(key: string, elm: IElement, override?: Record<string, any>){
-        let element = { ...this.cleanObj(elm),id:key, ...override }
-        let lable = {tagName: 'lable', title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
+    private addElemLable(key: string, elm: IElement, override?: Record<string, any>) {
+        let element = { ...this.cleanObj(elm), id: key, ...override }
+        let lable = { tagName: 'lable', title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
 
-        this.elements[key]= [element, lable];
+        this.elements[key] = [element, lable];
     }
 
     private cleanObj(obj: any, type: boolean = true) {
@@ -105,7 +109,6 @@ export class Form implements IForm {
     }
 
 }
-
 
 export const isIn = (srcText: string, item: string) => srcText.indexOf(item) !== -1;
 

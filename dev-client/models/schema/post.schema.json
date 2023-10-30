@@ -1,6 +1,12 @@
 {
     "name": "post",
     "active": true,
+    "pagesPerPage":5,
+    "searchKey":"title",
+    "displayName":"Blog",
+    "queryName":"category",
+    "useComment": true,
+    "useLikes": true,
     "useAuth": [
         "post",
         "put",
@@ -11,7 +17,6 @@
         "put",
         "delete"
     ],
-    "displayName":"Blog",
     "schemaOptions": {},
     "schemaObj": {
         "title": {

@@ -1,6 +1,7 @@
 {
   "name": "contact",
   "active": true,
+  "searchKey": "fullname",
   "useAuth": [
     "list",
     "get",
