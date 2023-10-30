@@ -1,6 +1,8 @@
 {
     "name": "message",
     "active": true,
+    "searchKey": "title",
+    "useComment":true,
     "useAuth": [
         "list",
         "get",

@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { Form } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
-        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, postPutMiddlewares, displayName } = _config;
+        let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, postPutMiddlewares, displayName, searchKey, pagesPerPage, queryName, useComment, uselikes, param } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -15,21 +15,35 @@ export class ConfigProps {
             this.active = active || false,
             this.schemaObj = schemaObj || {},
             this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
-        this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name),
-            this.useAuth = this.removeDiplicates(useAuth),
+        this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name);
+        this.param = param || this.name + 'Id';
+        this.routeParam = this.routeName + '/:' + this.param;
+        this.useAuth = this.removeDiplicates(useAuth),
             this.useAdmin = this.removeDiplicates(useAdmin);
         this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
         this.displayName = displayName || this.routeName.replace('/', '');
+        queryName && (this.queryName = queryName);
+        searchKey && (this.searchKey = searchKey);
+        this.pagesPerPage = pagesPerPage || 5;
+        this.useComment = useComment;
+        this.uselikes = uselikes;
     }
     name;
     active;
     schemaObj;
     schemaOptions;
     routeName;
+    routeParam;
+    param;
+    pagesPerPage;
+    queryName;
+    searchKey;
     displayName;
     useAuth;
     useAdmin;
     postPutMiddlewares; // used for post put actions
+    useComment;
+    uselikes;
     removeDiplicates(arr) {
         // Set will remove diblicate
         return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
@@ -41,9 +55,13 @@ export class ConfigProps {
             schemaObj: this.schemaObj,
             schemaOptions: this.schemaOptions,
             routeName: this.routeName,
+            param: this.param,
+            routeParam: this.routeParam,
             useAuth: this.useAuth,
             useAdmin: this.useAdmin,
             displayName: this.displayName,
+            searchKey: this.searchKey,
+            pagesPerPage: this.pagesPerPage,
             postPutMiddlewares: this.postPutMiddlewares
         };
     }
