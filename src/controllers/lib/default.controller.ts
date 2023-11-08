@@ -22,6 +22,11 @@ export class DefaultController implements IController {
     this.responce(res).data(_form)
   }
 
+  async routedata(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let data = this.db.config.routeData
+    this.responce(res).data(data)
+  }
+  
   async route(req: express.Request, res: express.Response, next: express.NextFunction) {
     let routes = this.db.config.getRoutes!()
     this.responce(res).data(routes)

@@ -7,11 +7,13 @@
         "list",
         "get",
         "post",
-        "put",
-        "delete","search","count","route"
+        "delete",
+        "search",
+        "count",
+        "route"
     ],
     "useAdmin": [
-        "list","search"
+        "list","put","search"
     ],
     "displayName":"Messages",
     "schemaObj": {
@@ -20,14 +22,14 @@
             "required": true,
             "minLength": 3,
             "maxLength": 150,
-            "tagName": "input",
+            "tagname": "input",
             "className":"form-control"
         },
         "body": {
             "type": "String",
             "required": true,
             "minLength": 3,
-            "tagName": "textarea",
+            "tagname": "textarea",
             "className":"form-control"
         },
         "sender": {

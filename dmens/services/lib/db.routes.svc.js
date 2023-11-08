@@ -87,13 +87,7 @@ class RouteSvc extends SvcInstance {
         return appRouter.stack.filter((r) => r.route).map((r) => r.route);
     }
     pluralizeRoute(routeName) {
-        routeName = routeName.toLowerCase();
-        if (routeName.indexOf('/') == -1) {
-            return ('/' + pluralize(routeName));
-        }
-        else {
-            return routeName;
-        }
+        return pluralize(routeName);
     }
     //========================================================================================
     ToString(obj) {

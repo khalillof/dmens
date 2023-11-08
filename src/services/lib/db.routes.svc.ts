@@ -103,12 +103,7 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
     }
 
     pluralizeRoute(routeName: string) {
-        routeName = routeName.toLowerCase();
-        if (routeName.indexOf('/') == -1) {
-            return ('/' + pluralize(routeName));
-        } else {
-            return routeName;
-        }
+        return pluralize(routeName)
     }
 
     //========================================================================================

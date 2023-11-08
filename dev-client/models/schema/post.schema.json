@@ -25,46 +25,46 @@
             "unique": true,
             "minLength": 5,
             "maxLength": 150,
-            "tagName": "input",
+            "tagname": "input",
             "className":"form-control"
         },
         "image": {
             "type": "String",
             "minLength": 5,
             "maxLength": 150,
-            "tagName": "input",
+            "tagname": "input",
             "className":"form-control"
         },
         "descriptions": {
             "type": "String",
             "minLength": 5,
-            "tagName": "textarea",
+            "tagname": "textarea",
             "className":"form-control"
         },
         "body": {
             "type": "String",
             "required": true,
             "minLength": 5,
-            "tagName": "textarea",
+            "tagname": "textarea",
             "className":"form-control"
         },
         "isfeatured": {
             "type": "Boolean",
             "default": false,
-            "tagName": "input",
+            "tagname": "input",
             "inputtype": "checkbox",
             "className":"form-check-input"
         },
         "isPublished": {
             "type": "Boolean",
             "default": false,
-            "tagName": "input",
+            "tagname": "input",
             "inputtype": "checkbox",
             "className":"form-check-input"
         },
         "publisheDate": {
             "type": "Date",
-            "tagName": "input",
+            "tagname": "input",
             "inputtype": "date",
             "className":"form-control"
         },
@@ -73,7 +73,7 @@
             "ref": "category",
             "required": true,
             "autopopulate": true,
-            "tagName": "select",
+            "tagname": "select",
             "optionkey": "name",
             "className":"form-select"
         },

@@ -162,6 +162,6 @@ export const accConfgSchema = {
             }
         ]
     },
-    useAuth: ['search', 'count', 'form', 'route', 'list', 'get', 'post', 'put', 'delete'],
+    useAuth: ['search', 'count', 'list', 'get', 'put', 'delete'],
     useAdmin: ["list", 'search', 'count']
 };

@@ -42,82 +42,104 @@ function generateJwt(user) {
     }
 }
 //type = 'local' || 'jwt'|| 'facebook' || 'facebook-token'
-function authenticateUser(type, opts) {
-    return async (req, res, next) => {
-        let loginOptions = { session: false };
-        let pssportOptions = type === "jwt" ? loginOptions : {};
-        if ('facebook facebook-token'.indexOf(type) !== -1)
-            pssportOptions = { failureRedirect: '/auth/login', failureMessage: true };
-        try {
-            return await passport.authenticate(type, opts ?? pssportOptions, async (err, user, info) => {
-                let db = Svc.db.get('role');
-                console.log('authenticated user id :');
-                console.log((user && user._id) || info || err);
-                if (user) {
-                    let _roles = [];
-                    for (let id of user.roles) {
-                        let r = await db.findById(id);
-                        _roles.push(r);
+async function authenticateLocal(req, res, next) {
+    try {
+        return await passport.authenticate("local", {}, async (err, user, info) => {
+            if (user) {
+                console.log('authenticated user id local :\n', user._id);
+                delete user['hash'];
+                delete user['salt'];
+                // handle local login
+                return await reqLogin(user, { session: true }, true)(req, res, next);
+            }
+            else {
+                // 
+                if ((info || err) instanceof TokenExpiredError) {
+                    let _refToken = req.headers['refreshToken'];
+                    if (!_refToken) {
+                        return responce(res).badRequest('No refersh token! provided :' + String(info || err));
                     }
-                    user['hash'] = null;
-                    user['salt'] = null;
-                    user.roles = _roles;
-                    // handle local login
-                    return type === 'local' ? await reqLogin(user, loginOptions, true)(req, res, next) : await reqLogin(user, loginOptions)(req, res, next);
+                    // refresh token found in header
+                    let refUser = await Svc.db.get('account').findOne({ refreshToken: _refToken });
+                    if (!refUser) {
+                        return responce(res).badRequest('refresh token provided not found');
+                    }
+                    // user found check refresh token is valid
+                    if (isExpiredToken(refUser.refreshToken_expireAt)) {
+                        return responce(res).unAuthorized('expired refersh token! require sign in');
+                    }
+                    // valid refresh token was found next generate new access token only and let them access next()
+                    return await reqLogin(refUser, { session: true })(req, res, next);
+                }
+                else if (err) {
+                    return responce(res).badRequest((err.message ?? err));
+                }
+                else if (info) {
+                    return responce(res).badRequest((info.message ?? info));
                 }
                 else {
-                    // 
-                    if (info instanceof TokenExpiredError) {
-                        let _refToken = req.headers['refreshtoken'];
-                        if (!_refToken) {
-                            console.log(req.headers);
-                            responce(res).badRequest('No refersh token! provided');
-                            return;
-                        }
-                        // refresh token found in header
-                        let refUser = await db.findOne({ refreshToken: _refToken });
-                        if (!refUser) {
-                            responce(res).badRequest('refresh token provided not found');
-                            return;
-                        }
-                        // user found check refresh token is valid
-                        if (isExpiredToken(refUser.refreshToken_expireAt)) {
-                            responce(res).unAuthorized('expired refersh token! require sign in');
-                            return;
-                        }
-                        // valid refresh token was found next generate new access token only and let them access next()
-                        return await reqLogin(refUser, loginOptions)(req, res, next);
-                    }
-                    if (info) {
-                        responce(res).badRequest((info.message ?? info));
-                    }
-                    else {
-                        responce(res).unAuthorized();
-                    }
-                    logger.err(err ?? info);
-                    return;
+                    return responce(res).badRequest();
                 }
-            })(req, res, next); // end of passport authenticate
+            }
+        })(req, res, next); // end of passport authenticate
+    }
+    catch (err) {
+        logger.resErr(res, (err.message ?? err));
+    }
+}
+async function authenticateJwt(req, res, next) {
+    return await passport.authenticate("jwt", {}, async (err, user, info) => {
+        if (user) {
+            req.user = user;
+            console.log('user id jwt ......', user._id);
+            return next();
         }
-        catch (err) {
-            logger.resErr(res, (err.message ?? err));
+        else {
+            // 
+            if ((info || err) instanceof TokenExpiredError) {
+                let _refToken = req.headers['refreshToken'];
+                if (!_refToken) {
+                    return responce(res).badRequest('No refersh token! provided :' + String(info || err));
+                }
+                // refresh token found in header
+                let refUser = await Svc.db.get('account').findOne({ refreshToken: _refToken });
+                if (!refUser) {
+                    return responce(res).badRequest('refresh token provided not found');
+                }
+                // user found check refresh token is valid
+                if (isExpiredToken(refUser.refreshToken_expireAt)) {
+                    return responce(res).unAuthorized('expired refersh token! require sign in');
+                }
+                next();
+                // valid refresh token was found next generate new access token only and let them access next()
+                // return await reqLogin(refUser, loginOptions)(req, res, next)
+            }
+            else if (err) {
+                return responce(res).badRequest((err.message ?? err));
+            }
+            else if (info) {
+                return responce(res).badRequest((info.message ?? info));
+            }
+            else {
+                return responce(res).badRequest();
+            }
         }
-    };
+    })(req, res, next); // end of passport authenticate 
 }
 async function Tokens(user, access = true, refresh = false) {
     // generate json token
     let token = generateJwt(user);
     // update user with new refresh token
-    await createRefershToken(user);
+    if (refresh)
+        await createRefershToken(user);
     return token;
 }
 function reqLogin(user, options = { session: false }, both_tokens_required = false) {
     return async (req, res, next) => {
         return req.login(user, options, async (err) => {
             if (err) {
-                responce(res).badRequest(err.message);
                 logger.err(err);
-                return;
+                return responce(res).badRequest(err.message);
             }
             else if (both_tokens_required) {
                 // generate json token, usually when then first sign in to get both access and refresh tokens
@@ -151,27 +173,24 @@ function validateJWT(req, res, next) {
         next();
     });
 }
+async function getUUID() {
+    let id = randomUUID();
+    return await Promise.resolve(id);
+}
 async function createRefershToken(user) {
     if (!user) {
         throw new Error('user object is required');
     }
     let expireAt = getExpiredAt(true);
-    let _token = randomUUID();
-    await Svc.db.get('role').putById(user._id, {
+    let _token = await getUUID();
+    await Svc.db.get('account').putById(user._id, {
         refreshToken: _token,
         refreshTokenExpireAt: expireAt,
     });
-    user.refreshTokenb = _token,
-        user.refreshToken_expireAt = expireAt,
-        console.log('created Refersh Token : \n' + user.refreshToken);
-    /*
-    return {
-      refreshToken: _token,
-      refreshToken_expireAt: expireAt.getTime()
-    };
-    */
+    console.log('created Refersh Token : \n' + _token);
+    return user;
 }
 function isExpiredToken(expiryat) {
     return expiryat.getTime() < new Date().getTime();
 }
-export { generateJwt, authenticateUser, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };
+export { generateJwt, authenticateLocal, authenticateJwt, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };

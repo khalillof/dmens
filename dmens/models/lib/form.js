@@ -4,35 +4,22 @@ export class Form {
     constructor(props) {
         if (!(props instanceof ConfigProps))
             throw new Error('Form class require instance of configProp class');
-        let data = props.getProps();
-        delete data['postPutMiddlewares'];
-        this.config = data;
+        this.name = props.name;
         this.elements = {};
-        let isIn = (action) => [props.inAdmin(action), props.inAuth(action)];
-        this.listAuth = isIn('list');
-        this.getAuth = isIn('get');
-        this.postAuth = isIn('post');
-        this.putAuth = isIn('put');
-        this.searchAuth = isIn('search');
     }
-    config;
+    name;
     elements;
-    listAuth;
-    getAuth;
-    postAuth;
-    putAuth;
-    searchAuth;
-    async genElements(config) {
-        for (let [key, value] of Object.entries(config.schemaObj)) {
-            let tagName = value['tagName'];
-            if (typeof value === 'object' && tagName) {
-                switch (tagName) {
+    async genElements(schemaObj) {
+        for (let [key, value] of Object.entries(schemaObj)) {
+            let tagname = value['tagname'];
+            if (typeof value === 'object' && tagname) {
+                switch (tagname) {
                     case "input":
                         if (value['inputtype']) {
                             this.addElemLable(key, value, { type: value['inputtype'] });
                         }
                         else {
-                            let type = { type: typeof value['type'] === 'string' ? 'text' : 'checkbox' };
+                            let type = { type: (('Boolean boolean'.indexOf(value.type) !== -1) ? 'checkbox' : 'text') };
                             this.addElemLable(key, value, type);
                         }
                         break;
@@ -40,24 +27,27 @@ export class Form {
                         let options = [];
                         let { optionkey, ref } = value;
                         if (optionkey && ref && Svc.db.exist(ref)) {
-                            options = (await Svc.db.get(ref)?.model?.find()).map((item, i) => { return { tagName: 'option', key: i, title: item[optionkey], value: item._id.toString() }; });
+                            options = (await Svc.db.get(ref).model.find() || []).map((item, i) => { return { tagName: 'option', key: i, title: item[optionkey], value: item._id.toString() }; });
                             this.addElemLable(key, value, { options });
                         }
                         else {
                             this.addElemLable(key, value);
                         }
                         break;
+                    // case "textarea":
+                    //    let style = {minHeight: "200px"};
+                    //    this.addElemLable(key, {style,...value})
+                    //    break;
                     default:
                         this.addElemLable(key, value);
                         break;
                 }
             }
         }
-        return this;
     }
     addElemLable(key, elm, override) {
         let element = { ...this.cleanObj(elm), id: key, ...override };
-        let lable = { tagName: 'lable', title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
+        let lable = { title: (element.ariaLabel ?? key), 'aria-valuetext': (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
         this.elements[key] = [element, lable];
     }
     cleanObj(obj, type = true) {

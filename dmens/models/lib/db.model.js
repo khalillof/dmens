@@ -58,7 +58,7 @@ export class DbModel {
         }
         let one = await _configDb.findOne({ name: this.name });
         if (one) {
-            await _configDb.putById(one._id, this.config.getProps());
+            await _configDb.putById(one._id, this.config.getProps()); // update config
             envs.logLine('config entery already on database so it has been updated : name: ' + this.name);
         }
         else {

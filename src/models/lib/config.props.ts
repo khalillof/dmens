@@ -1,14 +1,14 @@
 "use strict";
 import { Svc } from '../../common/index.js';
 
-import { IConfigProps, IConfigPropsParameters, IForm } from '../../interfaces/index.js';
+import { IConfigProps, IConfigPropsParameters, IForm, IRouteData } from '../../interfaces/index.js';
 import { Form } from '../index.js';
+import { RouteData } from './RouteData.js';
 
 export class ConfigProps implements IConfigProps {
 
   constructor(_config: IConfigPropsParameters) {
-    let { name, active, schemaObj, schemaOptions, routeName, useAuth, useAdmin, postPutMiddlewares, displayName,
-      searchKey, pagesPerPage, queryName, useComment, uselikes, param } = _config;
+    let { name, active, schemaObj, schemaOptions, postPutMiddlewares, useComment, uselikes} = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -25,37 +25,18 @@ export class ConfigProps implements IConfigProps {
       this.schemaObj = schemaObj || {},
       this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
 
-    this.routeName = routeName && routeName?.toLocaleLowerCase() || Svc.routes.pluralizeRoute(name);
-    this.param = param || this.name + 'Id';
-    this.routeParam = this.routeName + '/:' + this.param;
-    this.useAuth = this.removeDiplicates(useAuth),
-      this.useAdmin = this.removeDiplicates(useAdmin)
+    this.routeData = new RouteData(_config);
     this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares)
-    this.displayName = displayName || this.routeName.replace('/', '')
-    queryName && (this.queryName = queryName);
-    searchKey && (this.searchKey = searchKey);
-    this.pagesPerPage = pagesPerPage || 5;
-    this.useComment = useComment;
-    this.uselikes = uselikes;
-
   }
 
   name: string
   active: Boolean
+  routeData :IRouteData
+  
   schemaObj: object
   schemaOptions?: Record<string, any>
-  routeName: string
-  routeParam: string
-  param: string
-  pagesPerPage: number
-  queryName?: string
-  searchKey?: string
-  displayName: string
-  useAuth: string[]
-  useAdmin: string[]
   postPutMiddlewares: string[] // used for post put actions
-  useComment?: boolean
-  uselikes?: boolean
+  formCache?:IForm
 
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
@@ -67,40 +48,45 @@ export class ConfigProps implements IConfigProps {
       active: this.active,
       schemaObj: this.schemaObj,
       schemaOptions: this.schemaOptions,
-      routeName: this.routeName,
-      param: this.param,
-      routeParam: this.routeParam,
-      useAuth: this.useAuth,
-      useAdmin: this.useAdmin,
-      displayName: this.displayName,
-      searchKey: this.searchKey,
-      pagesPerPage: this.pagesPerPage,
+      routeData: this.routeData,
       postPutMiddlewares: this.postPutMiddlewares
     }
   }
 
   getRoutes() {
-    return Svc.routes.getRoutesPathMethods(this.routeName)
+    return Svc.routes.getRoutesPathMethods(this.routeData.routeName)
   }
 
   async genForm(): Promise<IForm> {
-    return await new Form(this).genElements(this)
+    if(this.formCache)
+    return this.formCache;
+
+    let _form = new Form(this);
+    let clone = {...this.schemaObj};
+   await _form.genElements(clone)
+   this.formCache = _form;
+
+    return await Promise.resolve(_form) 
   }
 
   //check useAuth and useAdmin and return full list of middlewares
   authAdminMiddlewares(actionName: string): string[] {
+    
     let result: string[] = [];
-    this.inAuth(actionName) && result.push('authenticate')
-    this.inAdmin(actionName) && result.push('isAdmin')
+
+    if(this.inAuth(actionName)) 
+    result.push('authenticate')
+
+    if(this.inAdmin(actionName)) 
+    result.push('isAdmin')
 
     return result;
   }
 
-
-  inAuth(action: string): boolean {
-    return this.useAuth.indexOf(action) !== -1
+  inAuth(actionName:string):boolean{
+    return this.routeData.useAuth.indexOf(actionName) !== -1
   }
-  inAdmin(action: string): boolean {
-    return this.useAdmin.indexOf(action) !== -1
+  inAdmin(actionName:string):boolean{
+    return this.routeData.useAdmin.indexOf(actionName) !== -1
   }
 }

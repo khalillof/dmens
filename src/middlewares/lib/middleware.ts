@@ -3,11 +3,13 @@ import { isValidRole, Svc, responce, envs } from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
-import { authenticateUser } from '../../services/index.js';
+import { authenticateJwt } from '../../services/index.js';
 
 class Middlewares implements IMiddlewares {
 
-  authenticate = authenticateUser(envs.authStrategy());
+  async authenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    return await authenticateJwt(req, res, next);
+  }
 
 
   async getUserFromReq(req: express.Request) {
@@ -51,14 +53,32 @@ class Middlewares implements IMiddlewares {
   }
 
   isAuthenticated(req: any, res: express.Response, next: express.NextFunction) {
-    req.isAuthenticated() ? next() : responce(res).unAuthorized();
+    req.user ? next() : responce(res).unAuthorized();
 
   }
 
   async isAdmin(req: any, res: express.Response, next: express.NextFunction) {
-    return this.isInRole('admin');
 
+    if (!req.user) {
+      return responce(res).forbidden('require authentication')
+    }
+
+    if (req.user.roles) {
+      for (let r of req.user.roles) {
+        if (r.name === 'admin') {
+          next();
+          return;
+        }
+      }
+
+    }
+
+    responce(res).forbidden("Require Admin Role!");
+
+    return;
   }
+
+
   // roles
   isRolesExist(roles: string[]) {
     if (roles) {
@@ -74,18 +94,14 @@ class Middlewares implements IMiddlewares {
 
 
   isInRole(roleName: string) {
-    let db = Svc.db.get('account')!;
     return async (req: any, res: express.Response, next: express.NextFunction) => {
-      if (!req.isAuthenticated()) {
+      if (!req.user) {
         responce(res).forbidden('require authentication')
         return;
       }
-      let reqUser: any = req.user && req.user.roles ? req.user : await db.findById(req.user._id);
 
-      let roles = await db.model!.find({ _id: { $in: reqUser.roles } });
-
-      if (roles) {
-        for (let r of roles) {
+      if (req.user.roles) {
+        for (let r of req.user.roles) {
           if (r.name === roleName) {
             next();
             return;
@@ -94,7 +110,7 @@ class Middlewares implements IMiddlewares {
 
       }
 
-      responce(res).forbidden("Require Admin Role!");
+      responce(res).forbidden(`Require ${roleName} Role!`);
 
       return;
     }
