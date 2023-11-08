@@ -6,13 +6,17 @@
         "put",
         "delete"
     ],
-    "useAdmin": ["list"],
+    "useAdmin": [
+        "list",
+        "delete",
+        "search"
+    ],
     "schemaObj": {
         "body": {
             "type": "String",
             "required": true,
             "minLength": 3,
-            "tagName": "textarea",
+            "tagname": "textarea",
             "className":"form-control"
         },
         "user": {

@@ -14,7 +14,6 @@
   "useAdmin": [
     "list",
     "get",
-    "post",
     "put",
     "delete",
     "search",
@@ -37,7 +36,7 @@
       "required": true,
       "minLength": 3,
       "maxLength": 50,
-      "tagName": "input",
+      "tagname": "input",
       "className":"form-control"
     },
     "email": {
@@ -46,7 +45,7 @@
       "required": true,
       "minLength": 3,
       "maxLength": 30,
-      "tagName": "input",
+      "tagname": "input",
       "inputtype": "email",
       "className":"form-control"
     },
@@ -55,7 +54,7 @@
       "lowercase": true,
       "minLength": 3,
       "maxLength": 30,
-      "tagName": "input",
+      "tagname": "input",
       "inputtype": "telphone",
       "className":"form-control"
     },
@@ -63,8 +62,11 @@
       "type": "String",
       "required": true,
       "minLength": 5,
-      "tagName": "textarea",
-      "className":"form-control"
+      "tagname": "textarea",
+      "className":"form-control",
+      "style":{
+        "minHeight": "200px"
+      }
     }
   }
 }

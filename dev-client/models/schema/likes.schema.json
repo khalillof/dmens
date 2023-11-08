@@ -6,12 +6,12 @@
         "put",
         "delete"
     ],
-    "useAdmin": [],
+    "useAdmin": ["search","count"],
     "schemaObj": {
         "like": {
             "type": "Boolean",
             "default": false,
-            "tagName": "input",
+            "tagname": "input",
             "className":"form-control"
         },
         "rate": {
@@ -19,7 +19,7 @@
             "default": 0,
             "min": 0,
             "max": 5,
-            "tagName": "input",
+            "tagname": "input",
             "inputtype": "Number",
             "className":"form-control"
         },
@@ -27,7 +27,7 @@
             "type": "String",
             "minLength": 0,
             "maxLength": 150,
-            "tagName": "textarea",
+            "tagname": "textarea",
             "className":"form-control"
         },
         "userid": {

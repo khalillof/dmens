@@ -19,7 +19,7 @@
       "required": true,
       "minLength": 3,
       "maxLength": 30,
-      "tagName": "input",
+      "tagname": "input",
       "className":"form-control"
     }
   }

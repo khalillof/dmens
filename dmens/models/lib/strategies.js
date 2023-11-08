@@ -21,7 +21,7 @@ class PassportStrategies {
     }
     static Local2() {
         return new LocalStrategy(function (username, password, cb) {
-            Svc.db.get('account').model.findOne({ username: username }).populate('roles').exec().then((user) => {
+            Svc.db.get('account').model.findOne({ username: username }).then((user) => {
                 if (!user) {
                     return cb(null, false, { message: 'Incorrect username or password.' });
                 }
@@ -52,9 +52,9 @@ class PassportStrategies {
             audience: envs.audience(),
             // passReqToCallback:true
         }, async (payload, done) => {
-            Svc.db.get('account').model?.findById(payload.user._id).populate('roles').exec().then((error, user, info) => {
-                return user && done(false, user) || error && done(error, null) || info && done(false, null, info);
-            });
+            // roles populate relaying on autopopulate plugin
+            Svc.db.get('account').model?.findById(payload.user._id)
+                .then((error, user, info) => done(user, error, info));
         });
     }
     // JWT stratigy

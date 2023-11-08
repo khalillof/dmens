@@ -11,30 +11,10 @@ export interface IRequestFilter {
 
 export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 
-export interface IModelFormConfigData {
-  name: string
-  active: Boolean
-  routeName: string
-  param:string
-  routeParam:string
-  searchKey?:string
-  queryName?:string
-  pagesPerPage:number
-  useAuth: string[]
-  useAdmin: string[]
-  displayName:string
-  useComment?: boolean
-  uselikes?: boolean
-};
 export interface IForm {
-  config:IModelFormConfigData
+  name:string
   elements: Record<string, [Record<string, any>, Record<string, any>]>
 
-  listAuth :boolean[]
-  getAuth :boolean[]
-  postAuth :boolean[]
-  putAuth :boolean[]
-  searchAuth :boolean[]
 }
 export interface ISvc {
   db: ISvcIntance<IDbModel>
@@ -72,7 +52,7 @@ export interface IConfigPropsParameters {
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName?: string
-  param?:string
+  paramId?:string
   displayName?:string
   pagesPerPage?:number
   queryName?:string
@@ -85,30 +65,43 @@ export interface IConfigPropsParameters {
 
 };
 
-export interface IConfigProps {
-  name: string
-  active: Boolean
-  schemaObj: object
-  schemaOptions?: Record<string, any>
+export interface IRouteData {
+  modelName: string
   routeName: string
-  param:string
+  baseRoutePath:string
+  paramId:string
   routeParam:string
   searchKey?:string
   queryName?:string
   pagesPerPage:number
   useAuth: string[]
   useAdmin: string[]
-  postPutMiddlewares: string[]
   displayName:string
-  useComment?: boolean
-  uselikes?: boolean
+  useComment: boolean
+  uselikes: boolean
+
+  listAuth :boolean[]
+  getAuth :boolean[]
+  postAuth :boolean[]
+  putAuth :boolean[]
+  searchAuth :boolean[]
+};
+export interface IConfigProps {
+  name: string
+  active: Boolean
+  routeData :IRouteData
+  
+  schemaObj: object
+  schemaOptions?: Record<string, any>
+  postPutMiddlewares: string[] // used for post put actions
+  formCache?:IForm
   getRoutes?(): { method: string; path: string;}[]
   getProps?(): IConfigProps
   genForm?(): Promise<IForm>
   //check useAuth and useAdmin
   authAdminMiddlewares?(actionName: string): string[]
-  inAuth?(action:string):boolean
-  inAdmin?(action:string):boolean
+  inAuth?(actionName:string):boolean
+  inAdmin?(actionName:string):boolean
 };
 
 export interface IDbModel {

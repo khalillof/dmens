@@ -1,6 +1,6 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
-import {authenticateUser, generateJwt} from '../../services/index.js';
+import {authenticateLocal, generateJwt} from '../../services/index.js';
 import { envs} from '../../common/index.js';
 
 export class AccountController extends DefaultController {
@@ -20,7 +20,7 @@ export class AccountController extends DefaultController {
 
 async signin(req: express.Request, res: express.Response, next: express.NextFunction){
  // local /jwt
- return await authenticateUser('local')(req, res, next);
+ return await authenticateLocal(req, res, next);
 }
 async forgetPassword(req: express.Request, res: express.Response, next: express.NextFunction){
  //Normally setPassword is used when the user forgot the password 

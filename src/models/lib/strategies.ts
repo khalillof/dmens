@@ -26,7 +26,7 @@ export class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-        Svc.db.get('account')!.model!.findOne({ username: username }).populate('roles').exec().then((user:any) => {
+        Svc.db.get('account')!.model!.findOne({ username: username }).then((user:any) => {
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
                   
                   // Function defined at bottom of app.js
@@ -58,10 +58,9 @@ export class PassportStrategies {
       audience: envs.audience(),
      // passReqToCallback:true
     },async (payload:any, done:any) => {
-      Svc.db.get('account')!.model?.findById(payload.user._id).populate('roles').exec().then((error: any, user?: any, info?:any)=>{
-
-        return user && done(false,user) || error && done(error,null) || info && done(false,null,info);
-     })
+      // roles populate relaying on autopopulate plugin
+      Svc.db.get('account')!.model?.findById(payload.user._id)
+      .then((error: any, user?: any, info?:any)=> done(user,error, info))
   })}
   // JWT stratigy
   static JwtQueryParameterStrategy() {
