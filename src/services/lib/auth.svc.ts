@@ -104,7 +104,7 @@ async function authenticateLocal(req: express.Request, res: express.Response, ne
 async function authenticateJwt(req: express.Request, res: express.Response, next: express.NextFunction) {
 
   return await passport.authenticate("jwt", {}, async (err: any, user: any, info: any) => {
-
+    //console.log('user id jwt ......', {err,user, info})
     if (user) {
       req.user = user;
 

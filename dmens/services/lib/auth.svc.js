@@ -89,6 +89,7 @@ async function authenticateLocal(req, res, next) {
 }
 async function authenticateJwt(req, res, next) {
     return await passport.authenticate("jwt", {}, async (err, user, info) => {
+        //console.log('user id jwt ......', {err,user, info})
         if (user) {
             req.user = user;
             console.log('user id jwt ......', user._id);

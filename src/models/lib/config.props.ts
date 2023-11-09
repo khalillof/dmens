@@ -8,7 +8,7 @@ import { RouteData } from './RouteData.js';
 export class ConfigProps implements IConfigProps {
 
   constructor(_config: IConfigPropsParameters) {
-    let { name, active, schemaObj, schemaOptions, postPutMiddlewares, useComment, uselikes} = _config;
+    let { name, active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -31,12 +31,12 @@ export class ConfigProps implements IConfigProps {
 
   name: string
   active: Boolean
-  routeData :IRouteData
-  
+  routeData: IRouteData
+
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
-  formCache?:IForm
+  formCache?: IForm
 
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
@@ -58,35 +58,33 @@ export class ConfigProps implements IConfigProps {
   }
 
   async genForm(): Promise<IForm> {
-    if(this.formCache)
-    return this.formCache;
+    if (this.formCache)
+      return this.formCache;
 
     let _form = new Form(this);
-    let clone = {...this.schemaObj};
-   await _form.genElements(clone)
-   this.formCache = _form;
+    let clone = { ...this.schemaObj };
+    await _form.genElements(clone)
+    this.formCache = _form;
 
-    return await Promise.resolve(_form) 
+    return await Promise.resolve(_form)
   }
 
   //check useAuth and useAdmin and return full list of middlewares
   authAdminMiddlewares(actionName: string): string[] {
-    
-    let result: string[] = [];
 
-    if(this.inAuth(actionName)) 
-    result.push('authenticate')
-
-    if(this.inAdmin(actionName)) 
-    result.push('isAdmin')
-
-    return result;
+    if (this.inAdmin(actionName)) {
+      return ['authenticate', 'isAdmin']
+    } else if (this.inAuth(actionName)) {
+      return ['authenticate']
+    } else {
+      return []
+    }
   }
 
-  inAuth(actionName:string):boolean{
+  inAuth(actionName: string): boolean {
     return this.routeData.useAuth.indexOf(actionName) !== -1
   }
-  inAdmin(actionName:string):boolean{
+  inAdmin(actionName: string): boolean {
     return this.routeData.useAdmin.indexOf(actionName) !== -1
   }
 }

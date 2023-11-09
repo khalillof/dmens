@@ -84,6 +84,7 @@ export interface IRouteData {
   getAuth :boolean[]
   postAuth :boolean[]
   putAuth :boolean[]
+  deleteAuth : boolean[]
   searchAuth :boolean[]
 };
 export interface IConfigProps {
@@ -181,11 +182,12 @@ export interface IDefaultRoutesConfig {
   controller: IController;
   mware?: IMiddlewares;
   
-  addRoutePath(name:string):string
+  addPath(name:string):string
   buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
   setOptions(routPath: string): void;
   options(): void;
   setParam(): void;
+  defaultClientRoutes(): Promise<any>
   defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }
