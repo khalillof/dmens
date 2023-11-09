@@ -26,6 +26,7 @@ export class RouteData {
         this.getAuth = isIn('get');
         this.postAuth = isIn('post');
         this.putAuth = isIn('put');
+        this.deleteAuth = isIn('delete');
         this.searchAuth = isIn('search');
     }
     modelName;
@@ -45,6 +46,7 @@ export class RouteData {
     getAuth;
     postAuth;
     putAuth;
+    deleteAuth;
     searchAuth;
     removeDiplicates(arr) {
         // Set will remove diblicate

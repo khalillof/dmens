@@ -3,6 +3,7 @@ import { Svc, Assert, envs } from '../../common/index.js';
 import { middlewares } from '../../middlewares/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { appRouter } from '../../app.js';
+const inDefaultActions = (action) => ['get', 'post', 'put', 'delete', 'search', 'count', 'form', 'route', 'routedata'].indexOf(action) !== -1;
 export class DefaultRoutesConfig {
     router;
     config;
@@ -20,7 +21,9 @@ export class DefaultRoutesConfig {
         // add instance to routeStore
         Svc.routes.add(this);
     }
-    addRoutePath(name) {
+    addPath(name, param) {
+        if (param)
+            return this.config.routeData.routeParam + (name.startsWith('/') ? name : '/' + name);
         return this.config.routeData.baseRoutePath + (name.startsWith('/') ? name : '/' + name);
     }
     // custom routes
@@ -28,11 +31,13 @@ export class DefaultRoutesConfig {
         if (!route_path)
             throw new Error('buildRoute method require url or routeName');
         // remove diplicates
-        middlewares = Array.from(new Set([...middlewares, ...this.controller?.db.config.authAdminMiddlewares(actionName ?? method)]));
+        middlewares = Array.from(new Set([...middlewares, ...this.config.authAdminMiddlewares(actionName ?? 'No')]));
         let mdwrs = this.mware;
         // map middlewares string fuction names to actual functions
         let mdwares = middlewares.map((m) => mdwrs[m]);
-        return this.router[((method === 'list') ? 'get' : method)](route_path, ...mdwares, this.actions(actionName ?? method));
+        //if (this.config.name === 'account')
+        //  console.log(`${actionName} = ${method} = ${mdwares.length}  : ${middlewares}`)
+        return this.router[method](route_path, ...mdwares, this.actions(actionName ?? method));
     }
     setOptions(routPath) {
         this.router.options(routPath, corsWithOptions);
@@ -53,18 +58,23 @@ export class DefaultRoutesConfig {
             }
         });
     }
+    async defaultClientRoutes() {
+        await this.buidRoute(this.addPath('/search'), 'get', 'search'); // search
+        await this.buidRoute(this.addPath('/count'), 'get', 'count'); // count
+        await this.buidRoute(this.addPath('/form'), 'get', 'form'); // get form elements
+        await this.buidRoute(this.addPath('/route'), 'get', 'route'); // get form routes
+        await this.buidRoute(this.addPath('/routedata'), 'get', 'routedata'); // get model routeData
+    }
     async defaultRoutes() {
-        await this.buidRoute(this.config.routeData.baseRoutePath + '/search', 'list', 'search'); // search
-        await this.buidRoute(this.config.routeData.baseRoutePath + '/count', 'get', 'count'); // count
-        await this.buidRoute(this.config.routeData.baseRoutePath + '/form', 'get', 'form'); // get form elements
-        await this.buidRoute(this.config.routeData.baseRoutePath + '/route', 'get', 'route'); // get form routes
-        await this.buidRoute(this.config.routeData.baseRoutePath + '/routedata', 'get', 'routedata'); // get model routeData
-        await this.buidRoute(this.config.routeData.baseRoutePath, 'list', 'list'); // list
-        await this.buidRoute(this.config.routeData.routeParam, 'get', 'getOne'); // get by id
-        await this.buidRoute(this.config.routeData.baseRoutePath, 'get', 'getOne'); // getOne by filter parameter
-        await this.buidRoute(this.config.routeData.routeName, 'post', null, this.controller?.db.config.postPutMiddlewares); // post
-        await this.buidRoute(this.config.routeData.routeParam, 'put', null, this.controller?.db.config.postPutMiddlewares); // put
-        await this.buidRoute(this.config.routeData.routeParam, 'delete', null, ['validateCurrentUserOwnParamId']); // delete
+        await this.defaultClientRoutes();
+        let baseRoute = this.config.routeData.baseRoutePath;
+        let routeParam = this.config.routeData.routeParam;
+        await this.buidRoute(baseRoute, 'get', 'list'); // list
+        await this.buidRoute(routeParam, 'get', 'getOne'); // get by id
+        await this.buidRoute(baseRoute, 'get', 'getOne'); // getOne by filter parameter
+        await this.buidRoute(baseRoute, 'post', 'post', this.config.postPutMiddlewares); // post
+        await this.buidRoute(routeParam, 'put', 'put', this.config.postPutMiddlewares); // put
+        await this.buidRoute(routeParam, 'delete', 'delete', ['validateCurrentUserOwnParamId']); // delete
         this.setParam();
         this.options();
     }

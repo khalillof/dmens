@@ -96,7 +96,7 @@ class Middlewares implements IMiddlewares {
   isInRole(roleName: string) {
     return async (req: any, res: express.Response, next: express.NextFunction) => {
       if (!req.user) {
-        responce(res).forbidden('require authentication')
+        responce(res).forbidden('require authentication');
         return;
       }
 

@@ -4,7 +4,7 @@ import { Form } from '../index.js';
 import { RouteData } from './RouteData.js';
 export class ConfigProps {
     constructor(_config) {
-        let { name, active, schemaObj, schemaOptions, postPutMiddlewares, useComment, uselikes } = _config;
+        let { name, active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -54,12 +54,15 @@ export class ConfigProps {
     }
     //check useAuth and useAdmin and return full list of middlewares
     authAdminMiddlewares(actionName) {
-        let result = [];
-        if (this.inAuth(actionName))
-            result.push('authenticate');
-        if (this.inAdmin(actionName))
-            result.push('isAdmin');
-        return result;
+        if (this.inAdmin(actionName)) {
+            return ['authenticate', 'isAdmin'];
+        }
+        else if (this.inAuth(actionName)) {
+            return ['authenticate'];
+        }
+        else {
+            return [];
+        }
     }
     inAuth(actionName) {
         return this.routeData.useAuth.indexOf(actionName) !== -1;
