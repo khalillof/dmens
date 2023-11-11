@@ -94,7 +94,7 @@ export const roleConfigSchema = {
             "required": true,
             "minLength": 3,
             "maxLength": 30,
-            "tagName": "input",
+            "tag": "input",
             "className": "form-control"
         }
     }

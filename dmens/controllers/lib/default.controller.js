@@ -16,8 +16,8 @@ export class DefaultController {
         let _form = await this.db.config.genForm();
         this.responce(res).data(_form);
     }
-    async routedata(req, res, next) {
-        let data = this.db.config.routeData;
+    async modeldata(req, res, next) {
+        let data = this.db.config.modelData;
         this.responce(res).data(data);
     }
     async route(req, res, next) {

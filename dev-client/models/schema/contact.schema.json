@@ -36,7 +36,7 @@
       "required": true,
       "minLength": 3,
       "maxLength": 50,
-      "tagname": "input",
+      "tag": "input",
       "className":"form-control"
     },
     "email": {
@@ -45,7 +45,7 @@
       "required": true,
       "minLength": 3,
       "maxLength": 30,
-      "tagname": "input",
+      "tag": "input",
       "inputtype": "email",
       "className":"form-control"
     },
@@ -54,7 +54,7 @@
       "lowercase": true,
       "minLength": 3,
       "maxLength": 30,
-      "tagname": "input",
+      "tag": "input",
       "inputtype": "telphone",
       "className":"form-control"
     },
@@ -62,7 +62,7 @@
       "type": "String",
       "required": true,
       "minLength": 5,
-      "tagname": "textarea",
+      "tag": "textarea",
       "className":"form-control",
       "style":{
         "minHeight": "200px"

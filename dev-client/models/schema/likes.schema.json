@@ -11,7 +11,7 @@
         "like": {
             "type": "Boolean",
             "default": false,
-            "tagname": "input",
+            "tag": "input",
             "className":"form-control"
         },
         "rate": {
@@ -19,7 +19,7 @@
             "default": 0,
             "min": 0,
             "max": 5,
-            "tagname": "input",
+            "tag": "input",
             "inputtype": "Number",
             "className":"form-control"
         },
@@ -27,7 +27,7 @@
             "type": "String",
             "minLength": 0,
             "maxLength": 150,
-            "tagname": "textarea",
+            "tag": "textarea",
             "className":"form-control"
         },
         "userid": {

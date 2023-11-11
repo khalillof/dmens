@@ -25,46 +25,52 @@
             "unique": true,
             "minLength": 5,
             "maxLength": 150,
-            "tagname": "input",
+            "tag": "input",
             "className":"form-control"
         },
         "image": {
             "type": "String",
             "minLength": 5,
             "maxLength": 150,
-            "tagname": "input",
+            "tag": "input",
             "className":"form-control"
         },
         "descriptions": {
             "type": "String",
             "minLength": 5,
-            "tagname": "textarea",
-            "className":"form-control"
+            "tag": "textarea",
+            "className":"form-control",
+            "style":{
+                "minHeight": "150px"
+              }
         },
         "body": {
             "type": "String",
             "required": true,
             "minLength": 5,
-            "tagname": "textarea",
-            "className":"form-control"
+            "tag": "textarea",
+            "className":"form-control",
+            "style":{
+                "minHeight": "200px"
+              }
         },
         "isfeatured": {
             "type": "Boolean",
             "default": false,
-            "tagname": "input",
+            "tag": "input",
             "inputtype": "checkbox",
             "className":"form-check-input"
         },
         "isPublished": {
             "type": "Boolean",
             "default": false,
-            "tagname": "input",
+            "tag": "input",
             "inputtype": "checkbox",
             "className":"form-check-input"
         },
         "publisheDate": {
             "type": "Date",
-            "tagname": "input",
+            "tag": "input",
             "inputtype": "date",
             "className":"form-control"
         },
@@ -73,7 +79,7 @@
             "ref": "category",
             "required": true,
             "autopopulate": true,
-            "tagname": "select",
+            "tag": "select",
             "optionkey": "name",
             "className":"form-select"
         },

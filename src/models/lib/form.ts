@@ -34,7 +34,7 @@ export class Form implements IForm {
   async  genElements(schemaObj: Record<string, any>) {
          
         for (let [key, value] of Object.entries(schemaObj)) {
-            let tagname = value['tagname'];
+            let tagname = value['tag'];
 
             if (typeof value === 'object' && tagname) {
 
@@ -56,8 +56,9 @@ export class Form implements IForm {
 
                         if (optionkey && ref && Svc.db.exist(ref)) {
                             
-                            options =  (await Svc.db.get(ref)!.model!.find() || []).map((item: any, i: number) => { return { tagName: 'option', key: i, title: item[optionkey], value: item._id.toString() } });
-
+                            options =  (await Svc.db.get(ref)!.model!.find() || []).map((item: any) =>  ({key: item._id.toString(), title: item[optionkey], value: item._id.toString()}) );
+                            options.unshift({k:options.length+1 ,title:`Choose ${key}....` , disabled:true, defaultValue:""})
+                          
                             this.addElemLable(key, value, { options });
                         } else {
                             this.addElemLable(key, value);
@@ -78,7 +79,7 @@ export class Form implements IForm {
 
     private addElemLable(key: string, elm: IElement, override?: Record<string, any>) {
         let element = { ...this.cleanObj(elm), id: key, ...override }
-        let lable = { title: (element.ariaLabel ?? key),'aria-valuetext':(element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
+        let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
 
         this.elements[key] = [element, lable];
     }

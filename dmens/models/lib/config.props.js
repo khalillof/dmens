@@ -1,7 +1,6 @@
 "use strict";
 import { Svc } from '../../common/index.js';
-import { Form } from '../index.js';
-import { RouteData } from './RouteData.js';
+import { Form, ModelData } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
         let { name, active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
@@ -16,12 +15,12 @@ export class ConfigProps {
             this.active = active || false,
             this.schemaObj = schemaObj || {},
             this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
-        this.routeData = new RouteData(_config);
+        this.modelData = new ModelData(_config);
         this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
     }
     name;
     active;
-    routeData;
+    modelData;
     schemaObj;
     schemaOptions;
     postPutMiddlewares; // used for post put actions
@@ -36,12 +35,12 @@ export class ConfigProps {
             active: this.active,
             schemaObj: this.schemaObj,
             schemaOptions: this.schemaOptions,
-            routeData: this.routeData,
+            modelData: this.modelData,
             postPutMiddlewares: this.postPutMiddlewares
         };
     }
     getRoutes() {
-        return Svc.routes.getRoutesPathMethods(this.routeData.routeName);
+        return Svc.routes.getRoutesPathMethods(this.modelData.routeName);
     }
     async genForm() {
         if (this.formCache)
@@ -65,9 +64,9 @@ export class ConfigProps {
         }
     }
     inAuth(actionName) {
-        return this.routeData.useAuth.indexOf(actionName) !== -1;
+        return this.modelData.useAuth.indexOf(actionName) !== -1;
     }
     inAdmin(actionName) {
-        return this.routeData.useAdmin.indexOf(actionName) !== -1;
+        return this.modelData.useAdmin.indexOf(actionName) !== -1;
     }
 }

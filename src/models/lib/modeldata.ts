@@ -1,12 +1,12 @@
 "use strict";
 import { Svc } from '../../common/index.js';
-import { IConfigPropsParameters, IRouteData } from '../../interfaces/index.js';
+import { IConfigPropsParameters, IModelData } from '../../interfaces/index.js';
+   
 
-
-export class RouteData implements IRouteData {
+export class ModelData implements IModelData {
   constructor(_config: IConfigPropsParameters) {
     let { name, routeName, useAuth, useAdmin, displayName, searchKey, 
-      pagesPerPage, queryName, paramId, useComment, uselikes } = _config;
+      pagesPerPage, queryName, paramId, useComment, useLikes, mdTemplate } = _config;
         if(!name){
           throw new Error('name is required propery')
         }
@@ -20,7 +20,8 @@ export class RouteData implements IRouteData {
     this.useAdmin = this.removeDiplicates(useAdmin);
     this.displayName = displayName || this.modelName;
     this.useComment = useComment || false;
-    this.uselikes = uselikes || false; 
+    this.useLikes = useLikes || false; 
+    this.mdTemplate = mdTemplate;
 
     if (queryName)
       this.queryName = queryName;
@@ -52,7 +53,8 @@ export class RouteData implements IRouteData {
   useAuth: string[];
   useAdmin: string[];
   useComment: boolean
-  uselikes: boolean 
+  useLikes: boolean 
+  mdTemplate?:string 
 
   listAuth: boolean[]
   getAuth: boolean[]

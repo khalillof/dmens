@@ -22,8 +22,8 @@ export class ConfigController extends DefaultController {
         this.responce(res).success()
     }
     
-    async routesdata(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Svc.db.obj().map(async (d)=>  d.config.routeData));
+    async modelsdata(req: express.Request, res: express.Response, next: express.NextFunction) {
+        let data = await Promise.all(Svc.db.obj().map(async (d)=>  d.config.modelData));
         this.responce(res).data(data)
       }
 
@@ -62,7 +62,7 @@ export class ConfigController extends DefaultController {
             Svc.db.delete(item.name)
 
             // delete app route
-            Svc.routes.deleteAppRoute(item.routeData.routeName)
+            Svc.routes.deleteAppRoute(item.modelData.routeName)
 
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
             this.responce(res).success()
