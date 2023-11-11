@@ -11,7 +11,7 @@ export class Form {
     elements;
     async genElements(schemaObj) {
         for (let [key, value] of Object.entries(schemaObj)) {
-            let tagname = value['tagname'];
+            let tagname = value['tag'];
             if (typeof value === 'object' && tagname) {
                 switch (tagname) {
                     case "input":
@@ -27,7 +27,8 @@ export class Form {
                         let options = [];
                         let { optionkey, ref } = value;
                         if (optionkey && ref && Svc.db.exist(ref)) {
-                            options = (await Svc.db.get(ref).model.find() || []).map((item, i) => { return { tagName: 'option', key: i, title: item[optionkey], value: item._id.toString() }; });
+                            options = (await Svc.db.get(ref).model.find() || []).map((item, i) => ({ key: i, title: item[optionkey], value: item._id.toString() }));
+                            options.unshift({ k: options.length + 1, title: `Choose ${key}....`, disabled: true, defaultValue: "" });
                             this.addElemLable(key, value, { options });
                         }
                         else {
@@ -47,7 +48,7 @@ export class Form {
     }
     addElemLable(key, elm, override) {
         let element = { ...this.cleanObj(elm), id: key, ...override };
-        let lable = { title: (element.ariaLabel ?? key), 'aria-valuetext': (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
+        let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
         this.elements[key] = [element, lable];
     }
     cleanObj(obj, type = true) {

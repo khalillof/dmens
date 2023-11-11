@@ -16,7 +16,7 @@
             "type": "String",
             "required": true,
             "minLength": 3,
-            "tagname": "textarea",
+            "tag": "textarea",
             "className":"form-control"
         },
         "user": {

@@ -61,11 +61,13 @@ export interface IConfigPropsParameters {
   useAdmin?: string[]
   postPutMiddlewares?:string[]
   useComment?: boolean
-  uselikes?: boolean
+  useLikes?: boolean
+  mdTemplate?:string
 
 };
 
-export interface IRouteData {
+
+export interface IModelData{
   modelName: string
   routeName: string
   baseRoutePath:string
@@ -77,8 +79,6 @@ export interface IRouteData {
   useAuth: string[]
   useAdmin: string[]
   displayName:string
-  useComment: boolean
-  uselikes: boolean
 
   listAuth :boolean[]
   getAuth :boolean[]
@@ -86,11 +86,15 @@ export interface IRouteData {
   putAuth :boolean[]
   deleteAuth : boolean[]
   searchAuth :boolean[]
-};
+
+  useComment: boolean
+  useLikes: boolean
+  mdTemplate?:string
+}
 export interface IConfigProps {
   name: string
   active: Boolean
-  routeData :IRouteData
+  modelData :IModelData
   
   schemaObj: object
   schemaOptions?: Record<string, any>
@@ -166,6 +170,14 @@ export interface IController {
   db: IDbModel;
   responce: Iresponce;
   log: Ilogger;
+
+  form(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  route(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  modeldata(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+
+  count(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  search(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+
   list(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   getOne(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
   post(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
@@ -176,11 +188,19 @@ export interface IController {
 
 };
 
+export interface IConfigController extends IController{
+  forms(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  routes(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  modelsdata(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  deleteRoute(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+}
 export interface IDefaultRoutesConfig {
   router: IRouter
   config:IConfigProps
   controller: IController;
   mware?: IMiddlewares;
+  baseRoutePath:string
+  baseRouteParam:string
   
   addPath(name:string):string
   buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>

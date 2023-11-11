@@ -1,8 +1,8 @@
 "use strict";
 import { Svc } from '../../common/index.js';
-export class RouteData {
+export class ModelData {
     constructor(_config) {
-        let { name, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, uselikes } = _config;
+        let { name, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, mdTemplate } = _config;
         if (!name) {
             throw new Error('name is required propery');
         }
@@ -15,7 +15,8 @@ export class RouteData {
             this.useAdmin = this.removeDiplicates(useAdmin);
         this.displayName = displayName || this.modelName;
         this.useComment = useComment || false;
-        this.uselikes = uselikes || false;
+        this.useLikes = useLikes || false;
+        this.mdTemplate = mdTemplate;
         if (queryName)
             this.queryName = queryName;
         if (searchKey)
@@ -41,7 +42,8 @@ export class RouteData {
     useAuth;
     useAdmin;
     useComment;
-    uselikes;
+    useLikes;
+    mdTemplate;
     listAuth;
     getAuth;
     postAuth;

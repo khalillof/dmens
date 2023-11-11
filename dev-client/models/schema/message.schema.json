@@ -22,14 +22,14 @@
             "required": true,
             "minLength": 3,
             "maxLength": 150,
-            "tagname": "input",
+            "tag": "input",
             "className":"form-control"
         },
         "body": {
             "type": "String",
             "required": true,
             "minLength": 3,
-            "tagname": "textarea",
+            "tag": "textarea",
             "className":"form-control"
         },
         "sender": {

@@ -1,9 +1,8 @@
 "use strict";
-import { Svc } from '../../common/index.js';
 
-import { IConfigProps, IConfigPropsParameters, IForm, IRouteData } from '../../interfaces/index.js';
-import { Form } from '../index.js';
-import { RouteData } from './RouteData.js';
+import { Svc } from '../../common/index.js';
+import { IConfigProps, IConfigPropsParameters, IForm, IModelData} from '../../interfaces/index.js';
+import { Form, ModelData } from '../index.js';
 
 export class ConfigProps implements IConfigProps {
 
@@ -25,14 +24,13 @@ export class ConfigProps implements IConfigProps {
       this.schemaObj = schemaObj || {},
       this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
 
-    this.routeData = new RouteData(_config);
+    this.modelData = new ModelData(_config);
     this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares)
   }
 
   name: string
   active: Boolean
-  routeData: IRouteData
-
+  modelData : IModelData
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
@@ -48,13 +46,13 @@ export class ConfigProps implements IConfigProps {
       active: this.active,
       schemaObj: this.schemaObj,
       schemaOptions: this.schemaOptions,
-      routeData: this.routeData,
+      modelData: this.modelData,
       postPutMiddlewares: this.postPutMiddlewares
     }
   }
 
   getRoutes() {
-    return Svc.routes.getRoutesPathMethods(this.routeData.routeName)
+    return Svc.routes.getRoutesPathMethods(this.modelData.routeName)
   }
 
   async genForm(): Promise<IForm> {
@@ -82,9 +80,9 @@ export class ConfigProps implements IConfigProps {
   }
 
   inAuth(actionName: string): boolean {
-    return this.routeData.useAuth.indexOf(actionName) !== -1
+    return this.modelData.useAuth.indexOf(actionName) !== -1
   }
   inAdmin(actionName: string): boolean {
-    return this.routeData.useAdmin.indexOf(actionName) !== -1
+    return this.modelData.useAdmin.indexOf(actionName) !== -1
   }
 }
