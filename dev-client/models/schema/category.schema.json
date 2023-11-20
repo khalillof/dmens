@@ -2,13 +2,15 @@
   "name": "category",
   "active": true,
   "useAuth": [
-    "post",
-    "put",
+    "create",
+    "update",
+    "patch",
     "delete"
   ],
   "useAdmin": [
-    "post",
-    "put",
+    "create",
+    "update",
+    "patch",
     "delete"
   ],
   "schemaObj": {

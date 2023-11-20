@@ -1,5 +1,5 @@
 import express from 'express';
-import { isValidRole, Svc, responce, envs } from '../../common/index.js';
+import { isValidRole, Svc, responce} from '../../common/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
@@ -15,7 +15,7 @@ class Middlewares implements IMiddlewares {
   async getUserFromReq(req: express.Request) {
     return req.body && req.body.email ? await Svc.db.get('account')!.findOne({ email: req.body.email }) : null;
   }
-  checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction) {
+  checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction):void {
     if (req.body) {
       let { email, username, password } = req.body;
       if (!username && email) { req.body.username = email };
@@ -23,19 +23,21 @@ class Middlewares implements IMiddlewares {
 
       if (req.body.email && req.body.password) {
         next();
-        return;
+      }else{
+        responce(res).badRequest('Missing required body fields')
       }
-    }
+    }else{
     responce(res).badRequest('Missing required body fields')
-    return;
+    }
   }
 
   async validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction) {
     await this.getUserFromReq(req) ? responce(res).badRequest('User email already exists') : next();
   }
 
-  validateCurrentUserOwnParamId(req: any, res: express.Response, next: express.NextFunction) {
-    req.user && String(req.user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
+  validateCurrentUserOwnParamId(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let user:any = req.user;
+    user && String(user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
   }
   validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction) {
     (req.user && req.body.email === req.user.email) ? next() : responce(res).unAuthorized();
@@ -116,7 +118,7 @@ class Middlewares implements IMiddlewares {
     }
   }
 
-  isJson(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  isJson(req: express.Request, res: express.Response, next: express.NextFunction) {
 
     const toJsonNext = (data: any) => {
       req.body = JSON.parse(data);

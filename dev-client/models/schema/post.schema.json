@@ -8,13 +8,15 @@
     "useComment": true,
     "useLikes": true,
     "useAuth": [
-        "post",
-        "put",
+        "create",
+        "update",
+        "patch",
         "delete"
     ],
     "useAdmin": [
-        "post",
-        "put",
+        "create",
+        "update",
+        "patch",
         "delete"
     ],
     "schemaOptions": {},

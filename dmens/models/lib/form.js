@@ -27,7 +27,7 @@ export class Form {
                         let options = [];
                         let { optionkey, ref } = value;
                         if (optionkey && ref && Svc.db.exist(ref)) {
-                            options = (await Svc.db.get(ref).model.find() || []).map((item, i) => ({ key: i, title: item[optionkey], value: item._id.toString() }));
+                            options = (await Svc.db.get(ref).model.find() || []).map((item) => ({ key: item._id.toString(), title: item[optionkey], value: item._id.toString() }));
                             options.unshift({ k: options.length + 1, title: `Choose ${key}....`, disabled: true, defaultValue: "" });
                             this.addElemLable(key, value, { options });
                         }

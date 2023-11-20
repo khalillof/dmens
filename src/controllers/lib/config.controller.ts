@@ -31,7 +31,7 @@ export class ConfigController extends DefaultController {
        let _forms =  await Promise.all(Svc.db.obj().map(async (d)=>  await d.config.genForm!()));
         this.responce(res).data(_forms)
       }
-    override  async post(req: express.Request, res: express.Response) {
+    override  async create(req: express.Request, res: express.Response) {
         let conf: IConfigPropsParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
@@ -40,7 +40,7 @@ export class ConfigController extends DefaultController {
     }
 
 
-    override  async put(req: express.Request, res: express.Response, next: express.NextFunction) {
+    override  async update(req: express.Request, res: express.Response, next: express.NextFunction) {
         let id = req.params['id'];
 
         let config = (id && await this.db.findById(id)) || req.body.name && await this.db.findOne({ name: req.body.name });
