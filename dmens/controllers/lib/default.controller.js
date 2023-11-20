@@ -72,7 +72,7 @@ export class DefaultController {
         let item = await this.db.findOne(q);
         this.responce(res).data(item);
     }
-    async post(req, res, next) {
+    async create(req, res, next) {
         let item = await this.db.create(req.body);
         console.log('document Created :', item);
         this.responce(res).data(item);
@@ -81,7 +81,7 @@ export class DefaultController {
         await this.db.patchById(req.params['id'], req.body);
         this.responce(res).success();
     }
-    async put(req, res, next) {
+    async update(req, res, next) {
         await this.db.putById(req.params['id'], req.body);
         this.responce(res).success();
     }

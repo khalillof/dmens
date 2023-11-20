@@ -5,17 +5,19 @@
   "useAuth": [
     "list",
     "get",
-    "post",
-    "put",
+    "create",
+    "update",
     "delete",
+    "patch",
     "search",
     "count"
   ],
   "useAdmin": [
     "list",
     "get",
-    "put",
+    "update",
     "delete",
+    "patch",
     "search",
     "count"
   ],

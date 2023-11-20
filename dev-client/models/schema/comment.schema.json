@@ -2,8 +2,9 @@
     "name": "comment",
     "active": true,
     "useAuth": [
-        "post",
-        "put",
+        "create",
+        "update",
+        "patch",
         "delete"
     ],
     "useAdmin": [

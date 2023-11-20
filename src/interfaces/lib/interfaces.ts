@@ -66,6 +66,12 @@ export interface IConfigPropsParameters {
 
 };
 
+export interface IActionData{
+  path:string
+  reqAuth:boolean
+  reqAdmin:boolean
+}
+
 
 export interface IModelData{
   modelName: string
@@ -79,13 +85,6 @@ export interface IModelData{
   useAuth: string[]
   useAdmin: string[]
   displayName:string
-
-  listAuth :boolean[]
-  getAuth :boolean[]
-  postAuth :boolean[]
-  putAuth :boolean[]
-  deleteAuth : boolean[]
-  searchAuth :boolean[]
 
   useComment: boolean
   useLikes: boolean
@@ -165,35 +164,40 @@ export interface Ilogger {
   resErr: (res: express.Response, err: any) => void;
 };
 
+export type IRequestVerpsAsync = (req: express.Request, res: express.Response, next: express.NextFunction)=> Promise<void>
+export type IRequestVerps = (req: express.Request, res: express.Response, next: express.NextFunction)=> void
+
 export interface IController {
 
   db: IDbModel;
   responce: Iresponce;
   log: Ilogger;
 
-  form(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  route(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  modeldata(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  form:IRequestVerpsAsync;
+  route:IRequestVerpsAsync;
+  modeldata:IRequestVerpsAsync;
 
-  count(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  search(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  count:IRequestVerpsAsync;
+  search:IRequestVerpsAsync;
 
-  list(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  getOne(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  post(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  patch(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  put(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  delete(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  list:IRequestVerpsAsync;
+  getOne:IRequestVerpsAsync;
+  create:IRequestVerpsAsync;
+  patch:IRequestVerpsAsync;
+  update:IRequestVerpsAsync;
+  delete:IRequestVerpsAsync;
   tryCatch(actionNam: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 
 };
 
 export interface IConfigController extends IController{
-  forms(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  routes(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  modelsdata(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
-  deleteRoute(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>;
+  forms:IRequestVerpsAsync;
+  routes:IRequestVerpsAsync;
+  modelsdata:IRequestVerpsAsync;
+  deleteRoute:IRequestVerpsAsync;
 }
+export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>Promise<any>;
+
 export interface IDefaultRoutesConfig {
   router: IRouter
   config:IConfigProps
@@ -201,9 +205,17 @@ export interface IDefaultRoutesConfig {
   mware?: IMiddlewares;
   baseRoutePath:string
   baseRouteParam:string
+  setMiddlewars(action:string,middlewares?:string[]):Promise<any[]>
   
-  addPath(name:string):string
-  buidRoute(routeName: string, method: string, actionName?: string | null,  middlewares?: string[] | null): Promise<any>
+  list:IHttpVerp
+  get:IHttpVerp
+  create:IHttpVerp
+  update:IHttpVerp
+  delete:IHttpVerp
+  search:IHttpVerp
+  patch:IHttpVerp
+
+  addPath(name:string, paramId?:boolean):string
   setOptions(routPath: string): void;
   options(): void;
   setParam(): void;
@@ -213,28 +225,28 @@ export interface IDefaultRoutesConfig {
 }
 
 export interface IMiddlewares {
-  authenticate:(req: any, res: any, next: any) => Promise<any>
-  getUserFromReq(req: express.Request): Promise<any>;
-  checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  authenticate:IRequestVerpsAsync;
+  getUserFromReq:IRequestVerpsAsync;
+  checkLoginUserFields:IRequestVerps;
 
-  validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  validateSameEmailDoesntExist:IRequestVerpsAsync;
 
-  validateCurrentUserOwnParamId(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  validateCurrentUserOwnParamId:IRequestVerps;
 
-  validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction): void;
+  validateHasQueryEmailBelongToCurrentUser:IRequestVerps;
 
-  validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction): void;
+  validateBodyEmailBelongToCurrentUser:IRequestVerps;
 
-  userExist(req: express.Request, res: express.Response, next: express.NextFunction): Promise<any>;
-  uploadSchema(req: any, res: express.Response, next: express.NextFunction): void;
-  isAuthenticated(req: any, res: express.Response, next: express.NextFunction): void;
+  userExist:IRequestVerpsAsync;
+  uploadSchema:IRequestVerps;
+  isAuthenticated:IRequestVerps;
   // roles
   isRolesExist(roles: [string]): boolean;
-  isJson(req: express.Request, res: express.Response, next: express.NextFunction): void;
+  isJson:IRequestVerps;
 
-  isInRole(roleName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
-  isAdmin(req: any, res: express.Response, next: express.NextFunction): void;
+  isInRole(roleName: string): IRequestVerpsAsync;
+  isAdmin:IRequestVerps;
 }
 export interface Iauthenticate {
-  (type: any, opts?: any): (req: any, res: any, next: any) => Promise<any>
+  (type: any, opts?: any): IRequestVerpsAsync;
 }

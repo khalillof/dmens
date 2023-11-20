@@ -6,14 +6,14 @@
     "useAuth": [
         "list",
         "get",
-        "post",
+        "create",
         "delete",
         "search",
         "count",
         "route"
     ],
     "useAdmin": [
-        "list","put","search"
+        "list","search"
     ],
     "displayName":"Messages",
     "schemaObj": {

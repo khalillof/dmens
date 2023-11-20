@@ -81,17 +81,15 @@ export const configConfigProp: IConfigPropsParameters = {
   displayName:"Configrations",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: confSchema,
-  useAuth:['search','count','routes','list','get','post','put','delete'],
-  useAdmin: ['search','count','routes','list','get','post','put','delete'],
+  useAuth:['list','get','create','update','delete','patch','search','count','routes', 'forms'],
+  useAdmin: ['list','get','create','update','patch','delete','search','count','routes','forms'],
   postPutMiddlewares: ['isJson', 'uploadSchema']
 };
 export const roleConfigSchema ={
   name: "role",
   active: true,
-  useAuth: ["search","count","list","get","post","put","delete"
-  ],
-  useAdmin: ["search","count","list","get","post","put","delete"
-  ],
+  useAuth: ['list','create','update','patch','delete',"search","count"],
+  useAdmin: ['create','update','patch','delete',"search","count"],
   schemaObj: {
     "name": {
       "type": "String",
@@ -169,8 +167,8 @@ export const accConfgSchema = {
       }
     ]
   },
-  useAuth:['search','count','list','get','put','delete'],
-  useAdmin: ["list",'search','count']
+  useAuth: ['list','get','update','patch','delete',"search","count"],
+  useAdmin: ['list',"search","count"],
 };
 
 

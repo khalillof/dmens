@@ -22,17 +22,21 @@ class Middlewares {
             ;
             if (req.body.email && req.body.password) {
                 next();
-                return;
+            }
+            else {
+                responce(res).badRequest('Missing required body fields');
             }
         }
-        responce(res).badRequest('Missing required body fields');
-        return;
+        else {
+            responce(res).badRequest('Missing required body fields');
+        }
     }
     async validateSameEmailDoesntExist(req, res, next) {
         await this.getUserFromReq(req) ? responce(res).badRequest('User email already exists') : next();
     }
     validateCurrentUserOwnParamId(req, res, next) {
-        req.user && String(req.user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
+        let user = req.user;
+        user && String(user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
     }
     validateBodyEmailBelongToCurrentUser(req, res, next) {
         (req.user && req.body.email === req.user.email) ? next() : responce(res).unAuthorized();

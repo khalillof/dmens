@@ -24,13 +24,13 @@ export class ConfigController extends DefaultController {
         let _forms = await Promise.all(Svc.db.obj().map(async (d) => await d.config.genForm()));
         this.responce(res).data(_forms);
     }
-    async post(req, res) {
+    async create(req, res) {
         let conf = req.body;
         let result = await Operations.createModelConfigRoute(conf);
         envs.logLine('document created or Overrided :', result.controller?.db.name);
         this.responce(res).data(result.controller.db.config.getProps());
     }
-    async put(req, res, next) {
+    async update(req, res, next) {
         let id = req.params['id'];
         let config = (id && await this.db.findById(id)) || req.body.name && await this.db.findOne({ name: req.body.name });
         let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });

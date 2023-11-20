@@ -3,7 +3,8 @@ import { Svc, Assert, envs } from '../../common/index.js';
 import { middlewares } from '../../middlewares/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { appRouter } from '../../app.js';
-//const isDefaultActions = (action: string) => ['get', 'post', 'put', 'delete', 'search', 'count', 'form', 'route', 'modeldata'].indexOf(action) !== -1;
+// defaultActions =['list','get', 'create', 'update','patch', 'delete', 'search', 'count', 'form', 'route', 'modeldata']
+//const isDefaultActions = (action: string) => defaultActions.indexOf(action) !== -1;
 export class DefaultRoutesConfig {
     router;
     config;
@@ -30,19 +31,6 @@ export class DefaultRoutesConfig {
             return this.baseRouteParam + (name.startsWith('/') ? name : '/' + name);
         return this.baseRoutePath + (name.startsWith('/') ? name : '/' + name);
     }
-    // custom routes
-    async buidRoute(route_path, method, actionName, middlewares = []) {
-        if (!route_path)
-            throw new Error('buildRoute method require url or routeName');
-        // remove diplicates
-        middlewares = Array.from(new Set([...middlewares, ...this.config.authAdminMiddlewares(actionName ?? 'No')]));
-        let mdwrs = this.mware;
-        // map middlewares string fuction names to actual functions
-        let mdwares = middlewares.map((m) => mdwrs[m]);
-        //if (this.config.name === 'account')
-        //  console.log(`${actionName} = ${method} = ${mdwares.length}  : ${middlewares}`)
-        return this.router[method](route_path, ...mdwares, this.actions(actionName ?? method));
-    }
     setOptions(routPath) {
         this.router.options(routPath, corsWithOptions);
     }
@@ -63,22 +51,49 @@ export class DefaultRoutesConfig {
         });
     }
     async defaultClientRoutes() {
-        await this.buidRoute(this.addPath('/search'), 'get', 'search'); // search
-        await this.buidRoute(this.addPath('/count'), 'get', 'count'); // count
-        await this.buidRoute(this.addPath('/form'), 'get', 'form'); // get form elements
-        await this.buidRoute(this.addPath('/route'), 'get', 'route'); // get form routes
-        await this.buidRoute(this.addPath('/modeldata'), 'get', 'modeldata'); // get model routeData
+        await this.search(); // search
+        await this.get(this.addPath('/count'), 'count'); // count
+        await this.get(this.addPath('/form'), 'form'); // get form elements
+        await this.get(this.addPath('/route'), 'route'); // get form routes
+        await this.get(this.addPath('/modeldata'), 'modeldata'); // get model routeData
     }
     async defaultRoutes() {
         await this.defaultClientRoutes();
-        await this.buidRoute(this.baseRoutePath, 'get', 'list'); // list   
-        await this.buidRoute(this.addPath('/one'), 'get', 'getOne'); // getOne by filter parameter
-        await this.buidRoute(this.baseRouteParam, 'get', 'getOne'); // get by id
-        await this.buidRoute(this.addPath('/create'), 'post', 'post', this.config.postPutMiddlewares); // post
-        await this.buidRoute(this.addPath('/edit', true), 'put', 'put', this.config.postPutMiddlewares); // put
-        await this.buidRoute(this.addPath('/delete', true), 'delete', 'delete', ['validateCurrentUserOwnParamId']); // delete
+        await this.list(); // list   
+        await this.get(); // get by id
+        await this.get(this.addPath('/one')); // getOne by filter parameter
+        await this.create(); // post
+        await this.update(); // put
+        await this.patch(); // patch
+        await this.delete(); // delete
         this.setParam();
         this.options();
+    }
+    async setMiddlewars(action, middlewares = []) {
+        let mware = this.mware;
+        let mdrs = [...middlewares, ...this.config.authAdminMiddlewares(action)].map((m) => mware[m]);
+        return [...mdrs, this.actions(action)];
+    }
+    async list(path, action, middlewares) {
+        await this.router.get(path ?? this.baseRoutePath, await this.setMiddlewars(action ?? 'list', middlewares));
+    }
+    async get(path, action, middlewares) {
+        await this.router.get(path ?? this.baseRouteParam, await this.setMiddlewars(action ?? 'getOne', middlewares));
+    }
+    async create(path, action, middlewares) {
+        await this.router.post(path ?? this.addPath('/create'), await this.setMiddlewars(action ?? 'create', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]));
+    }
+    async update(path, action, middlewares) {
+        await this.router.put(path ?? this.addPath('/update', true), await this.setMiddlewars(action ?? 'update', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]));
+    }
+    async delete(path, action, middlewares) {
+        await this.router.delete(path ?? this.addPath('/delete', true), await this.setMiddlewars(action ?? 'delete', [...(middlewares ? middlewares : []), 'validateCurrentUserOwnParamId']));
+    }
+    async search(path, action, middlewares) {
+        await this.router.search(path ?? this.addPath('/search'), await this.setMiddlewars(action ?? 'search', middlewares));
+    }
+    async patch(path, action, middlewares) {
+        await this.router.patch(path ?? this.addPath('/patch', true), await this.setMiddlewars(action ?? 'patch', middlewares));
     }
     actions(actionName) {
         return this.controller.tryCatch(actionName);

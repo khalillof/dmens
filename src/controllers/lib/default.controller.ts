@@ -96,7 +96,7 @@ export class DefaultController implements IController {
     let item = await this.db.findOne(q);
     this.responce(res).data(item)
   }
-  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async create(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.create(req.body);
     console.log('document Created :', item);
     this.responce(res).data(item)
@@ -107,7 +107,7 @@ export class DefaultController implements IController {
     this.responce(res).success()
   }
 
-  async put(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async update(req: express.Request, res: express.Response, next: express.NextFunction) {
     await this.db.putById(req.params['id'], req.body);
     this.responce(res).success()
   }

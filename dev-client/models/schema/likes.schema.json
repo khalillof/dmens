@@ -2,9 +2,10 @@
     "name": "like",
     "active": true,
     "useAuth": [
-        "post",
-        "put",
-        "delete"
+        "create",
+        "update",
+        "delete",
+        "patch"
     ],
     "useAdmin": ["search","count"],
     "schemaObj": {
