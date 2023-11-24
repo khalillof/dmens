@@ -1,6 +1,6 @@
 {
     "name": "like",
-    "active": true,
+    "dependent": true,
     "useAuth": [
         "create",
         "update",

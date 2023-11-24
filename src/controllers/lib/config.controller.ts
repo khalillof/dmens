@@ -23,7 +23,7 @@ export class ConfigController extends DefaultController {
     }
     
     async modelsdata(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Svc.db.obj().map(async (d)=>  d.config.modelData));
+        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.modelData ));
         this.responce(res).data(data)
       }
 

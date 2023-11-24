@@ -37,7 +37,7 @@ export const confSchema = {
     "minLength": 3,
     "maxLength": 30
   },
-  active: {
+  dependent: {
     "type": Boolean,
     "default": false
   },
@@ -69,15 +69,18 @@ export const confSchema = {
     "minLength": 3,
     "maxLength": 50
   },
- // middlewares: {
-  //  "type": [String],
- //   "default": []
- // },
+  postPutMiddlewares: {
+    "type": [String],
+    "default": []
+  },
+  template:{
+    "type": String
+  },
 };
 
 export const configConfigProp: IConfigPropsParameters = {
   name: "config",
-  active: true,
+  dependent: false,
   displayName:"Configrations",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: confSchema,
@@ -87,7 +90,7 @@ export const configConfigProp: IConfigPropsParameters = {
 };
 export const roleConfigSchema ={
   name: "role",
-  active: true,
+  dependent: true,
   useAuth: ['list','create','update','patch','delete',"search","count"],
   useAdmin: ['create','update','patch','delete',"search","count"],
   schemaObj: {
@@ -105,7 +108,7 @@ export const roleConfigSchema ={
 }
 export const accConfgSchema = {
   name: "account",
-  active: true,
+  dependent: false,
   displayName:"Accounts",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: {

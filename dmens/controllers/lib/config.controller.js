@@ -17,7 +17,7 @@ export class ConfigController extends DefaultController {
         this.responce(res).success();
     }
     async modelsdata(req, res, next) {
-        let data = await Promise.all(Svc.db.obj().map(async (d) => d.config.modelData));
+        let data = await Promise.all(Svc.db.obj().filter((d) => d.config.dependent === false).map((a) => a.config.modelData));
         this.responce(res).data(data);
     }
     async forms(req, res, next) {

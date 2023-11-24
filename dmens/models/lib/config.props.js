@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { Form, ModelData } from '../index.js';
 export class ConfigProps {
     constructor(_config) {
-        let { name, active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
+        let { name, dependent: active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -12,14 +12,14 @@ export class ConfigProps {
             throw new Error(`ConfigProps basic schema validation faild ! name property : ${name} already on db.`);
         }
         this.name = name.toLowerCase(),
-            this.active = active || false,
+            this.dependent = active || false,
             this.schemaObj = schemaObj || {},
             this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
         this.modelData = new ModelData(_config);
         this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
     }
     name;
-    active;
+    dependent;
     modelData;
     schemaObj;
     schemaOptions;
@@ -32,7 +32,7 @@ export class ConfigProps {
     getProps() {
         return {
             name: this.name,
-            active: this.active,
+            dependent: this.dependent,
             schemaObj: this.schemaObj,
             schemaOptions: this.schemaOptions,
             modelData: this.modelData,
