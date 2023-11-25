@@ -4,11 +4,11 @@ import { Svc, envs } from '../../common/index.js';
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
-import { ConfigProps } from './config.props.js';
+import { ModelConfig } from './model.config.js';
 import { autopopulatePlugin } from './autopopulate.js';
-export class DbModel {
+export class ModelDb {
     constructor(_config) {
-        this.config = (_config instanceof ConfigProps) ? _config : new ConfigProps(_config);
+        this.config = (_config instanceof ModelConfig) ? _config : new ModelConfig(_config);
         const { name, schemaObj, schemaOptions } = this.config;
         this.name = name;
         let _schema = new mongoose.Schema(schemaObj, schemaOptions).plugin(autopopulatePlugin);

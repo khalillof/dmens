@@ -16,8 +16,8 @@ export class ConfigController extends DefaultController {
         Svc.routes.deleteRoutePath(req.query['path']);
         this.responce(res).success();
     }
-    async modelsdata(req, res, next) {
-        let data = await Promise.all(Svc.db.obj().filter((d) => d.config.dependent === false).map((a) => a.config.modelData));
+    async modelClientsData(req, res, next) {
+        let data = await Promise.all(Svc.db.obj().filter((d) => d.config.dependent === false).map((a) => a.config.getModelClientData()));
         this.responce(res).data(data);
     }
     async forms(req, res, next) {
@@ -46,7 +46,7 @@ export class ConfigController extends DefaultController {
             // if there is db deleted
             Svc.db.delete(item.name);
             // delete app route
-            Svc.routes.deleteAppRoute(item.modelData.routeName);
+            Svc.routes.deleteAppRoute(item.routeName);
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`);
             this.responce(res).success();
         }

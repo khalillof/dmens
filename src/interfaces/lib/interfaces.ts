@@ -11,13 +11,13 @@ export interface IRequestFilter {
 
 export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 
-export interface IForm {
+export interface IModelForm {
   name:string
   elements: Record<string, [Record<string, any>, Record<string, any>]>
 
 }
 export interface ISvc {
-  db: ISvcIntance<IDbModel>
+  db: ISvcIntance<IModelDb>
   routes: IRouteSvc
 }
 export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
@@ -46,7 +46,7 @@ export interface ISvcIntance<T> {
   exist(keyValue: string): boolean
 }
 
-export interface IConfigPropsParameters {
+export interface IModelConfigParameters {
   name: string
   dependent?: Boolean
   schemaObj: object
@@ -73,42 +73,44 @@ export interface IActionData{
 }
 
 
-export interface IModelData{
-  modelName: string
+export interface IModelClientData {
+  name: string
   routeName: string
+  displayName:string
   baseRoutePath:string
   paramId:string
   routeParam:string
   searchKey?:string
   queryName?:string
   pagesPerPage:number
+  
   useAuth: string[]
   useAdmin: string[]
-  displayName:string
   useComment: boolean
   useLikes: boolean
+
   template?:string
 }
-export interface IConfigProps {
-  name: string
+export interface IModelConfig extends IModelClientData {
   dependent: Boolean
-  modelData :IModelData
+  template?:string 
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
-  formCache?:IForm
+  formCache?:IModelForm
   getRoutes?(): { method: string; path: string;}[]
-  getProps?(): IConfigProps
-  genForm?(): Promise<IForm>
+  getProps?(): IModelConfig
+  getModelClientData?(): IModelClientData
+  genForm?(): Promise<IModelForm>
   //check useAuth and useAdmin
   authAdminMiddlewares?(actionName: string): string[]
   inAuth?(actionName:string):boolean
   inAdmin?(actionName:string):boolean
 };
 
-export interface IDbModel {
+export interface IModelDb {
   readonly name: string
-  readonly config: IConfigProps
+  readonly config: IModelConfig
   readonly model?: Model<any>;
   count: number
 
@@ -167,13 +169,13 @@ export type IRequestVerps = (req: express.Request, res: express.Response, next: 
 
 export interface IController {
 
-  db: IDbModel;
+  db: IModelDb;
   responce: Iresponce;
   log: Ilogger;
 
   form:IRequestVerpsAsync;
   route:IRequestVerpsAsync;
-  modeldata:IRequestVerpsAsync;
+  modelClientData:IRequestVerpsAsync;
 
   count:IRequestVerpsAsync;
   search:IRequestVerpsAsync;
@@ -191,14 +193,14 @@ export interface IController {
 export interface IConfigController extends IController{
   forms:IRequestVerpsAsync;
   routes:IRequestVerpsAsync;
-  modelsdata:IRequestVerpsAsync;
+  modelClientsData:IRequestVerpsAsync;
   deleteRoute:IRequestVerpsAsync;
 }
 export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>Promise<any>;
 
 export interface IDefaultRoutesConfig {
   router: IRouter
-  config:IConfigProps
+  config:IModelConfig
   controller: IController;
   mware?: IMiddlewares;
   baseRoutePath:string

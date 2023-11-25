@@ -1,8 +1,8 @@
-import { ConfigProps } from "../index.js";
+import { ModelConfig } from "../index.js";
 import { Svc } from '../../common/index.js';
-export class Form {
+export class ModelForm {
     constructor(props) {
-        if (!(props instanceof ConfigProps))
+        if (!(props instanceof ModelConfig))
             throw new Error('Form class require instance of configProp class');
         this.name = props.name;
         this.elements = {};

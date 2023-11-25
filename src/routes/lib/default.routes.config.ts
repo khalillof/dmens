@@ -1,7 +1,7 @@
 import { corsWithOptions } from "./cors.config.js";
 import { Svc, Assert, envs } from '../../common/index.js'
 import { middlewares } from '../../middlewares/index.js';
-import { IConfigProps, IController, IDefaultRoutesConfig, IMiddlewares,IRouteCallback } from '../../interfaces/index.js';
+import { IModelConfig, IController, IDefaultRoutesConfig, IMiddlewares,IRouteCallback } from '../../interfaces/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import { appRouter } from '../../app.js'
 
@@ -10,7 +10,7 @@ import { appRouter } from '../../app.js'
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   router: any
-  config: IConfigProps
+  config: IModelConfig
   controller: IController
   mware?: IMiddlewares
   baseRoutePath:string
@@ -23,8 +23,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
     this.controller = controller
     this.config = controller.db.config;
-    this.baseRoutePath = controller.db.config.modelData.baseRoutePath;
-    this.baseRouteParam = controller.db.config.modelData.routeParam;
+    this.baseRoutePath = controller.db.config.baseRoutePath;
+    this.baseRouteParam = controller.db.config.routeParam;
     this.router = appRouter;
     this.mware = middlewares;
 
@@ -50,7 +50,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     this.setOptions(this.baseRouteParam);
   }
   setParam() {
-    return this.router.param(this.config.modelData.paramId, async (req: any, res: any, next: any, id: string) => {
+    return this.router.param(this.config.paramId, async (req: any, res: any, next: any, id: string) => {
       try {
         Assert.idString(id);
         next()
@@ -68,7 +68,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     await this.get(this.addPath('/count'),'count'); // count
     await this.get(this.addPath('/form'),'form'); // get form elements
     await this.get(this.addPath('/route'),'route'); // get form routes
-    await this.get(this.addPath('/modeldata'),'modeldata'); // get model routeData
+    await this.get(this.addPath('/client'),'modelClientData'); // get model routeData
   }
   async defaultRoutes() { // routedata
     await this.defaultClientRoutes()

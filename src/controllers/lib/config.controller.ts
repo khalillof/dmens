@@ -1,7 +1,7 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
 import { Svc, envs } from '../../common/index.js'
-import { IConfigProps, IConfigPropsParameters } from '../../interfaces/index.js';
+import { IModelConfig, IModelConfigParameters } from '../../interfaces/index.js';
 import { Operations } from '../../operations/index.js';
 
 export class ConfigController extends DefaultController {
@@ -22,8 +22,8 @@ export class ConfigController extends DefaultController {
         this.responce(res).success()
     }
     
-    async modelsdata(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.modelData ));
+    async modelClientsData(req: express.Request, res: express.Response, next: express.NextFunction) {
+        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.getModelClientData!() ));
         this.responce(res).data(data)
       }
 
@@ -32,7 +32,7 @@ export class ConfigController extends DefaultController {
         this.responce(res).data(_forms)
       }
     override  async create(req: express.Request, res: express.Response) {
-        let conf: IConfigPropsParameters = req.body;
+        let conf: IModelConfigParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
         envs.logLine('document created or Overrided :', result.controller?.db.name);
@@ -53,7 +53,7 @@ export class ConfigController extends DefaultController {
 
     override  async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
         let id = req.params['id'];
-        let item: IConfigProps = await this.db.findById(id);
+        let item: IModelConfig = await this.db.findById(id);
 
         if (item) {
             // delete config record on database
@@ -62,7 +62,7 @@ export class ConfigController extends DefaultController {
             Svc.db.delete(item.name)
 
             // delete app route
-            Svc.routes.deleteAppRoute(item.modelData.routeName)
+            Svc.routes.deleteAppRoute(item.routeName)
 
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
             this.responce(res).success()

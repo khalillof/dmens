@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { MongoServerError } from "mongodb";
 import { AssertionError } from '../lib/assertionError.js';
 import jwt from 'jsonwebtoken';
-import { IDbModel, IDefaultRoutesConfig } from '../../interfaces/index.js';
+import { IModelDb, IDefaultRoutesConfig } from '../../interfaces/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import express from 'express';
 export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.ValidationError,mongoose.Error.CastError, AssertionError, MongoServerError, jwt.TokenExpiredError];
@@ -68,7 +68,7 @@ export const isValidRole = (role: string) => (role && Roles.indexOf(role) !== -1
 
 
 // db object
-export const dbStore: IDbModel[] = [];
+export const dbStore: IModelDb[] = [];
 
 // routesStore
 export const routeStore: IDefaultRoutesConfig[] = [];

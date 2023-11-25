@@ -1,5 +1,5 @@
-import { IConfigProps, IForm, IElement } from "../../interfaces/index.js";
-import { ConfigProps } from "../index.js";
+import { IModelConfig, IModelForm, IElement } from "../../interfaces/index.js";
+import { ModelConfig } from "../index.js";
 import { Svc } from '../../common/index.js'
 
 export interface ILable {
@@ -16,10 +16,10 @@ export interface IFormVarient {
     icon?: string
 }
 
-export class Form implements IForm {
+export class ModelForm implements IModelForm {
 
-    constructor(props: IConfigProps) {
-        if (!(props instanceof ConfigProps))
+    constructor(props: IModelConfig) {
+        if (!(props instanceof ModelConfig))
             throw new Error('Form class require instance of configProp class')
 
         this.name = props.name;

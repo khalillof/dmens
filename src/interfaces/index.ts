@@ -1,4 +1,4 @@
 
 
-import {Ilogger,IModelData,IActionData, IRequestFilter,IElement,IForm,Iresponce,Iresponces,ISvcIntance, IController,IRouteSvc, IDbModel,ISvc, IRouteCallback, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IConfigProps, IConfigPropsParameters} from './lib/interfaces.js'
-export {Ilogger,IModelData,IActionData,IRequestFilter,Iresponce,IElement, IForm,Iresponces,ISvc,ISvcIntance,IRouteSvc , IController, IDbModel ,IRouteCallback, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IConfigProps, IConfigPropsParameters};
+import {Ilogger,IModelClientData,IActionData, IRequestFilter,IElement,IModelForm,Iresponce,Iresponces,ISvcIntance, IController,IRouteSvc, IModelDb,ISvc, IRouteCallback, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IModelConfig, IModelConfigParameters} from './lib/interfaces.js'
+export {Ilogger,IModelClientData,IActionData,IRequestFilter,Iresponce,IElement, IModelForm,Iresponces,ISvc,ISvcIntance,IRouteSvc , IController, IModelDb ,IRouteCallback, IDefaultRoutesConfig, IMiddlewares, Iauthenticate, IModelConfig, IModelConfigParameters};
