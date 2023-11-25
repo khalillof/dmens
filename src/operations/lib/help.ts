@@ -1,6 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
-import { IConfigPropsParameters } from '../../interfaces/index.js';
+import { IModelConfigParameters } from '../../interfaces/index.js';
 
 export const typeMappings = {
   "String": mongoose.SchemaTypes.String,
@@ -78,7 +78,7 @@ export const confSchema = {
   },
 };
 
-export const configConfigProp: IConfigPropsParameters = {
+export const configConfigProp: IModelConfigParameters = {
   name: "config",
   dependent: false,
   displayName:"Configrations",

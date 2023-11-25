@@ -1,10 +1,10 @@
-import { IDbModel } from '../../interfaces/index.js';
+import { IModelDb } from '../../interfaces/index.js';
 import { Svc, envs} from '../../common/index.js';
 import seeds from '../seeds.json' assert {type: 'json'};
 import {posts} from './posts.js'
 //import {app} from '../../app.js'
 type dbCallback = {
-    (db: IDbModel): Promise<any>;
+    (db: IModelDb): Promise<any>;
 }
 export class ClientSeedDatabase {
 

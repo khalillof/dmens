@@ -1,6 +1,5 @@
 import { PassportStrategies } from './lib/strategies.js';
-import { DbModel } from './lib/db.model.js';
-import { Form } from './lib/form.js';
-import { ConfigProps } from './lib/config.props.js';
-import { ModelData } from './lib/model.data.js';
-export { PassportStrategies, DbModel, ConfigProps, ModelData, Form };
+import { ModelDb } from './lib/model.db.js';
+import { ModelForm } from './lib/model.form.js';
+import { ModelConfig } from './lib/model.config.js';
+export { PassportStrategies, ModelDb, ModelConfig, ModelForm };

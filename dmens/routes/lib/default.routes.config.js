@@ -18,8 +18,8 @@ export class DefaultRoutesConfig {
         }
         this.controller = controller;
         this.config = controller.db.config;
-        this.baseRoutePath = controller.db.config.modelData.baseRoutePath;
-        this.baseRouteParam = controller.db.config.modelData.routeParam;
+        this.baseRoutePath = controller.db.config.baseRoutePath;
+        this.baseRouteParam = controller.db.config.routeParam;
         this.router = appRouter;
         this.mware = middlewares;
         typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
@@ -39,7 +39,7 @@ export class DefaultRoutesConfig {
         this.setOptions(this.baseRouteParam);
     }
     setParam() {
-        return this.router.param(this.config.modelData.paramId, async (req, res, next, id) => {
+        return this.router.param(this.config.paramId, async (req, res, next, id) => {
             try {
                 Assert.idString(id);
                 next();
@@ -55,7 +55,7 @@ export class DefaultRoutesConfig {
         await this.get(this.addPath('/count'), 'count'); // count
         await this.get(this.addPath('/form'), 'form'); // get form elements
         await this.get(this.addPath('/route'), 'route'); // get form routes
-        await this.get(this.addPath('/modeldata'), 'modeldata'); // get model routeData
+        await this.get(this.addPath('/client'), 'modelClientData'); // get model routeData
     }
     async defaultRoutes() {
         await this.defaultClientRoutes();

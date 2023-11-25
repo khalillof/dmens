@@ -1,4 +1,4 @@
-import { IDbModel, IDefaultRoutesConfig, ISvc, ISvcIntance, IRouteSvc } from "../../interfaces/index.js";
+import { IModelDb, IDefaultRoutesConfig, ISvc, ISvcIntance, IRouteSvc } from "../../interfaces/index.js";
 import { envs } from "../../common/index.js";
 import { dbStore, routeStore } from "../../common/lib/helpers.js";
 import { appRouter } from '../../app.js'
@@ -132,7 +132,7 @@ class RouteSvc extends SvcInstance<IDefaultRoutesConfig> implements IRouteSvc {
 
 class Svc implements ISvc {
 
-    db: ISvcIntance<IDbModel>
+    db: ISvcIntance<IModelDb>
     routes: IRouteSvc
     constructor() {
         this.db = new SvcInstance('name');

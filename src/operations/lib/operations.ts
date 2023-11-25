@@ -1,6 +1,6 @@
 "use strict";
-import { IConfigProps, IConfigPropsParameters, IController, IDbModel, IRouteCallback } from '../../interfaces/index.js';
-import { DbModel } from '../../models/lib/db.model.js';
+import { IModelConfig, IModelConfigParameters, IController, IModelDb, IRouteCallback } from '../../interfaces/index.js';
+import { ModelDb } from '../../models/lib/model.db.js';
 import path from 'path';
 import fs from 'fs';
 import { Svc, envs } from '../../common/index.js';
@@ -35,18 +35,18 @@ export class Operations {
   }
 
   // ============ DbModel
-  static async createModelInstance(_config: IConfigPropsParameters) {
-    let _model = new DbModel(_config);
+  static async createModelInstance(_config: IModelConfigParameters) {
+    let _model = new ModelDb(_config);
     return Promise.resolve(_model);
   }
-  static async createModelWithConfig(_config: IConfigPropsParameters) {
+  static async createModelWithConfig(_config: IModelConfigParameters) {
     let _model = await Operations.createModelInstance(_config);
     await  Operations.createConfig(_model);
     return _model;
   }
 
     // ============ Config
-    static async createConfig(db: IDbModel) {
+    static async createConfig(db: IModelDb) {
     return  await db.createConfig();
     }
   // ===================== Routes
@@ -54,7 +54,7 @@ export class Operations {
     return Promise.resolve(new DefaultRoutesConfig(controller, callback));
   }
   
-  static async createModelConfigRoute(_config: IConfigPropsParameters, controller?: IController, routeCallback?: any) {
+  static async createModelConfigRoute(_config: IModelConfigParameters, controller?: IController, routeCallback?: any) {
 
     let _model = await Operations.createModelWithConfig(_config);
 
@@ -65,7 +65,7 @@ export class Operations {
   // create model route from config 
   static async createModelsRoutesFromDb(){
    let allDbConfigs = await Svc.db.get('config')!.model!.find();
-   allDbConfigs = allDbConfigs.filter((p:IConfigProps)=> !Svc.db.exist(p.name));
+   allDbConfigs = allDbConfigs.filter((p:IModelConfig)=> !Svc.db.exist(p.name));
 
    if(allDbConfigs.length)
    for await( let config of allDbConfigs){
@@ -75,7 +75,7 @@ export class Operations {
 
   }
   // create or override model config route
-  static async overrideModelConfigRoute(_config: IConfigPropsParameters) {
+  static async overrideModelConfigRoute(_config: IModelConfigParameters) {
     let dbName = _config.name;
     if (!dbName || !Svc.db.exist(dbName)) {
       envs.throwErr(' db model name not found')
@@ -89,7 +89,7 @@ export class Operations {
 
   static async createModelFromJsonString(jsonString: string) {
     if (typeof jsonString === 'string') {
-      let _conf: IConfigPropsParameters = JSON.parse(jsonString);
+      let _conf: IModelConfigParameters = JSON.parse(jsonString);
       return await Operations.createModelConfigRoute(_conf);
     } else {
       throw new Error('this method makeModelFromJsonString require json data as string');
@@ -100,7 +100,7 @@ export class Operations {
     if (path.isAbsolute(filePath) && Operations.isJsonFile(filePath)) {
 
       let data = fs.readFileSync(filePath, 'utf8');
-      let jsobj: IConfigProps = JSON.parse(data);
+      let jsobj: IModelConfig = JSON.parse(data);
 
       return await Operations.createModelConfigRoute(jsobj);
     } else {
@@ -139,7 +139,7 @@ export class Operations {
     return path.extname(file) === '.json';
   }
 
-  static async validateSchema(schemaObj: IConfigPropsParameters) {
+  static async validateSchema(schemaObj: IModelConfigParameters) {
 
     for await (let item of Object.entries(schemaObj)) {
       await this.deepSearch(item);

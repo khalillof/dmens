@@ -1,5 +1,5 @@
 "use strict";
-import { DbModel } from '../../models/lib/db.model.js';
+import { ModelDb } from '../../models/lib/model.db.js';
 import path from 'path';
 import fs from 'fs';
 import { Svc, envs } from '../../common/index.js';
@@ -24,7 +24,7 @@ export class Operations {
     }
     // ============ DbModel
     static async createModelInstance(_config) {
-        let _model = new DbModel(_config);
+        let _model = new ModelDb(_config);
         return Promise.resolve(_model);
     }
     static async createModelWithConfig(_config) {

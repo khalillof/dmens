@@ -1,17 +1,17 @@
 "use strict";
 import mongoose from 'mongoose';
 import { Svc, envs } from '../../common/index.js'
-import { IConfigProps, IConfigPropsParameters, IDbModel} from '../../interfaces/index.js'
+import { IModelConfig, IModelConfigParameters, IModelDb} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
 import { PassportStrategies } from './strategies.js';
-import { ConfigProps } from './config.props.js';
+import { ModelConfig } from './model.config.js';
 import { autopopulatePlugin } from './autopopulate.js';
 
-export class DbModel implements IDbModel {
+export class ModelDb implements IModelDb {
 
-  constructor(_config: IConfigPropsParameters | IConfigProps ) {
-    this.config = (_config instanceof ConfigProps) ? _config: new ConfigProps(_config);
+  constructor(_config: IModelConfigParameters | IModelConfig ) {
+    this.config = (_config instanceof ModelConfig) ? _config: new ModelConfig(_config);
     const {name,schemaObj,schemaOptions} =this.config;
     
     this.name = name;
@@ -41,7 +41,7 @@ export class DbModel implements IDbModel {
   }
 
   readonly name:string
-  readonly config:IConfigProps
+  readonly config:IModelConfig
   readonly model?: mongoose.Model<any>;
   count: number = 0;
 

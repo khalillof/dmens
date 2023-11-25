@@ -1,9 +1,9 @@
 import express from 'express';
 import { logger, responce, Assert, Svc } from '../../common/index.js';
-import { Ilogger, Iresponce, IController, IDbModel, IRequestFilter } from '../../interfaces/index.js';
+import { Ilogger, Iresponce, IController, IModelDb, IRequestFilter } from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
-  db: IDbModel;
+  db: IModelDb;
   responce: Iresponce;
   log: Ilogger;
   constructor(name: string) {
@@ -22,8 +22,8 @@ export class DefaultController implements IController {
     this.responce(res).data(_form)
   }
   
-  async modeldata(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let data = this.db.config.modelData
+  async modelClientData(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let data = this.db.config.getModelClientData!()
     this.responce(res).data(data)
   }
   
