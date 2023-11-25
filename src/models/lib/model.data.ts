@@ -5,7 +5,7 @@ import { IConfigPropsParameters, IModelData} from '../../interfaces/index.js';
 export class ModelData implements IModelData {
   constructor(_config: IConfigPropsParameters) {
     const { name, routeName, useAuth, useAdmin, displayName, searchKey, 
-      pagesPerPage, queryName, paramId, useComment, useLikes, mdTemplate } = _config;
+      pagesPerPage, queryName, paramId, useComment, useLikes, template } = _config;
         if(!name){
           throw new Error('name is required propery')
         }
@@ -20,7 +20,7 @@ export class ModelData implements IModelData {
     this.displayName = displayName || this.modelName;
     this.useComment = useComment || false;
     this.useLikes = useLikes || false; 
-    this.mdTemplate = mdTemplate;
+    this.template = template;
 
     if (queryName)
       this.queryName = queryName;
@@ -46,7 +46,7 @@ export class ModelData implements IModelData {
   useAdmin: string[];
   useComment: boolean
   useLikes: boolean 
-  mdTemplate?:string 
+  template?:string 
 
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate

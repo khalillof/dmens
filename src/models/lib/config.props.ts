@@ -7,7 +7,7 @@ import { Form, ModelData } from '../index.js';
 export class ConfigProps implements IConfigProps {
 
   constructor(_config: IConfigPropsParameters) {
-    let { name, active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
+    let { name, dependent: active, schemaObj, schemaOptions, postPutMiddlewares } = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -20,7 +20,7 @@ export class ConfigProps implements IConfigProps {
 
 
     this.name = name.toLowerCase(),
-      this.active = active || false,
+      this.dependent = active || false,
       this.schemaObj = schemaObj || {},
       this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
 
@@ -29,7 +29,7 @@ export class ConfigProps implements IConfigProps {
   }
 
   name: string
-  active: Boolean
+  dependent: Boolean
   modelData : IModelData
   schemaObj: object
   schemaOptions?: Record<string, any>
@@ -43,7 +43,7 @@ export class ConfigProps implements IConfigProps {
   getProps(): IConfigProps {
     return {
       name: this.name,
-      active: this.active,
+      dependent: this.dependent,
       schemaObj: this.schemaObj,
       schemaOptions: this.schemaOptions,
       modelData: this.modelData,

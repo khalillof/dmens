@@ -1,6 +1,6 @@
 {
     "name": "post",
-    "active": true,
+    "dependent": false,
     "pagesPerPage":5,
     "searchKey":"title",
     "displayName":"Blog",
@@ -91,5 +91,6 @@
             "required": true,
             "autopopulate": true
         }
-    }
+    },
+    "template": ""
 }

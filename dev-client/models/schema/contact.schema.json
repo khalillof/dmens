@@ -1,6 +1,6 @@
 {
   "name": "contact",
-  "active": true,
+  "dependent": false,
   "searchKey": "fullname",
   "useAuth": [
     "list",

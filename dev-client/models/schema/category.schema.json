@@ -1,6 +1,6 @@
 {
   "name": "category",
-  "active": true,
+  "dependent": true,
   "useAuth": [
     "create",
     "update",

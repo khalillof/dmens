@@ -1,6 +1,6 @@
 {
     "name": "message",
-    "active": true,
+    "dependent": true,
     "searchKey": "title",
     "useComment":true,
     "useAuth": [

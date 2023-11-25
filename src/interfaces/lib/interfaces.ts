@@ -48,7 +48,7 @@ export interface ISvcIntance<T> {
 
 export interface IConfigPropsParameters {
   name: string
-  active?: Boolean
+  dependent?: Boolean
   schemaObj: object
   schemaOptions?: Record<string, any>
   routeName?: string
@@ -62,7 +62,7 @@ export interface IConfigPropsParameters {
   postPutMiddlewares?:string[]
   useComment?: boolean
   useLikes?: boolean
-  mdTemplate?:string
+  template?:string
 
 };
 
@@ -85,16 +85,14 @@ export interface IModelData{
   useAuth: string[]
   useAdmin: string[]
   displayName:string
-
   useComment: boolean
   useLikes: boolean
-  mdTemplate?:string
+  template?:string
 }
 export interface IConfigProps {
   name: string
-  active: Boolean
+  dependent: Boolean
   modelData :IModelData
-  
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions

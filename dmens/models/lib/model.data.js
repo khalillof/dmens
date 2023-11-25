@@ -2,7 +2,7 @@
 import { Svc } from '../../common/index.js';
 export class ModelData {
     constructor(_config) {
-        const { name, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, mdTemplate } = _config;
+        const { name, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, template } = _config;
         if (!name) {
             throw new Error('name is required propery');
         }
@@ -16,7 +16,7 @@ export class ModelData {
         this.displayName = displayName || this.modelName;
         this.useComment = useComment || false;
         this.useLikes = useLikes || false;
-        this.mdTemplate = mdTemplate;
+        this.template = template;
         if (queryName)
             this.queryName = queryName;
         if (searchKey)
@@ -37,7 +37,7 @@ export class ModelData {
     useAdmin;
     useComment;
     useLikes;
-    mdTemplate;
+    template;
     removeDiplicates(arr) {
         // Set will remove diblicate
         return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : [];
