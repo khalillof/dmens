@@ -60,6 +60,7 @@ export interface IModelConfigParameters {
   useAuth?: string[]
   useAdmin?: string[]
   postPutMiddlewares?:string[]
+  removeActions?:string[]
   useComment?: boolean
   useLikes?: boolean
   template?:string
@@ -97,6 +98,7 @@ export interface IModelConfig extends IModelClientData {
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
+  removeActions?:string[]
   formCache?:IModelForm
   getRoutes?(): { method: string; path: string;}[]
   getProps?(): IModelConfig
@@ -212,7 +214,6 @@ export interface IDefaultRoutesConfig {
   create:IHttpVerp
   update:IHttpVerp
   delete:IHttpVerp
-  search:IHttpVerp
   patch:IHttpVerp
 
   addPath(name:string, paramId?:boolean):string

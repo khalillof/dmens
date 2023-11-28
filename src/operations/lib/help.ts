@@ -73,6 +73,10 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
+  removeActions: {
+    "type": [String],
+    "default": []
+  },
   template:{
     "type": String
   },
