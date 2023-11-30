@@ -242,7 +242,7 @@ export interface IMiddlewares {
   uploadSchema:IRequestVerps;
   isAuthenticated:IRequestVerps;
   // roles
-  isRolesExist(roles: [string]): boolean;
+  //isRolesExist(roles: [string]): boolean;
   isJson:IRequestVerps;
 
   isInRole(roleName: string): IRequestVerpsAsync;
