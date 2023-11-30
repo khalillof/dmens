@@ -9,7 +9,7 @@ export class ModelConfig implements IModelConfig {
   constructor(_config: IModelConfigParameters) {
     let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares,
       routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage,
-      queryName, paramId, useComment, useLikes, template } = _config;
+      queryName, paramId, useComment, useLikes,removeActions, template } = _config;
 
     // basic validation
     if (!name || !schemaObj) {
@@ -42,8 +42,10 @@ export class ModelConfig implements IModelConfig {
 
     this.pagesPerPage = pagesPerPage || 5;
     this.schemaObj = schemaObj || {},
-      this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
+    this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
+    
     this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares)
+    this.removeActions = this.removeDiplicates(removeActions);
   }
 
   name: string
@@ -65,6 +67,7 @@ export class ModelConfig implements IModelConfig {
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
+  removeActions?:string[]
   formCache?: IModelForm
 
   private removeDiplicates(arr?: any[]) {
@@ -75,6 +78,7 @@ export class ModelConfig implements IModelConfig {
     return {
       ...this.getModelClientData(),
       dependent: this.dependent,
+      removeActions:this.removeActions,
       schemaObj: this.schemaObj,
       schemaOptions: this.schemaOptions,
       postPutMiddlewares: this.postPutMiddlewares

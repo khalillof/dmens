@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { ModelForm } from '../index.js';
 export class ModelConfig {
     constructor(_config) {
-        let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, template } = _config;
+        let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, removeActions, template } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -31,6 +31,7 @@ export class ModelConfig {
         this.schemaObj = schemaObj || {},
             this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
         this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
+        this.removeActions = this.removeDiplicates(removeActions);
     }
     name;
     dependent;
@@ -50,6 +51,7 @@ export class ModelConfig {
     schemaObj;
     schemaOptions;
     postPutMiddlewares; // used for post put actions
+    removeActions;
     formCache;
     removeDiplicates(arr) {
         // Set will remove diblicate
@@ -59,6 +61,7 @@ export class ModelConfig {
         return {
             ...this.getModelClientData(),
             dependent: this.dependent,
+            removeActions: this.removeActions,
             schemaObj: this.schemaObj,
             schemaOptions: this.schemaOptions,
             postPutMiddlewares: this.postPutMiddlewares

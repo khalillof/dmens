@@ -64,7 +64,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
   async defaultClientRoutes() { // routedata
 
-    await this.search();// search
+    await this.get(this.addPath('/search'),'search');// search
     await this.get(this.addPath('/count'),'count'); // count
     await this.get(this.addPath('/form'),'form'); // get form elements
     await this.get(this.addPath('/route'),'route'); // get form routes
@@ -106,14 +106,12 @@ async update(path?:string,action?:string, middlewares?:string[]){
 await this.router.put(path??this.addPath('/update', true), await this.setMiddlewars(action??'update', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]));
 }
 async delete(path?:string,action?:string, middlewares?:string[]){
-await this.router.delete(path ?? this.addPath('/delete', true), await this.setMiddlewars(action??'delete', [...(middlewares ? middlewares! : []),'validateCurrentUserOwnParamId']));
+await this.router.delete(path || this.addPath('/delete', true), await this.setMiddlewars(action??'delete', [...(middlewares ? middlewares! : []),'validateCurrentUserOwnParamId']));
 }
-async search(path?:string,action?:string, middlewares?:string[]){
-await this.router.search(path??this.addPath('/search'), await this.setMiddlewars(action??'search', middlewares));
-}
+
 async patch(path?:string,action?:string, middlewares?:string[]){
 
-await this.router.patch(path??this.addPath('/patch', true), await  this.setMiddlewars(action??'patch', middlewares));
+await this.router.patch(path || this.addPath('/patch', true), await  this.setMiddlewars(action??'patch', middlewares));
 }
 
   actions(actionName: string) {
