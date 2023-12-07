@@ -6,8 +6,10 @@ export class ModelForm {
             throw new Error('Form class require instance of configProp class');
         this.name = props.name;
         this.elements = {};
+        this.initialState = {};
     }
     name;
+    initialState;
     elements;
     async genElements(schemaObj) {
         for (let [key, value] of Object.entries(schemaObj)) {
@@ -15,11 +17,12 @@ export class ModelForm {
             if (typeof value === 'object' && tagname) {
                 switch (tagname) {
                     case "input":
-                        if (value['inputtype']) {
-                            this.addElemLable(key, value, { type: value['inputtype'] });
+                        let type = value['inputtype'];
+                        if (type) {
+                            this.addElemLable(key, value, { type });
                         }
                         else {
-                            let type = { type: (('Boolean boolean'.indexOf(value.type) !== -1) ? 'checkbox' : 'text') };
+                            type = { type: (('Boolean boolean'.indexOf(value.type) !== -1) ? 'checkbox' : 'text') };
                             this.addElemLable(key, value, type);
                         }
                         break;
@@ -47,9 +50,10 @@ export class ModelForm {
         }
     }
     addElemLable(key, elm, override) {
-        let element = { ...this.cleanObj(elm), id: key, ...override };
+        let element = { ...this.cleanObj(elm), id: key, ...override, name: key };
         let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
         this.elements[key] = [element, lable];
+        this.initialState[key] = "";
     }
     cleanObj(obj, type = true) {
         for (let [key, value] of Object.entries(obj)) {
