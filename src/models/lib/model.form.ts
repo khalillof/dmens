@@ -16,6 +16,7 @@ export interface IFormVarient {
     icon?: string
 }
 
+
 export class ModelForm implements IModelForm {
 
     constructor(props: IModelConfig) {
@@ -25,10 +26,12 @@ export class ModelForm implements IModelForm {
         this.name = props.name;
 
         this.elements = {}
+        this.initialState ={}
 
     }
 
     name: string
+    initialState: Record<string, any>;
     elements: Record<string, [Record<string, any>, Record<string, any>]>
 
   async  genElements(schemaObj: Record<string, any>) {
@@ -40,11 +43,12 @@ export class ModelForm implements IModelForm {
 
                 switch (tagname) {
                     case "input":
-                        if (value['inputtype']) {
-                            this.addElemLable(key, value, { type: value['inputtype'] })
+                        let type = value['inputtype'];
+                        if (type) {
+                            this.addElemLable(key, value, { type})
                         } else {
                            
-                            let type = { type:  (('Boolean boolean'.indexOf(value.type) !==-1) ?  'checkbox': 'text') };
+                            type = { type:  (('Boolean boolean'.indexOf(value.type) !==-1) ?  'checkbox': 'text') };
                             this.addElemLable(key, value, type)
                         }
 
@@ -78,10 +82,11 @@ export class ModelForm implements IModelForm {
     }
 
     private addElemLable(key: string, elm: IElement, override?: Record<string, any>) {
-        let element = { ...this.cleanObj(elm), id: key, ...override }
+        let element = { ...this.cleanObj(elm), id: key, ...override , name:key}
         let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
 
         this.elements[key] = [element, lable];
+        this.initialState[key] =  "";
     }
 
     private cleanObj(obj: any, type: boolean = true) {
@@ -114,20 +119,6 @@ export const isTag = function (tagename: string) {
         taxtArea: _isTag('textarea'),
     }
 }
-export function Label(props: ILable) {
-    const { label, htmlFor, isRadioCheckBox } = props;
-    return `<label className=${(isRadioCheckBox ? "form-check-lable" : "form-lable")} for=${htmlFor}> ${label}:</label>`
-}
 
-export function FormVarient(props: IFormVarient) {
-    const { isInputGroup, isRadioCheckBox, label, icon, children } = props;
-    let _class = isRadioCheckBox ? "form-check" : (isInputGroup ? "input-group" : "form-floating");
-
-    return `<div className=${_class + " mb-3"} >
-        ${children}
-        ${(isRadioCheckBox || !isInputGroup) && label && Label({ isRadioCheckBox, ...label })}
-        ${(isInputGroup && icon) && '<span className="input-group-text"><i className=' + icon + '></i> </span>'}
-    </div>`
-}
 
 
