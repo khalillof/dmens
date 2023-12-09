@@ -14,7 +14,7 @@ export type IElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElemen
 export interface IModelForm {
   name:string
   initialState:Record<string,any>
-  elements: Record<string, [Record<string, any>, Record<string, any>]>
+  elements: Record<string, any>
 
 }
 export interface ISvc {

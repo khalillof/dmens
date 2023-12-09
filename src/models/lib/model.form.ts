@@ -32,40 +32,34 @@ export class ModelForm implements IModelForm {
 
     name: string
     initialState: Record<string, any>;
-    elements: Record<string, [Record<string, any>, Record<string, any>]>
+    elements: Record<string, any>
 
   async  genElements(schemaObj: Record<string, any>) {
          
-        for (let [key, value] of Object.entries(schemaObj)) {
-            let tagname = value['tag'];
+        for (let [key, val] of Object.entries(schemaObj)) {
+            let tagname = val['tag'];
 
-            if (typeof value === 'object' && tagname) {
+            if (typeof val === 'object' && tagname) {
 
                 switch (tagname) {
                     case "input":
-                        let type = value['inputtype'];
-                        if (type) {
-                            this.addElemLable(key, value, { type})
-                        } else {
-                           
-                            type = { type:  (('Boolean boolean'.indexOf(value.type) !==-1) ?  'checkbox': 'text') };
-                            this.addElemLable(key, value, type)
-                        }
+                        let type = val['inputtype'] || (isIn('Boolean boolean',val.type) ?'checkbox': 'text');        
+                        this.addElemLable(key, val,{type})
 
                         break;
                     case "select":
                         let options: Record<string, any>[] = []
 
-                        let { optionkey, ref } = value;
+                        let { optionkey, ref } = val;
 
                         if (optionkey && ref && Svc.db.exist(ref)) {
                             
                             options =  (await Svc.db.get(ref)!.model!.find() || []).map((item: any) =>  ({key: item._id.toString(), title: item[optionkey], value: item._id.toString()}) );
                             options.unshift({k:options.length+1 ,title:`Choose ${key}....` , disabled:true, defaultValue:""})
                           
-                            this.addElemLable(key, value, { options });
+                            this.addElemLable(key, val, { options });
                         } else {
-                            this.addElemLable(key, value);
+                            this.addElemLable(key, val);
                         }
                         break;
                    // case "textarea":
@@ -73,7 +67,7 @@ export class ModelForm implements IModelForm {
                     //    this.addElemLable(key, {style,...value})
                     //    break;
                     default:
-                        this.addElemLable(key, value)
+                        this.addElemLable(key, val)
                         break;
                 }
             }
@@ -83,9 +77,7 @@ export class ModelForm implements IModelForm {
 
     private addElemLable(key: string, elm: IElement, override?: Record<string, any>) {
         let element = { ...this.cleanObj(elm), id: key, ...override , name:key}
-        let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" }
-
-        this.elements[key] = [element, lable];
+        this.elements[key] = element;
         this.initialState[key] =  "";
     }
 

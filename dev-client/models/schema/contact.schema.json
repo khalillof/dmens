@@ -49,7 +49,8 @@
       "maxLength": 30,
       "tag": "input",
       "inputtype": "email",
-      "className":"form-control"
+      "className":"form-control",
+      "title":"Your email"
     },
     "telphone": {
       "type": "string",
