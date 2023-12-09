@@ -12,30 +12,24 @@ export class ModelForm {
     initialState;
     elements;
     async genElements(schemaObj) {
-        for (let [key, value] of Object.entries(schemaObj)) {
-            let tagname = value['tag'];
-            if (typeof value === 'object' && tagname) {
+        for (let [key, val] of Object.entries(schemaObj)) {
+            let tagname = val['tag'];
+            if (typeof val === 'object' && tagname) {
                 switch (tagname) {
                     case "input":
-                        let type = value['inputtype'];
-                        if (type) {
-                            this.addElemLable(key, value, { type });
-                        }
-                        else {
-                            type = { type: (('Boolean boolean'.indexOf(value.type) !== -1) ? 'checkbox' : 'text') };
-                            this.addElemLable(key, value, type);
-                        }
+                        let type = val['inputtype'] || (isIn('Boolean boolean', val.type) ? 'checkbox' : 'text');
+                        this.addElemLable(key, val, { type });
                         break;
                     case "select":
                         let options = [];
-                        let { optionkey, ref } = value;
+                        let { optionkey, ref } = val;
                         if (optionkey && ref && Svc.db.exist(ref)) {
                             options = (await Svc.db.get(ref).model.find() || []).map((item) => ({ key: item._id.toString(), title: item[optionkey], value: item._id.toString() }));
                             options.unshift({ k: options.length + 1, title: `Choose ${key}....`, disabled: true, defaultValue: "" });
-                            this.addElemLable(key, value, { options });
+                            this.addElemLable(key, val, { options });
                         }
                         else {
-                            this.addElemLable(key, value);
+                            this.addElemLable(key, val);
                         }
                         break;
                     // case "textarea":
@@ -43,7 +37,7 @@ export class ModelForm {
                     //    this.addElemLable(key, {style,...value})
                     //    break;
                     default:
-                        this.addElemLable(key, value);
+                        this.addElemLable(key, val);
                         break;
                 }
             }
@@ -51,8 +45,7 @@ export class ModelForm {
     }
     addElemLable(key, elm, override) {
         let element = { ...this.cleanObj(elm), id: key, ...override, name: key };
-        let lable = { title: (element.ariaLabel ?? key), htmlFor: (element.id ?? key), className: (element.type && element.type === "checkbox") ? "form-check-lable" : "form-lable" };
-        this.elements[key] = [element, lable];
+        this.elements[key] = element;
         this.initialState[key] = "";
     }
     cleanObj(obj, type = true) {
@@ -79,16 +72,3 @@ export const isTag = function (tagename) {
         taxtArea: _isTag('textarea'),
     };
 };
-export function Label(props) {
-    const { label, htmlFor, isRadioCheckBox } = props;
-    return `<label className=${(isRadioCheckBox ? "form-check-lable" : "form-lable")} for=${htmlFor}> ${label}:</label>`;
-}
-export function FormVarient(props) {
-    const { isInputGroup, isRadioCheckBox, label, icon, children } = props;
-    let _class = isRadioCheckBox ? "form-check" : (isInputGroup ? "input-group" : "form-floating");
-    return `<div className=${_class + " mb-3"} >
-        ${children}
-        ${(isRadioCheckBox || !isInputGroup) && label && Label({ isRadioCheckBox, ...label })}
-        ${(isInputGroup && icon) && '<span className="input-group-text"><i className=' + icon + '></i> </span>'}
-    </div>`;
-}
