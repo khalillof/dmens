@@ -15,6 +15,9 @@
     "useAdmin": [
         "list","search"
     ],
+    "plugins":[
+        "comment","like"
+       ],
     "displayName":"Messages",
     "schemaObj": {
         "title": {

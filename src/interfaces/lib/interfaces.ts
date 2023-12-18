@@ -62,8 +62,7 @@ export interface IModelConfigParameters {
   useAdmin?: string[]
   postPutMiddlewares?:string[]
   removeActions?:string[]
-  useComment?: boolean
-  useLikes?: boolean
+  plugins?:string[]
   template?:string
 
 };
@@ -88,8 +87,7 @@ export interface IModelClientData {
   
   useAuth: string[]
   useAdmin: string[]
-  useComment: boolean
-  useLikes: boolean
+  plugins:string[]
 
   template?:string
 }

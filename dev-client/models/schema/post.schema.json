@@ -19,6 +19,9 @@
         "patch",
         "delete"
     ],
+    "plugins":[
+        "comment","like"
+       ],
     "schemaOptions": {},
     "schemaObj": {
         "title": {

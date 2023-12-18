@@ -3,7 +3,7 @@ import { Svc } from '../../common/index.js';
 import { ModelForm } from '../index.js';
 export class ModelConfig {
     constructor(_config) {
-        let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, useComment, useLikes, removeActions, template } = _config;
+        let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, plugins, removeActions, template } = _config;
         // basic validation
         if (!name || !schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
@@ -20,8 +20,7 @@ export class ModelConfig {
         this.useAuth = this.removeDiplicates(useAuth);
         this.useAdmin = this.removeDiplicates(useAdmin);
         this.displayName = displayName || this.name;
-        this.useComment = useComment || false;
-        this.useLikes = useLikes || false;
+        this.plugins = this.removeDiplicates(plugins);
         this.template = template;
         if (queryName)
             this.queryName = queryName;
@@ -45,8 +44,7 @@ export class ModelConfig {
     displayName;
     useAuth;
     useAdmin;
-    useComment;
-    useLikes;
+    plugins;
     template;
     schemaObj;
     schemaOptions;
@@ -77,8 +75,7 @@ export class ModelConfig {
             useAuth: this.useAuth,
             useAdmin: this.useAdmin,
             displayName: this.displayName,
-            useComment: this.useComment,
-            useLikes: this.useLikes,
+            plugins: this.plugins,
             template: this.template,
             queryName: this.queryName,
             searchKey: this.searchKey,
