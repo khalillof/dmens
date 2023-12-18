@@ -48,7 +48,11 @@ export const confSchema = {
     "type": Object,
     "required": true
   },
-
+displayName: {
+    "type": String,
+    "minLength": 3,
+    "maxLength": 50
+  },
   routeName: {
     "type": String,
     "unique": true,
@@ -64,11 +68,7 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
-  displayName: {
-    "type": String,
-    "minLength": 3,
-    "maxLength": 50
-  },
+  
   postPutMiddlewares: {
     "type": [String],
     "default": []
@@ -77,6 +77,10 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
+  plugins:{
+    "type": [String],
+    "default": []
+},
   template:{
     "type": String
   },
@@ -90,7 +94,8 @@ export const configConfigProp: IModelConfigParameters = {
   schemaObj: confSchema,
   useAuth:['list','get','create','update','delete','patch','search','count','routes', 'forms'],
   useAdmin: ['list','get','create','update','patch','delete','search','count','routes','forms'],
-  postPutMiddlewares: ['isJson', 'uploadSchema']
+  postPutMiddlewares: ['isJson', 'uploadSchema'],
+  plugins: ['comment','like']
 };
 export const roleConfigSchema ={
   name: "role",
