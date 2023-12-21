@@ -48,7 +48,7 @@ export const confSchema = {
     "type": Object,
     "required": true
   },
-displayName: {
+  displayName: {
     "type": String,
     "minLength": 3,
     "maxLength": 50
@@ -83,7 +83,7 @@ displayName: {
 },
   template:{
     "type": String
-  },
+  }
 };
 
 export const configConfigProp: IModelConfigParameters = {

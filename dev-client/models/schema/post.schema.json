@@ -33,13 +33,7 @@
             "tag": "input",
             "className":"form-control"
         },
-        "image": {
-            "type": "String",
-            "minLength": 5,
-            "maxLength": 150,
-            "tag": "input",
-            "className":"form-control"
-        },
+      
         "descriptions": {
             "type": "String",
             "minLength": 5,
@@ -54,6 +48,7 @@
             "required": true,
             "minLength": 5,
             "tag": "textarea",
+            "html":"true",
             "className":"form-control",
             "style":{
                 "minHeight": "200px"
@@ -93,6 +88,13 @@
             "ref": "account",
             "required": true,
             "autopopulate": true
+        },
+        "image": {
+            "type": "String",
+            "minLength": 5,
+            "maxLength": 150,
+            "tag": "input",
+            "className":"form-control"
         }
     },
     "template": ""

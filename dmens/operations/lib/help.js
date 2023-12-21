@@ -78,7 +78,7 @@ export const confSchema = {
     },
     template: {
         "type": String
-    },
+    }
 };
 export const configConfigProp = {
     name: "config",
