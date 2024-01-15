@@ -68,7 +68,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     await this.get(this.addPath('/count'),'count'); // count
     await this.get(this.addPath('/form'),'form'); // get form elements
     await this.get(this.addPath('/route'),'route'); // get form routes
-    await this.get(this.addPath('/client'),'modelClientData'); // get model routeData
+    await this.get(this.addPath('/viewdata'),'viewData'); // get model routeData
   }
   async defaultRoutes() { // routedata
     await this.defaultClientRoutes()

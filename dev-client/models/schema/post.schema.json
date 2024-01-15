@@ -5,8 +5,6 @@
     "searchKey":"title",
     "displayName":"Blog",
     "queryName":"category",
-    "useComment": true,
-    "useLikes": true,
     "useAuth": [
         "create",
         "update",
@@ -20,7 +18,7 @@
         "delete"
     ],
     "plugins":[
-        "comment","like"
+        "comment","like", "usehtml"
        ],
     "schemaOptions": {},
     "schemaObj": {
@@ -97,5 +95,6 @@
             "className":"form-control"
         }
     },
-    "template": ""
+    "listTemplate": "<article class='blog-post'><h3 class='blog-post-title pb-3 mb-3 fst-italic'>${title}</h3><p class='blog-post-meta'>${createdAt} | By: <a href='/portfolio'> ${author.firstname} ${author.lastname}</a> </p><p className='lead'> ${descriptions} </p><a href='/posts/${_id}'> Continue reading... !</a> </article>",
+    "modelTemplate":"<article class='blog-post'><h3 class='blog-post-title pb-3 mb-3 fst-italic'>${title}</h3><p class='blog-post-meta'>${createdAt} | By: <a href='/portfolio'> ${author.firstname} ${author.lastname}</a> </p><p className='lead'> ${descriptions} </p> <p className='lead'> ${body} </p></article>"
 }

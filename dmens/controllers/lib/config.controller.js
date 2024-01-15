@@ -16,8 +16,8 @@ export class ConfigController extends DefaultController {
         Svc.routes.deleteRoutePath(req.query['path']);
         this.responce(res).success();
     }
-    async modelClientsData(req, res, next) {
-        let data = await Promise.all(Svc.db.obj().filter((d) => d.config.dependent === false).map((a) => a.config.getModelClientData()));
+    async viewsData(req, res, next) {
+        let data = await Promise.all(Svc.db.obj().filter((d) => d.config.dependent === false).map((a) => a.config.getViewData()));
         this.responce(res).data(data);
     }
     async forms(req, res, next) {

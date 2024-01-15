@@ -63,7 +63,9 @@ export interface IModelConfigParameters {
   postPutMiddlewares?:string[]
   removeActions?:string[]
   plugins?:string[]
-  template?:string
+
+  modelTemplate?:string
+  listTemplate?:string
 
 };
 
@@ -74,24 +76,27 @@ export interface IActionData{
 }
 
 
-export interface IModelClientData {
+export interface IModelViewData {
   name: string
   routeName: string
   displayName:string
   baseRoutePath:string
   paramId:string
   routeParam:string
-  searchKey?:string
-  queryName?:string
   pagesPerPage:number
-  
+
+  modelKeys:string[]
   useAuth: string[]
   useAdmin: string[]
   plugins:string[]
 
-  template?:string
+  queryName?:string
+  searchKey?:string
+
+  modelTemplate?:string
+  listTemplate?:string
 }
-export interface IModelConfig extends IModelClientData {
+export interface IModelConfig extends IModelViewData {
   dependent: Boolean
   template?:string 
   schemaObj: object
@@ -101,7 +106,7 @@ export interface IModelConfig extends IModelClientData {
   formCache?:IModelForm
   getRoutes?(): { method: string; path: string;}[]
   getProps?(): IModelConfig
-  getModelClientData?(): IModelClientData
+  getViewData?(): IModelViewData
   genForm?(): Promise<IModelForm>
   //check useAuth and useAdmin
   authAdminMiddlewares?(actionName: string): string[]
@@ -176,7 +181,7 @@ export interface IController {
 
   form:IRequestVerpsAsync;
   route:IRequestVerpsAsync;
-  modelClientData:IRequestVerpsAsync;
+  viewData:IRequestVerpsAsync;
 
   count:IRequestVerpsAsync;
   search:IRequestVerpsAsync;
@@ -194,7 +199,7 @@ export interface IController {
 export interface IConfigController extends IController{
   forms:IRequestVerpsAsync;
   routes:IRequestVerpsAsync;
-  modelClientsData:IRequestVerpsAsync;
+  viewsData:IRequestVerpsAsync;
   deleteRoute:IRequestVerpsAsync;
 }
 export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>Promise<any>;

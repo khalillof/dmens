@@ -3,34 +3,33 @@ import { Svc } from '../../common/index.js';
 import { ModelForm } from '../index.js';
 export class ModelConfig {
     constructor(_config) {
-        let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares, routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage, queryName, paramId, plugins, removeActions, template } = _config;
         // basic validation
-        if (!name || !schemaObj) {
+        if (!_config.name || !_config.schemaObj) {
             throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
         }
-        this.name = name.toLowerCase();
+        this.name = _config.name.toLowerCase();
         if (Svc.db.exist(this.name)) {
-            throw new Error(`ConfigProps basic schema validation faild ! name property : ${name} already on db.`);
+            throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
         }
-        this.dependent = dependent || false,
-            this.routeName = routeName ? routeName.replace('/', '').toLowerCase() : Svc.routes.pluralizeRoute(this.name);
+        this.dependent = _config.dependent || false,
+            this.schemaObj = _config.schemaObj || {},
+            this.routeName = _config.routeName ? _config.routeName.replace('/', '').toLowerCase() : Svc.routes.pluralizeRoute(this.name);
         this.baseRoutePath = '/' + this.routeName;
-        this.paramId = paramId || this.name + 'Id';
+        this.paramId = _config.paramId || this.name + 'Id';
         this.routeParam = this.baseRoutePath + '/:' + this.paramId;
-        this.useAuth = this.removeDiplicates(useAuth);
-        this.useAdmin = this.removeDiplicates(useAdmin);
-        this.displayName = displayName || this.name;
-        this.plugins = this.removeDiplicates(plugins);
-        this.template = template;
-        if (queryName)
-            this.queryName = queryName;
-        if (searchKey)
-            this.searchKey = searchKey;
-        this.pagesPerPage = pagesPerPage || 5;
-        this.schemaObj = schemaObj || {},
-            this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions };
-        this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares);
-        this.removeActions = this.removeDiplicates(removeActions);
+        this.useAuth = this.removeDiplicates(_config.useAuth);
+        this.useAdmin = this.removeDiplicates(_config.useAdmin);
+        this.displayName = _config.displayName || this.name;
+        this.plugins = this.removeDiplicates(_config.plugins);
+        this.modelTemplate = _config.modelTemplate;
+        this.listTemplate = _config.listTemplate;
+        this.queryName = _config.queryName;
+        this.searchKey = _config.searchKey;
+        this.pagesPerPage = _config.pagesPerPage || 5;
+        this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions };
+        this.postPutMiddlewares = this.removeDiplicates(_config.postPutMiddlewares);
+        this.removeActions = this.removeDiplicates(_config.removeActions);
+        this.modelKeys = Object.keys(_config.schemaObj || {});
     }
     name;
     dependent;
@@ -39,13 +38,15 @@ export class ModelConfig {
     routeParam;
     paramId;
     pagesPerPage;
+    modelKeys;
     queryName;
     searchKey;
     displayName;
     useAuth;
     useAdmin;
     plugins;
-    template;
+    modelTemplate;
+    listTemplate;
     schemaObj;
     schemaOptions;
     postPutMiddlewares; // used for post put actions
@@ -57,7 +58,7 @@ export class ModelConfig {
     }
     getProps() {
         return {
-            ...this.getModelClientData(),
+            ...this.getViewData(),
             dependent: this.dependent,
             removeActions: this.removeActions,
             schemaObj: this.schemaObj,
@@ -65,18 +66,20 @@ export class ModelConfig {
             postPutMiddlewares: this.postPutMiddlewares
         };
     }
-    getModelClientData() {
+    getViewData() {
         return {
             name: this.name,
             routeName: this.routeName,
             baseRoutePath: this.baseRoutePath,
             paramId: this.paramId,
             routeParam: this.baseRoutePath,
+            modelKeys: this.modelKeys,
             useAuth: this.useAuth,
             useAdmin: this.useAdmin,
             displayName: this.displayName,
             plugins: this.plugins,
-            template: this.template,
+            modelTemplate: this.modelTemplate,
+            listTemplate: this.listTemplate,
             queryName: this.queryName,
             searchKey: this.searchKey,
             pagesPerPage: this.pagesPerPage
