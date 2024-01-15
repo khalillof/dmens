@@ -68,7 +68,10 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
-  
+  usehtml:{
+    "type": Boolean,
+    "default": false
+  },
   postPutMiddlewares: {
     "type": [String],
     "default": []
@@ -81,7 +84,10 @@ export const confSchema = {
     "type": [String],
     "default": []
 },
-  template:{
+  modelTemplate:{
+    "type": String
+  },
+  listTemplate:{
     "type": String
   }
 };

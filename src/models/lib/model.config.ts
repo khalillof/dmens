@@ -2,50 +2,48 @@
 
 import { Svc } from '../../common/index.js';
 import { IModelConfig, IModelConfigParameters, IModelForm, IModelClientData } from '../../interfaces/index.js';
-import { ModelForm } from '../index.js';
+import { ModelForm} from '../index.js';
 
 export class ModelConfig implements IModelConfig {
 
   constructor(_config: IModelConfigParameters) {
-    let { name, dependent, schemaObj, schemaOptions, postPutMiddlewares,
-      routeName, useAuth, useAdmin, displayName, searchKey, pagesPerPage,
-      queryName, paramId, plugins,removeActions, template } = _config;
+
 
     // basic validation
-    if (!name || !schemaObj) {
+    if (!_config.name || !_config.schemaObj) {
       throw new Error(`ConfigProps class constructor is missing requird properties => ${_config}`);
     }
-    this.name = name.toLowerCase();
+    this.name = _config.name.toLowerCase();
 
     if (Svc.db.exist(this.name)) {
-      throw new Error(`ConfigProps basic schema validation faild ! name property : ${name} already on db.`);
+      throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
     }
 
-    this.dependent = dependent || false,
+    this.dependent = _config.dependent || false,
+    this.schemaObj = _config.schemaObj || {},
 
-      this.routeName = routeName ? routeName.replace('/', '').toLowerCase() : Svc.routes.pluralizeRoute(this.name);
+    this.routeName = _config.routeName ? _config.routeName.replace('/', '').toLowerCase() : Svc.routes.pluralizeRoute(this.name);
     this.baseRoutePath = '/' + this.routeName;
-    this.paramId = paramId || this.name + 'Id';
+    this.paramId = _config.paramId || this.name + 'Id';
     this.routeParam = this.baseRoutePath + '/:' + this.paramId;
-    this.useAuth = this.removeDiplicates(useAuth);
-    this.useAdmin = this.removeDiplicates(useAdmin);
-    this.displayName = displayName || this.name;
-    this.plugins  = this.removeDiplicates(plugins);
+    this.useAuth = this.removeDiplicates(_config.useAuth);
+    this.useAdmin = this.removeDiplicates(_config.useAdmin);
+    this.displayName = _config.displayName || this.name;
+    this.plugins  = this.removeDiplicates(_config.plugins);
   
-    this.template = template;
+    this.modelTemplate = _config.modelTemplate;
+    this.listTemplate = _config.listTemplate;
+    this.queryName =_config. queryName;
+    this.searchKey = _config.searchKey;
 
-    if (queryName)
-      this.queryName = queryName;
-
-    if (searchKey)
-      this.searchKey = searchKey;
-
-    this.pagesPerPage = pagesPerPage || 5;
-    this.schemaObj = schemaObj || {},
-    this.schemaOptions = { timestamps: true, strict: true, ...schemaOptions }
+    this.pagesPerPage = _config.pagesPerPage || 5;
     
-    this.postPutMiddlewares = this.removeDiplicates(postPutMiddlewares)
-    this.removeActions = this.removeDiplicates(removeActions);
+    this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions }
+    
+    this.postPutMiddlewares = this.removeDiplicates(_config.postPutMiddlewares)
+    this.removeActions = this.removeDiplicates(_config.removeActions);
+    this.modelKeys = Object.keys(_config.schemaObj || {});
+
   }
 
   name: string
@@ -55,14 +53,15 @@ export class ModelConfig implements IModelConfig {
   routeParam: string;
   paramId: string;
   pagesPerPage: number;
+  modelKeys:string[]
   queryName?: string;
   searchKey?: string;
   displayName: string;
   useAuth: string[];
   useAdmin: string[];
   plugins:string[]
-  template?: string
-
+  modelTemplate?:string
+  listTemplate?:string
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions
@@ -75,7 +74,7 @@ export class ModelConfig implements IModelConfig {
   }
   getProps(): IModelConfig {
     return {
-      ...this.getModelClientData(),
+      ...this.getViewData(),
       dependent: this.dependent,
       removeActions:this.removeActions,
       schemaObj: this.schemaObj,
@@ -83,18 +82,20 @@ export class ModelConfig implements IModelConfig {
       postPutMiddlewares: this.postPutMiddlewares
     }
   }
-  getModelClientData(): IModelClientData {
+  getViewData(): IModelClientData {
     return {
       name: this.name,
       routeName: this.routeName,
       baseRoutePath: this.baseRoutePath,
       paramId: this.paramId,
       routeParam: this.baseRoutePath,
+      modelKeys:this.modelKeys,
       useAuth: this.useAuth,
       useAdmin: this.useAdmin,
       displayName: this.displayName,
       plugins: this.plugins,
-      template: this.template,
+      modelTemplate: this.modelTemplate,
+      listTemplate: this.listTemplate,
       queryName: this.queryName,
       searchKey: this.searchKey,
       pagesPerPage: this.pagesPerPage
@@ -135,3 +136,5 @@ export class ModelConfig implements IModelConfig {
     return this.useAdmin.indexOf(actionName) !== -1
   }
 }
+
+

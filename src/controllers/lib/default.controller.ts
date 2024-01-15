@@ -22,8 +22,8 @@ export class DefaultController implements IController {
     this.responce(res).data(_form)
   }
   
-  async modelClientData(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let data = this.db.config.getModelClientData!()
+  async viewData(req: express.Request, res: express.Response, next: express.NextFunction) {
+    let data = this.db.config.getViewData!()
     this.responce(res).data(data)
   }
   

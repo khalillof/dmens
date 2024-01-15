@@ -3,8 +3,9 @@ import { DefaultController } from './default.controller.js';
 import { Svc, envs } from '../../common/index.js'
 import { IModelConfig, IModelConfigParameters } from '../../interfaces/index.js';
 import { Operations } from '../../operations/index.js';
+import { IConfigController } from 'src/interfaces/lib/interfaces.js';
 
-export class ConfigController extends DefaultController {
+export class ConfigController extends DefaultController implements IConfigController {
 
     constructor(name = 'config') {
         super(name)
@@ -22,8 +23,8 @@ export class ConfigController extends DefaultController {
         this.responce(res).success()
     }
     
-    async modelClientsData(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.getModelClientData!() ));
+    async viewsData(req: express.Request, res: express.Response, next: express.NextFunction) {
+        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.getViewData!() ));
         this.responce(res).data(data)
       }
 

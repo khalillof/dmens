@@ -71,5 +71,7 @@
         "minHeight": "200px"
       }
     }
-  }
+  },
+  "modelTemplate":"<div><p>Name: ${fullname}</p><p>Email : ${email}</p><p>telphone : ${telphone}</p><p>Message: ${message}</p><p>CreatedAt : ${createdAt}</p></div>",
+  "listTemplate":"<div><p> Name:${fullname}</p><p> createdAt: ${createdAt}</p></div>"
 }
