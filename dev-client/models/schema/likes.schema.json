@@ -8,7 +8,7 @@
         "patch"
     ],
     
-    "useAdmin": ["search","count"],
+    "useAdmin": ["search"],
     "schemaObj": {
         "like": {
             "type": "Boolean",
@@ -16,27 +16,11 @@
             "tag": "input",
             "className":"form-control"
         },
-        "rate": {
-            "type": "Number",
-            "default": 0,
-            "min": 0,
-            "max": 5,
-            "tag": "input",
-            "inputtype": "Number",
-            "className":"form-control"
-        },
-        "comment": {
-            "type": "String",
-            "minLength": 0,
-            "maxLength": 150,
-            "tag": "textarea",
-            "className":"form-control"
-        },
-        "userid": {
+        "user": {
             "type": "ObjectId",
             "ref": "account",
             "required": true,
-            "autopopulate": true
+            "autopopulate": false
         },
         "modelid": {
             "type": "ObjectId",

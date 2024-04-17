@@ -8,8 +8,6 @@
         "delete"
     ],
     "useAdmin": [
-        "list",
-        "delete",
         "search"
     ],
     "schemaObj": {

@@ -30,7 +30,7 @@ export const responce = (res: express.Response, cb?: Function) => {
   let successMsg = 'operation Successful!';
   let errMsg = 'error operation faild!';
 
-  let self = {
+  const self = {
     errObjInfo: (error: any, obj: any, info: any) => {
       if (obj) {
         cb ? self.callback(cb) : self.success();
