@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { dbStore, envs } from '../../common/index.js';
-import { Operations } from '../../operations/index.js';
+import { Operations } from '../../models/index.js';
 /////////////////
 const dbOptions = {
     //rejectUnauthorized: true,

@@ -24,7 +24,7 @@ export const typeMappings = {
     "map": mongoose.SchemaTypes.Map,
     "Map": mongoose.SchemaTypes.Map,
 };
-export const confSchema = {
+export const configTemplateSchema = {
     name: {
         "type": String,
         "unique": true,
@@ -32,6 +32,12 @@ export const confSchema = {
         "required": true,
         "minLength": 3,
         "maxLength": 30
+    },
+    description: {
+        "type": String,
+        "required": false,
+        "minLength": 3,
+        "maxLength": 200
     },
     dependent: {
         "type": Boolean,
@@ -64,10 +70,6 @@ export const confSchema = {
         "type": [String],
         "default": []
     },
-    usehtml: {
-        "type": Boolean,
-        "default": false
-    },
     postPutMiddlewares: {
         "type": [String],
         "default": []
@@ -87,12 +89,12 @@ export const confSchema = {
         "type": String
     }
 };
-export const configConfigProp = {
+export const configTemplateProps = {
     name: "config",
     dependent: false,
     displayName: "Configrations",
     schemaOptions: { timestamps: true, strict: true },
-    schemaObj: confSchema,
+    schemaObj: configTemplateSchema,
     useAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
     useAdmin: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
     postPutMiddlewares: ['isJson', 'uploadSchema'],
@@ -181,4 +183,48 @@ export const accConfgSchema = {
     },
     useAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
     useAdmin: ['list', "search", "count"],
+};
+const FormDefaults = {
+    parentClassname: "form-floating",
+    labelClassNames: {
+        text: "form-label",
+        select: "form-label",
+        textarea: "form-label",
+        date: "form-label",
+        checkbox: "form-check-label",
+        radio: "form-check-label"
+    },
+    input: {
+        text: {
+            type: "text",
+            class: "input-control",
+            required: false,
+            minLength: 3,
+            maxLength: 50
+        },
+        checkbox: {
+            type: "checkbox",
+            class: "form-check",
+            required: false
+        },
+        radio: {
+            type: "radio",
+            class: "form-check",
+            required: false
+        }
+    },
+    select: {
+        class: "form-select",
+        required: false
+    },
+    textarea: {
+        class: "input-control",
+        rows: 4,
+        required: false,
+        minLength: 3
+    },
+    date: {
+        class: "input-control",
+        required: false
+    }
 };

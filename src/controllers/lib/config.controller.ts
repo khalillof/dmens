@@ -2,7 +2,7 @@ import express from 'express';
 import { DefaultController } from './default.controller.js';
 import { Svc, envs } from '../../common/index.js'
 import { IModelConfig, IModelConfigParameters } from '../../interfaces/index.js';
-import { Operations } from '../../operations/index.js';
+import { Operations } from '../../models/index.js';
 import { IConfigController } from 'src/interfaces/lib/interfaces.js';
 
 export class ConfigController extends DefaultController implements IConfigController {

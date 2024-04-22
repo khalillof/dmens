@@ -49,6 +49,7 @@ export interface ISvcIntance<T> {
 
 export interface IModelConfigParameters {
   name: string
+  description?:string,
   dependent?: Boolean
   schemaObj: object
   schemaOptions?: Record<string, any>
@@ -75,7 +76,6 @@ export interface IActionData{
   reqAdmin:boolean
 }
 
-
 export interface IModelViewData {
   name: string
   routeName: string
@@ -97,8 +97,8 @@ export interface IModelViewData {
   listTemplate?:string
 }
 export interface IModelConfig extends IModelViewData {
+  description?:string,
   dependent: Boolean
-  template?:string 
   schemaObj: object
   schemaOptions?: Record<string, any>
   postPutMiddlewares: string[] // used for post put actions

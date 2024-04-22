@@ -1,6 +1,6 @@
 import { DefaultController } from './default.controller.js';
 import { Svc, envs } from '../../common/index.js';
-import { Operations } from '../../operations/index.js';
+import { Operations } from '../../models/index.js';
 export class ConfigController extends DefaultController {
     constructor(name = 'config') {
         super(name);
