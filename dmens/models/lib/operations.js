@@ -1,16 +1,17 @@
 "use strict";
-import { ModelDb } from '../../models/lib/model.db.js';
+import { ModelDb } from './model.db.js';
 import path from 'path';
 import fs from 'fs';
 import { Svc, envs } from '../../common/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
-import { accConfgSchema, typeMappings, configConfigProp, roleConfigSchema } from './help.js';
+import { accConfgSchema, typeMappings, configTemplateProps, roleConfigSchema } from './configration.js';
 import { DefaultController } from '../../controllers/index.js';
 //=============================================
 export class Operations {
     static async create_default_models_routes() {
-        // create config model and routes
-        await Operations.createModelWithConfig(configConfigProp);
+        // create configration Template model
+        await Operations.createModelInstance(configTemplateProps);
+        // create configration Routes with configController
         await ConfigRoutes();
         // create account roles
         await Operations.createModelConfigRoute(roleConfigSchema);
@@ -29,12 +30,8 @@ export class Operations {
     }
     static async createModelWithConfig(_config) {
         let _model = await Operations.createModelInstance(_config);
-        await Operations.createConfig(_model);
+        await _model.createConfig();
         return _model;
-    }
-    // ============ Config
-    static async createConfig(db) {
-        return await db.createConfig();
     }
     // ===================== Routes
     static async createRouteInstance(controller, callback) {

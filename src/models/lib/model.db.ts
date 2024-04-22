@@ -10,7 +10,8 @@ import { autopopulatePlugin } from './autopopulate.js';
 
 export class ModelDb implements IModelDb {
 
-  constructor(_config: IModelConfigParameters | IModelConfig ) {
+  constructor(_config: IModelConfigParameters | IModelConfig) {
+
     this.config = (_config instanceof ModelConfig) ? _config: new ModelConfig(_config);
     const {name,schemaObj,schemaOptions} =this.config;
     
@@ -33,7 +34,7 @@ export class ModelDb implements IModelDb {
       // assign
       this.model = Account;
     } else {
-      this.model = mongoose.model(this.name, _schema);
+        this.model = mongoose.model(this.name, _schema); 
     }
 
     // add to db store

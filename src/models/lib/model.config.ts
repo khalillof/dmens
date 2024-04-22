@@ -44,9 +44,12 @@ export class ModelConfig implements IModelConfig {
     this.removeActions = this.removeDiplicates(_config.removeActions);
     this.modelKeys = Object.keys(_config.schemaObj || {});
 
+    this.description = _config.description || `Template model for read create update and delete data operations `
+
   }
 
   name: string
+  description?:string
   dependent: Boolean
   routeName: string;
   baseRoutePath: string;
@@ -76,6 +79,7 @@ export class ModelConfig implements IModelConfig {
     return {
       ...this.getViewData(),
       dependent: this.dependent,
+      description:this.description,
       removeActions:this.removeActions,
       schemaObj: this.schemaObj,
       schemaOptions: this.schemaOptions,

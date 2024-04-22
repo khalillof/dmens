@@ -24,7 +24,7 @@ export const logger = {
 export const responce = (res, cb) => {
     let successMsg = 'operation Successful!';
     let errMsg = 'error operation faild!';
-    let self = {
+    const self = {
         errObjInfo: (error, obj, info) => {
             if (obj) {
                 cb ? self.callback(cb) : self.success();

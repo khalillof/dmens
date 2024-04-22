@@ -30,8 +30,10 @@ export class ModelConfig {
         this.postPutMiddlewares = this.removeDiplicates(_config.postPutMiddlewares);
         this.removeActions = this.removeDiplicates(_config.removeActions);
         this.modelKeys = Object.keys(_config.schemaObj || {});
+        this.description = _config.description || `Template model for read create update and delete data operations `;
     }
     name;
+    description;
     dependent;
     routeName;
     baseRoutePath;
@@ -60,6 +62,7 @@ export class ModelConfig {
         return {
             ...this.getViewData(),
             dependent: this.dependent,
+            description: this.description,
             removeActions: this.removeActions,
             schemaObj: this.schemaObj,
             schemaOptions: this.schemaOptions,

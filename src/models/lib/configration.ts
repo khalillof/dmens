@@ -1,6 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
-import { IModelConfigParameters } from '../../interfaces/index.js';
+import { IModelConfigParameters} from '../../interfaces/index.js';
 
 export const typeMappings = {
   "String": mongoose.SchemaTypes.String,
@@ -27,7 +27,7 @@ export const typeMappings = {
   "Map": mongoose.SchemaTypes.Map,
 }
 
-export const confSchema = {
+export const configTemplateSchema = {
 
   name: {
     "type": String,
@@ -36,6 +36,12 @@ export const confSchema = {
     "required": true,
     "minLength": 3,
     "maxLength": 30
+  },
+  description: {
+    "type": String,
+    "required": false,
+    "minLength": 3,
+    "maxLength": 200
   },
   dependent: {
     "type": Boolean,
@@ -46,7 +52,7 @@ export const confSchema = {
   },
   schemaObj: {
     "type": Object,
-    "required": true
+    "required":true
   },
   displayName: {
     "type": String,
@@ -68,10 +74,6 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
-  usehtml:{
-    "type": Boolean,
-    "default": false
-  },
   postPutMiddlewares: {
     "type": [String],
     "default": []
@@ -80,34 +82,35 @@ export const confSchema = {
     "type": [String],
     "default": []
   },
-  plugins:{
+  plugins: {
     "type": [String],
     "default": []
-},
-  modelTemplate:{
+  },
+  modelTemplate: {
     "type": String
   },
-  listTemplate:{
+  listTemplate: {
     "type": String
   }
 };
 
-export const configConfigProp: IModelConfigParameters = {
+export const configTemplateProps: IModelConfigParameters = {
   name: "config",
   dependent: false,
-  displayName:"Configrations",
+  displayName: "Configrations",
   schemaOptions: { timestamps: true, strict: true },
-  schemaObj: confSchema,
-  useAuth:['list','get','create','update','delete','patch','search','count','routes', 'forms'],
-  useAdmin: ['list','get','create','update','patch','delete','search','count','routes','forms'],
+  schemaObj: configTemplateSchema,
+  useAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
+  useAdmin: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
   postPutMiddlewares: ['isJson', 'uploadSchema'],
-  plugins: ['comment','like']
+  plugins: ['comment', 'like']
 };
-export const roleConfigSchema ={
+
+export const roleConfigSchema = {
   name: "role",
   dependent: true,
-  useAuth: ['list','create','update','patch','delete',"search","count"],
-  useAdmin: ['create','update','patch','delete',"search","count"],
+  useAuth: ['list', 'create', 'update', 'patch', 'delete', "search", "count"],
+  useAdmin: ['create', 'update', 'patch', 'delete', "search", "count"],
   schemaObj: {
     "name": {
       "type": "String",
@@ -116,15 +119,15 @@ export const roleConfigSchema ={
       "required": true,
       "minLength": 3,
       "maxLength": 30,
-      "tag" :"input",
-      "className":"form-control"
+      "tag": "input",
+      "className": "form-control"
     }
   }
 }
 export const accConfgSchema = {
   name: "account",
   dependent: false,
-  displayName:"Accounts",
+  displayName: "Accounts",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: {
 
@@ -185,9 +188,51 @@ export const accConfgSchema = {
       }
     ]
   },
-  useAuth: ['list','get','update','patch','delete',"search","count"],
-  useAdmin: ['list',"search","count"],
+  useAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
+  useAdmin: ['list', "search", "count"],
 };
 
-
-
+const FormDefaults = {
+  parentClassname: "form-floating",
+  labelClassNames: {
+    text: "form-label",
+    select: "form-label",
+    textarea: "form-label",
+    date: "form-label",
+    checkbox: "form-check-label",
+    radio: "form-check-label"
+  },
+  input: {
+    text: {
+      type: "text",
+      class: "input-control",
+      required: false,
+      minLength: 3,
+      maxLength: 50
+    },
+    checkbox: {
+      type: "checkbox",
+      class: "form-check",
+      required: false
+    },
+    radio: {
+      type: "radio",
+      class: "form-check",
+      required: false
+    }
+  },
+  select: {
+    class: "form-select",
+    required: false
+  },
+  textarea: {
+    class: "input-control",
+    rows: 4,
+    required: false,
+    minLength: 3
+  },
+  date: {
+    class: "input-control",
+    required: false
+  }
+}
