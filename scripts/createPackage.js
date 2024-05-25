@@ -6,10 +6,20 @@ async function cleanDirectoryOrCreateOne(dirPath){ // be carefull
   const dirP = path.resolve(__dirname, dirPath);
 
  if (fs.existsSync(dirP)) {
-  console.log('The directory exists. will be deleted and new one will be created');
-  // Synchronous deletion
- fs.rmSync(dirP, { recursive: true, force: true });
- fs.mkdirSync(dirP);
+
+    console.log('found dir will be empty :',dirP)
+    // Synchronous deletion
+  
+   fs.rm(dirP, { recursive: true},(err)=>{
+    if(err){
+     throw err
+    }else{
+      console.log('dir deleted and new one will be created :')
+       fs.mkdirSync(dirP);
+    }
+  
+   });
+  
  console.log('Directory cleaned successfully.');
 
 } else {
@@ -20,9 +30,9 @@ async function cleanDirectoryOrCreateOne(dirPath){ // be carefull
 
 }
 
-async function copyFile(file) {
+async function copyFile(file,to='../dist/') {
   const srcPath = path.resolve(__dirname, file);
-  const distPath = path.resolve(__dirname, '../dist/', path.basename(file));
+  const distPath = path.resolve(__dirname, to, path.basename(file));
 
   fs.copyFileSync(srcPath, distPath);
 }
@@ -79,12 +89,14 @@ async function addLicense(packageData) {
  * LICENSE file in the root directory of this source tree.
  */
 `;
-  await Promise.all(
-    [
-      //'../dist/cjs/index.js',
-      '../dist-ts/index.js',
-    ].map(file => prepend(path.resolve(__dirname, file), license)),
-  );
+
+ // await Promise.all(
+ //   [
+ //     //'../dist/cjs/index.js',
+ //     '../dist-ts/index.js',
+ //   ].map(file => prepend(path.resolve(__dirname, file), license)),
+ // );
+
 }
 
 async function deleteSecretsFiles(){
@@ -104,22 +116,33 @@ async function deleteSecretsFiles(){
 }
 async function run() {
   // directory content will be deleted if die exist or ne one will be created
-  await cleanDirectoryOrCreateOne('../dist/')
+  //await cleanDirectoryOrCreateOne('../dist/')
 
   //copy dist-ts to dist
- await copyDirectory('../dist-ts/')
+ //await copyDirectory('../dist-ts/')
+
+ 
+ await copyFile('../src/models/lib/az-config.json','../dist/models/lib/');
+ await copyFile('../src/services/seeds.json','../dist/services/');
+ 
+ let addFiles = ['../README.md', '../CHANGELOG.md', '../LICENSE.md'];
+ // if dev enviroment add env.test file to dist
+ if(!process.env['NODE_ENV']){
+  addFiles.push('../.env.test');
+ }
+
 
  // add extra files
-  await Promise.all(
-    ['../README.md', '../CHANGELOG.md', '../LICENSE.md'].map(file => copyFile(file)),
-  ).then(()=> console.log('successfully copied ../README.md', '../CHANGELOG.md', '../LICENSE.md'));
+  await Promise.all(addFiles.map(file => copyFile(file))).then(()=> console.log('successfully copied',addFiles));
+
 
   const packageData = await createPackageFile();
   await addLicense(packageData);
 
-
+  //if(process.env['NODE_ENV'] && process.env['NODE_ENV'] === 'production'){
   // clean secrets such as .env
- await deleteSecretsFiles();
+  // await deleteSecretsFiles();
+  //}
 
   // TypeScript - We don't have any typescript definitions yet, but if someone wants to add them, this will make our life easier.
  /**
