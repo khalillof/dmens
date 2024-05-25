@@ -28,8 +28,8 @@ jobs:
         run: npm ci
       #- name: create folder dmens if not existed
         #run: mkdir -p ./dmens     
-      - name: npm run ts && npm run build:createPackage out dist folder 
-        run: npm run ts && npm run build:createPackage
+      - name: npm run build:clean && npm run ts && npm run createPackage 
+        run: npm run build:clean && npm run ts && npm run createPackage
       - name: delete some folder
         run: |
          rm   ./create-env-file.sh
