@@ -1,9 +1,10 @@
 import { corsWithOptions } from "./cors.config.js";
-import { Svc, Assert, envs } from '../../common/index.js'
+import { Assert, envs } from '../../common/index.js'
+import {Store} from '../../services/index.js'
 import { middlewares } from '../../middlewares/index.js';
 import { IModelConfig, IController, IDefaultRoutesConfig, IMiddlewares,IRouteCallback } from '../../interfaces/index.js';
 import { DefaultController } from '../../controllers/index.js';
-import { appRouter } from '../../app.js'
+import { appRouter } from '../../index.js'
 
 // defaultActions =['list','get', 'create', 'update','patch', 'delete', 'search', 'count', 'form', 'route', 'modeldata']
 //const isDefaultActions = (action: string) => defaultActions.indexOf(action) !== -1;
@@ -15,7 +16,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   mware?: IMiddlewares
   baseRoutePath:string
   baseRouteParam:string
-  
+  routeName?: string | undefined;
   constructor(controller: IController, callback?: IRouteCallback) {
     if (!(controller instanceof DefaultController)) {
       envs.throwErr('route configration require instance of class DefaultController')
@@ -23,15 +24,22 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
     this.controller = controller
     this.config = controller.db.config;
+    this.routeName = controller.db.config.routeName;
     this.baseRoutePath = controller.db.config.baseRoutePath;
     this.baseRouteParam = controller.db.config.routeParam;
     this.router = appRouter;
     this.mware = middlewares;
 
-    typeof callback === 'function' ? callback.call(this) : this.defaultRoutes();
+    if(typeof callback === 'function'){
+     callback.call(this)
+    }else{
+      this.defaultRoutes();
+      this.defaultClientRoutes()
+      
+    } 
 
     // add instance to routeStore
-    Svc.routes.add(this);
+    Store.route.add(this);
 
   }
 
@@ -71,7 +79,6 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     await this.get(this.addPath('/viewdata'),'viewData'); // get model routeData
   }
   async defaultRoutes() { // routedata
-    await this.defaultClientRoutes()
 
     await this.list(); // list   
     await this.get() // get by id
@@ -89,6 +96,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
  async setMiddlewars(action:string,middlewares:string[]=[]){
   let mware:any = this.mware;
   let mdrs = [...middlewares, ...this.config.authAdminMiddlewares!(action)].map((m) => mware[m]);
+  //debug only console.log(`mode name :${this.config.name}:  >>>> action :${action} `)
   return [...mdrs,this.actions(action)];
 }
 
@@ -100,7 +108,7 @@ async get(path?:string,action?:string, middlewares?:string[]){
 await this.router.get(path?? this.baseRouteParam,await this.setMiddlewars(action??'getOne', middlewares))
 }
 async create(path?:string,action?:string, middlewares?:string[]){
-await this.router.post(path ??this.addPath('/create') ,await this.setMiddlewars(action ??'create', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]))
+await this.router.post(path ?? this.addPath('/create') ,await this.setMiddlewars(action ??'create', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]))
 }
 async update(path?:string,action?:string, middlewares?:string[]){
 await this.router.put(path??this.addPath('/update', true), await this.setMiddlewars(action??'update', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]));

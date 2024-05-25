@@ -7,7 +7,7 @@ FROM node:18.12.1-alpine3.15 as builder
 
 WORKDIR /app
 
-COPY  ./dmens ./dmens
+COPY  ./dist .
 COPY  ./create-env-file.sh .
 COPY  ./package-lock.json .
 COPY  ./package.json .

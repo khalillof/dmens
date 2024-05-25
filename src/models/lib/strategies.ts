@@ -1,8 +1,10 @@
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
-import { envs, Svc } from "../../common/index.js";
+import { envs } from "../../common/index.js";
+import { Store} from '../../services/index.js';
 import { Strategy as LocalStrategy } from  'passport-local';
 import {BearerStrategy,ITokenPayload} from "passport-azure-ad";
-import  azconfig from './az-config.json' assert {type: 'json'};
+import  azconfig from './az-config.json';
+
 import crypto from 'crypto';
 
 const  azOptions:any = {
@@ -26,7 +28,7 @@ export class PassportStrategies {
   static Local2(){
     return new LocalStrategy(
       function(username, password, cb) {
-        Svc.db.get('account')!.model!.findOne({ username: username }).then((user:any) => {
+        Store.db.get('account')!.model!.findOne({ username: username }).then((user:any) => {
                   if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
                   
                   // Function defined at bottom of app.js
@@ -59,7 +61,7 @@ export class PassportStrategies {
      // passReqToCallback:true
     },async (payload:any, done:any) => {
       // roles populate relaying on autopopulate plugin
-      Svc.db.get('account')!.model?.findById(payload.user._id)
+      Store.db.get('account')!.model?.findById(payload.user._id)
       .then((error: any, user?: any, info?:any)=> done(user,error, info))
   })}
   // JWT stratigy
@@ -95,7 +97,7 @@ function validPassword(password:string, hash:string, salt:any) {
 
 
 function verifyPasswordSafe(username:string, password:string, cb:any) {
-  Svc.db.get('account')!.model!.findOne({ username: username },(err:any, user:any)=>{
+  Store.db.get('account')!.model!.findOne({ username: username },(err:any, user:any)=>{
     if (err) { return cb(err); }
     if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
 

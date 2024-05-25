@@ -1,7 +1,8 @@
 import passport from 'passport';
 import express from 'express'
 import jwt from 'jsonwebtoken';
-import { responce, envs, Svc, logger } from "../../common/index.js";
+import { responce, envs,logger } from "../../common/index.js";
+import { Store} from '../../services/index.js';
 import { randomUUID } from 'crypto';
 
 const { verify, sign, TokenExpiredError } = jwt;
@@ -52,7 +53,7 @@ async function authenticateLocal(req: express.Request, res: express.Response, ne
 
   try {
     return await passport.authenticate("local", {}, async (err: any, user: any, info: any) => {
-
+    
       if (user) {
         console.log('authenticated user id local :\n', user._id)
         delete user['hash'];
@@ -71,7 +72,7 @@ async function authenticateLocal(req: express.Request, res: express.Response, ne
           }
 
           // refresh token found in header
-          let refUser = await Svc.db.get('account')!.findOne({ refreshToken: _refToken });
+          let refUser = await Store.db.get('account')!.findOne({ refreshToken: _refToken });
 
           if (!refUser) {
             return responce(res).badRequest('refresh token provided not found');
@@ -121,7 +122,7 @@ async function authenticateJwt(req: express.Request, res: express.Response, next
         }
 
         // refresh token found in header
-        let refUser = await Svc.db.get('account')!.findOne({ refreshToken: _refToken });
+        let refUser = await Store.db.get('account')!.findOne({ refreshToken: _refToken });
 
         if (!refUser) {
           return responce(res).badRequest('refresh token provided not found');
@@ -209,7 +210,7 @@ async function createRefershToken(user: any) {
 
   let _token = await getUUID();
 
-  await Svc.db.get('account')!.putById(user._id, {
+  await Store.db.get('account')!.putById(user._id, {
     refreshToken: _token,
     refreshTokenExpireAt: expireAt,
   });

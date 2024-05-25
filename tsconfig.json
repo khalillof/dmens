@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
-        "outDir": "dmens",
+        "outDir": "dist-ts",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitOverride": true,
@@ -35,6 +35,7 @@
         "node_modules",
         ".vscode",
         "test",
+        "scripts",
         //"dev-client",
         "build"
     ]

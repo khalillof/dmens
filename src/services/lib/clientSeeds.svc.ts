@@ -1,6 +1,7 @@
 import { IModelDb } from '../../interfaces/index.js';
-import { Svc, envs} from '../../common/index.js';
-import seeds from '../seeds.json' assert {type: 'json'};
+import {envs} from '../../common/index.js';
+import { Store} from '../../services/index.js';
+import seeds from '../seeds.json' ;
 import {posts} from './posts.js'
 //import {app} from '../../app.js'
 type dbCallback = {
@@ -8,7 +9,7 @@ type dbCallback = {
 }
 export class ClientSeedDatabase {
 
-    async init(dev=true) {
+    async init(dev=envs.isDevelopment) {
         envs.logLine('started database seeding ..!');
        if(dev){
         await this.addRoles();
@@ -33,7 +34,7 @@ export class ClientSeedDatabase {
 
         await this.countDb('account', async (Db: any) => {
 
-            const roles = await Svc.db.get('role')!.model!.find({ name: { $in: ["admin", "user"] } })
+            const roles = await Store.db.get('role')!.model!.find({ name: { $in: ["admin", "user"] } })
 
             if (roles) {
                 await Promise.all(seeds.accounts.map(async (account: any) => {
@@ -118,7 +119,7 @@ export class ClientSeedDatabase {
 
     countDb(dbName: string, callback: dbCallback) {
         return new Promise(async (resolve) => {
-            let Db = Svc.db.get(dbName)!;
+            let Db = Store.db.get(dbName)!;
             Db.model!.estimatedDocumentCount().then( async (count: number) => {
                 if (count === 0) {
                     callback && resolve(await callback(Db))
@@ -133,7 +134,7 @@ export class ClientSeedDatabase {
     }
 
     async getIDs(name: string, filter?: {}) {
-        return (await Svc.db.get(name)!.model?.find(filter!)!).map((md: any) => md._id);
+        return (await Store.db.get(name)!.model?.find(filter!)!).map((md: any) => md._id);
     }
 
     async saver(dbName: string, objArr: any[]) {

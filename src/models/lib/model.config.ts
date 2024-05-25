@@ -1,7 +1,7 @@
 "use strict";
 
-import { Svc } from '../../common/index.js';
-import { IModelConfig, IModelConfigParameters, IModelForm, IModelClientData } from '../../interfaces/index.js';
+import { Store } from '../../services/index.js';
+import { IModelConfig, IModelConfigParameters, IModelForm, IModelViewData } from '../../interfaces/index.js';
 import { ModelForm} from '../index.js';
 
 export class ModelConfig implements IModelConfig {
@@ -15,14 +15,14 @@ export class ModelConfig implements IModelConfig {
     }
     this.name = _config.name.toLowerCase();
 
-    if (Svc.db.exist(this.name)) {
+    if (Store.db.exist(this.name)) {
       throw new Error(`ConfigProps basic schema validation faild ! name property : ${_config.name} already on db.`);
     }
 
     this.dependent = _config.dependent || false,
     this.schemaObj = _config.schemaObj || {},
 
-    this.routeName = _config.routeName ? _config.routeName.replace('/', '').toLowerCase() : Svc.routes.pluralizeRoute(this.name);
+    this.routeName = _config.routeName ? _config.routeName.replace('/', '').toLowerCase() : Store.route.pluralizeRoute(this.name);
     this.baseRoutePath = '/' + this.routeName;
     this.paramId = _config.paramId || this.name + 'Id';
     this.routeParam = this.baseRoutePath + '/:' + this.paramId;
@@ -86,7 +86,7 @@ export class ModelConfig implements IModelConfig {
       postPutMiddlewares: this.postPutMiddlewares
     }
   }
-  getViewData(): IModelClientData {
+  getViewData(): IModelViewData {
     return {
       name: this.name,
       routeName: this.routeName,
@@ -106,7 +106,7 @@ export class ModelConfig implements IModelConfig {
     }
   }
   getRoutes() {
-    return Svc.routes.getRoutesPathMethods(this.routeName)
+    return Store.route.getRoutesPathMethods(this.routeName)
   }
 
   async genForm(): Promise<IModelForm> {

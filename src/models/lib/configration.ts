@@ -102,7 +102,7 @@ export const configTemplateProps: IModelConfigParameters = {
   schemaObj: configTemplateSchema,
   useAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
   useAdmin: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
-  postPutMiddlewares: ['isJson', 'uploadSchema'],
+  postPutMiddlewares: ['isJson'], // 'uploadSchema'
   plugins: ['comment', 'like']
 };
 
