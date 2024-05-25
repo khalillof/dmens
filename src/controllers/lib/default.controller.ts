@@ -1,5 +1,6 @@
 import express from 'express';
-import { logger, responce, Assert, Svc } from '../../common/index.js';
+import { logger, responce, Assert} from '../../common/index.js';
+import { Store } from '../../services/index.js';
 import { Ilogger, Iresponce, IController, IModelDb, IRequestFilter } from '../../interfaces/index.js';
 
 export class DefaultController implements IController {
@@ -7,7 +8,7 @@ export class DefaultController implements IController {
   responce: Iresponce;
   log: Ilogger;
   constructor(name: string) {
-    this.db = Svc.db.get(name)!;
+    this.db = Store.db.get(name)!;
     this.responce = responce;
     this.log = logger;
   }

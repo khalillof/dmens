@@ -3,7 +3,8 @@ build
 npm.sh
 node_modules/**/*
 node_modules
-test.env
+.env
+.env.test
 #client/create-env-file.sh
 src/**/*
 src
@@ -11,7 +12,7 @@ src
 .git
 views/**/*
 dmens/.env
-dmens/test.env
+dmens/.env.test
 admin_data.txt
 tsconfig.json
 README.md

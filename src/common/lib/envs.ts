@@ -1,10 +1,20 @@
 import {env} from 'process';
+import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-const __dirname =fileURLToPath(import.meta.url);
+const isDevelopment = env['NODE_ENV'] !== 'production';
+
 const baseDir = path.resolve(path.dirname(__dirname).replace('lib','').replace('common',''));
-const isDevelopment = ()=> env['NODE_ENV'] === 'development';
+const envFileName = isDevelopment ? '.env.test' : '.env' ;
+export const envPath = path.join(baseDir, envFileName);
+
+// load envirmoment vars
+ let {error, parsed } = dotenv.config({ path: envPath });
+
+ if (error) {
+  throw new Error('enviroment file error :'+error);
+}
 const getOr = (key:string, or:any=null)=> env[key] ??  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
 
@@ -48,6 +58,11 @@ export const envs = {
          throw new Error(msg);
   }
 };
+
+if (!error && !isDevelopment && fs.existsSync(envPath)) {
+  fs.unlinkSync(envPath)
+  console.log('.env file will be removed')
+}
 
 
 

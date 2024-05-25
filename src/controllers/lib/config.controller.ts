@@ -1,6 +1,7 @@
 import express from 'express';
 import { DefaultController } from './default.controller.js';
-import { Svc, envs } from '../../common/index.js'
+import { envs } from '../../common/index.js'
+import { Store} from '../../services/index.js'
 import { IModelConfig, IModelConfigParameters } from '../../interfaces/index.js';
 import { Operations } from '../../models/index.js';
 import { IConfigController } from 'src/interfaces/lib/interfaces.js';
@@ -12,27 +13,29 @@ export class ConfigController extends DefaultController implements IConfigContro
     }
 
     async routes(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let routes = Svc.routes.getRoutesPathMethods()
+        let routes = Store.route.getRoutesPathMethods()
         this.responce(res).data(routes)
     }
     async deleteRoute(req: express.Request, res: express.Response, next: express.NextFunction) {
         if (!req.query && !req.query['path'] && !(typeof req.query['path'] === 'string')) {
             return this.responce(res).badRequest('require query string path');
         }
-        Svc.routes.deleteRoutePath(req.query['path'] as string)
+        Store.route.deleteRoutePath(req.query['path'] as string)
         this.responce(res).success()
     }
     
     async viewsData(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Svc.db.obj().filter((d)=>  d.config.dependent === false ).map((a)=> a.config.getViewData!() ));
+        let data = await Promise.all(Store.db.store.filter(async(d)=>  d.config.dependent === false ).map(async(a)=> a.config.getViewData!() ));
+       // console.log(data)
         this.responce(res).data(data)
       }
 
     async forms(req: express.Request, res: express.Response, next: express.NextFunction) {
-       let _forms =  await Promise.all(Svc.db.obj().map(async (d)=>  await d.config.genForm!()));
+       let _forms =  await Promise.all(Store.db.store.map(async (d)=>  await d.config.genForm!()));
         this.responce(res).data(_forms)
       }
-    override  async create(req: express.Request, res: express.Response) {
+      
+    override  async create(req: express.Request, res: express.Response, next: express.NextFunction) {
         let conf: IModelConfigParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
@@ -60,10 +63,10 @@ export class ConfigController extends DefaultController implements IConfigContro
             // delete config record on database
             await this.db.deleteById(id);
             // if there is db deleted
-            Svc.db.delete(item.name)
+            Store.db.delete(item.name)
 
             // delete app route
-            Svc.routes.deleteAppRoute(item.routeName)
+            Store.route.deleteAppRoute(item.routeName)
 
             console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
             this.responce(res).success()

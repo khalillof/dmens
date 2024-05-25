@@ -17,11 +17,11 @@ export interface IModelForm {
   elements: Record<string, any>
 
 }
-export interface ISvc {
-  db: ISvcIntance<IModelDb>
-  routes: IRouteSvc
+export interface IStore {
+  db: IStoreIntance<IModelDb>
+  route: IRouteStore
 }
-export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
+export interface IRouteStore extends IStoreIntance<IDefaultRoutesConfig> {
   print(): void
   getRoutes(routePath?: string): IRoute[]
   getRoutesPathMethods(routeName?: string): { method: string, path: string }[]
@@ -38,8 +38,11 @@ export interface IRouteSvc extends ISvcIntance<IDefaultRoutesConfig> {
   pluralizeRoute(routeName: string): string
 }
 
-export interface ISvcIntance<T> {
-  obj(): T[]
+export interface IStoreIntance<T> {
+  storeKey: string
+  storeName: string
+  store: T[]
+  //obj(): T[]
   get(keyValue: string): T | null
   add(obj: T | any): void
   delete(keyValue: string): void
@@ -207,6 +210,7 @@ export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>P
 export interface IDefaultRoutesConfig {
   router: IRouter
   config:IModelConfig
+  routeName?:string
   controller: IController;
   mware?: IMiddlewares;
   baseRoutePath:string

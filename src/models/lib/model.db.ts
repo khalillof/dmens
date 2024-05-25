@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
-import { Svc, envs } from '../../common/index.js'
+import { envs } from '../../common/index.js'
+import { Store} from '../../services/index.js';
 import { IModelConfig, IModelConfigParameters, IModelDb} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
@@ -38,7 +39,7 @@ export class ModelDb implements IModelDb {
     }
 
     // add to db store
-     Svc.db.add(this);
+     Store.db.add(this);
   }
 
   readonly name:string
@@ -67,7 +68,7 @@ export class ModelDb implements IModelDb {
       return;
     }
 
-    let _configDb = Svc.db.get('config')!;
+    let _configDb = Store.db.get('config')!;
 
     if (!_configDb) {
       envs.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`)

@@ -1,5 +1,6 @@
 import express from 'express';
-import { Svc, responce} from '../../common/index.js';
+import { responce} from '../../common/index.js';
+import { Store} from '../../services/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
@@ -7,7 +8,7 @@ import { authenticateJwt as authenticate } from '../../services/index.js';
 
 
   async function getUserFromReq(req: express.Request) {
-    return req.body && req.body.email ? await Svc.db.get('account')!.findOne({ email: req.body.email }) : null;
+    return req.body && req.body.email ? await Store.db.get('account')!.findOne({ email: req.body.email }) : null;
   }
   function checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction):void {
     if (req.body) {
@@ -101,8 +102,8 @@ import { authenticateJwt as authenticate } from '../../services/index.js';
   }
 //}
 //export default new Middlewares();
-const Middlewares:IMiddlewares = {authenticate,getUserFromReq,checkLoginUserFields,validateSameEmailDoesntExist,
+const Middlewares:IMiddlewares = {uploadSchema,authenticate,getUserFromReq,checkLoginUserFields,validateSameEmailDoesntExist,
   validateCurrentUserOwnParamId,validateBodyEmailBelongToCurrentUser,validateHasQueryEmailBelongToCurrentUser,
-  userExist,uploadSchema,isAuthenticated,isAdmin,isInRole,isJson}
+  userExist,isAuthenticated,isAdmin,isInRole,isJson}
 
 export default Middlewares;

@@ -26,10 +26,10 @@ jobs:
           scope: '@tuban/dmens'
       - name: run npm install (ci) ===================
         run: npm ci
-      - name: create folder dmens if not existed
-        run: mkdir -p ./dmens     
-      - name: compile typescrept to dmens folder 
-        run: npm run ts
+      #- name: create folder dmens if not existed
+        #run: mkdir -p ./dmens     
+      - name: npm run ts && npm run build:createPackage out dist folder 
+        run: npm run ts && npm run build:createPackage
       - name: delete some folder
         run: |
          rm -rf  ./dev-client

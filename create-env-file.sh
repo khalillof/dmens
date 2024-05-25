@@ -1,6 +1,6 @@
 #!/bin/sh
 
-envFile=/home/node/app/dmens/.env
+envFile=/home/node/app/.env
 
 touch $envFile
 
@@ -33,4 +33,4 @@ head -2 $envFile
 #mv .env ./client
 #echo  $envFile
 sleep 1
-npm start
+npm run start-prod

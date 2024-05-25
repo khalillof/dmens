@@ -6,9 +6,8 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const getCert =(certName:string) => path.join(path.dirname(fileURLToPath(import.meta.url)), certName);
+const getCert =(certName:string) => path.join(__dirname, certName);
 
 export async function menServer(app:any,isHttps = false){
  

@@ -3,7 +3,8 @@ import { IModelConfig, IModelConfigParameters, IController, IRouteCallback } fro
 import { ModelDb } from './model.db.js';
 import path from 'path';
 import fs from 'fs';
-import { Svc, envs } from '../../common/index.js';
+import {envs } from '../../common/index.js';
+import { Store} from '../../services/index.js';
 import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
 import { accConfgSchema, typeMappings, configTemplateProps, roleConfigSchema} from './configration.js';
 import { DefaultController } from '../../controllers/index.js';
@@ -17,7 +18,7 @@ export class Operations {
     // create configration Template model
    await Operations.createModelInstance(configTemplateProps)
    // create configration Routes with configController
-    await ConfigRoutes();
+   await ConfigRoutes();
 
     // create account roles
     await Operations.createModelConfigRoute(roleConfigSchema)
@@ -61,8 +62,8 @@ export class Operations {
 
   // create model route from config 
   static async createModelsRoutesFromDb(){
-   let allDbConfigs = await Svc.db.get('config')!.model!.find();
-   allDbConfigs = allDbConfigs.filter((p:IModelConfig)=> !Svc.db.exist(p.name));
+   let allDbConfigs = await Store.db.get('config')!.model!.find();
+   allDbConfigs = allDbConfigs.filter((p:IModelConfig)=> !Store.db.exist(p.name));
 
    if(allDbConfigs.length)
    for await( let config of allDbConfigs){
@@ -74,12 +75,12 @@ export class Operations {
   // create or override model config route
   static async overrideModelConfigRoute(_config: IModelConfigParameters) {
     let dbName = _config.name;
-    if (!dbName || !Svc.db.exist(dbName)) {
+    if (!dbName || !Store.db.exist(dbName)) {
       envs.throwErr(' db model name not found')
     }
 
     // delete model if exists
-    Svc.db.delete(dbName);
+    Store.db.delete(dbName);
 
     return await Operations.createModelConfigRoute(_config);
   }

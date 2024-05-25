@@ -1,6 +1,6 @@
 import { IModelConfig, IModelForm, IElement } from "../../interfaces/index.js";
 import { ModelConfig } from "../index.js";
-import { Svc } from '../../common/index.js'
+import { Store } from '../../services/index.js'
 
 export interface ILable {
     label: string,
@@ -52,9 +52,9 @@ export class ModelForm implements IModelForm {
 
                         let { optionkey, ref } = val;
 
-                        if (optionkey && ref && Svc.db.exist(ref)) {
+                        if (optionkey && ref && Store.db.exist(ref)) {
                             
-                            options =  (await Svc.db.get(ref)!.model!.find() || []).map((item: any) =>  ({key: item._id.toString(), title: item[optionkey], value: item._id.toString()}) );
+                            options =  (await Store.db.get(ref)!.model!.find() || []).map((item: any) =>  ({key: item._id.toString(), title: item[optionkey], value: item._id.toString()}) );
                             options.unshift({k:options.length+1 ,title:`Choose ${key}....` , disabled:true, defaultValue:""})
                           
                             this.addElemLable(key, val, { options });
