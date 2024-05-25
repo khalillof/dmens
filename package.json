@@ -19,7 +19,7 @@
   "module": "./dist/index.js",
   "scripts": {
     "build:dev": "npm run clean && npm run ts && npm run copyDevFiles",
-    "build:prod": "npm run build:clean && npm run ts && npm run createPackage",
+    "build:prod": "npm run clean && npm run ts && npm run createPackage",
     "clean": "node ./scripts/clean.js",
     "createPackage": "node ./scripts/createPackage.js",
     "copyDevFiles":"node ./scripts/copyDevFiles.js",
