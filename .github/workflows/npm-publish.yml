@@ -32,7 +32,6 @@ jobs:
         run: npm run ts && npm run build:createPackage
       - name: delete some folder
         run: |
-         rm -rf  ./dev-client
          rm   ./create-env-file.sh
       - name: run publish to npm registery
         run: npm publish
