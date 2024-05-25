@@ -25,7 +25,7 @@
     "release": "npm run build && npm publish ./dist",
     "ts": "tsc --build --clean && tsc",
     "start": "node ./dist-ts/index.js",
-    "start-prod": "node ./dist/index.js",
+    "start-prod": "node ./index.js",
     "trace": "tsc --traceResolution"
   },
   "dependencies": {
