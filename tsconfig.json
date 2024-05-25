@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
-        "outDir": "dist-ts",
+        "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitOverride": true,

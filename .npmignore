@@ -8,6 +8,13 @@ client
 node_modules
 src 
 .dockerignore
+
+dist-ts
+dev-client
+dist-ts/.env
+dist-ts/test.env
+dist/.env
+dist/test.env
 .env
 **/.env
 **/old.env

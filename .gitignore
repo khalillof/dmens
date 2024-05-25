@@ -1,4 +1,5 @@
 node_modules
+
 bin/cert.csr
 bin/certificate.pem
 bin/private.key
@@ -7,11 +8,15 @@ npm.sh
 admin_data.txt
 #client/create-env-file.sh
 dist
-build
-dmens/.env
-dmens/test.env
+dist-ts
+dev-client
+dist-ts/.env
+dist-ts/test.env
+dist/.env
+dist/test.env
 .env
 test.env
+build
 #purets/bin
 # Logs
 logs
