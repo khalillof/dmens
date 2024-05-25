@@ -17,6 +17,7 @@ dist/test.env
 .env
 test.env
 build
+admin_data.txt
 #purets/bin
 # Logs
 logs
