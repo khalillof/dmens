@@ -126,11 +126,6 @@ async function run() {
  await copyFile('../src/services/seeds.json','../dist/services/');
  
  let addFiles = ['../README.md', '../CHANGELOG.md', '../LICENSE.md'];
- // if dev enviroment add env.test file to dist
- if(!process.env['NODE_ENV']){
-  addFiles.push('../.env.test');
- }
-
 
  // add extra files
   await Promise.all(addFiles.map(file => copyFile(file))).then(()=> console.log('successfully copied',addFiles));
@@ -138,11 +133,6 @@ async function run() {
 
   const packageData = await createPackageFile();
   await addLicense(packageData);
-
-  //if(process.env['NODE_ENV'] && process.env['NODE_ENV'] === 'production'){
-  // clean secrets such as .env
-  // await deleteSecretsFiles();
-  //}
 
   // TypeScript - We don't have any typescript definitions yet, but if someone wants to add them, this will make our life easier.
  /**

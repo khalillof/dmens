@@ -74,10 +74,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - name: create folder ./dmens
-        run: mkdir -p ./dmens
-      - name: compile typescrept to ts-output folder 
-        run: npm run ts
+      #- name: create folder ./dmens
+       # run: mkdir -p ./dmens
 
   build-deploy:
     # Run this job when pull request merges
@@ -96,10 +94,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      #- name: create folder dmens if not existed
-       # run: mkdir -p ./dmens
-      - name: npm run ts && npm run build:createPackage out dist folder 
-        run: npm run ts && npm run build:createPackage
+      - name: npm run clean && npm run ts && npm run createPackage out dist folder 
+        run: npm run clean && npm run ts && npm run createPackage
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
