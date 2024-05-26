@@ -25,8 +25,8 @@ export class ConfigController extends DefaultController implements IConfigContro
     }
     
     async viewsData(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.all(Store.db.store.filter(async(d)=>  d.config.dependent === false ).map(async(a)=> a.config.getViewData!() ));
-       // console.log(data)
+        let data = await Promise.all(Store.db.store.filter((d)=>  d.config.dependent == false ).map((a)=> a.config.getViewData!() ));
+        //console.log(data)
         this.responce(res).data(data)
       }
 

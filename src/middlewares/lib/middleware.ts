@@ -4,7 +4,7 @@ import { Store} from '../../services/index.js';
 import { IMiddlewares } from '../../interfaces/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
-import { authenticateJwt as authenticate } from '../../services/index.js';
+import { authenticate } from '../../services/index.js';
 
 
   async function getUserFromReq(req: express.Request) {
