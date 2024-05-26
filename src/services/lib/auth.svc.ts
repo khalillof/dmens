@@ -49,11 +49,13 @@ function generateJwt(user: any) {
 }
 
 //type = 'local' || 'jwt'|| 'facebook' || 'facebook-token'
-async function authenticateLocal(req: express.Request, res: express.Response, next: express.NextFunction) {
-
+function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() || 'jwt'), options?: any){
+  return  (req: express.Request, res: express.Response, next: express.NextFunction)=> {
+    return passport.authenticate(authType, options, async (err: any, user: any, info: any) =>{
+       //console.log('AuthStrategy >>>>......>>>>>>>>>>>>> \n',authType, {err,user, info})
   try {
-    return await passport.authenticate("local", {}, async (err: any, user: any, info: any) => {
-    
+   if(authType === 'local'){
+
       if (user) {
         console.log('authenticated user id local :\n', user._id)
         delete user['hash'];
@@ -93,18 +95,11 @@ async function authenticateLocal(req: express.Request, res: express.Response, ne
           return responce(res).badRequest();
         }
       }
-    })(req, res, next); // end of passport authenticate
 
-  } catch (err: any) {
-    logger.resErr(res, (err.message ?? err))
-  }
-}
+     // end of local passport authenticate
 
+  }else if(authType === 'jwt'){
 
-
-async function authenticateJwt(req: express.Request, res: express.Response, next: express.NextFunction) {
-
-  return await passport.authenticate("jwt", {}, async (err: any, user: any, info: any) => {
     //console.log('user id jwt ......', {err,user, info})
     if (user) {
       req.user = user;
@@ -143,8 +138,19 @@ async function authenticateJwt(req: express.Request, res: express.Response, next
         return responce(res).badRequest();
       }
     }
-  })(req, res, next); // end of passport authenticate 
+  // end of jwt passport authenticate
+  }
+  else if(authType === 'oidc'){
+
+    // end of oidc passport authenticate
+  }
+  } catch (err: any) {
+    logger.resErr(res, (err.message ?? err))
+  }
+})(req, res, next);
 }
+}
+
 
 async function Tokens(user: any, access = true, refresh = false) {
   // generate json token
@@ -225,4 +231,4 @@ function isExpiredToken(expiryat: Date) {
 }
 
 
-export { generateJwt, authenticateLocal, authenticateJwt, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };
+export { generateJwt, authenticate, validateJWT, verify, createRefershToken, isExpiredToken, randomUUID };

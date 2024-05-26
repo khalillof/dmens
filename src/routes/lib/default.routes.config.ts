@@ -95,7 +95,11 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   
  async setMiddlewars(action:string,middlewares:string[]=[]){
   let mware:any = this.mware;
-  let mdrs = [...middlewares, ...this.config.authAdminMiddlewares!(action)].map((m) => mware[m]);
+  let mdrs = [...middlewares, ...this.config.authAdminMiddlewares!(action)].map((m) => {
+   return m==='authenticate' ? mware[m]() : mware[m];
+  }
+  );
+  
   //debug only console.log(`mode name :${this.config.name}:  >>>> action :${action} `)
   return [...mdrs,this.actions(action)];
 }

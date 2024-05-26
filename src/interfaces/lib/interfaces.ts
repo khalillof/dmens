@@ -173,8 +173,8 @@ export interface Ilogger {
   resErr: (res: express.Response, err: any) => void;
 };
 
-export type IRequestVerpsAsync = (req: express.Request, res: express.Response, next: express.NextFunction)=> Promise<void>
-export type IRequestVerps = (req: express.Request, res: express.Response, next: express.NextFunction)=> void
+export type IRequestVerpsAsync = (req: express.Request, res: express.Response, next: express.NextFunction)=> Promise<any>
+export type IRequestVerps = (req: express.Request, res: express.Response, next: express.NextFunction)=> any
 
 export interface IController {
 
@@ -234,7 +234,7 @@ export interface IDefaultRoutesConfig {
 }
 
 export interface IMiddlewares {
-  authenticate:IRequestVerpsAsync;
+  authenticate:Iauthenticate;
   getUserFromReq:IRequestVerpsAsync;
   checkLoginUserFields:IRequestVerps;
 
@@ -257,5 +257,5 @@ export interface IMiddlewares {
   isAdmin:IRequestVerps;
 }
 export interface Iauthenticate {
-  (type: any, opts?: any): IRequestVerpsAsync;
+  (type?: 'oidc'| 'jwt' | 'local', opts?: any): IRequestVerpsAsync;
 }

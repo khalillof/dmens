@@ -16,6 +16,7 @@ dist-ts/test.env
 dist/.env
 dist/test.env
 .env
+admin_data.txt
 **/.env
 **/old.env
 dmens/.env
