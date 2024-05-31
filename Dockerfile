@@ -8,7 +8,6 @@ FROM node:18.12.1-alpine3.15 as builder
 WORKDIR /app
 
 COPY  ./dist .
-COPY  ./create-env-file.sh .
 COPY  ./package-lock.json .
 COPY  ./package.json .
 RUN npm ci  --only=production --omit=dev
