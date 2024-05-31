@@ -17,12 +17,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+          #registry-url: 'https://registry.npmjs.org'
+          registry-url: https://npm.pkg.github.com/
           scope: '@tuban/dmens'
       - name: run npm install (ci) ===================
         run: npm ci
@@ -30,9 +31,7 @@ jobs:
         #run: mkdir -p ./dmens     
       - name: npm run clean && npm run ts && npm run createPackage 
         run: npm run clean && npm run ts && npm run createPackage
-      - name: delete some folder
-        run: |
-         rm   ./create-env-file.sh
+        
       - name: run publish to npm registery
         run: npm publish
         env:

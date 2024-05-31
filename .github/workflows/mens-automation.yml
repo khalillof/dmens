@@ -1,5 +1,5 @@
 name: Trigger auto deployment for dmens
-
+# https://docs.github.com/en/packages/quickstart
 # When this action will be executed
 on:
   # Automatically trigger it when detected changes in repo
@@ -87,28 +87,27 @@ jobs:
         node-version: [18.x]
     steps:
       - name: Checkout to the branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js [${{ matrix.node-version }}]
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
       - run: npm ci
       - name: npm run clean && npm run ts && npm run createPackage out dist folder 
         run: npm run clean && npm run ts && npm run createPackage
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to docker container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PSSWORD }}
 
       - name: Build and push container image to docker registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: |
@@ -118,14 +117,14 @@ jobs:
           context: ./
 
       - name: Log in to Github container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.GHRC_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push container image to github registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: |

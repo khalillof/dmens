@@ -5,7 +5,6 @@ import { Store} from '../../services/index.js';
 import { IModelConfig, IModelConfigParameters, IModelDb} from '../../interfaces/index.js'
 import passport from 'passport';
 import passportLocalMongoose from 'passport-local-mongoose';
-import { PassportStrategies } from './strategies.js';
 import { ModelConfig } from './model.config.js';
 import { autopopulatePlugin } from './autopopulate.js';
 
@@ -22,15 +21,12 @@ export class ModelDb implements IModelDb {
 
     if (this.name === 'account') {
       _schema?.plugin(passportLocalMongoose);
-      const Account: any = mongoose.model(this.name, _schema);
-      //passport.use(new Strategy(User.authenticate()));
+      const Account:any = mongoose.model(this.name, _schema);
+
       //local strategy
       passport.use(Account.createStrategy());
       passport.serializeUser(Account.serializeUser());
       passport.deserializeUser(Account.deserializeUser());
-      // extras
-      // strategy jwt || az
-      passport.use(PassportStrategies.getAuthStrategy());
 
       // assign
       this.model = Account;
