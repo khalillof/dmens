@@ -30,7 +30,5 @@ WORKDIR ${appDir}
 #COPY --from=builder /app/node_modules  ${appDir}/node_modules
 COPY --chown=node:node  --from=builder /app  .
 
-RUN chmod +x  ${appDir}/create-env-file.sh
-
 CMD ["npm", "run","start-prod"]
 
