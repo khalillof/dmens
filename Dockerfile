@@ -32,5 +32,5 @@ COPY --chown=node:node  --from=builder /app  .
 
 RUN chmod +x  ${appDir}/create-env-file.sh
 
-CMD [ "./create-env-file.sh" ]
-#CMD ["npm", "run","client"]
+CMD ["npm", "run","start-prod"]
+

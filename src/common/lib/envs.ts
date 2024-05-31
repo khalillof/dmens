@@ -10,10 +10,24 @@ const envFileName = isDevelopment ? '.env.test' : '.env' ;
 export const envPath = path.join(baseDir, envFileName);
 
 // load envirmoment vars
+if(fs.existsSync(envPath)){
  let {error, parsed } = dotenv.config({ path: envPath });
 
  if (error) {
   throw new Error('enviroment file error :'+error);
+}else{
+  // delete .env file
+  if (!error && !isDevelopment && fs.existsSync(envPath)) {
+    fs.unlinkSync(envPath)
+    console.log('.env file will be removed')
+  }
+}
+}else{
+  if(!env['NODE_ENV']){
+     throw new Error('enviroment does not exist :'+envPath);
+  }else{
+    console.log('enviroment data found it seems like runing on container enviroment ')
+  }
 }
 const getOr = (key:string, or:any=null)=> env[key] ??  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
@@ -30,7 +44,7 @@ export const envs = {
     authStrategy:()=> {
     let authStr =  getOr('AUTH_STRAtEGY', 'jwt').toLowerCase();
 
-    if("jwt az".indexOf(authStr) !== -1){
+    if("jwt az oidc local".indexOf(authStr) !== -1){
       return authStr === 'az' ? 'oauth-bearer' :  authStr;     
     }else{
       throw new Error( `>>> ${authStr} : >>>  auth strategy does not exist`)
@@ -59,10 +73,7 @@ export const envs = {
   }
 };
 
-if (!error && !isDevelopment && fs.existsSync(envPath)) {
-  fs.unlinkSync(envPath)
-  console.log('.env file will be removed')
-}
+
 
 
 

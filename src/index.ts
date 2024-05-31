@@ -7,6 +7,7 @@ import session from 'express-session';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
+import { PassportStrategies } from './models/index.js';
 import { Store} from './services/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
 import { corsWithOptions } from './routes/index.js';
@@ -66,20 +67,10 @@ app.use(helmet({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function(user, done) {
-  console.log('-----------------------------');
-  console.log('serialize user');
-  console.log(user);
-  console.log('-----------------------------');
-  done(null, user);
-});
-passport.deserializeUser(function(user:any, done) {
-  console.log('-----------------------------');
-  console.log('deserialize user');
-  console.log(user);
-  console.log('-----------------------------');
-  done(null, user);
-});
+// strategy jwt || az
+passport.use(PassportStrategies.getAuthStrategy());
+//==============================
+
 // create database models
 await dbInit();
 

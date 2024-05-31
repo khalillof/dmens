@@ -3,6 +3,7 @@ import { envs } from "../../common/index.js";
 import { Store} from '../../services/index.js';
 import { Strategy as LocalStrategy } from  'passport-local';
 import {BearerStrategy,ITokenPayload} from "passport-azure-ad";
+import jwksRsa  from 'jwks-rsa';
 import  azconfig from './az-config.json';
 
 import crypto from 'crypto';
@@ -20,28 +21,6 @@ const  azOptions:any = {
 
 export class PassportStrategies {
 
-   // local 
-   static LocalDefault() {
-    return new LocalStrategy(verifyPasswordSafe)
-  }
-
-  static Local2(){
-    return new LocalStrategy(
-      function(username, password, cb) {
-        Store.db.get('account')!.model!.findOne({ username: username }).then((user:any) => {
-                  if (!user) { return cb(null, false, { message: 'Incorrect username or password.' }); }
-                  
-                  // Function defined at bottom of app.js
-                  const isValid = validPassword(password, user.hash, user.salt);
-                  
-                  if (isValid) {
-                      return cb(null, false, { message: 'Incorrect username or password.' });
-                  } else {
-                      return cb(null, user);
-                  }
-              }).catch((err:any)=> cb(err));
-  });
-  }
 
   // azure active directory b2c
  static azBearerStrategy = ()=> new BearerStrategy(azOptions, (payload: ITokenPayload, done: any) => {
@@ -53,17 +32,48 @@ export class PassportStrategies {
 );
   // JWT stratigy
   static JwtAuthHeaderAsBearerTokenStrategy() {
-    return new JwtStrategy({
+    const pubKey= "tNqFsicjCn3AOBwqYzXJeyHglMils58K9AiJkJReJwdkcmek1mapW6jDG-FMtCahfru7vDhtY0s207xyXh5P9CAQG9vyE7yDOz1sBZ5QtBOXq8xx0rGtr_ePWISPFOQkRhfBY-PgOXr4dCPE2fQAPtpw-LJdKiI6nOwzlvgUZp7Q3znwmSrBM3H8ZL8HByb2Jlr9oQi_0_wONAM7_DjQc4Jximznb-ebgabPGuyKyfe3dM455w7E7mMete8CFWPKtn7ItTNv1pWrGWra5N5LjJthIeC_Fjk9u2nWc4vEPIW1sYqBTYv_9YCJTh7sSkMIn5Am2y9xcoqDyUV02xvTLQ";
+    const opts={
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: envs.secretKey(),
+      secretOrKey: pubKey,
       issuer: envs.issuer(),
       audience: envs.audience(),
      // passReqToCallback:true
-    },async (payload:any, done:any) => {
+    }
+    return new JwtStrategy(opts,async (payload:any, done:any) => {
       // roles populate relaying on autopopulate plugin
       Store.db.get('account')!.model?.findById(payload.user._id)
       .then((error: any, user?: any, info?:any)=> done(user,error, info))
   })}
+
+
+    // JWT stratigy
+    static JwtStrategy() {
+      const jwtOpts = {
+        // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
+    secretOrKeyProvider: jwksRsa.passportJwtSecret({
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+      jwksUri: `${envs.issuer()}.well-known/jwks`
+    }),
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+
+    // Validate the audience and the issuer.
+    audience:  envs.audience(),
+    issuer: envs.issuer(),
+    algorithms: ['RS256']
+      };
+     
+      return new JwtStrategy(jwtOpts,async (payload:any, done:any) => {
+        console.log(' oidc payload :\n',payload)
+        // roles populate relaying on autopopulate plugin
+       // Store.db.get('account')!.model?.findById(payload.user._id)
+       // .then((error: any, user?: any, info?:any)=> done(user,error, info))
+       let user = payload,error=null,info=null;
+       //user.roles =[{name:'admin'}];
+       done(user,error, info)
+    })}
   // JWT stratigy
   static JwtQueryParameterStrategy() {
     return new JwtStrategy(
@@ -84,7 +94,17 @@ export class PassportStrategies {
   }
 
 static getAuthStrategy(){
-    return envs.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
+  switch(envs.authStrategy()){
+    case"jwt":
+    //return PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
+    return PassportStrategies.JwtStrategy();
+    case "oauth-bearer":
+     return PassportStrategies.azBearerStrategy()
+      default:
+    return PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
+
+  }
+    //return envs.authStrategy() === 'oauth-bearer' ? PassportStrategies.azBearerStrategy() : PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy(); 
   }
 }
 

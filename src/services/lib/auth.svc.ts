@@ -104,7 +104,7 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
     if (user) {
       req.user = user;
 
-      console.log('user id jwt ......', user._id)
+      console.log('user id jwt ......', user)
       return next()
     } else {
 
@@ -141,7 +141,9 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
   // end of jwt passport authenticate
   }
   else if(authType === 'oidc'){
-
+    req.user = user;
+    console.log('passed through oidc starategy ......:\n', user)
+    return next()
     // end of oidc passport authenticate
   }
   } catch (err: any) {
