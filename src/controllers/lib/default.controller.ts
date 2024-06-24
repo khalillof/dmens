@@ -2,6 +2,7 @@ import express from 'express';
 import { logger, responce, Assert} from '../../common/index.js';
 import { Store } from '../../services/index.js';
 import { Ilogger, Iresponce, IController, IModelDb, IRequestFilter } from '../../interfaces/index.js';
+import { authenticate } from '../../services/index.js';
 
 export class DefaultController implements IController {
   db: IModelDb;
@@ -117,6 +118,11 @@ export class DefaultController implements IController {
     console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
     this.responce(res).success()
   }
+
+  test(req: express.Request, res: express.Response, next: express.NextFunction) {
+    this.responce(res).data(req.user)
+  }
+
   ////// helpers ================================
   tryCatch(actionName: string) {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -77,6 +77,8 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     await this.get(this.addPath('/form'),'form'); // get form elements
     await this.get(this.addPath('/route'),'route'); // get form routes
     await this.get(this.addPath('/viewdata'),'viewData'); // get model routeData
+    await this.get(this.addPath('/test'),'test', ['authenticate']); // tet auth
+
   }
   async defaultRoutes() { // routedata
 
@@ -125,6 +127,7 @@ async patch(path?:string,action?:string, middlewares?:string[]){
 
 await this.router.patch(path || this.addPath('/patch', true), await  this.setMiddlewars(action??'patch', middlewares));
 }
+
 
   actions(actionName: string) {
     return this.controller!.tryCatch(actionName)
