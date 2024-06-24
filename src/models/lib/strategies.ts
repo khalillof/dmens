@@ -55,7 +55,7 @@ export class PassportStrategies {
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: `${envs.issuer()}.well-known/jwks`
+      jwksUri: envs.jwks_uri()
     }),
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 
@@ -66,7 +66,7 @@ export class PassportStrategies {
       };
      
       return new JwtStrategy(jwtOpts,async (payload:any, done:any) => {
-        console.log(' oidc payload :\n',payload)
+        console.log('jwt payload :\n',payload)
         // roles populate relaying on autopopulate plugin
        // Store.db.get('account')!.model?.findById(payload.user._id)
        // .then((error: any, user?: any, info?:any)=> done(user,error, info))

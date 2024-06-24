@@ -105,6 +105,7 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
       req.user = user;
 
       console.log('user id jwt ......', user)
+      
       return next()
     } else {
 
