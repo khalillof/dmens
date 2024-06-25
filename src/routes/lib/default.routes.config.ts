@@ -69,15 +69,17 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     });
   }
 
-
+ async addGetClientRoute(pathActionname:string, middlewares?:string[]){
+ await this.get(this.addPath(`/client/${pathActionname}`),pathActionname,middlewares)
+}
   async defaultClientRoutes() { // routedata
 
-    await this.get(this.addPath('/client/search'),'search');// search
-    await this.get(this.addPath('/client/count'),'count'); // count
-    await this.get(this.addPath('/client/form'),'form'); // get form elements
-    await this.get(this.addPath('/client/route'),'route'); // get form routes
-    await this.get(this.addPath('/client/viewdata'),'viewData'); // get model routeData
-    await this.get(this.addPath('/client/test'),'test', ['authenticate']); // tet auth
+    await this.addGetClientRoute('search');// search
+    await this.addGetClientRoute('count'); // count
+    await this.addGetClientRoute('form'); // get form elements
+    await this.addGetClientRoute('route'); // get form routes
+    await this.addGetClientRoute('viewdata'); // get model routeData
+    await this.addGetClientRoute('test', ['authenticate']); // tet auth
 
   }
   async defaultRoutes() { // routedata

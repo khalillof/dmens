@@ -177,11 +177,11 @@ export interface IController {
 
   form:IRequestVerpsAsync;
   route:IRequestVerpsAsync;
-  viewData:IRequestVerpsAsync;
+  viewdata:IRequestVerpsAsync;
 
   count:IRequestVerpsAsync;
   search:IRequestVerpsAsync;
-
+  test:IRequestVerpsAsync;
   list:IRequestVerpsAsync;
   getOne:IRequestVerpsAsync;
   create:IRequestVerpsAsync;
@@ -195,7 +195,7 @@ export interface IController {
 export interface IConfigController extends IController{
   forms:IRequestVerpsAsync;
   routes:IRequestVerpsAsync;
-  viewsData:IRequestVerpsAsync;
+  viewsdata:IRequestVerpsAsync;
   deleteRoute:IRequestVerpsAsync;
 }
 export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>Promise<any>;
@@ -209,7 +209,7 @@ export interface IDefaultRoutesConfig {
   baseRoutePath:string
   baseRouteParam:string
   setMiddlewars(action:string,middlewares?:string[]):Promise<any[]>
-  
+ 
   list:IHttpVerp
   get:IHttpVerp
   create:IHttpVerp
@@ -218,6 +218,7 @@ export interface IDefaultRoutesConfig {
   patch:IHttpVerp
 
   addPath(name:string, paramId?:boolean):string
+  addGetClientRoute(pathActionname:string, middlewares?:string[]):Promise<void>
   setOptions(routPath: string): void;
   options(): void;
   setParam(): void;
