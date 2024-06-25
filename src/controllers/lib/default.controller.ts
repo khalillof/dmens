@@ -23,7 +23,7 @@ export class DefaultController implements IController {
     this.responce(res).data(_form)
   }
 
-  async viewData(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async viewdata(req: express.Request, res: express.Response, next: express.NextFunction) {
     let data = this.db.config.getViewData!()
     this.responce(res).data(data)
   }
@@ -131,7 +131,7 @@ export class DefaultController implements IController {
     this.responce(res).success()
   }
 
-  test(req: express.Request, res: express.Response, next: express.NextFunction) {
+ async test(req: express.Request, res: express.Response, next: express.NextFunction) {
     console.log('this test method =======================>>>')
     this.responce(res).data(req.user)
   }
