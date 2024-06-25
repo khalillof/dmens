@@ -27,7 +27,7 @@ async forgetPassword(req: express.Request, res: express.Response, next: express.
  if(!req.body.email && req.body.password){
   return this.responce(res).badRequest('some requied body fields are missing')
  }
- let user = await this.db.findOne({email:req.body.email});
+ let user = await this.db.model?.findOne({email:req.body.email});
   if (!user){
     return this.responce(res).badRequest('some of your input are not valid')
     }else{
@@ -57,7 +57,7 @@ async  updateUser(req: any, res: express.Response, next: express.NextFunction){
    this.responce(res).unAuthorized()
  } else {
    // user is already authenticated that is why I am checking for body.password only
-   let User = await this.db.findById(req.params.id);
+   let User = await this.db.model?.findById(req.params.id);
    if (req.user.password !== req.body.password)
      await User.setPassword(req.body.password)
    await User.save(req.body, this.responce(res).errObjInfo)

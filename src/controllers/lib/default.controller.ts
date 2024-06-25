@@ -1,8 +1,7 @@
 import express from 'express';
-import { logger, responce, Assert} from '../../common/index.js';
+import { logger, responce, Assert } from '../../common/index.js';
 import { Store } from '../../services/index.js';
 import { Ilogger, Iresponce, IController, IModelDb, IRequestFilter } from '../../interfaces/index.js';
-import { authenticate } from '../../services/index.js';
 
 export class DefaultController implements IController {
   db: IModelDb;
@@ -23,12 +22,12 @@ export class DefaultController implements IController {
     let _form = await this.db.config.genForm!()
     this.responce(res).data(_form)
   }
-  
+
   async viewData(req: express.Request, res: express.Response, next: express.NextFunction) {
     let data = this.db.config.getViewData!()
     this.responce(res).data(data)
   }
-  
+
   async route(req: express.Request, res: express.Response, next: express.NextFunction) {
     let routes = this.db.config.getRoutes!()
     this.responce(res).data(routes)
@@ -47,7 +46,7 @@ export class DefaultController implements IController {
     Assert.iSafeString(value)
 
     // the following three lines validate the reqested Key is actually present in the model schema properties
-    let iskeyInModel = this.db.model?.schema.pathType(key)
+    let iskeyInModel: any = this.db.model?.schema.pathType(key)
     if ("real nested virtual".indexOf(iskeyInModel!) === -1) {
       return this.responce(res).data([]);
     }
@@ -75,7 +74,7 @@ export class DefaultController implements IController {
     page && (delete filter['page'])
     sort && (delete filter['sort'])
     total && (delete filter['total'])
-   
+
     return { filter, limit, page, sort, total };
   }
 
@@ -90,36 +89,50 @@ export class DefaultController implements IController {
   }
 
   async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {
-    //console.log('hello paramas :',req.params)
-    let q = req.params['id'] ? { _id: req.params['id'] } : req.query;
-    if (!q) {
+
+    if (req.params) {
+      let _id = req.params[this.db.name + 'Id'];
+      if (_id) {
+        let item = await this.db.model!.findById(_id);
+        this.responce(res).data(item);
+        return;
+      } else {
+        let item = await this.db.model!.findById(req.params);
+        this.responce(res).data(item)
+        return
+      }
+
+    } else if (req.query) {
+      let item = await this.db.model!.findOne(req.query);
+      this.responce(res).data(item)
+    } else {
       return this.responce(res).badRequest()
     }
-    let item = await this.db.findOne(q);
-    this.responce(res).data(item)
+
   }
   async create(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.create(req.body);
+    let item = await this.db.model?.create(req.body);
     console.log('document Created :', item);
     this.responce(res).data(item)
   }
 
   async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.patchById(req.params['id'], req.body);
+    await this.db.model?.findOneAndUpdate(req.params, req.body);
     this.responce(res).success()
   }
 
   async update(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.putById(req.params['id'], req.body);
+    await this.db.model!.findByIdAndUpdate(req.params, req.body);
     this.responce(res).success()
   }
   async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.deleteById(req.params['id']);
+    let item = await this.db.model?.findByIdAndDelete(req.params['id']);
     console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
     this.responce(res).success()
   }
 
   test(req: express.Request, res: express.Response, next: express.NextFunction) {
+    console.log('this test method =======================>>>')
     this.responce(res).data(req.user)
   }
 

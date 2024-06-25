@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { responce, envs,logger } from "../../common/index.js";
 import { Store} from '../../services/index.js';
 import { randomUUID } from 'crypto';
+import { model } from 'mongoose';
 
 const { verify, sign, TokenExpiredError } = jwt;
 
@@ -74,7 +75,7 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
           }
 
           // refresh token found in header
-          let refUser = await Store.db.get('account')!.findOne({ refreshToken: _refToken });
+          let refUser = await Store.db.get('account')?.model?.findOne({ refreshToken: _refToken });
 
           if (!refUser) {
             return responce(res).badRequest('refresh token provided not found');
@@ -118,7 +119,7 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
         }
 
         // refresh token found in header
-        let refUser = await Store.db.get('account')!.findOne({ refreshToken: _refToken });
+        let refUser = await Store.db.get('account')?.model?.findOne({ refreshToken: _refToken });
 
         if (!refUser) {
           return responce(res).badRequest('refresh token provided not found');
@@ -219,7 +220,7 @@ async function createRefershToken(user: any) {
 
   let _token = await getUUID();
 
-  await Store.db.get('account')!.putById(user._id, {
+  await Store.db.get('account')!.model?.findByIdAndUpdate(user._id, {
     refreshToken: _token,
     refreshTokenExpireAt: expireAt,
   });

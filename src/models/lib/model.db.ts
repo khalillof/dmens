@@ -17,7 +17,7 @@ export class ModelDb implements IModelDb {
     
     this.name = name;
 
-    let _schema = new mongoose.Schema(schemaObj,schemaOptions ).plugin(autopopulatePlugin);
+    let _schema:any = new mongoose.Schema(schemaObj,schemaOptions ).plugin(autopopulatePlugin);
 
     if (this.name === 'account') {
       _schema?.plugin(passportLocalMongoose);
@@ -69,13 +69,13 @@ export class ModelDb implements IModelDb {
     if (!_configDb) {
       envs.throwErr(`config model not present on the database, could not create config entry for model :${this.name}`)
     }
-    let one = await _configDb.findOne({ name: this.name });
+    let one = await _configDb.model?.findOne({ name: this.name });
 
     if (one) {
-      await _configDb.putById(one._id,this.config.getProps!()); // update config
+      await _configDb.model?.findByIdAndUpdate(one._id,this.config.getProps!()); // update config
       envs.logLine('config entery already on database so it has been updated : name: '+ this.name)
     } else {
-      let rst = await _configDb.create(this.config.getProps!());
+      let rst = await _configDb.model?.create(this.config.getProps!());
       envs.logLine(`created config entry for model name : ${rst.name}`)
     }
   }
@@ -92,27 +92,4 @@ export class ModelDb implements IModelDb {
 
   }
 
-  async findById(id: string) {
-    return await this.model!.findById(id);
-  }
-  async findOne(query: Record<string, any>) {
-    return await this.model!.findOne(query);
-  }
-  async create(obj: object) {
-    return await this.model?.create(obj);
-  }
-
-  async putById(id: string, objFields: Record<string, any>) {
-    return await this.model?.findByIdAndUpdate(id, objFields);
-  }
-
-  async deleteById(id: string) {
-    return await this.model?.findByIdAndDelete(id);
-  }
-  async deleteByQuery(query: Record<string, any>) {
-    return await this.model?.findOneAndDelete(query);
-  }
-  async patchById(objFields: any) {
-    return await this.model?.findOneAndUpdate(objFields._id, objFields);
-  }
 }
