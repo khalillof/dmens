@@ -127,14 +127,7 @@ export interface IModelDb {
   createConfig(): Promise<any>;
   
   Tolist(filter?: Record<string, any>, limit?: number, page?: number, sort?: number): Promise<any[]>;
-  findById(id: string): Promise<any>
-  findOne(filter: Record<string, any>): Promise<any>;
-  create(obj: object): Promise<any>;
-  putById(id: string, objFields: Record<string, any>): Promise<any>;
 
-  deleteById(id: string): Promise<any>;
-  deleteByQuery(filter: Record<string, any>): Promise<any>;
-  patchById(id: string, objFields: object): Promise<any>;
 }
 
 export interface IConstructor<T> {

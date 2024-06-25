@@ -47,7 +47,7 @@ export class ConfigController extends DefaultController implements IConfigContro
     override  async update(req: express.Request, res: express.Response, next: express.NextFunction) {
         let id = req.params['id'];
 
-        let config = (id && await this.db.findById(id)) || req.body.name && await this.db.findOne({ name: req.body.name });
+        let config = (id && await this.db.model?.findById(id)) || req.body.name && await this.db.model?.findOne({ name: req.body.name });
 
         let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
 
@@ -57,11 +57,11 @@ export class ConfigController extends DefaultController implements IConfigContro
 
     override  async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
         let id = req.params['id'];
-        let item: IModelConfig = await this.db.findById(id);
+        let item: IModelConfig | any = await this.db.model?.findById(id);
 
         if (item) {
             // delete config record on database
-            await this.db.deleteById(id);
+            await this.db.model?.findByIdAndDelete(id);
             // if there is db deleted
             Store.db.delete(item.name)
 

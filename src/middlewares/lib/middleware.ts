@@ -8,7 +8,7 @@ import { authenticate } from '../../services/index.js';
 
 
   async function getUserFromReq(req: express.Request) {
-    return req.body && req.body.email ? await Store.db.get('account')!.findOne({ email: req.body.email }) : null;
+    return req.body && req.body.email ? await Store.db.get('account')!.model?.findOne({ email: req.body.email }) : null;
   }
   function checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction):void {
     if (req.body) {
