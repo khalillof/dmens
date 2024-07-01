@@ -64,16 +64,28 @@ export class PassportStrategies {
     issuer: envs.issuer(),
     algorithms: ['RS256']
       };
-     
+     console.log('options: ',jwtOpts)
+
+     try{                                               // done:(error: any, user?: Express.User | false, info?: any)
       return new JwtStrategy(jwtOpts,async (payload:any, done:any) => {
-        console.log('jwt payload :\n',payload)
+       // console.log('jwt payload :\n',payload)
         // roles populate relaying on autopopulate plugin
        // Store.db.get('account')!.model?.findById(payload.user._id)
        // .then((error: any, user?: any, info?:any)=> done(user,error, info))
-       let user = payload,error=null,info=null;
        //user.roles =[{name:'admin'}];
-       done(user,error, info)
-    })}
+
+       if(payload){
+       done(null,payload, null)
+       }else {
+        done("unknown error",false, null)
+       }
+      
+    })
+     }catch(err){
+      console.error(err);
+     throw err
+     }
+  }
   // JWT stratigy
   static JwtQueryParameterStrategy() {
     return new JwtStrategy(
