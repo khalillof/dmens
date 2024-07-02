@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { responce, envs,logger } from "../../common/index.js";
 import { Store} from '../../services/index.js';
 import { randomUUID } from 'crypto';
-import { model } from 'mongoose';
+//import { model } from 'mongoose';
 
 const { verify, sign, TokenExpiredError } = jwt;
 
