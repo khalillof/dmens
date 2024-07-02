@@ -60,14 +60,12 @@ export class PassportStrategies {
           jwksUri: envs.jwks_uri(),
           handleSigningKeyError: (err, cb) => {
             if (err instanceof jwksRsa.SigningKeyNotFoundError) {
-
-              //return cb(new Error('This is bad'));
-              // tem action
-              throw err
+              console.error(err)
+              return cb(err);
             }
-        
-           // return cb(err);
-           throw err
+            
+            console.error(err)
+           return cb(err);
           }
         }),
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
