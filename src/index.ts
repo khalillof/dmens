@@ -68,7 +68,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // strategy jwt || az
-passport.use(PassportStrategies.getAuthStrategy());
+passport.use(await PassportStrategies.getAuthStrategy());
 //==============================
 
 // create database models
