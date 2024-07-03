@@ -11,7 +11,7 @@ import { PassportStrategies } from './models/index.js';
 import { Store} from './services/index.js';
 import { dbInit, ClientSeedDatabase } from './services/index.js';
 import { corsWithOptions } from './routes/index.js';
-import { menServer } from './bin/www.js';
+import { httpServer } from './bin/www.js';
 
 export  const app = express();
 export const appRouter = express.Router();
@@ -107,7 +107,7 @@ await new ClientSeedDatabase().init();
 
 
 if(!envs.isDevelopment){
-  menServer(app, false) 
+  httpServer(app) 
   }else{
   app.listen(envs.port(), () => envs.logLine(`development server is running on port: ${envs.port()}`));
 
