@@ -1,42 +1,46 @@
 #!/usr/bin/env node
-//import express from 'express';
-//import  debug from 'debug';
-//debug('Express-Api-Server:server');
+
 import http from 'node:http';
 import https from 'node:https';
 import fs from 'fs';
 import path from 'path';
 
-const getCert =(certName:string) => path.join(__dirname, certName);
+const port = process.env['PORT'] || '3000';
 
-export async function menServer(app:any,isHttps = false){
+export async function httpServer(app:any){
  
-  var server: any;
-  var port = isHttps ? normalizePort(process.env['PORT'] || '443') : normalizePort(process.env['PORT'] || '3000');
-  process.env['PORT'] = port;
-  if (isHttps){
- app.set('secPort',port); 
- var options = {
-  key: fs.readFileSync(getCert('private.key')),
-  cert: fs.readFileSync(getCert('certificate.pem'))
- };
-  server = https.createServer(options,app);
-}else{
-
   app.set('port', port);
-  server = http.createServer(app);
+ const server = http.createServer(app);
 
- }
-
-
- server.listen(port, ()=> console.log(`dmens ${app.get('env')} server is listening on port: ${port}`));
+ server.listen(port, ()=> console.log(`dmens http ${app.get('env')} server is listening on port: ${port}`));
 server.on('error', onError);
-//server.on('listening', onListening);
-
 
 return server;
 };
 
+// To Do later
+export async function httpsServer(app:any){
+ 
+ app.set('secPort',port); 
+ let sslkey_dir = process.env['SSLKEY_DIR'];
+ let sslcert_dir = process.env['SSLCERT_DIR'];
+
+ if(sslkey_dir && sslcert_dir){
+ var options = {
+  key: fs.readFileSync( path.join(__dirname, sslkey_dir)),
+  cert: fs.readFileSync(path.join(__dirname, sslcert_dir))
+ };
+
+const  server = https.createServer(options,app);
+
+ server.listen(port, ()=> console.log(`dmens https ${app.get('env')} server is listening on port: ${port}`));
+server.on('error', onError);
+return server
+ }else{
+  throw new Error(" https server require sslkey and sslcert are not found")
+ }
+
+};
 
 function normalizePort(val:any) {
   var port = parseInt(val, 10);
@@ -58,7 +62,7 @@ function onError(error:any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
-  let port = process.env['PORT']
+
   var bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
@@ -75,16 +79,3 @@ function onError(error:any) {
       throw error;
   }
 }
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-/*
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-    debug('Listening on ' + bind);
-}
-*/
