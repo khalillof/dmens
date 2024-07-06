@@ -1,4 +1,5 @@
 import passport from 'passport';
+/*
 import { Issuer, Strategy} from 'openid-client';
 
 
@@ -45,12 +46,8 @@ import { Issuer, Strategy} from 'openid-client';
 };
 export const authorizeOidc= async (req:any, res:any,next:any)=>passport.authenticate("oidc", {}, async (err: any, user: any, info: any) => res.send({err, user, info}))(req, res,next);
 
-  /**
-   * reset OidcStrategy
-   *
-   * @memberof PassportService
-   */
  function resetOidcStrategy() {
  //debug('OidcStrategy: reset');
     passport.unuse('oidc');
   }
+*/

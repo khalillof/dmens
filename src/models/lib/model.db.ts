@@ -46,11 +46,11 @@ export class ModelDb implements IModelDb {
 
   async initPostDatabaseSeeding() {
     // count
-    this.count = await this.model!.count()
+    this.count = await this.model!.countDocuments()
 
     // create document watcher to notify you on document changes so you can update documents count property
     this.model!.watch().on('change', async change => {
-      this.count = await this.model?.count() ?? 0;
+      this.count = await this.model?.countDocuments() ?? 0;
       console.log('number of documents counted are :' + this.count)
       //console.log(JSON.stringify(change))
     })
