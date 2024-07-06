@@ -37,7 +37,7 @@ export class PassportStrategies {
       secretOrKey: envs.jwtSecret(),
       issuer: envs.issuer(),
       audience: envs.audience(),
-      // passReqToCallback:true
+      algorithms: ['RS256']
     }
     return new JwtStrategy(opts, async (payload: any, done: any) => {
       // roles populate relaying on autopopulate plugin
@@ -51,11 +51,29 @@ export class PassportStrategies {
   static async JwtStrategy() {
 
     try {
-      const jwtOpts = {
-        // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
-        secretOrKeyProvider: jwksRsa.passportJwtSecret({
+      const client = jwksRsa({
+        cache:true,
+        jwksUri: envs.jwks_uri(),
+        requestHeaders: {'Connection': 'Keep-Alive','Keep-Alive': 'timeout=5, max=1000'}, // Optional
+        timeout: 50000 // Defaults to 30s
+      });
+      let keys:any = await client.getKeys();
+
+      console.log('kind : ',keys[0].kid)
+    
+
+const kid = keys[0].kid;
+const key = await client.getSigningKey(kid);
+const signingKey = key.getPublicKey();
+ //console.log('key :',key)
+ //console.log('public key :', signingKey);
+
+//throw new Error(' Keys')
+ // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
+      /*  secretOrKeyProvider: jwksRsa.passportJwtSecret({
           cache: true,
           rateLimit: true,
+          timeout: 5000, // 30000 // Defaults to 30s,
           jwksRequestsPerMinute: 5,
           jwksUri: envs.jwks_uri(),
           handleSigningKeyError: (err, cb) => {
@@ -68,6 +86,10 @@ export class PassportStrategies {
            return cb(err);
           }
         }),
+        */
+        
+      const jwtOpts = {
+       secretOrKey:signingKey,
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   
         // Validate the audience and the issuer.
@@ -117,7 +139,7 @@ export class PassportStrategies {
   static async getAuthStrategy() {
     switch (envs.authStrategy()) {
       case "jwt":
-        //return PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
+        //return await PassportStrategies.JwtAuthHeaderAsBearerTokenStrategy();
         return await PassportStrategies.JwtStrategy();
       case "oauth-bearer":
         return await PassportStrategies.azBearerStrategy()

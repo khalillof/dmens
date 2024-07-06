@@ -124,4 +124,3 @@ appSettings().then(()=> console.log('success >>>>>>>>>>>>>>>>>')).catch(err=>con
 
  //let r = Svc.routes.getRoutesPathMethods('/configs');
  //envs.logLine(r)
-
