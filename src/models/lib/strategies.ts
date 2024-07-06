@@ -76,7 +76,7 @@ static async getJwtPubKeySecret() {
   const publicKey = await getJwks.getPublicKey({
     kid: detail.kid,
     alg: detail.alg,
-   domain:'https://auth.tuban.me/dex',
+   domain:envs.issuer(),
   })
 
  // console.log('pubkey : ',publicKey)
