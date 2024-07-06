@@ -5,7 +5,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { BearerStrategy, ITokenPayload } from "passport-azure-ad";
 import jwksRsa from 'jwks-rsa';
 import azconfig from './az-config.json';
-import https from 'node:https';
+import http from 'node:http';
 import fetch from 'node-fetch' ;
 
 import buildGetJwks from 'get-jwks';
@@ -68,9 +68,9 @@ static async getJwtPubKeySecret() {
     timeout: 5000,
     jwksPath:'/keys',
     providerDiscovery: false,
-    agent: new https.Agent({
-      keepAlive: true,
-    }),
+   // agent: new http.Agent({
+    //  keepAlive: true,
+   // }),
   })
 
   const publicKey = await getJwks.getPublicKey({
@@ -86,11 +86,12 @@ return publicKey;
 }
   // JWT stratigy
   static async JwtStrategy() {
- const pubKeySecret =  await PassportStrategies.getJwtPubKeySecret()
+ //const pubKeySecret =  await PassportStrategies.getJwtPubKeySecret()
     try {
+      
       /*
       const client = jwksRsa({
-       requestAgent: new https.Agent({keepAlive:true,timeout:5000}),
+       requestAgent: new http.Agent({keepAlive:true,timeout:5000}),
         cache:true,
         jwksUri: envs.jwks_uri(),
         requestHeaders: {
@@ -105,6 +106,7 @@ return publicKey;
 
 
 const kid = keys[0].kid;
+console.log('kid :',kid)
 const key = await client.getSigningKey(kid);
 const signingKey = key.getPublicKey();
 */
@@ -131,7 +133,14 @@ const signingKey = key.getPublicKey();
 
       // done:(error: any, user?: Express.User | false, info?: any)
       return new JwtStrategy({ 
-        secretOrKey:pubKeySecret,
+        //secretOrKey:""
+        secretOrKeyProvider: jwksRsa.passportJwtSecret({
+          cache: true,
+          rateLimit: true,
+          timeout: 5000, // 30000 // Defaults to 30s,
+          jwksRequestsPerMinute: 5,
+          jwksUri: envs.jwks_uri()
+        }),
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   
         // Validate the audience and the issuer.
