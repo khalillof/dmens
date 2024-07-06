@@ -5,6 +5,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { BearerStrategy, ITokenPayload } from "passport-azure-ad";
 import jwksRsa from 'jwks-rsa';
 import azconfig from './az-config.json';
+import http from 'node:https';
 
 import crypto from 'crypto';
 
@@ -49,12 +50,18 @@ export class PassportStrategies {
 
   // JWT stratigy
   static async JwtStrategy() {
-
+   //let agent = await httpServer(app)
     try {
       const client = jwksRsa({
+       // requestAgent: new http.Agent({keepAlive:true,timeout:5000}),
         cache:true,
         jwksUri: envs.jwks_uri(),
-        requestHeaders: {'Connection': 'Keep-Alive','Keep-Alive': 'timeout=5, max=1000'}, // Optional
+        requestHeaders: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers':'Authorization, Origin, X-Requested-With, Content-Type, Accept',
+          'Connection': 'Keep-Alive',
+          'Keep-Alive': 'timeout=5, max=1000'
+        }, // Optional
         timeout: 50000 // Defaults to 30s
       });
       let keys:any = await client.getKeys();
