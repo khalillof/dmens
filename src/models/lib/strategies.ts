@@ -59,14 +59,14 @@ export class PassportStrategies {
       });
       let keys:any = await client.getKeys();
       //console.log(keys)
-     // console.log('kind : ',keys[0].kid)
+      console.log('kind : ',keys[0].kid)
     
 
 const kid = keys[0].kid;
 const key = await client.getSigningKey(kid);
 const signingKey = key.getPublicKey();
- console.log('key :',key)
- console.log('public key :', signingKey);
+ //console.log('key :',key)
+ //console.log('public key :', signingKey);
 
 //throw new Error(' Keys')
  // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
