@@ -6,10 +6,6 @@ import { BearerStrategy, ITokenPayload } from "passport-azure-ad";
 import jwksRsa from 'jwks-rsa';
 import azconfig from './az-config.json';
 import http from 'node:http';
-import fetch from 'node-fetch' ;
-
-import buildGetJwks from 'get-jwks';
-
 import crypto from 'crypto';
 
 const azOptions: any = {
@@ -53,88 +49,14 @@ export class PassportStrategies {
     })
   }
 
-static async getJwtPubKeySecret() {
-  const keys_req = await fetch(envs.jwks_uri())
-  const keys:any = await keys_req.json();
 
-//console.log(' keys: ',keys.keys);
-
-  let detail = keys.keys[0];
-  console.log('kind : ',detail.kid)
-
-  const getJwks = buildGetJwks({
-    max: 100,
-    ttl: 60 * 1000,
-    timeout: 5000,
-    jwksPath:'/keys',
-    providerDiscovery: false,
-   // agent: new http.Agent({
-    //  keepAlive: true,
-   // }),
-  })
-
-  const publicKey = await getJwks.getPublicKey({
-    kid: detail.kid,
-    alg: detail.alg,
-   domain:envs.issuer(),
-  })
-
- // console.log('pubkey : ',publicKey)
- // throw new Error('Debug')
-return publicKey;
-
-}
   // JWT stratigy
   static async JwtStrategy() {
- //const pubKeySecret =  await PassportStrategies.getJwtPubKeySecret()
-    try {
-      
-      /*
-      const client = jwksRsa({
-       requestAgent: new http.Agent({keepAlive:true,timeout:5000}),
-        cache:true,
-        jwksUri: envs.jwks_uri(),
-        requestHeaders: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers':'Authorization, Origin, X-Requested-With, Content-Type, Accept',
-          'Connection': 'Keep-Alive',
-          'Keep-Alive': 'timeout=5, max=1000'
-        }, // Optional
-        timeout: 50000 // Defaults to 30s
-      });
-      let keys:any = await client.getKeys();
 
-
-const kid = keys[0].kid;
-console.log('kid :',kid)
-const key = await client.getSigningKey(kid);
-const signingKey = key.getPublicKey();
-*/
-//throw new Error(' Keys')
- // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
-      /*  secretOrKeyProvider: jwksRsa.passportJwtSecret({
-          cache: true,
-          rateLimit: true,
-          timeout: 5000, // 30000 // Defaults to 30s,
-          jwksRequestsPerMinute: 5,
-          jwksUri: envs.jwks_uri(),
-          handleSigningKeyError: (err, cb) => {
-            if (err instanceof jwksRsa.SigningKeyNotFoundError) {
-              console.error(err)
-              return cb(err);
-            }
-            
-            console.error(err)
-           return cb(err);
-          }
-        }),
-        */
-        
-
-      // done:(error: any, user?: Express.User | false, info?: any)
       return new JwtStrategy({ 
         //secretOrKey:""
         secretOrKeyProvider: jwksRsa.passportJwtSecret({
+          proxy:process.env['JWT_PROXY'],
           cache: true,
           rateLimit: true,
           timeout: 5000, // 30000 // Defaults to 30s,
@@ -148,12 +70,6 @@ const signingKey = key.getPublicKey();
         issuer: envs.issuer(),
         algorithms: ['RS256']
       }, async (payload: any, done: any) => {
-        // console.log('jwt payload :\n',payload)
-        // roles populate relaying on autopopulate plugin
-        // Store.db.get('account')!.model?.findById(payload.user._id)
-        // .then((error: any, user?: any, info?:any)=> done(user,error, info))
-        //user.roles =[{name:'admin'}];
-
         if (payload) {
           done(null, payload, null)
         } else {
@@ -161,10 +77,7 @@ const signingKey = key.getPublicKey();
         }
 
       })
-    } catch (err) {
-      console.error(err);
-      throw err
-    }
+
   }
   // JWT stratigy
   static async JwtQueryParameterStrategy() {
