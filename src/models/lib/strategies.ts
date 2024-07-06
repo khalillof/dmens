@@ -34,7 +34,7 @@ export class PassportStrategies {
   static async JwtAuthHeaderAsBearerTokenStrategy() {
     const opts = {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: "f85188d00a7cdf4d0f59c19188176e4323be1df5",
+      secretOrKey: envs.jwtSecret(),
       issuer: envs.issuer(),
       audience: envs.audience(),
       algorithms: ['RS256']
