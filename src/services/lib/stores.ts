@@ -124,7 +124,7 @@ class RouteStore extends StoreInstance<IDefaultRoutesConfig> implements IRouteSt
         const len = appRouter.stack.length;
         for (let index = 0; index < len; index++) {
             let item = appRouter.stack[index];
-            if (item && item.route.path.startsWith(routePath)) {
+            if (item && item.route?.path.startsWith(routePath)) {
                 callback(item, index)
             }
         }
