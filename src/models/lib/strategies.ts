@@ -58,6 +58,7 @@ export class PassportStrategies {
         timeout: 50000 // Defaults to 30s
       });
       let keys:any = await client.getKeys();
+
       console.log('kind : ',keys[0].kid)
     
 
