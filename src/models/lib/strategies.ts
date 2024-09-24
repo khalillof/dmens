@@ -43,6 +43,7 @@ export class PassportStrategies {
       algorithms: ['RS256'],
       passReqToCallback: false
     }, async (payload: any, done: any) => {
+      //console.log('payload:\n', payload)
       // roles populate relaying on autopopulate plugin
       Store.db.get('account')!.model?.findById(payload.user._id)
         .then((error: any, user?: any, info?: any) => done(user, error, info))
