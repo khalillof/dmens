@@ -29,7 +29,7 @@ if(fs.existsSync(envPath)){
     console.log('enviroment data found it seems like runing on container enviroment ')
   }
 }
-const getOr = (key:string, or:any=null)=> env[key] ??  or ;
+const getOr = (key:string, or:any=undefined)=> env[key] ||  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
 
 export const envs = {
@@ -52,12 +52,12 @@ export const envs = {
     
       },
     useCore: ()=> getOr('USE_CORES',true),
-    secretKey: ()=>  getOr('SECRET_KEY', ' '),
-    jwtSecret:()=> getOr('JWT_SECRET', ' '),
+    secretKey: ()=>  getOr('SECRET_KEY'),
+    jwtSecret:()=> getOr('JWT_SECRET'),
     jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
     jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
     issuer:  ()=> getOr('ISSUER'),
-    jwks_uri:()=> getOr('jwks_uri', `${envs.issuer()}/keys`),
+    jwks_uri:()=> getOr('jwks_uri', `${envs.issuer()}jwks`),
     audience: ()=> getOr('AUDIENCE'), //'yoursite.net'
     schemaDir: ()=> getOr('SCHEMA_DIR',getAbsolutePath('models/schema')),
     getSchemaUploadPath: (name:string | any)=> path.join(envs.schemaDir(),`${name}.${Date.now()}.json`),
