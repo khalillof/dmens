@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 import { IModelDb, IDefaultRoutesConfig } from '../../interfaces/index.js';
 import { DefaultController } from '../../controllers/index.js';
 import express from 'express';
+
+
 export const errStore = [mongoose.Error.ValidatorError, mongoose.Error.ValidationError,mongoose.Error.CastError, AssertionError, MongoServerError, jwt.TokenExpiredError];
 
 export const logger = {
