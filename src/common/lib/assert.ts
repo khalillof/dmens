@@ -1,6 +1,5 @@
 import {AssertionError} from './assertionError.js';
 import util from 'util';
-import { Stream } from 'stream';
 
 const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
@@ -22,9 +21,6 @@ export class Assert {
     if (value !== undefined && !value) Assert.fail(value, 'Truthful value', message)
   }
 
-  static defined (value:any, { message = '' } = {}) {
-    if (value === undefined) Assert.fail(value, 'No undefined values', message)
-  }
 
   static instanceOf (value:any, type:any, { message = '' } = {}) {
     if (!(value instanceof type)) {
@@ -45,22 +41,6 @@ export class Assert {
     if ((type === Function) && typeof value === 'function') return
 
     Assert.fail(value, type, message)
-  }
-
-  static array (value:any, { required = false, notEmpty = false, message = '' } = {}) {
-    if (required || notEmpty) Assert.typeOf(value, Array, message)
-    if (value !== undefined) Assert.typeOf(value, Array, message)
-    if (value && !value.length && notEmpty) Assert.fail(value, 'Not empty array')
-  }
-
-  static arrayOf (value:any, fo : any, { required = false, notEmpty = false, message = '' } = {}) {
-    Assert.array(value, { required, notEmpty, message })
-
-    if (!Array.isArray(fo)) Assert.fail(fo, 'of option expect an Array type')
-    if (!fo.every((i:any) => validTypes.includes(i))) {
-      Assert.fail(value, fo, message || `Assert.array 'of' option accept only one of [${validTypes.map((t:any) => t.name)}] types`)
-    }
-    if (value && value.length && fo.length && !value.every((i:any) => i && fo.includes(i.constructor))) Assert.fail(value, `Array one of [${fo.map((t:any) => t.name)}] types`, message)
   }
 
   static object (value:any, { required = false, notEmpty = false, message = '' } = {}) {
@@ -102,31 +82,7 @@ export class Assert {
       Assert.iSafeString(value, message)
     if (value.length > len) Assert.fail(value, 'id string is too long', message)
   }
-  static boolean (value:any, { required = false, message = '' } = {}) {
-    if (required) Assert.typeOf(value, Boolean, message)
-    if (value !== undefined) Assert.typeOf(value, Boolean, message)
-  }
 
-  static buffer (value:any, { required = false, notEmpty = false, message = '' } = {}) {
-    if (required && !Buffer.isBuffer(value)) Assert.fail(value, 'Buffer', message)
-    if (value !== undefined && !Buffer.isBuffer(value)) Assert.fail(value, 'Buffer', message)
-    if (!value.length && notEmpty) Assert.fail(value, 'Not empty buffer', message)
-  }
-
-  static date (value:any, { required = false, message = ''|| {} } = {}) {
-    if (required) Assert.instanceOf(value, Date, message)
-    if (value !== undefined) Assert.instanceOf(value, Date, message)
-  }
-
-  static func (value:any, { required = false, message = ''|| {} } = {}) {
-    if (required) Assert.typeOf(value, Function, message)
-    if (value !== undefined) Assert.instanceOf(value, Function, message)
-  }
-
-  static stream (value:any, { required = false, message = ''|| {} } = {}) {
-    if (required) Assert.instanceOf(value, Stream, message)
-    if (value !== undefined) Assert.instanceOf(value, Stream, message)
-  }
 
   static id (value:any, { required = false, message = '' } = {}) {
     const int = Number(value)
