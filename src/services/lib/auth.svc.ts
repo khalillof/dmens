@@ -50,7 +50,7 @@ function generateJwt(user: any) {
 }
 
 //type = 'local' || 'jwt'|| 'facebook' || 'facebook-token'
-function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() || 'jwt'), options?: any){
+function authenticate(authType: 'jwt' | 'local'= (envs.authStrategy() || 'jwt'), options?: any){
   return  (req: express.Request, res: express.Response, next: express.NextFunction)=> {
     return passport.authenticate(authType, options, async (err: any, user: any, info: any) =>{
        //console.log('AuthStrategy >>>>......>>>>>>>>>>>>> \n',authType, {err,user, info})
@@ -105,7 +105,7 @@ function authenticate(authType: 'oidc'| 'jwt' | 'local'= (envs.authStrategy() ||
     if (user) {
       req.user = user;
 
-      console.log('user id jwt ......', user)
+      console.info('user id jwt ......', user)
       
       return next()
     } else {

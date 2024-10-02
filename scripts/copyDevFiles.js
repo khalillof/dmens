@@ -9,7 +9,7 @@ async function copyFile(file,to='../dist/') {
 }
 
 async function run (){
-  await copyFile('../src/models/lib/az-config.json','../dist/models/lib/');
+  //await copyFile('../src/models/lib/az-config.json','../dist/models/lib/');
   await copyFile('../src/services/seeds.json','../dist/services/');
   await copyFile('../.env.test');
 

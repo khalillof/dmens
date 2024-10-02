@@ -59,8 +59,14 @@ import { authenticate } from '../../services/index.js';
         responce(res).forbidden('require authentication');
         return;
       }
-      else if (req.user.roles) {
-        for (let r of req.user.roles) {
+      else if(req.user.role && typeof req.user.role === 'string'){
+       if(req.user.role === 'Administrator'){
+        next()
+        return;
+       }
+      }
+      else if (req.user.profile.roles) {
+        for (let r of req.user.profile.roles) {
           if (r.name === roleName) {
             next();
             return;
@@ -74,7 +80,7 @@ import { authenticate } from '../../services/index.js';
     }
   }
 
- const isAdmin = async(req: express.Request, res: express.Response, next: express.NextFunction)=> isInRole('admin')(req,res,next);
+ const isAdmin = async(req: express.Request, res: express.Response, next: express.NextFunction)=> isInRole('Administrator')(req,res,next);
 
   function isJson(req: express.Request, res: express.Response, next: express.NextFunction) {
 

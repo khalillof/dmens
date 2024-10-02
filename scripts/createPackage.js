@@ -122,7 +122,7 @@ async function run() {
  //await copyDirectory('../dist-ts/')
 
  
- await copyFile('../src/models/lib/az-config.json','../dist/models/lib/');
+ //await copyFile('../src/models/lib/az-config.json','../dist/models/lib/');
  await copyFile('../src/services/seeds.json','../dist/services/');
  
  let addFiles = ['../README.md', '../CHANGELOG.md', '../LICENSE.md'];
