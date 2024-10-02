@@ -251,5 +251,5 @@ export interface IMiddlewares {
   isAdmin:IRequestVerps;
 }
 export interface Iauthenticate {
-  (type?: 'oidc'| 'jwt' | 'local', opts?: any): IRequestVerpsAsync;
+  (type?: 'jwt' | 'local', opts?: any): IRequestVerpsAsync;
 }
