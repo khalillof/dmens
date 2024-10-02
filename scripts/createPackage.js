@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const glob = require('glob');
+//const glob = require('glob');
 
 async function cleanDirectoryOrCreateOne(dirPath){ // be carefull
   const dirP = path.resolve(__dirname, dirPath);
@@ -51,11 +51,11 @@ async function copyDirectory(dirPath) {
 }
 }
 
-function typescriptCopy(from, to) {
-  const files = glob.sync('**/*.d.ts', { cwd: from });
-  const cmds = files.map(file => fs.copyFile(path.resolve(from, file), path.resolve(to, file)));
-  return Promise.all(cmds);
-}
+//function typescriptCopy(from, to) {
+//  const files = glob.sync('**/*.d.ts', { cwd: from });
+//  const cmds = files.map(file => fs.copyFile(path.resolve(from, file), path.resolve(to, file)));
+//  return Promise.all(cmds);
+//}
 
 async function createPackageFile() {
 
