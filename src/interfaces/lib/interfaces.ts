@@ -62,8 +62,8 @@ export interface IModelConfigParameters {
   pagesPerPage?:number
   queryName?:string
   searchKey?:string
-  useAuth?: string[]
-  useAdmin?: string[]
+  userAuth?: string[]
+  adminAuth?: string[]
   postPutMiddlewares?:string[]
   removeActions?:string[]
   plugins?:string[]
@@ -89,8 +89,8 @@ export interface IModelViewData {
   pagesPerPage:number
 
   modelKeys:string[]
-  useAuth: string[]
-  useAdmin: string[]
+  userAuth: string[]
+  adminAuth: string[]
   plugins:string[]
 
   queryName?:string
@@ -113,8 +113,8 @@ export interface IModelConfig extends IModelViewData {
   genForm?(): Promise<IModelForm>
   //check useAuth and useAdmin
   authAdminMiddlewares?(actionName: string): string[]
-  inAuth?(actionName:string):boolean
-  inAdmin?(actionName:string):boolean
+  inUserAuth?(actionName:string):boolean
+  inAdminAuth?(actionName:string):boolean
 };
 
 export interface IModelDb {

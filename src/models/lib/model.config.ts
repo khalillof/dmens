@@ -26,8 +26,8 @@ export class ModelConfig implements IModelConfig {
     this.baseRoutePath = '/' + this.routeName;
     this.paramId = _config.paramId || this.name + 'Id';
     this.routeParam = this.baseRoutePath + '/:' + this.paramId;
-    this.useAuth = this.removeDiplicates(_config.useAuth);
-    this.useAdmin = this.removeDiplicates(_config.useAdmin);
+    this.userAuth = this.removeDiplicates(_config.userAuth);
+    this.adminAuth = this.removeDiplicates(_config.adminAuth);
     this.displayName = _config.displayName || this.name;
     this.plugins  = this.removeDiplicates(_config.plugins);
   
@@ -60,8 +60,8 @@ export class ModelConfig implements IModelConfig {
   queryName?: string;
   searchKey?: string;
   displayName: string;
-  useAuth: string[];
-  useAdmin: string[];
+  userAuth: string[];
+  adminAuth: string[];
   plugins:string[]
   modelTemplate?:string
   listTemplate?:string
@@ -94,8 +94,8 @@ export class ModelConfig implements IModelConfig {
       paramId: this.paramId,
       routeParam: this.baseRoutePath,
       modelKeys:this.modelKeys,
-      useAuth: this.useAuth,
-      useAdmin: this.useAdmin,
+      userAuth: this.userAuth,
+      adminAuth: this.adminAuth,
       displayName: this.displayName,
       plugins: this.plugins,
       modelTemplate: this.modelTemplate,
@@ -124,20 +124,20 @@ export class ModelConfig implements IModelConfig {
   //check useAuth and useAdmin and return full list of middlewares
   authAdminMiddlewares(actionName: string): string[] {
 
-    if (this.inAdmin(actionName)) {
+    if (this.inAdminAuth(actionName)) {
       return ['authenticate', 'isAdmin']
-    } else if (this.inAuth(actionName)) {
+    } else if (this.inUserAuth(actionName)) {
       return ['authenticate']
     } else {
       return []
     }
   }
 
-  inAuth(actionName: string): boolean {
-    return this.useAuth.indexOf(actionName) !== -1
+  inUserAuth(actionName: string): boolean {
+    return this.userAuth.indexOf(actionName) !== -1
   }
-  inAdmin(actionName: string): boolean {
-    return this.useAdmin.indexOf(actionName) !== -1
+  inAdminAuth(actionName: string): boolean {
+    return this.adminAuth.indexOf(actionName) !== -1
   }
 }
 
