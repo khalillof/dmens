@@ -66,11 +66,11 @@ export const configTemplateSchema = {
     "minLength": 3,
     "maxLength": 30
   },
-  useAuth: {
+  userAuth: {
     "type": [String],
     "default": []
   },
-  useAdmin: {
+  adminAuth: {
     "type": [String],
     "default": []
   },
@@ -100,8 +100,8 @@ export const configTemplateProps: IModelConfigParameters = {
   displayName: "Configrations",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: configTemplateSchema,
-  useAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
-  useAdmin: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
+  userAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
+  adminAuth: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
   postPutMiddlewares: ['isJson'], // 'uploadSchema'
   plugins: ['comment', 'like']
 };
@@ -109,8 +109,8 @@ export const configTemplateProps: IModelConfigParameters = {
 export const roleConfigSchema = {
   name: "role",
   dependent: true,
-  useAuth: ['list', 'create', 'update', 'patch', 'delete', "search", "count"],
-  useAdmin: ['create', 'update', 'patch', 'delete', "search", "count"],
+  userAuth: ['list', 'create', 'update', 'patch', 'delete', "search", "count"],
+  adminAuth: ['create', 'update', 'patch', 'delete', "search", "count"],
   schemaObj: {
     "name": {
       "type": "String",
@@ -176,10 +176,6 @@ export const accConfgSchema = {
     last_login: {
       "type": Date
     },
-    facebookId: {
-      "type": String,
-      "default": ""
-    },
     roles: [
       {
         "type": mongoose.Types.ObjectId,
@@ -188,8 +184,8 @@ export const accConfgSchema = {
       }
     ]
   },
-  useAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
-  useAdmin: ['list', "search", "count"],
+  userAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
+  adminAuth: ['list', "search", "count"],
 };
 
 const FormDefaults = {
