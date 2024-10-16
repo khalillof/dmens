@@ -105,7 +105,7 @@ class RouteStore extends StoreInstance<IDefaultRoutesConfig> implements IRouteSt
     }
 
     pluralizeRoute(routeName: string) {
-        return pluralize(routeName)
+        return pluralize(routeName);
     }
 
     //========================================================================================

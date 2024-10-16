@@ -23,43 +23,26 @@ export class ModelConfig implements IModelConfig {
     this.schemaObj = _config.schemaObj || {},
 
     this.routeName = _config.routeName ? _config.routeName.replace('/', '').toLowerCase() : Store.route.pluralizeRoute(this.name);
-    this.baseRoutePath = '/' + this.routeName;
-    this.paramId = _config.paramId || this.name + 'Id';
-    this.routeParam = this.baseRoutePath + '/:' + this.paramId;
     this.userAuth = this.removeDiplicates(_config.userAuth);
     this.adminAuth = this.removeDiplicates(_config.adminAuth);
-    this.displayName = _config.displayName || this.name;
     this.plugins  = this.removeDiplicates(_config.plugins);
   
     this.modelTemplate = _config.modelTemplate;
     this.listTemplate = _config.listTemplate;
-    this.queryName =_config. queryName;
     this.searchKey = _config.searchKey;
-
-    this.pagesPerPage = _config.pagesPerPage || 5;
     
     this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions }
-    
-    this.postPutMiddlewares = this.removeDiplicates(_config.postPutMiddlewares)
-    this.removeActions = this.removeDiplicates(_config.removeActions);
-    this.modelKeys = Object.keys(_config.schemaObj || {});
 
-    this.description = _config.description || `Template model for read create update and delete data operations `
+    this.modelKeys = Object.keys(_config.schemaObj || {});
 
   }
 
   name: string
-  description?:string
   dependent: Boolean
   routeName: string;
-  baseRoutePath: string;
-  routeParam: string;
-  paramId: string;
-  pagesPerPage: number;
   modelKeys:string[]
   queryName?: string;
   searchKey?: string;
-  displayName: string;
   userAuth: string[];
   adminAuth: string[];
   plugins:string[]
@@ -67,8 +50,6 @@ export class ModelConfig implements IModelConfig {
   listTemplate?:string
   schemaObj: object
   schemaOptions?: Record<string, any>
-  postPutMiddlewares: string[] // used for post put actions
-  removeActions?:string[]
   formCache?: IModelForm
 
   private removeDiplicates(arr?: any[]) {
@@ -79,30 +60,22 @@ export class ModelConfig implements IModelConfig {
     return {
       ...this.getViewData(),
       dependent: this.dependent,
-      description:this.description,
-      removeActions:this.removeActions,
       schemaObj: this.schemaObj,
+      authAdminMiddlewares:this.authAdminMiddlewares,
       schemaOptions: this.schemaOptions,
-      postPutMiddlewares: this.postPutMiddlewares
     }
   }
   getViewData(): IModelViewData {
     return {
       name: this.name,
       routeName: this.routeName,
-      baseRoutePath: this.baseRoutePath,
-      paramId: this.paramId,
-      routeParam: this.baseRoutePath,
       modelKeys:this.modelKeys,
       userAuth: this.userAuth,
       adminAuth: this.adminAuth,
-      displayName: this.displayName,
       plugins: this.plugins,
       modelTemplate: this.modelTemplate,
       listTemplate: this.listTemplate,
-      queryName: this.queryName,
       searchKey: this.searchKey,
-      pagesPerPage: this.pagesPerPage
     }
   }
   getRoutes() {

@@ -54,7 +54,7 @@ export class ModelForm implements IModelForm {
 
                         if (optionkey && ref && Store.db.exist(ref)) {
                             
-                            options =  (await Store.db.get(ref)!.model!.find() || []).map((item: any) =>  ({key: item._id.toString(), title: item[optionkey], value: item._id.toString()}) );
+                            options =  (await Store.db.get(ref)!.model!.find() || []).map((item: any) =>  ({ title: item[optionkey], value: item._id.toString()}) );
                             options.unshift({k:options.length+1 ,title:`Choose ${key}....` , disabled:true, defaultValue:""})
                           
                             this.addElemLable(key, val, { options });

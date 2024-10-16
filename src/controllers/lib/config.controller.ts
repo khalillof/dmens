@@ -35,7 +35,7 @@ export class ConfigController extends DefaultController implements IConfigContro
         this.responce(res).data(_forms)
       }
       
-    override  async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+    override  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
         let conf: IModelConfigParameters = req.body;
         let result = await Operations.createModelConfigRoute(conf);
 
