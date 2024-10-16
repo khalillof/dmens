@@ -7,13 +7,13 @@ export async function ConfigRoutes() {
 
     return new DefaultRoutesConfig(new ConfigController(),
         async function (this: IDefaultRoutesConfig) {
-            await this.defaultClientRoutes()
+            await this.defaultExtraRoutes()
             //await this.defaultRoutes()
-            await this.addGetClientRoute('routes', ['authenticate', 'isAdmin'])
-            await this.addGetClientRoute('forms') 
-            await this.addGetClientRoute('viewsdata') 
+            await this.addGetExtraRoute('routes', ['authenticate', 'isAdmin'])
+            await this.addGetExtraRoute('forms') 
+            await this.addGetExtraRoute('viewsdata') 
             
-            await this.delete(this.addPath('/route/delete'), 'deleteRoute', ['authenticate', 'isAdmin'])
+            await this.delete(this.config.routeName+'/route/delete', 'deleteRoute', ['authenticate', 'isAdmin'])
         
             await this.list()
             

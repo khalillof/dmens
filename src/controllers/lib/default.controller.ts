@@ -88,7 +88,7 @@ export class DefaultController implements IController {
     this.responce(res).data(items, undefined, _total)
   }
 
-  async getOne(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async get(req: express.Request, res: express.Response, next: express.NextFunction) {
 
     if (req.params) {
       let _id = req.params[this.db.name + 'Id'];
@@ -110,16 +110,12 @@ export class DefaultController implements IController {
     }
 
   }
-  async create(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
     let item = await this.db.model?.create(req.body);
     console.log('document Created :', item);
     this.responce(res).data(item)
   }
 
-  async patch(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.model?.findOneAndUpdate(req.params, req.body);
-    this.responce(res).success()
-  }
 
   async update(req: express.Request, res: express.Response, next: express.NextFunction) {
     await this.db.model!.findByIdAndUpdate(req.params, req.body);

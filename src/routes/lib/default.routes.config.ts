@@ -6,27 +6,24 @@ import { IModelConfig, IController, IDefaultRoutesConfig, IMiddlewares,IRouteCal
 import { DefaultController } from '../../controllers/index.js';
 import { appRouter } from '../../index.js'
 
-// defaultActions =['list','get', 'create', 'update','patch', 'delete', 'search', 'count', 'form', 'route', 'modeldata']
-//const isDefaultActions = (action: string) => defaultActions.indexOf(action) !== -1;
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   router: any
   config: IModelConfig
   controller: IController
   mware?: IMiddlewares
-  baseRoutePath:string
-  baseRouteParam:string
-  routeName?: string | undefined;
+  baseRoute:string
+  routeParam: string;
   constructor(controller: IController, callback?: IRouteCallback) {
     if (!(controller instanceof DefaultController)) {
       envs.throwErr('route configration require instance of class DefaultController')
     }
 
+    
     this.controller = controller
     this.config = controller.db.config;
-    this.routeName = controller.db.config.routeName;
-    this.baseRoutePath = controller.db.config.baseRoutePath;
-    this.baseRouteParam = controller.db.config.routeParam;
+    this.baseRoute = '/'+controller.db.config.routeName
+    this.routeParam = this.baseRoute + `/${controller.db.config.name+'Id'}`
     this.router = appRouter;
     this.mware = middlewares;
 
@@ -34,7 +31,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
      callback.call(this)
     }else{
       this.defaultRoutes();
-      this.defaultClientRoutes()
+      this.defaultExtraRoutes()
       
     } 
 
@@ -43,22 +40,15 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 
   }
 
-  addPath(name: string, param?: boolean): string {
-    if (param)
-      return this.baseRouteParam + (name.startsWith('/') ? name : '/' + name);
-    return this.baseRoutePath + (name.startsWith('/') ? name : '/' + name);
-  }
-
-
   setOptions(routPath: string) {
     this.router.options(routPath, corsWithOptions);
   }
   options() {
-    this.setOptions(this.baseRoutePath);
-    this.setOptions(this.baseRouteParam);
+    this.setOptions(this.config.routeName);
+   this.setOptions(this.routeParam);
   }
   setParam() {
-    return this.router.param(this.config.paramId, async (req: any, res: any, next: any, id: string) => {
+    return this.router.param(this.config.name+'Id', async (req: any, res: any, next: any, id: string) => {
       try {
         Assert.idString(id);
         next()
@@ -69,27 +59,23 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     });
   }
 
- async addGetClientRoute(pathActionname:string, middlewares?:string[]){
- await this.get(this.addPath(`/client/${pathActionname}`),pathActionname,middlewares)
+ async addGetExtraRoute(pathActionname:string, middlewares?:string[]){
+ await this.get(`${this.baseRoute}/${pathActionname}`,pathActionname,middlewares)
 }
-  async defaultClientRoutes() { // routedata
-
-    await this.addGetClientRoute('search');// search
-    await this.addGetClientRoute('count'); // count
-    await this.addGetClientRoute('form'); // get form elements
-    await this.addGetClientRoute('route'); // get form routes
-    await this.addGetClientRoute('viewdata'); // get model routeData
-    await this.addGetClientRoute('test', ['authenticate']); // tet auth
+  async defaultExtraRoutes() { // routedata
+   for(let pathAction of ['search','count','form','route','viewdata']){
+    await this.addGetExtraRoute(pathAction);
+   }
+  await this.addGetExtraRoute('test', ['authenticate']); // tet auth
 
   }
   async defaultRoutes() { // routedata
 
     await this.list(); // list   
     await this.get() // get by id
-    await this.get(this.addPath('/one')) // getOne by filter parameter
-    await this.create()// post
+   // await this.get(this.config.routeName+'/one') // getOne by filter parameter
+    await this.post()// post
     await this.update()// put
-    await this.patch()// patch
     await this.delete()// delete
 
     this.setParam();
@@ -109,25 +95,20 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
 }
 
 async list(path?:string,action?:string, middlewares?:string[]){
-await this.router.get(path ??this.baseRoutePath, await this.setMiddlewars(action! ?? 'list', middlewares));
+await this.router.get(path ??this.baseRoute, await this.setMiddlewars(action! ?? 'list', middlewares));
 
 }
 async get(path?:string,action?:string, middlewares?:string[]){
-await this.router.get(path?? this.baseRouteParam,await this.setMiddlewars(action??'getOne', middlewares))
+await this.router.get((path ?? this.routeParam),await this.setMiddlewars(action??'get', middlewares))
 }
-async create(path?:string,action?:string, middlewares?:string[]){
-await this.router.post(path ?? this.addPath('/create') ,await this.setMiddlewars(action ??'create', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]))
+async post(path?:string,action?:string, middlewares?:string[]){
+await this.router.post((path ?? this.baseRoute),await this.setMiddlewars(action ??'create', [...(middlewares ? middlewares : [])]))
 }
 async update(path?:string,action?:string, middlewares?:string[]){
-await this.router.put(path??this.addPath('/update', true), await this.setMiddlewars(action??'update', [...(middlewares ? middlewares : []), ...this.config.postPutMiddlewares]));
+await this.router.put(path??this.routeParam, await this.setMiddlewars(action??'update', [...(middlewares ? middlewares : [])]));
 }
 async delete(path?:string,action?:string, middlewares?:string[]){
-await this.router.delete(path || this.addPath('/delete', true), await this.setMiddlewars(action??'delete', [...(middlewares ? middlewares! : []),'validateCurrentUserOwnParamId']));
-}
-
-async patch(path?:string,action?:string, middlewares?:string[]){
-
-await this.router.patch(path || this.addPath('/patch', true), await  this.setMiddlewars(action??'patch', middlewares));
+await this.router.delete(path || this.routeParam, await this.setMiddlewars(action??'delete', [...(middlewares ? middlewares! : []),'validateCurrentUserOwnParamId']));
 }
 
 

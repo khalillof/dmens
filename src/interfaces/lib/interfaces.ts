@@ -52,22 +52,14 @@ export interface IStoreIntance<T> {
 
 export interface IModelConfigParameters {
   name: string
-  description?:string,
+  routeName?: string
   dependent?: Boolean
   schemaObj: object
   schemaOptions?: Record<string, any>
-  routeName?: string
-  paramId?:string
-  displayName?:string
-  pagesPerPage?:number
-  queryName?:string
   searchKey?:string
   userAuth?: string[]
   adminAuth?: string[]
-  postPutMiddlewares?:string[]
-  removeActions?:string[]
   plugins?:string[]
-
   modelTemplate?:string
   listTemplate?:string
 
@@ -82,39 +74,28 @@ export interface IActionData{
 export interface IModelViewData {
   name: string
   routeName: string
-  displayName:string
-  baseRoutePath:string
-  paramId:string
-  routeParam:string
-  pagesPerPage:number
-
   modelKeys:string[]
   userAuth: string[]
   adminAuth: string[]
   plugins:string[]
-
-  queryName?:string
   searchKey?:string
 
   modelTemplate?:string
   listTemplate?:string
 }
 export interface IModelConfig extends IModelViewData {
-  description?:string,
   dependent: Boolean
   schemaObj: object
   schemaOptions?: Record<string, any>
-  postPutMiddlewares: string[] // used for post put actions
-  removeActions?:string[]
   formCache?:IModelForm
   getRoutes?(): { method: string; path: string;}[]
   getProps?(): IModelConfig
   getViewData?(): IModelViewData
   genForm?(): Promise<IModelForm>
   //check useAuth and useAdmin
-  authAdminMiddlewares?(actionName: string): string[]
   inUserAuth?(actionName:string):boolean
   inAdminAuth?(actionName:string):boolean
+  authAdminMiddlewares(actionName: string): string[]
 };
 
 export interface IModelDb {
@@ -183,9 +164,8 @@ export interface IController {
   search:IRequestVerpsAsync;
   test:IRequestVerpsAsync;
   list:IRequestVerpsAsync;
-  getOne:IRequestVerpsAsync;
-  create:IRequestVerpsAsync;
-  patch:IRequestVerpsAsync;
+  get:IRequestVerpsAsync;
+  post:IRequestVerpsAsync;
   update:IRequestVerpsAsync;
   delete:IRequestVerpsAsync;
   tryCatch(actionNam: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
@@ -203,26 +183,23 @@ export type IHttpVerp = (path?:string, action?:string ,middlewares?:string[])=>P
 export interface IDefaultRoutesConfig {
   router: IRouter
   config:IModelConfig
-  routeName?:string
   controller: IController;
   mware?: IMiddlewares;
-  baseRoutePath:string
-  baseRouteParam:string
+  baseRoute:string
+  routeParam:string
   setMiddlewars(action:string,middlewares?:string[]):Promise<any[]>
- 
+
   list:IHttpVerp
   get:IHttpVerp
-  create:IHttpVerp
+  post:IHttpVerp
   update:IHttpVerp
   delete:IHttpVerp
-  patch:IHttpVerp
 
-  addPath(name:string, paramId?:boolean):string
-  addGetClientRoute(pathActionname:string, middlewares?:string[]):Promise<void>
+  addGetExtraRoute(pathActionname:string, middlewares?:string[]):Promise<void>
   setOptions(routPath: string): void;
   options(): void;
   setParam(): void;
-  defaultClientRoutes(): Promise<any>
+  defaultExtraRoutes(): Promise<any>
   defaultRoutes(): Promise<any>;
   actions(actionName: string): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
 }

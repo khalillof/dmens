@@ -37,12 +37,7 @@ export const configTemplateSchema = {
     "minLength": 3,
     "maxLength": 30
   },
-  description: {
-    "type": String,
-    "required": false,
-    "minLength": 3,
-    "maxLength": 200
-  },
+
   dependent: {
     "type": Boolean,
     "default": false
@@ -53,11 +48,6 @@ export const configTemplateSchema = {
   schemaObj: {
     "type": Object,
     "required":true
-  },
-  displayName: {
-    "type": String,
-    "minLength": 3,
-    "maxLength": 50
   },
   routeName: {
     "type": String,
@@ -71,14 +61,6 @@ export const configTemplateSchema = {
     "default": []
   },
   adminAuth: {
-    "type": [String],
-    "default": []
-  },
-  postPutMiddlewares: {
-    "type": [String],
-    "default": []
-  },
-  removeActions: {
     "type": [String],
     "default": []
   },
@@ -97,12 +79,10 @@ export const configTemplateSchema = {
 export const configTemplateProps: IModelConfigParameters = {
   name: "config",
   dependent: false,
-  displayName: "Configrations",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: configTemplateSchema,
   userAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
   adminAuth: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
-  postPutMiddlewares: ['isJson'], // 'uploadSchema'
   plugins: ['comment', 'like']
 };
 
@@ -124,10 +104,9 @@ export const roleConfigSchema = {
     }
   }
 }
-export const accConfgSchema = {
+export const accConfgSchema:IModelConfigParameters = {
   name: "account",
   dependent: false,
-  displayName: "Accounts",
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: {
 
@@ -187,48 +166,3 @@ export const accConfgSchema = {
   userAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
   adminAuth: ['list', "search", "count"],
 };
-
-const FormDefaults = {
-  parentClassname: "form-floating",
-  labelClassNames: {
-    text: "form-label",
-    select: "form-label",
-    textarea: "form-label",
-    date: "form-label",
-    checkbox: "form-check-label",
-    radio: "form-check-label"
-  },
-  input: {
-    text: {
-      type: "text",
-      class: "input-control",
-      required: false,
-      minLength: 3,
-      maxLength: 50
-    },
-    checkbox: {
-      type: "checkbox",
-      class: "form-check",
-      required: false
-    },
-    radio: {
-      type: "radio",
-      class: "form-check",
-      required: false
-    }
-  },
-  select: {
-    class: "form-select",
-    required: false
-  },
-  textarea: {
-    class: "input-control",
-    rows: 4,
-    required: false,
-    minLength: 3
-  },
-  date: {
-    class: "input-control",
-    required: false
-  }
-}
