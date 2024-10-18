@@ -1,9 +1,9 @@
-import { cors,corsWithOptions} from './lib/cors.config.js';
-import {AccountRoutes} from './lib/account.routes.config.js';
-import {DefaultRoutesConfig} from './lib/default.routes.config.js';
+export { cors,corsWithOptions} from './lib/cors.config.js';
+export {AccountRoutes} from './lib/account.routes.config.js';
+export {DefaultRoutesConfig} from './lib/default.routes.config.js';
 
-import {ConfigRoutes} from './lib/config.routes.config.js';
-import {uploadImages, uploadSchema} from './lib/uploads.js';
+export {ConfigRoutes} from './lib/config.routes.config.js';
+export {uploadImages, uploadSchema} from './lib/uploads.js';
 
 
-export { corsWithOptions,cors,DefaultRoutesConfig,ConfigRoutes, AccountRoutes, uploadImages, uploadSchema}
+//export { corsWithOptions,cors,DefaultRoutesConfig,ConfigRoutes, AccountRoutes, uploadImages, uploadSchema}
