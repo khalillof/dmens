@@ -29,19 +29,20 @@ export class ModelConfig implements IModelConfig {
   
     this.modelTemplate = _config.modelTemplate;
     this.listTemplate = _config.listTemplate;
+
     this.searchKey = _config.searchKey;
-    
     this.schemaOptions = { timestamps: true, strict: true, ..._config.schemaOptions }
 
     this.modelKeys = Object.keys(_config.schemaObj || {});
 
+    // generate template string
+    this.genTemplates();
   }
 
   name: string
   dependent: Boolean
   routeName: string;
   modelKeys:string[]
-  queryName?: string;
   searchKey?: string;
   userAuth: string[];
   adminAuth: string[];
@@ -52,6 +53,28 @@ export class ModelConfig implements IModelConfig {
   schemaOptions?: Record<string, any>
   formCache?: IModelForm
 
+  private genTemplates(){
+    if (!this.listTemplate) {
+      let _modelKeys = [...this.modelKeys, 'createdAt', 'updatedAt', '_id'];
+      let _keys = (_modelKeys?.length > 3) ? [_modelKeys[0], _modelKeys[1],'createdAt', 'updatedAt'] : _modelKeys
+
+      this.listTemplate = toTemplate(_keys);
+    }
+    
+    if(!this.modelTemplate) {
+
+      this.modelTemplate = toTemplate(this.modelKeys)
+    }
+
+    //==================================
+    function  toTemplate(keys:string[]){
+      let div = "<dl class='row '>";
+      for (let _key of keys) {
+        div +=  "<dt class='col-md-2 text-truncate'>"+ _key  + "</dt><dd class='col-md-4'> ${" +  _key + "}</dd>";
+      }
+    return div += "</dl>";
+    }
+  }
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
     return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : []
