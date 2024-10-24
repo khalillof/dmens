@@ -54,27 +54,64 @@ export class ModelConfig implements IModelConfig {
   formCache?: IModelForm
 
   private genTemplates(){
-    if (!this.listTemplate) {
-      let _modelKeys = [...this.modelKeys, 'createdAt', 'updatedAt', '_id'];
-      let _keys = (_modelKeys?.length > 3) ? [_modelKeys[0], _modelKeys[1],'createdAt', 'updatedAt'] : _modelKeys
+    const isIn =(arr:any, text:any)=> arr.indexOf(text) !== -1;
+    let __Keys: any[] = [];
+    for(let [key,value] of Object.entries(this.schemaObj)){
+      let _valType = typeof value;
+      let _typeType = String(value['type']);
 
-      this.listTemplate = toTemplate(_keys);
+        if(_typeType && (_valType  === 'object' || _valType  === 'function')){
+          
+        let _typeTypeTest = [isIn("Boolean boolean Date number text String string",_typeType), isIn(_typeType,"String()"), isIn(_typeType,"Boolean()") ,isIn(_typeType,"Boolean()")];
+
+      if(isIn(_typeTypeTest,true)){
+            __Keys.push(key);  
+           // console.log(key,': added to list')
+      }
+
+    }else if(_valType === 'string' || _valType === 'boolean'){
+          __Keys.push(key);
+        }
+      
+    }
+
+    if (!this.listTemplate) {
+      let keys = __Keys;
+
+    if(this.name === 'account'){
+    let refreshTokenIndex = __Keys.indexOf('refreshToken');
+     keys = keys.splice(refreshTokenIndex,1)
+    }
+         keys = __Keys?.length > 3 ? [__Keys[0], __Keys[1], __Keys[2]] : keys;
+      this.listTemplate = this.toTemplate(keys, true);
     }
     
     if(!this.modelTemplate) {
 
-      this.modelTemplate = toTemplate(this.modelKeys)
+      this.modelTemplate = this.toTemplate(__Keys)
     }
 
     //==================================
-    function  toTemplate(keys:string[]){
-      let div = "<dl class='row '>";
-      for (let _key of keys) {
-        div +=  "<dt class='col-md-2 text-truncate'>"+ _key  + "</dt><dd class='col-md-4'> ${" +  _key + "}</dd>";
-      }
-    return div += "</dl>";
-    }
+
   }
+  private toTemplate(keys:string[], islist:boolean =false){
+     let div = "<dl class='container-fluid text-center'> <dl class='row '> ";
+
+    function addToDiv(k:string){
+    div += "<dt class='col-md-2 text-truncate text-end'>"+ k  + "</dt><dd class='col-md-4 text-start'> ${" + k + "}</dd>"
+    }
+     
+    addToDiv("updatedAt");
+    addToDiv("createdAt");
+    keys.forEach((_key)=> addToDiv(_key));
+      
+     div +="</dl>";
+
+     if(islist)
+    div += "<a class='btn btn-link btn-lg' href='/"+this.routeName+"/${_id}'>ReadMore</a> <hr/>"
+
+    return div + "</div>";
+    }
   private removeDiplicates(arr?: any[]) {
     // Set will remove diblicate
     return (arr && Array.isArray(arr)) ? Array.from(new Set(arr)) : []
