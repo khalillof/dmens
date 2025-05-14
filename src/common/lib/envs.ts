@@ -29,7 +29,7 @@ if(fs.existsSync(envPath)){
     console.log('enviroment data found it seems like runing on container enviroment ')
   }
 }
-const getOr = (key:string, or:any=undefined)=> env[key] ||  or ;
+const getOr = (key:string, or:any=undefined)=> env[key] ??  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
 
 export const envs = {
@@ -37,6 +37,7 @@ export const envs = {
     baseDir,
     getAbsolutePath,
     port:()=> getOr('PORT',3000),
+    admin_role : ()=> getOr("ADMIN_ROLE","Adminstrator"),
     admin_email:()=> getOr('ADMIN_EMAIL', ''),
     admin_userName: ()=> getOr('ADMIN_USERNAME',''),
     admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
@@ -67,7 +68,7 @@ export const envs = {
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
 
   logLine:(...args: any[])=>{
-    console.log('================================================>>> \n',...args)
+    console.log(...args,'\n==================================================>>>')
   },
   throwErr:(msg:string="unknown error")=>{
          throw new Error(msg);

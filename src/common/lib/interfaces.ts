@@ -1,0 +1,305 @@
+import {IRoute ,Request,Response,NextFunction, IRouter} from 'express'
+import { Model, SortOrder , HydratedDocument, Schema, ClientSession} from 'mongoose';
+
+export type IDefaultActions = 'list'|'get'|'post'|'put'|'delete'|'search'|'count'|'metadata'|'route'|'viewdata'|'routedata'| 'deleteRoute';
+
+export interface IAction{
+    action: IDefaultActions
+    admin: boolean
+}
+
+export interface IRequestFilter{
+  filter: Record<string, any>
+  page: number
+  total: boolean
+  pagesize: number
+  orderby: string
+  sortorder: SortOrder
+}
+
+export interface IModelForm {
+  name: string
+  initialState: Record<string, any>
+  elements: Record<string, any>
+
+}
+
+export interface IRouteManager {
+  router: IRouter
+  config: IDefaultRoutesConfig
+
+  print(name?: string): void
+
+  getRoutes():  IRoute[]
+  getRoutesPathMethods(routeName?: string): { method: string, path: string }[]
+
+  removeAllRoutes(): void
+  removeRoutePath(routePath: string, method:IMethod): void
+
+  routesToString(): string
+  routesToJson(): string
+
+}
+
+export interface IStoreIntance<T> {
+  storeKey: string
+  storeName: string
+  store: T[]
+  //obj(): T[]
+  get(keyValue: string): T | null
+  add(obj: T | any): void
+  delete(keyValue: string): void
+  len(): number
+  exist(keyValue: string): boolean
+}
+export type IMongooseTypes =
+  "String" |
+  "Number" |
+  "BigInt" |
+  "Date" |
+  "Binary" |
+  "Boolean" |
+  "Mixed" |
+  "ObjectId" |
+  "Array" |
+  "DocumentArray" |
+  "Decimal" |
+  "Map";
+
+export interface IPropertyInfo {
+  name: string
+  schemaType: IMongooseTypes
+  displayName?: string
+  tagName: string
+  attributes?: Record<string, any>
+}
+
+export interface IEndPointRoute {
+  _id?:string
+  method: "get"|"post"|"put"|"delete"  
+  paramId?:string
+  path?: string,
+  passAuth?:boolean
+  authorize?: boolean,
+  admin?: boolean,
+  headers?: Record<string,string>
+}
+export interface IEndPoint{
+  _id?:string
+  name:string
+  isActive?:boolean
+  host:string
+  routes:IEndPointRoute[]
+}
+export interface IConfigParameters {
+  name: string
+  routeName?: string
+  paramId?: string
+  tags?:string[]
+  disabledActions?:string[]
+  queryKey?: string
+  disableRoutes?: boolean
+  isArchieved?: boolean
+  schemaObj: object
+  schemaOptions?: Record<string, any>
+  recaptcha?:object
+  pagesize?: number
+  orderby?: string
+  sortorder?: SortOrder
+
+  authorize?:Record<string,boolean>
+  endPoints?:IEndPoint[]
+  
+  textSearch?: string[]
+  modelTemplates?: Record<string,string>
+};
+
+  
+export interface IRouteData {
+  name: string
+  routeName: string
+  paramId: string
+  pagesize: number
+  orderby: string
+  sortorder: SortOrder
+  authorize:Map<string,boolean>
+}
+
+export interface IViewData {
+  queryKey?: string
+ // metaData: IMetaData
+  tags:string[]
+  textSearch?: string[]
+  modelTemplates?: Record<string,string>
+}
+
+export interface IMetaData {
+  properties: Record<string,{instance:string, options: any}>
+  requiredProperties: string[];
+}
+
+export interface IModelInstanceMethods {
+
+  getRouteData(): IRouteData
+  getViewData(includeMetadata?: boolean): Promise<IViewData>
+}
+// Create a new Model type that knows about IUserMethods...
+export interface IModel extends Model<IConfigration, {}, IModelInstanceMethods>{
+  //findByName(name:string): Promise<HydratedDocument<IConfigration, IModelMethods>>
+  toList(query: IRequestFilter): Promise<HydratedDocument<IConfigration, IModelInstanceMethods>[]>
+  getMetaData(_schema?:Schema): Promise<IMetaData>
+  execWithSessionAsync:IExecWithSessionAsync
+ 
+}
+
+export interface IConfigration extends IRouteData{
+  _id: string
+  disableRoutes: boolean
+  isArchieved: boolean
+  endPoints:IEndPoint[]
+  schemaObj: Record<string, any>
+  schemaOptions: Map<string, any>
+  recaptcha?:object
+  tags:string[]
+  disabledActions:string[]
+  queryKey?: string
+  textSearch?: string[]
+  modelTemplates?: Map<string,string>
+  createdAt: Date
+  updatedAt: Date
+__v: number
+
+}
+
+
+export interface IConstructor<T> {
+  new(...args: any[]): T;
+}
+export interface Iresponces {
+  errObjInfo: (err: any, obj: any, info: any) => void;
+  success: (msg?: string) => void;
+  fail: (msg?: string) => void;
+  errStatus: (status: number, msg: string) => void;
+  badRequest: (msg?: string) => void;
+  forbidden: (msg?: string) => void;
+  unAuthorized: (msg?: string) => void;
+  notFound: (msg?: string) => void;
+  error: (err: any) => void;
+  data: (item: any, message?: string, total?: number) => void;
+  errCb: (err: any, cb: Function) => void;
+  errSuccess: (err: any) => void;
+  callback: (cb: Function, obj?: any) => void;
+  json: (obj: object) => void;
+  ok: () => void;
+};
+// function with parmeters interface 
+export interface Iresponce {
+  (res: Response, cb?: Function): Iresponces;
+}
+// function with parmeters interface 
+export interface IRouteCallback {
+  (this: IDefaultRoutesConfig): void;
+}
+
+export type IRequestVerpsAsync = (req: Request, res: Response, next: NextFunction) => Promise<any>
+export type IRequestVerps = (req: Request, res: Response, next: NextFunction) => any
+
+
+export interface IController {
+  config: IConfigration
+  db: IModel
+  endPoint(host:string,route:IEndPointRoute): IRequestVerpsAsync;
+  buildQuery(query: Record<string, any>): IRequestFilter
+
+  count: IRequestVerpsAsync;
+  search: IRequestVerpsAsync;
+  test: IRequestVerpsAsync;
+
+  list: IRequestVerpsAsync;
+  get: IRequestVerpsAsync;
+  create: IRequestVerpsAsync;
+  update: IRequestVerpsAsync;
+  delete: IRequestVerpsAsync;
+
+};
+
+export interface IConfigController extends IController {
+  metadata: IRequestVerpsAsync
+  viewdata: IRequestVerpsAsync
+  routedata: IRequestVerpsAsync
+  routes:IRequestVerpsAsync
+  routesdata: IRequestVerpsAsync
+
+  addRoute: IRequestVerpsAsync
+  removeRoute: IRequestVerpsAsync
+
+  enableRoutes: IRequestVerpsAsync
+  disableRoutes: IRequestVerpsAsync
+  
+}
+export type IHttpVerp = (path?: string, action?: string, middlewares?: string[]) => Promise<any>;
+export type IMethod = "get" | "post" | "put" | "delete" | "options";
+
+export interface IActiveRoutes {
+  get: string[]
+  post: string[]
+  put: string[]
+  delete: string[]
+  options: string[]
+}
+export interface IDefaultRoutesConfig {
+  router: IRouter
+  config: IConfigration
+  controller: IController
+  baseRoute: string
+  paramId : string
+  activeRoutes: IActiveRoutes
+  routeManager : IRouteManager
+
+  addOptions(path?:string):void
+  addRoute(
+    method: IMethod,
+    path?: string,
+    action?: string,
+    middlewares?: string[]
+  ): Promise<void>
+  addRoutePath(method: IMethod, path?: string): string
+  setMiddlewars(action: string, middlewares?: string[]): Promise<any[]>
+  addEndPoints(): Promise<void>
+  
+  setParam(paramId: string): void;
+  defaultRoutes(): Promise<any>;
+  actions(actionName: string): IRequestVerpsAsync;
+}
+
+export interface IMiddlewares {
+  authorize: IRequestVerpsAsync
+
+  uploadSchema: IRequestVerps;
+  isAuthenticated: IRequestVerps;
+  // roles
+  //isRolesExist(roles: [string]): boolean;
+  isJson: IRequestVerps;
+
+  isInRole(roleName: string): IRequestVerpsAsync;
+  isAdmin: IRequestVerps;
+}
+export interface Iauthenticate {
+  (type?: 'jwt' | 'local', opts?: any): IRequestVerpsAsync;
+}
+
+export interface IExecWithSessionCallback {
+  (this: IModel, session: ClientSession): Promise<any>
+}
+
+export interface ICleanExecWithSessionCallback {
+  (this: IModel): Promise<any>
+}
+
+export interface IExecWithSessionAsync {
+  (this:IModel , callback: IExecWithSessionCallback, cleanJob?:ICleanExecWithSessionCallback):Promise<any>
+}
+
+export interface asyncCallback {
+  (db:Model<any>): Promise<any>
+}

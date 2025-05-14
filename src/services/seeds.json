@@ -1,21 +1,4 @@
 {
-    "roles":[
-        {
-            "name":"user"
-        },
-        {
-            "name":"admin"
-        },
-        {
-            "name":"editor"
-        },
-        {
-            "name":"application"
-        },
-        {
-            "name":"creator"
-        }
-    ],
     "accounts": [
         {
             "firstname": "Khalil",
@@ -25,7 +8,7 @@
             "admin": true,
             "active": true,
             "email_verified": true,
-            "roles": [{}]
+            "roles": ["Admistrator"]
         },
         {
             "firstname": "John",

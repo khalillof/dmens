@@ -1,18 +1,42 @@
-import { IModelDb } from '../../interfaces/index.js';
-import {envs} from '../../common/index.js';
-import { Store} from '../../services/index.js';
+
+import mongoose from 'mongoose';
+import {appData, envs,asyncCallback} from '../../common';
 import seeds from '../seeds.json' ;
 import {posts} from './posts.js'
-//import {app} from '../../app.js'
-type dbCallback = {
-    (db: IModelDb): Promise<any>;
+import {  init_models} from '../../models';
+
+/////////////////
+const dbOptions = {
+  //rejectUnauthorized: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  //retryWrites: false
+};
+
+export async function dbInit() {
+    try {
+
+      envs.logLine('db connction string :' + envs.databaseUrl());
+
+      await mongoose.connect(envs.databaseUrl())
+      console.log("Successfully Connected to db!");
+
+      // Create Configration - Account - default directory  db models and routes
+    await  init_models()
+
+     envs.logLine(`Numbers of models on the database are : ${appData.size}`);
+
+    } catch (err: any) {
+      console.error(err);
+      process.exit(1);
+    }
 }
+
 export class ClientSeedDatabase {
 
     async init(dev=envs.isDevelopment) {
         envs.logLine('started database seeding ..!');
        if(dev){
-        await this.addRoles();
         await this.addAccounts();
         await this.addCateories();
         await this.addContacts();
@@ -20,35 +44,15 @@ export class ClientSeedDatabase {
         await this.addPosts();
         await this.addComments(); 
        }else{
-        await this.addRoles();
         await this.addAccounts();
        }
         envs.logLine('finished database seeding ..!');
     }
     accountsCache: any[] = [];
 
-    async addRoles() {
-        await this.saver('role', seeds.roles);
-    }
+
     async addAccounts() {
-
-        await this.countDb('account', async (Db: any) => {
-
-            const roles = await Store.db.get('role')!.model!.find({ name: { $in: ["admin", "user"] } })
-
-            if (roles) {
-                await Promise.all(seeds.accounts.map(async (account: any) => {
-                    account.roles = roles;
-                    let ut = await Db.model.register!(account, "password");
-                    this.accountsCache.push(ut);
-                }))
-                console.log('finished seeding accounts')
-            }
-            else {
-                console.log(' roles are not ready for accounts creations')
-            }
-
-        })
+        this.saver('account', seeds.accounts)
     }
 
     async addContacts() {
@@ -117,10 +121,10 @@ export class ClientSeedDatabase {
     }
 
 
-    countDb(dbName: string, callback: dbCallback) {
+    countDb(dbName: string, callback: asyncCallback) {
         return new Promise(async (resolve) => {
-            let Db = Store.db.get(dbName)!;
-            Db.model!.estimatedDocumentCount().then( async (count: number) => {
+            let Db = mongoose.models[dbName]!;
+            Db.estimatedDocumentCount().then( async (count: number) => {
                 if (count === 0) {
                     callback && resolve(await callback(Db))
                 } else if(count > 0) {
@@ -134,12 +138,12 @@ export class ClientSeedDatabase {
     }
 
     async getIDs(name: string, filter?: {}) {
-        return (await Store.db.get(name)!.model?.find(filter!)!).map((md: any) => md._id);
+        return (await mongoose.models[name]?.find(filter!)!).map((md: any) => md._id);
     }
 
     async saver(dbName: string, objArr: any[]) {
         await this.countDb(dbName, async (db) => {
-            await Promise.all(objArr.map(async (obj: any) => await new db.model!(obj).save()))
+            await Promise.all(objArr.map(async (obj: any) => await new db(obj).save()))
             console.log('finished seeding ' + dbName)        
         })
     }

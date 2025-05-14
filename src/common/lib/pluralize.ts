@@ -1,6 +1,18 @@
 /* global define */
 
-export default  (function() {
+interface IPluralize {
+  (word: string, count?: number, inclusive?: boolean): string;
+  plural: (word: string) => any;
+  isPlural: (word: string) => boolean;
+  singular: (word: string) => any;
+  isSingular: (word: string) => boolean;
+  addPluralRule(rule: any, replacement: string): void;
+  addSingularRule(rule: any, replacement: string): void;
+  addUncountableRule(word: any): void;
+  addIrregularRule(single: string, plural: string): void;
+}
+
+export const  pluralize: IPluralize =  (function() {
   // Rule storage - pluralize and singularize need to be run sequentially,
   // while other rules can be optimized using an object for instant lookups.
   var pluralRules: any[][] = [];

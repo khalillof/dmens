@@ -1,7 +1,7 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
-import { envs } from "../../common/index.js";
-import { Store } from '../../services/index.js';
+import { envs } from "../../common";
 import jwksRsa from 'jwks-rsa';
+import mongoose from 'mongoose';
 
 export class PassportStrategies {
 
@@ -18,7 +18,7 @@ export class PassportStrategies {
     }, async (payload: any, done: any) => {
       //console.log('payload:\n', payload)
       // roles populate relaying on autopopulate plugin
-      Store.db.get('account')!.model?.findById(payload.user._id)
+      mongoose.models['account'].findById(payload.user._id)
         .then((error: any, user?: any, info?: any) => done(user, error, info))
     })
   }

@@ -1,148 +1,175 @@
-import express from 'express';
-import { logger, responce, Assert } from '../../common/index.js';
-import { Store } from '../../services/index.js';
-import { Ilogger, Iresponce, IController, IModelDb, IRequestFilter } from '../../interfaces/index.js';
+import { Request, Response, NextFunction } from "express";
+import mongoose, { sanitizeFilter } from 'mongoose';
+import {
+  responces, appData, removeItemsFromObject,
+  IEndPointRoute, IConfigration, IController,
+  IRequestFilter, IRequestVerpsAsync,
+  IModel
+} from '../../common/index.js';
+
+import fetch from 'node-fetch';
+
 
 export class DefaultController implements IController {
-  db: IModelDb;
-  responce: Iresponce;
-  log: Ilogger;
-  constructor(name: string) {
-    this.db = Store.db.get(name)!;
-    this.responce = responce;
-    this.log = logger;
+
+  config: IConfigration
+  db: IModel
+  constructor(config: IConfigration, ) {
+
+    if (!config) {
+      throw new Error('Defaultcontroller require config instance ')
+    }
+    this.config = config;
+    this.db = mongoose.model<IConfigration, IModel>(config.name);
+
   }
 
-  async count(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let num = await this.db.model?.countDocuments(req.query)
-    this.responce(res).data(num!)
+
+  endPoint(host: string, route: IEndPointRoute): IRequestVerpsAsync {
+    // console.log('reached http client====================================>\n',host,route);
+    let { method, path, passAuth, paramId, headers } = route;
+
+    let url = new URL((path ? host + path + (paramId ?? "") : host));
+
+    headers = { ...headers, "Content-Type": "application/json" };
+
+    let build: any = { method, headers };
+
+    return async (req: Request, res: Response, next: NextFunction) => {
+      //console.log('reached http client====================================>\n',req.method,req.query);
+
+      if (req.query) {
+        for (let [key, value] of Object.entries(req.query)) {
+          url.searchParams.append(key, value as string)
+        }
+      }
+      if (passAuth && req.headers.authorization) {
+        headers!['Authorization'] = req.headers.authorization;
+      }
+
+
+      if (method !== 'get')
+        build.body = req.body;
+
+      let responce = await fetch(url, build);
+      let data = await responce.json();
+      return responces.data(res, data)
+    }
+  }
+  buildQuery(query: Record<string, any>): IRequestFilter {
+    let con = this.config;
+    if (query) {
+      let queries: Record<string, any> = sanitizeFilter(query);
+      let { page, pagesize, orderby, sortorder, total } = queries;
+      pagesize ??= con.pagesize;
+      page ??= 1;
+      orderby ??= con.orderby;
+      sortorder ??= con.sortorder;
+      total ??= false;
+
+      // clean filter
+      removeItemsFromObject(queries, ['page', 'size', 'sortorder', 'orderby', 'total']);
+
+      return { filter: queries, page, pagesize, orderby, sortorder, total };
+    } else {
+      let { pagesize, orderby, sortorder } = con;
+      return { filter: {}, pagesize, page: 1, orderby, sortorder, total: false }
+    }
   }
 
-  async form(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let _form = await this.db.config.genForm!()
-    this.responce(res).data(_form)
+  async count(req: Request, res: Response, next: NextFunction) {
+    let num = await this.db.countDocuments(sanitizeFilter(req.query))
+    responces.data(res, num!)
   }
 
-  async viewdata(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let data = this.db.config.getViewData!()
-    this.responce(res).data(data)
-  }
-
-  async route(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let routes = this.db.config.getRoutes!()
-    this.responce(res).data(routes)
-  }
-
-  async search(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async search(req: Request, res: Response, next: NextFunction) {
 
     if (!req.query) {
-      return this.responce(res).data([]);
+      return responces.data(res, []);
     }
 
-    // extract key value from request.query object
-    let key = Object.keys(req.query)[0]
-    let value = req.query[key] as string
-    // chech string is safe
-    Assert.iSafeString(value)
+    let query = this.buildQuery!(req.query)!;
 
-    // the following three lines validate the reqested Key is actually present in the model schema properties
-    let iskeyInModel: any = this.db.model?.schema.pathType(key)
-    if ("real nested virtual".indexOf(iskeyInModel!) === -1) {
-      return this.responce(res).data([]);
+    // text search only
+    if (query.filter['text']) {
+
+      query.filter = { $text: { $search: query.filter['text'] } };
+
+      let items = await this.db.toList(query);
+
+      return responces.data(res, items!);
+
+    } else {
+      // //While not a full text search, for partial matching, regular expressions can be used
+      let searchKeys = Object.keys(query.filter).map((key) => [[key], new RegExp(`${query.filter[key]}`, 'i')]);
+      query.filter = Object.fromEntries(searchKeys);
+      let items = await this.db.toList(query);
+      return responces.data(res, items!);
+
     }
-
-    const docs = await this.db.Tolist({ [key]: new RegExp(`${value}`, 'i') });
-
-    this.responce(res).data(docs!);
-
   }
 
-  getQueryData(filter: Record<string, any>): IRequestFilter {
+  async list(req: Request, res: Response, next: NextFunction) {
 
-    if (!filter) {
-      return {};
-    }
+    let query = this.buildQuery!(req.query)!;
 
-    let _limit = filter['limit'], _page = filter['page'], _sort = filter['sort'], _total = filter['total'];
+    let items = await this.db.toList(query);
 
-    const limit = _limit ? Number(_limit) : 5;
-    const page = _page ? Number(_page) : 1;
-    const sort = (_sort && (_sort === "1" || _sort === "-1")) ? Number(_sort) : 1;
-    const total = _total ? Boolean(_total) : undefined;
+    let total = query.total ? await this.db.countDocuments(query.filter) : undefined;
 
-    limit && (delete filter['limit'])
-    page && (delete filter['page'])
-    sort && (delete filter['sort'])
-    total && (delete filter['total'])
-
-    return { filter, limit, page, sort, total };
+    return responces.data(res, items, total)
   }
 
-  async list(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let { filter, limit, page, sort, total } = this.getQueryData(req.query)
-    let items = await this.db.Tolist(filter, limit, page, sort);
-    let _total = total ? await this.db.model?.countDocuments(filter) : undefined;
-
-    // console.log(`filter = ${filter}, limit =${limit}, page =${page}, sort = ${sort}, total =${total}`)
-
-    this.responce(res).data(items, undefined, _total)
-  }
-
-  async get(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async get(req: Request, res: Response, next: NextFunction) {
 
     if (req.params) {
-      let _id = req.params[this.db.name + 'Id'];
+      let _id = req.params[this.config.paramId!];
       if (_id) {
-        let item = await this.db.model!.findById(_id);
-        this.responce(res).data(item);
+        let item = await this.db.findById(_id);
+        responces.data(res, item);
         return;
       } else {
-        let item = await this.db.model!.findById(req.params);
-        this.responce(res).data(item)
-        return
+        let item = await this.db.findById(req.params);
+        responces.data(res, item)
+        return;
       }
 
     } else if (req.query) {
-      let item = await this.db.model!.findOne(req.query);
-      this.responce(res).data(item)
+
+      let item = await this.db.findOne(sanitizeFilter(req.query));
+      return responces.data(res, item)
     } else {
-      return this.responce(res).badRequest()
+      return responces.badRequest(res)
     }
 
   }
-  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.model?.create(req.body);
+  async create(req: Request, res: Response, next: NextFunction) {
+    let item = await this.db.create(req.body);
     console.log('document Created :', item);
-    this.responce(res).data(item)
+    responces.data(res, item)
   }
 
-
-  async update(req: express.Request, res: express.Response, next: express.NextFunction) {
-    await this.db.model!.findByIdAndUpdate(req.params, req.body);
-    this.responce(res).success()
+  async update(req: Request, res: Response, next: NextFunction) {
+    let _id = req.params[this.config.paramId!];
+        if(_id && await this.db.exists({_id})){
+        let data=   await this.db.findByIdAndUpdate(_id,req.body);
+        responces.data(res,data);
+        }
+        
+        // let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
+        //envs.logLine('document created or Overrided :', result.controller?.db.name);
+       return responces.notFound(res);
   }
-  async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
-    let item = await this.db.model?.findByIdAndDelete(req.params['id']);
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    let item = await this.db.findByIdAndDelete(req.params[this.config.paramId]);
     console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
-    this.responce(res).success()
+    responces.success(res)
   }
 
- async test(req: express.Request, res: express.Response, next: express.NextFunction) {
+  async test(req: Request, res: Response, next: NextFunction) {
     console.log('this test method =======================>>>')
-    this.responce(res).data(req.user)
+    responces.data(res, req.user)
   }
 
-  ////// helpers ================================
-  tryCatch(actionName: string) {
-    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      try {
-        let self: any = this;
-        await self[actionName](req, res, next)
-        return;
-      } catch (err) {
-        this.responce(res).error(err);
-      }
-    }
-  }
 }
-
