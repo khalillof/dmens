@@ -1,15 +1,18 @@
 "use strict";
-import { appData, envs } from './common';
-import path from 'path';
+import { appData, envs } from './common/index.js';
+import path,{ dirname, } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 import compression from 'compression';
 import express, { Router } from 'express';
 import session from 'express-session';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
-import { PassportStrategies } from './models';
-import { dbInit, ClientSeedDatabase, } from './services';
-import { corsWithOptions} from './routes';
+import { PassportStrategies } from './models/index.js';
+import { dbInit, ClientSeedDatabase, } from './services/index.js';
+import { corsWithOptions} from './routes/index.js';
 import { httpServer } from './bin/www.js';
 
 // Create the Express application

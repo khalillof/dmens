@@ -1,5 +1,7 @@
-const path = require('path');
-const fs = require('fs');
+import fs from 'fs';
+import path,{ dirname, } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function copyFile(file,to='../dist/') {
   const srcPath = path.resolve(__dirname, file);

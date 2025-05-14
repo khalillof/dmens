@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DefaultController } from './default.controller.js';
-import { appData, responces, IConfigration, IConfigParameters, IConfigController, IMethod, appMethods, appActions } from '../../common/';
-import { createMangedInstance, createRouteInstance } from '../../models';
+import { appData, responces, IConfigration, IConfigParameters, IConfigController, IMethod, appMethods, appActions } from '../../common/index.js';
+import { createMangedInstance, createRouteInstance } from '../../models/index.js';
 import mongoose from 'mongoose';
 
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html

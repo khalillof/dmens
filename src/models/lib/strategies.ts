@@ -1,5 +1,5 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
-import { envs } from "../../common";
+import { envs } from "../../common/index.js";
 import jwksRsa from 'jwks-rsa';
 import mongoose from 'mongoose';
 

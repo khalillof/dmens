@@ -1,9 +1,9 @@
 
 import mongoose from 'mongoose';
-import {appData, envs,asyncCallback} from '../../common';
-import seeds from '../seeds.json' ;
+import {appData, envs,asyncCallback} from '../../common/index.js';
+import seeds from '../seeds.json' with { type: "json" } ;
 import {posts} from './posts.js'
-import {  init_models} from '../../models';
+import {  init_models} from '../../models/index.js';
 
 /////////////////
 const dbOptions = {
@@ -142,7 +142,7 @@ export class ClientSeedDatabase {
     }
 
     async saver(dbName: string, objArr: any[]) {
-        await this.countDb(dbName, async (db) => {
+        await this.countDb(dbName, async (db:any) => {
             await Promise.all(objArr.map(async (obj: any) => await new db(obj).save()))
             console.log('finished seeding ' + dbName)        
         })

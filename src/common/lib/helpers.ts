@@ -2,7 +2,7 @@
 
 import { DefaultController } from '../../controllers/index.js';
 import express from 'express';
-import { IDefaultRoutesConfig, IMethod} from "./interfaces";
+import { IDefaultRoutesConfig, IMethod} from "./interfaces.js";
 import _ from "passport-local-mongoose";
 
 declare global {

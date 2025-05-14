@@ -1,6 +1,6 @@
 
 import { NextFunction, Response, Request } from 'express';
-import { appData, IDefaultRoutesConfig } from '../../common';
+import { appData, IDefaultRoutesConfig } from '../../common/index.js';
 import mongoose from 'mongoose';
 
 export async function ConfigRoutesCallback(this: IDefaultRoutesConfig) {

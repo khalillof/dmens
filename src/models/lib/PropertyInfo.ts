@@ -1,5 +1,5 @@
 "use strict";
-import { IPropertyInfo, IMongooseTypes } from "../../common";
+import { IPropertyInfo, IMongooseTypes } from "../../common/index.js";
 
 
 

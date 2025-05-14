@@ -1,6 +1,6 @@
 import { IRouter } from "express";
-import { envs, IDefaultRoutesConfig, IMethod, IRouteManager } from "../../common";
-import { DefaultRoutesConfig } from "./default.routes.config";
+import { envs, IDefaultRoutesConfig, IMethod, IRouteManager } from "../../common/index.js";
+import { DefaultRoutesConfig } from "./default.routes.config.js";
 
 export class RouteManager implements IRouteManager {
     router: IRouter

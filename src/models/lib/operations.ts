@@ -1,10 +1,10 @@
 "use strict";
 import mongoose, { ClientSession, IndexDirection, Schema } from 'mongoose';
-import { autopopulatePlugin, mongooseTypeMappings, configDb, toList, getMetaData } from '../';
-import { appData, envs, IConfigration, IConfigParameters, IModel, ICleanExecWithSessionCallback } from '../../common'
+import { autopopulatePlugin, mongooseTypeMappings, configDb, toList, getMetaData } from '../index.js';
+import { appData, envs, IConfigration, IConfigParameters, IModel, ICleanExecWithSessionCallback } from '../../common/index.js'
 import path from 'path';
 import fs from 'fs';
-import { DefaultRoutesConfig } from '../../routes';
+import { DefaultRoutesConfig } from '../../routes/index.js';
 
 
 export async function init_models() {
@@ -143,7 +143,7 @@ export async function createModelInstance(config: IConfigration) {
   _schema.statics = { toList, getMetaData };
 
   if (textSearch?.length) {
-    let obg: { [x: string]: IndexDirection } = Object.fromEntries(textSearch.map((key) => [key, "text"]));
+    let obg: { [x: string]: IndexDirection } = Object.fromEntries(textSearch.map((key:any) => [key, "text"]));
     _schema.index(obg)
   }
   envs.logLine('created new data model : ' + name);

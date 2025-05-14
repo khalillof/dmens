@@ -1,5 +1,10 @@
-const path = require('path');
-const fs = require('fs');
+
+import fs from 'fs';
+import path,{ dirname, } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+
 //const glob = require('glob');
 
 async function cleanDirectoryOrCreateOne(dirPath){ // be carefull
@@ -67,6 +72,7 @@ async function createPackageFile() {
     ...packageDataOther,
     main: './index.js',
     module: './es/index.js',
+    type: module,
     private: false,
   };
   const distPath = path.resolve(__dirname, '../dist/package.json');
