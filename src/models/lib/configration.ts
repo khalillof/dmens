@@ -1,6 +1,6 @@
 "use strict";
 import { SchemaTypes, Schema, model} from 'mongoose';
-import {pluralize, IEndPoint, IEndPointRoute, IConfigration, IConfigParameters, IMetaData, IModel, IRequestFilter, IRouteData, appActions, IExecWithSessionCallback, ICleanExecWithSessionCallback } from '../../common';
+import {pluralize, IEndPoint, IEndPointRoute, IConfigration, IConfigParameters, IMetaData, IModel, IRequestFilter, IRouteData, appActions, IExecWithSessionCallback, ICleanExecWithSessionCallback } from '../../common/index.js';
 import { ConfigRoutesCallback, DefaultRoutesConfig } from '../../routes/index.js';
 
 // https://www.slingacademy.com/article/sorting-results-in-mongoose-by-date/
@@ -84,7 +84,7 @@ export async function getMetaData(this: IModel, _schema?: Schema): Promise<IMeta
 
   let properties: Record<string, any> = {};
 
-  (_schema ?? this.schema).eachPath(async (path, stype) => {
+  (_schema ?? this.schema).eachPath(async (path:any, stype) => {
     let { instance, options } = stype;
     if (stype.schema) {
       properties[path] = [await this.getMetaData(stype.schema)];

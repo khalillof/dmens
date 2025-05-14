@@ -1,6 +1,6 @@
 
 ################################### stage one
-FROM node:18.12.1-alpine3.15 as builder
+FROM node:latest as builder
 
 # install dependencies for node-gyp
 #RUN apk add --no-cache python make g++
@@ -13,7 +13,7 @@ COPY  ./package.json .
 RUN npm ci  --only=production --omit=dev
 
 ################################### stage two
-FROM node:18.9-alpine3.15
+FROM node:latest
 
 EXPOSE 3000
 ENV NODE_ENV=production

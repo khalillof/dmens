@@ -1,5 +1,5 @@
 import path from  'path';
-import {envs} from  '../../common';
+import {envs} from  '../../common/index.js';
 import multer from 'multer';
 
 function setMulter(uploadDir:string,filterCallback:Function|any, fieldsNum = 1){

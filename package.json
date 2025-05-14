@@ -15,6 +15,7 @@
   ],
   "author": "Khalil Tuban",
   "license": "ISC",
+  "type": "module",
   "main": "./index.js",
   "module": "./dist/index.js",
   "scripts": {

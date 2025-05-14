@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Middlewares } from '../../middlewares/index.js';
-import { responces, IActiveRoutes, IController, IDefaultRoutesConfig, IMethod, IRouteCallback, appData, IConfigration, IRouteManager, appMethods } from '../../common';
+import { responces, IActiveRoutes, IController, IDefaultRoutesConfig, IMethod, IRouteCallback, appData, IConfigration, IRouteManager, appMethods } from '../../common/index.js';
 import { ConfigController, DefaultController } from '../../controllers/index.js';
 //import { appRouter } from '../../index.js'
 import { Request, Response, NextFunction, IRouter , Router} from "express";
@@ -48,7 +48,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     
     let cont: any = this.controller;
     // check action 
-    if (!cont[action]) {
+    if (!cont[action!]) {
       throw new Error(`Route name -(${this.baseRoute}) -- action --( ${action} ) not found`)
     }
     if(this.config.disabledActions.isFound(action)){

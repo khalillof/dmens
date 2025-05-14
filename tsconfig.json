@@ -17,12 +17,7 @@
         "module": "NodeNext",
         "moduleResolution": "nodenext",
         "importHelpers": true,
-        "target": "es2022",
-        
-        "lib": [
-            "es2022",
-            "dom"
-        ],
+        "target": "esnext",
         "inlineSourceMap": false
     },
     "include": [
