@@ -1,5 +1,2 @@
 
-
-import middlewares from './lib/middleware.js';
-
-export {middlewares}
+export * from './lib/middleware.js';

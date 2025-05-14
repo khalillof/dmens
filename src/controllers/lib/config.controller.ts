@@ -1,80 +1,235 @@
-import express from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { DefaultController } from './default.controller.js';
-import { envs } from '../../common/index.js'
-import { Store} from '../../services/index.js'
-import { IModelConfig, IModelConfigParameters } from '../../interfaces/index.js';
-import { Operations } from '../../models/index.js';
-import { IConfigController } from 'src/interfaces/lib/interfaces.js';
+import { appData, responces, IConfigration, IConfigParameters, IConfigController, IMethod, appMethods, appActions } from '../../common/';
+import { createMangedInstance, createRouteInstance } from '../../models';
+import mongoose from 'mongoose';
 
+// https://mongoosejs.com/docs/typescript/statics-and-methods.html
 export class ConfigController extends DefaultController implements IConfigController {
 
-    constructor(name = 'config') {
-        super(name)
+    constructor(config: IConfigration) {
+        super(config)
+
     }
 
-    async routes(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let routes = Store.route.getRoutesPathMethods()
-        this.responce(res).data(routes)
-    }
-    async deleteRoute(req: express.Request, res: express.Response, next: express.NextFunction) {
-        if (!req.query && !req.query['path'] && !(typeof req.query['path'] === 'string')) {
-            return this.responce(res).badRequest('require query string path');
+    async routes(req: Request, res: Response, next: NextFunction) {
+
+        let modelName = req.params['modelName'];
+
+        if (modelName) {
+            let routes = appData.get(modelName)?.activeRoutes!;
+            return responces.data(res, routes)
         }
-        Store.route.deleteRoutePath(req.query['path'] as string)
-        this.responce(res).success()
+        return responces.notFound(res)
     }
-    
-    async viewsdata(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let data = await Promise.resolve(Store.db.store.filter((f:any)=> f.config.dependent==false).map((a)=> a.config.getViewData!() ));
-        //console.log(data)
-        this.responce(res).data(data)
-      }
 
-    async forms(req: express.Request, res: express.Response, next: express.NextFunction) {
-       let _forms =  await Promise.all(Store.db.store.map(async (d)=>  await d.config.genForm!()));
-        this.responce(res).data(_forms)
-      }
+    async metadata(req: Request, res: Response, next: NextFunction) {
+        let modelName = req.params['modelName'];
       
-    override  async post(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let conf: IModelConfigParameters = req.body;
-        let result = await Operations.createModelConfigRoute(conf);
-
-        envs.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).data(result.controller.db.config.getProps!())
+        if(modelName === 'config'){
+          let items = await this.db.getMetaData!();
+          return responces.data(res, items)
+        }else if(modelName && appData.has(modelName)){
+         let items   = await appData.get(modelName)?.controller.db.getMetaData();
+        return responces.data(res, items)
+        }else{
+            return responces.notFound(res);
+        }
     }
 
+    // /configs/model/:name/viewData
+    async viewdata(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
 
-    override  async update(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let id = req.params['id'];
+        if (name) {
+            let vd = (await this.db.findOne({ name }))?.getViewData()
+            return responces.data(res, vd);
+        }
 
-        let config = (id && await this.db.model?.findById(id)) || req.body.name && await this.db.model?.findOne({ name: req.body.name });
-
-        let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
-
-        envs.logLine('document created or Overrided :', result.controller?.db.name);
-        this.responce(res).success();
+        return responces.notFound(res);
     }
 
-    override  async delete(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let id = req.params['id'];
-        let item: IModelConfig | any = await this.db.model?.findById(id);
+    async routedata(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
 
-        if (item) {
-            // delete config record on database
-            await this.db.model?.findByIdAndDelete(id);
-            // if there is db deleted
-            Store.db.delete(item.name)
+        if (name) {
+            let vd = (await this.db.findOne({ name }))?.getRouteData()
+            return responces.data(res, vd);
+        }
 
-            // delete app route
-            Store.route.deleteAppRoute(item.routeName)
+        return responces.notFound(res);
+    }
+    async getRoutesPathMethods(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
+        let routeConfig = appData.get(name);
+        if (name && routeConfig) {
+            let vd = routeConfig.routeManager.getRoutesPathMethods()
+            return responces.data(res, vd);
+        }
 
-            console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
-            this.responce(res).success()
+        return responces.notFound(res);
+    }
+    async addRoute(req: Request, res: Response, next: NextFunction) {
+        const name = req.params['modelName'];
+        const { path, method, action } = {...req.query,...req.body} as any;
+
+        if (!(name)) {
+            return responces.notFound(res);
+        }
+
+        if ((typeof path === 'string' && typeof method === 'string') && appMethods.isFound(method)) {
+
+            let routeConfig: any = appData.get(name);
+            if (routeConfig.activeRoutes[method].isFound(path)) {
+                return responces.error(res, new Error(`path - ${path} - already on active Routes list`));
+            }
+
+            if(!appActions.isFound(action)){
+                return responces.error(res, new Error(`action name - ${action} - is not valid action name`));
+                
+            }
+            else if(routeConfig.config.disabledActions.isFound(action)){
+                return responces.error(res, new Error(`action name - ${action} - is action name : ${action} is on disabledAction list`));
+                
+            }
+            else{
+                await routeConfig.addRoute(method, path, action);
+                return responces.success(res)
+            }
 
         } else {
-            this.responce(res).notFound()
+
+            return  responces.badRequest(res);
+        }
+    }
+
+    async removeRoute(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
+        let { path, method, action } = {...req.query,...req.body} as any;
+
+        if (!(name)) {
+            return responces.notFound(res);
         }
 
+        if ((typeof path === 'string' && typeof method === 'string') && appMethods.isFound(method)) {
 
+            let routeConfig: any = appData.get(name);
+            if (!routeConfig.activeRoutes[method].isFound(path)) {
+                return responces.notFound(res);
+            } else {
+                routeConfig?.routeManager.deleteRoutePath(path as string, method as IMethod);
+                routeConfig.activeRoutes.get.deleteItemInArray(path);
+
+                routeConfig.config.disabledActions.deleteItemInArray(action);
+                routeConfig.controller.config = routeConfig.config;
+                
+                 await  this.db.findById(routeConfig.config._id)
+                return responces.success(res)
+            }
+        } else {
+            return responces.badRequest(res);
+        }
+    }
+
+    async enableRoutes(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
+
+        if (!(name)) {
+            return responces.notFound(res);
+        }
+
+        if(appData.has(name)){
+           await  appData.get(name)?.defaultRoutes();
+           return responces.success(res)
+        }else{
+            let config = await this.db.findOne({name});
+           await createRouteInstance(config as IConfigration);
+           return responces.success(res);
+        }
+
+       
+    }
+
+    async disableRoutes(req: Request, res: Response, next: NextFunction) {
+        let name = req.params['modelName'];
+
+        if (!(name)) {
+            return responces.notFound(res);
+        }
+        
+        if(appData.has(name)){
+            appData.get(name)?.routeManager.removeAllRoutes();
+            // remove route instance
+            appData.delete(name);
+         }
+         return responces.success(res)
+    }
+
+    async viewsdata(req: Request, res: Response, next: NextFunction) {
+        let vdata: any = [];
+        vdata = (await this.db.find(req.query ?? { isArchieved: false })).map((c) => c.getViewData());
+        //console.log(data)
+        return responces.data(res, vdata)
+    }
+    // http://localhost:8000/api/configs/routesdata?archieve=false&tags=tuban
+    async routesdata(req: Request, res: Response, next: NextFunction) {
+        let rdata: any = [];
+        rdata = (await this.db.find(req.query ?? { isArchieved: false })).map((c) => c.getRouteData());
+        //console.log(data)
+        return responces.data(res, rdata)
+    }
+
+    override  async create(req: Request, res: Response, next: NextFunction) {
+        let conf: IConfigParameters = req.body;
+        // let result = await Operations.createModelConfigRoute(conf);
+      await  createMangedInstance(conf)
+        // envs.logLine('document created or Overrided :', result.controller?.db.name);
+        // this.responce(res).data(result.controller.db.config.getProps!())
+        responces.success(res);
+
+    }
+
+    override  async update(req: Request, res: Response, next: NextFunction) {
+        let _id = req.params[this.config.paramId!];
+        let exist:IConfigration = await this.db.exists({_id}) as any;
+        if(_id && exist ){
+            
+            let updatedConfig :IConfigration | null=   await this.db.findByIdAndUpdate(_id,req.body);
+
+            if(!updatedConfig?.isArchieved && !updatedConfig?.disableRoutes){
+                if(appData.has(exist.name)){
+                    appData.get(updatedConfig!.name)?.routeManager.removeAllRoutes();
+                    appData.delete(exist.name)
+                }
+                await   createMangedInstance(updatedConfig!,true);
+            }
+        
+        return responces.data(res,updatedConfig);
+        }
+        
+        // let result = await Operations.overrideModelConfigRoute({ ...config, ...req.body });
+        //envs.logLine('document created or Overrided :', result.controller?.db.name);
+       return responces.notFound(res);
+    }
+
+    override  async delete(req: Request, res: Response, next: NextFunction) {
+        let _id = req.params[this.config.paramId!];
+        let exist:IConfigration = await this.db.exists({_id}) as any;
+        if(_id && exist ){
+            let data :IConfigration | null=   await this.db.findOneAndDelete({_id});
+
+            if(!data?.isArchieved && !data?.disableRoutes){
+                if(appData.has(exist.name)){
+                    appData.get(data!.name)?.routeManager.removeAllRoutes();
+                    appData.delete(exist.name);
+                }
+                if(mongoose.models[data!.name]){
+                   mongoose.deleteModel(data!.name);
+                }
+            }
+        console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${data}`)
+         responces.data(res,data);
+        }
+         responces.notFound(res)
     }
 }

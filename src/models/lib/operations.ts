@@ -1,177 +1,262 @@
 "use strict";
-import { IModelConfig, IModelConfigParameters, IController, IRouteCallback } from '../../interfaces/index.js';
-import { ModelDb } from './model.db.js';
+import mongoose, { ClientSession, IndexDirection, Schema } from 'mongoose';
+import { autopopulatePlugin, mongooseTypeMappings, configDb, toList, getMetaData } from '../';
+import { appData, envs, IConfigration, IConfigParameters, IModel, ICleanExecWithSessionCallback } from '../../common'
 import path from 'path';
 import fs from 'fs';
-import {envs } from '../../common/index.js';
-import { Store} from '../../services/index.js';
-import { DefaultRoutesConfig, ConfigRoutes, AccountRoutes } from '../../routes/index.js';
-import { accConfgSchema, typeMappings, configTemplateProps, roleConfigSchema} from './configration.js';
-import { DefaultController } from '../../controllers/index.js';
-
-//=============================================
-
-export class Operations {
-
-  static async create_default_models_routes() {
-
-    // create configration Template model
-   await Operations.createModelInstance(configTemplateProps)
-   // create configration Routes with configController
-   await ConfigRoutes();
-
-    // create account roles
-    await Operations.createModelConfigRoute(roleConfigSchema)
-
-    // create account model config and routes
-    await Operations.createModelWithConfig(accConfgSchema);
-    await AccountRoutes()
-
-    // load models routes from default directory
-   await Operations.createModelsRoutesFromDirectory();
-   
-   // create models routes from default db
-    await Operations.createModelsRoutesFromDb()
+import { DefaultRoutesConfig } from '../../routes';
 
 
+export async function init_models() {
+
+  if (await configDb.countDocuments() <= 1) {
+    envs.logLine(' no configrations found on database so we will try default directory');
+
+    // create from directory
+    await createFromDirectory();
+    return;
+  }
+  // try and query operator
+  /* 
+  let twoInlist = await configDb.find().and([
+     { $or: [{name: 'role'}, {name: 'account'}] }
+   ])
+   .exec();
+ */
+
+  // then do rest of models
+
+  for await (let config of await configDb.find({ isArchieved: false })) {
+    if (config.name !== 'config')
+      await createMangedInstance(config)
   }
 
-  // ============ DbModel
-  static async createModelInstance(_config: IModelConfigParameters) {
-    let _model = new ModelDb(_config);
-    return Promise.resolve(_model);
+}
+
+export async function createFromJsonString(jsonString: string) {
+  if (typeof jsonString === 'string') {
+    let config: IConfigParameters = JSON.parse(jsonString);
+    return await createMangedInstance(config, false);
+  } else {
+    throw new Error('this method makeModelFromJsonString require json data as string');
   }
-  static async createModelWithConfig(_config: IModelConfigParameters) {
-    let _model = await Operations.createModelInstance(_config);
-    await  _model.createConfig();
-    return _model;
-  }
+}
 
-  // ===================== Routes
-  static async createRouteInstance(controller: IController, callback?: IRouteCallback) {
-    return Promise.resolve(new DefaultRoutesConfig(controller, callback));
-  }
-  
-  static async createModelConfigRoute(_config: IModelConfigParameters, controller?: IController, routeCallback?: any) {
-
-    let _model = await Operations.createModelWithConfig(_config);
-
-    return await Operations.createRouteInstance(controller ?? new DefaultController(_model.name), routeCallback);
-
-  }
-
-  // create model route from config 
-  static async createModelsRoutesFromDb(){
-   let allDbConfigs = await Store.db.get('config')!.model!.find();
-   allDbConfigs = allDbConfigs.filter((p:IModelConfig)=> !Store.db.exist(p.name));
-
-   if(allDbConfigs.length)
-   for await( let config of allDbConfigs){
-   await Operations.createModelInstance(config)
-    await Operations.createRouteInstance(new DefaultController(config.name))
- };
-
-  }
-  // create or override model config route
-  static async overrideModelConfigRoute(_config: IModelConfigParameters) {
-    let dbName = _config.name;
-    if (!dbName || !Store.db.exist(dbName)) {
-      envs.throwErr(' db model name not found')
-    }
-
-    // delete model if exists
-    Store.db.delete(dbName);
-
-    return await Operations.createModelConfigRoute(_config);
-  }
-
-  static async createModelFromJsonString(jsonString: string) {
-    if (typeof jsonString === 'string') {
-      let _conf: IModelConfigParameters = JSON.parse(jsonString);
-      return await Operations.createModelConfigRoute(_conf);
-    } else {
-      throw new Error('this method makeModelFromJsonString require json data as string');
-    }
-  }
-
-  static async createModelFromJsonFile(filePath: string) {
-    if (path.isAbsolute(filePath) && Operations.isJsonFile(filePath)) {
-
-      let data = fs.readFileSync(filePath, 'utf8');
-      let jsobj: IModelConfig = JSON.parse(data);
-
-      return await Operations.createModelConfigRoute(jsobj);
-    } else {
-      // handel dirNames within files
-      if (path.dirname(filePath)) {
-        console.log(' found dir name in : ' + path.dirname(filePath));
-        await Operations.createModelsRoutesFromDirectory(filePath);
-      } else {
-        throw new Error('file should be json and absolute' + filePath);
-      }
-    }
+export async function createFromJsonFile(filePath: string): Promise<any> {
+  if (!path.isAbsolute(filePath)) {
     throw new Error('file should be json and absolute' + filePath);
   }
 
-  // if no directory provided will use default directory
-  static async createModelsRoutesFromDirectory(directory: string = envs.schemaDir()) {
 
-    if (fs.existsSync(directory)) {
-      return await Promise.all(fs.readdirSync(directory).map(async (fileName: string) => {
-        let _file = path.join(directory, fileName);
-        if (Operations.isJsonFile(_file)) {
-          return await Operations.createModelFromJsonFile(_file);
-        }
-        return;
-      }));
-    } else {
-      //throw new Error('directory Not Found : ' + directory);
-      envs.logLine(`(( createModelsRoutesFromDirectory )) => Directory not found : ${directory}`)
-      return null;
-    }
+  if (isJsonFile(filePath)) {
+
+    let data = fs.readFileSync(filePath, 'utf8');
+    let config: IConfigParameters = JSON.parse(data);
+
+    return await createMangedInstance(config, false);
+    // handel dirNames within files
+  } else if (path.dirname(filePath)) {
+    console.log(' found dir name in : ' + path.dirname(filePath));
+    return await createFromDirectory(filePath);
+  } else {
+    throw new Error('file should be json and absolute' + filePath);
   }
 
+}
 
-  // helpers :.............................................
-  static isJsonFile(file: string) {
-    return path.extname(file) === '.json';
+// if no directory provided will use default directory
+export async function createFromDirectory(directory: string = envs.schemaDir()) {
+
+  if (fs.existsSync(directory)) {
+    return await Promise.all(fs.readdirSync(directory).map(async (fileName: string) => {
+      let _file = path.join(directory, fileName);
+      if (isJsonFile(_file)) {
+        return await createFromJsonFile(_file);
+      }
+      return;
+    }));
+  } else {
+    //throw new Error('directory Not Found : ' + directory);
+    envs.logLine(`(( createModelsRoutesFromDirectory )) => Directory not found : ${directory}`)
+    return null;
+  }
+}
+/*
+export async function createConfigInstance(config: IConfigParameters, cleanJob?: ICleanExecWithSessionCallback): Promise<IConfigration> {
+
+  if (config.name === "config") {
+    throw new Error("model Config already on the database");
   }
 
-  static async validateSchema(schemaObj: IModelConfigParameters) {
-
-    for await (let item of Object.entries(schemaObj)) {
-      await this.deepSearch(item);
-    }
-    //  return iconfig;
+  if (appData.has(config.name)) {
+    throw new Error(`config.name :${config.name} is already on db and appData`)
   }
-  // search item in object and map to mongoose schema
-  static isValidType(value: any) {
-    return 'number, string, boolean'.indexOf(typeof value) !== -1;
+
+  if (!config.schemaObj) {
+    throw new Error(' property schemaObj is required property')
   }
-  // search item in object and map to mongoose schema
-  static async deepSearch(item: any) {
 
-    // loop over the item
-    for (let [itemIndex, itemValue] of Object.entries(item)) {
+  if (!configDb) {
+    throw new Error(`config model not present on the database, could not create config entry for model :${config.name}`)
+  }
 
-      // check if item is object then call deepSearch agin recursively
-      if (typeof itemValue === "object") {
-        await this.deepSearch(itemValue);
-      } else {
+  let foundOne: any = await configDb.exists({ name: config.name });
 
-        // loop over typeMappings to map user schema string type to mongoose typings
-        for (const [mapKey, mapValue] of Object.entries(typeMappings)) {
-          if (itemValue === mapKey) {
-            item[itemIndex] = mapValue;
-          }
-          else {
-            // check for the item didn't match our typemappings is valid type or raise error
-            if (!this.isValidType(itemValue))
-              throw new Error('unvalid schema type value for the key:' + item[itemIndex] + ' :' + itemValue);
-          }
-        }
+  if (foundOne) {
+    throw new Error(`model named ${foundOne['name']} already on the database`);
+
+  } else {
+    let result = await configDb.execWithSessionAsync(async function (session) {
+      return await new configDb(config).save({ session });
+    }, cleanJob);
+
+    envs.logLine(`created config entry for model name : ${result.name}`);
+    return result;
+  }
+
+}
+*/
+export async function createModelInstance(config: IConfigration) {
+
+  let { name, schemaObj, schemaOptions, textSearch } = config;
+
+  if (mongoose.models[name]) {
+    throw new Error(`model named ${name} already exist`);
+  }
+
+  // let _options =  Object.fromEntries(schemaOptions); // will produce string error like 'true' not true
+
+  const options = Array.from(schemaOptions).reduce((acc: Record<string, any>, [key, value]) => {
+    if (value === 'true')
+      value = true;
+    if (value === 'false')
+      value = false;
+
+    acc[key] = value;
+    return acc;
+  }, {});
+
+
+  let _schema = new Schema<IConfigration, IModel>(schemaObj, options).plugin(autopopulatePlugin);
+
+  // add static method
+  _schema.statics = { toList, getMetaData };
+
+  if (textSearch?.length) {
+    let obg: { [x: string]: IndexDirection } = Object.fromEntries(textSearch.map((key) => [key, "text"]));
+    _schema.index(obg)
+  }
+  envs.logLine('created new data model : ' + name);
+
+  return mongoose.model(name, _schema);
+
+
+}
+
+export async function createRouteInstance(config: IConfigration) {
+  await Promise.resolve(new DefaultRoutesConfig(config))
+}
+
+export async function createMangedInstance(_config: IConfigParameters | IConfigration, configFromDb: boolean = true) {
+  // Using Mongoose's default connection
+  //const session = await mongoose.startSession();
+  // https://moldstud.com/articles/p-mastering-transactions-in-mongoose
+
+  if (configFromDb) {
+    await createModelInstance(_config as IConfigration);
+    if (!_config.disableRoutes)
+      await createRouteInstance(_config as IConfigration);
+  } else {
+
+      let { name, schemaObj } = _config;
+
+      if (name === "config") {
+        throw new Error("model Config already on the database");
       }
 
+      if (appData.has(name)) {
+        throw new Error(`model name :${name} is already on db and appData`)
+      }
+
+      if (!schemaObj) {
+        throw new Error(' property schemaObj is required property')
+      }
+
+      if (!configDb) {
+        throw new Error(`config model not present, could not create config entry for model :${name}`)
+      }
+
+      let foundOne: any = await configDb.exists({ name });
+
+      if (foundOne) {
+        throw new Error(`model name: ${foundOne['name']} already on the database`);
+
+      } else {
+
+         _config = await configDb.create(_config) as IConfigration;
+        envs.logLine(`created config entry for model name : ${name}`);
+
+        await createModelInstance(_config);
+        if (!_config.disableRoutes)
+        await createRouteInstance(_config);
+
+       // return _config;
+      }
+      // clean job
+      /*
+      if (mongoose.models[_config.name]) {
+        mongoose.deleteModel(_config.name)
+      }
+      if (appData.has(_config.name)) {
+        appData.get(_config.name)?.routeManager.removeAllRoutes();
+        appData.delete(_config.name)
+      }
+       */
+    
+  }
+
+  return true;
+}
+
+// helpers :.............................................
+export function isJsonFile(file: string) {
+  return path.extname(file) === '.json';
+}
+
+export async function validateSchema(schemaObj: IConfigParameters) {
+
+  for await (let item of Object.entries(schemaObj)) {
+    await deepSearch(item);
+  }
+  //  return iconfig;
+}
+// search item in object and map to mongoose schema
+function isValidType(value: any) {
+  return 'number, string, boolean'.indexOf(typeof value) !== -1;
+}
+// search item in object and map to mongoose schema
+export async function deepSearch(item: any) {
+
+  // loop over the item
+  for (let [itemIndex, itemValue] of Object.entries(item)) {
+
+    // check if item is object then call deepSearch agin recursively
+    if (typeof itemValue === "object") {
+      await deepSearch(itemValue);
+    } else {
+
+      // loop over typeMappings to map user schema string type to mongoose typings
+      for (const [mapKey, mapValue] of Object.entries(mongooseTypeMappings)) {
+        if (itemValue === mapKey) {
+          item[itemIndex] = mapValue;
+        }
+        else {
+          // check for the item didn't match our typemappings is valid type or raise error
+          if (!isValidType(itemValue))
+            throw new Error('unvalid schema type value for the key:' + item[itemIndex] + ' :' + itemValue);
+        }
+      }
     }
+
   }
 }

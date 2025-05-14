@@ -1,168 +1,337 @@
 "use strict";
-import mongoose from 'mongoose';
-import { IModelConfigParameters} from '../../interfaces/index.js';
+import { SchemaTypes, Schema, model} from 'mongoose';
+import {pluralize, IEndPoint, IEndPointRoute, IConfigration, IConfigParameters, IMetaData, IModel, IRequestFilter, IRouteData, appActions, IExecWithSessionCallback, ICleanExecWithSessionCallback } from '../../common';
+import { ConfigRoutesCallback, DefaultRoutesConfig } from '../../routes/index.js';
 
-export const typeMappings = {
-  "String": mongoose.SchemaTypes.String,
-  "string": mongoose.SchemaTypes.String,
-  "Number": mongoose.SchemaTypes.Number,
-  "number": mongoose.SchemaTypes.Number,
-  "Date": mongoose.SchemaTypes.Date,
-  "date": mongoose.SchemaTypes.Date,
-  "Binary": mongoose.SchemaTypes.Buffer,
-  "binary": mongoose.SchemaTypes.Buffer,
-  "Boolean": mongoose.SchemaTypes.Boolean,
-  "boolean": mongoose.SchemaTypes.Boolean,
-  "mixed": mongoose.SchemaTypes.Mixed,
-  "Mixed": mongoose.SchemaTypes.Mixed,
-  "_id": mongoose.SchemaTypes.ObjectId,
-  "id": mongoose.SchemaTypes.ObjectId,
-  "ObjectId": mongoose.SchemaTypes.ObjectId,
-  "objectid": mongoose.SchemaTypes.ObjectId,
-  "array": mongoose.SchemaTypes.Array,
-  "Array": mongoose.SchemaTypes.Array,
-  "decimal": mongoose.SchemaTypes.Decimal128,
-  "Decimal": mongoose.SchemaTypes.Decimal128,
-  "map": mongoose.SchemaTypes.Map,
-  "Map": mongoose.SchemaTypes.Map,
+// https://www.slingacademy.com/article/sorting-results-in-mongoose-by-date/
+// https://blog.devgenius.io/typescript-in-mongoose-9994fca6987b
+export const mongooseListTypes = [
+  "String",
+  "Number",
+  "BigInt",
+  "Date",
+  "Binary",
+  "Boolean",
+  "Mixed",
+  "ObjectId",
+  "Array",
+  "DocumentArray",
+  "Decimal",
+  "Map"
+]
+export const mongooseTypeMappings = {
+  "String": SchemaTypes.String,
+  "Number": SchemaTypes.Number,
+  "BigInt": SchemaTypes.BigInt,
+  "Date": SchemaTypes.Date,
+  "Binary": SchemaTypes.Buffer,
+  "Boolean": SchemaTypes.Boolean,
+  "Mixed": SchemaTypes.Mixed,
+  "ObjectId": SchemaTypes.ObjectId,
+  "Array": SchemaTypes.Array,
+  "DocumentArray": SchemaTypes.DocumentArray,
+  "Decimal": SchemaTypes.Decimal128,
+  "Map": SchemaTypes.Map,
+}
+// model static methos =======================
+export async function toList(this: IModel, query: IRequestFilter) {
+  let { filter, pagesize: size, page, orderby, sortorder } = query;
+  return await this.find(filter)
+    .skip((page - 1) * size)
+    .limit(size)
+    .sort({ [orderby]: sortorder }) // sort, use 1 for asc and -1 for dec
+    .exec();
 }
 
-export const configTemplateSchema = {
+export async function execWithSessionAsync(this: IModel, callback: IExecWithSessionCallback, cleanJob?: ICleanExecWithSessionCallback) {
+  const session = await this.startSession();
 
+  try {
+    if (typeof callback != 'function') {
+      throw new Error('execWithSessionAsynce require function callback')
+    }
+
+    console.log('started session transaction =============>');
+
+    session.startTransaction();
+    console.log('started session transaction =============>');
+
+    let transactionResult = await callback.call(this, session);
+
+    await session.commitTransaction();
+
+    console.log('transactionResult commited =============>\n', Object.keys(transactionResult));
+    return transactionResult;
+
+  } catch (error) {
+
+    await session.abortTransaction();
+    console.log(' Aborted transaction commited =============>');
+
+    if (typeof cleanJob === 'function') {
+      await cleanJob.call(this);
+    }
+    console.error(error);
+
+    throw error;
+  } finally {
+
+    await session?.endSession();
+    console.log('ended session transaction =============>');
+  }
+}
+export async function getMetaData(this: IModel, _schema?: Schema): Promise<IMetaData> {
+
+  let properties: Record<string, any> = {};
+
+  (_schema ?? this.schema).eachPath(async (path, stype) => {
+    let { instance, options } = stype;
+    if (stype.schema) {
+      properties[path] = [await this.getMetaData(stype.schema)];
+    } else {
+      delete options['type'];
+
+      properties[path] = { instance, options: { ...options } };
+    }
+  });
+
+  return { properties, requiredProperties: this.schema.requiredPaths() }
+}
+// end of static methods ===================
+
+const endPointRouteSchema = new Schema<IEndPointRoute>({
+  method: {
+    "type": String,
+    required: true,
+    enum: ["get", "post", "put", "delete"],
+    default: "get"
+  },
+  path: { "type": String, default: '', trim: true },
+  paramId: { "type": String },
+  authorize: { "type": Boolean, default: false },
+  admin: { "type": Boolean, default: false },
+  passAuth: { "type": Boolean, default: false },
+  headers: {
+    "type": Map,
+    of: String
+  }
+}, { strict: true });
+
+const endPointSchema = new Schema<IEndPoint>({
   name: {
     "type": String,
+    unique: true,
+    required: true,
+    minLength: 3,
+    maxLength: 30,
+    tagName: "text"
+  },
+  isActive: {
+    "type": Boolean,
+    default: true
+  },
+  host: {
+    "type": String,
+    unique: true,
+    lowercase: true,
+    required: true,
+    minLength: 10,
+    maxLength: 200,
+    tagName: "text"
+  },
+  routes: [endPointRouteSchema]
+}, { strict: true }).index({ name: 'text', host: 'text' });
+
+export const configSchema = new Schema<IConfigration, IModel>({
+
+  name: {
+    "type": SchemaTypes.String,
     "unique": true,
     "lowercase": true,
     "required": true,
     "minLength": 3,
     "maxLength": 30
   },
-
-  dependent: {
-    "type": Boolean,
-    "default": false
-  },
-  schemaOptions: {
-    "type": Object,
-  },
-  schemaObj: {
-    "type": Object,
-    "required":true
-  },
   routeName: {
-    "type": String,
+    "type": SchemaTypes.String,
     "unique": true,
     "lowercase": true,
     "minLength": 3,
-    "maxLength": 30
-  },
-  userAuth: {
-    "type": [String],
-    "default": []
-  },
-  adminAuth: {
-    "type": [String],
-    "default": []
-  },
-  plugins: {
-    "type": [String],
-    "default": []
-  },
-  modelTemplate: {
-    "type": String
-  },
-  listTemplate: {
-    "type": String
-  }
-};
-
-export const configTemplateProps: IModelConfigParameters = {
-  name: "config",
-  dependent: false,
-  schemaOptions: { timestamps: true, strict: true },
-  schemaObj: configTemplateSchema,
-  userAuth: ['list', 'get', 'create', 'update', 'delete', 'patch', 'search', 'count', 'routes', 'forms'],
-  adminAuth: ['list', 'get', 'create', 'update', 'patch', 'delete', 'search', 'count', 'routes', 'forms'],
-  plugins: ['comment', 'like']
-};
-
-export const roleConfigSchema = {
-  name: "role",
-  dependent: true,
-  userAuth: ['list', 'create', 'update', 'patch', 'delete', "search", "count"],
-  adminAuth: ['create', 'update', 'patch', 'delete', "search", "count"],
-  schemaObj: {
-    "name": {
-      "type": "String",
-      "unique": true,
-      "lowercase": true,
-      "required": true,
-      "minLength": 3,
-      "maxLength": 30,
-      "tag": "input",
-      "className": "form-control"
+    "maxLength": 30,
+    default: function () {
+      return pluralize(this.name);
     }
-  }
-}
-export const accConfgSchema:IModelConfigParameters = {
-  name: "account",
-  dependent: false,
-  schemaOptions: { timestamps: true, strict: true },
-  schemaObj: {
-
-    username: {
-      "type": String,
-      "unique": true,
-      "lowercase": true,
-      "required": true,
-      "minLength": 3,
-      "maxLength": 30
-    },
-    active: {
-      "type": Boolean,
-      "default": false
-    },
-    email: {
-      "type": String,
-      "unique": true,
-      "lowercase": true,
-      "required": true,
-      "minLength": 3,
-      "maxLength": 30
-    },
-    refreshToken: {
-      "type": String,
-      "minLength": 10,
-      "maxLength": 100
-    },
-    refreshTokenExpireAt: {
-      "type": Date
-    },
-    email_verified: {
-      "type": Boolean,
-      "default": false
-    },
-    firstname: {
-      "type": String,
-      "minLength": 3,
-      "maxLength": 50
-    },
-    lastname: {
-      "type": String,
-      "minLength": 3,
-      "maxLength": 50
-    },
-    last_login: {
-      "type": Date
-    },
-    roles: [
-      {
-        "type": mongoose.Types.ObjectId,
-        "ref": "role",
-        "autopopulate": true
-      }
-    ]
   },
-  userAuth: ['list', 'get', 'update', 'patch', 'delete', "search", "count"],
-  adminAuth: ['list', "search", "count"],
+  paramId: {
+    "type": SchemaTypes.String,
+    "minLength": 3,
+    "maxLength": 30,
+    default: function () {
+      return this.name + 'Id';
+    }
+  },
+  isArchieved: {
+    "type": Boolean,
+    default: false
+  },
+  disableRoutes: {
+    "type": Boolean,
+    default: false
+  },
+  queryKey: {
+    "type": String
+  },
+  tags: {
+    "type": [String],
+    default: []
+  },
+  schemaOptions: {
+    "type": SchemaTypes.Map,
+    of: String,
+    default: function () {
+      return new Map([['timestamps', true], ['strict', true], ['strictQuery', true]]);
+    }
+  },
+  schemaObj: {
+    "type": SchemaTypes.Mixed,
+    "required": true,
+    default: {}
+  },
+  recaptcha:{"type": SchemaTypes.Mixed},
+  endPoints: {
+    "type": [endPointSchema],
+    default: []
+  },
+  pagesize: {
+    "type": Number,
+    "default": 5,
+    min: 1,
+    max: 100
+  },
+  orderby: {
+    "type": String,
+    default: "createdAt",
+  },
+  sortorder: {
+    "type": String,
+    enum: ['asc', 'desc', 'ascending', 'descending', '1', '-1', -1, 1],
+    default: 'asc',
+  },
+  authorize: {
+    "type": Map,
+    of: Boolean,
+    default: {},
+    validate: {
+      validator: async function (v: Map<string, boolean>) {
+        let result = true;
+        for await (let i of v.keys()) {
+          if (!appActions.isFound(i)) {
+            result = false;
+            break;
+          }
+        }
+        return result;
+      },
+      message: (props) => `one of action key is not valid action!`
+    }
+  },
+  textSearch: {
+    "type": [String],
+    of: String,
+    "default": []
+  },
+  disabledActions: {
+    "type": [String],
+    of: String,
+    enum: appActions,
+    default: []
+  },
+  modelTemplates: {
+    "type": SchemaTypes.Map,
+    of: String
+  },
+
+}, { timestamps: true, strict: true, strictQuery: true }).index({ name: 'text' });
+
+
+
+configSchema.method('getRouteData', function getRouteData(): IRouteData {
+
+  let { name, routeName, paramId, pagesize, sortorder, orderby, authorize } = this;
+
+  return { name, routeName, paramId, pagesize, sortorder, orderby, authorize }
+});
+configSchema.method('getViewData', async function getViewData() {
+
+  let { queryKey, textSearch, tags, modelTemplates } = this;
+
+  return { queryKey, tags, textSearch, modelTemplates };
+});
+
+configSchema.statics = { toList, getMetaData, execWithSessionAsync };
+
+//configSchema.statics['getMetaData'] = getMetaData;
+
+const configTemplateProps: IConfigParameters = {
+  name: "config",
+  //disableRoutes: false,
+  queryKey: "name",
+  tags: [],
+  schemaOptions: { timestamps: true, strict: true },
+  schemaObj: {},
+  endPoints: [{
+    name: 'wow',
+    host: "https://auth.tuban.me/",
+    routes: [{
+      method: "get",
+      path: '.well-known/openid-configuration',
+
+    }]
+  }],
+  authorize:
+  {
+    "list": true,
+    "get": true,
+    "create": true,
+    "update": true,
+    "delete": true,
+    "search": true,
+    "count": true,
+    "addRoute": true,
+    "removeRoute": true,
+    "enableRoutes": true,
+    "disableRoutes": true,
+
+  }
+
 };
+
+export const configDb = model<IConfigration, IModel>("config", configSchema);
+/*
+configDb.execWithSessionAsync(async function(session){
+// run any job with session
+ await this.findByIdAndUpdate('fdfd',{},{session})
+}, async function() {
+  // run clean operation when error occur
+})
+*/
+
+/*
+// watch changes to Streams 
+configDb.watch().on('change',function(data){
+  data.
+console.log('<<<<<<<<<<<< Configration change stream logger >>>>>>>>>: \n',data)
+})
+*/
+
+configDb.findOne({ name: 'config' })
+  .then(async function (config) {
+
+    if (!config) {
+      config = await configDb.create(configTemplateProps);
+    }
+    // create routes
+    if (!config.disableRoutes)
+      new DefaultRoutesConfig(config, ConfigRoutesCallback)
+
+  });

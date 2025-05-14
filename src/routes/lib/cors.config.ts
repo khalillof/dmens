@@ -1,9 +1,9 @@
 import  Cors  from 'cors';
-import {envs} from '../../common/index.js'
+import {envs} from '../../common'
 
 //const corsOptions = (req:any, callback:Function)=> callback(null, {origin: config.cores_domains().indexOf(req.header('Origin')) !== -1});
     const getOptions=(origin:boolean)=> ({
-      origin,"methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      origin,"methods": "GET,HEAD,PUT,POST,DELETE",
       "preflightContinue": false,
       "optionsSuccessStatus": 204
     })

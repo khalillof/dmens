@@ -1,60 +1,19 @@
 import express from 'express';
-import { responce } from '../../common/index.js';
-import { Store } from '../../services/index.js';
-import { IMiddlewares } from '../../interfaces/index.js';
+import { envs, responces , IMiddlewares} from '../../common/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
-import { authenticate } from '../../services/index.js';
+import passport from 'passport';
 
-
-async function getUserFromReq(req: express.Request) {
-  return req.body && req.body.email ? await Store.db.get('account')!.model?.findOne({ email: req.body.email }) : null;
-}
-function checkLoginUserFields(req: express.Request, res: express.Response, next: express.NextFunction): void {
-  if (req.body) {
-    let { email, username, password } = req.body;
-    if (!username && email) { req.body.username = email };
-    if (!email && username) { req.body.email = username };
-
-    if (req.body.email && req.body.password) {
-      next();
-    } else {
-      responce(res).badRequest('Missing required body fields')
-    }
-  } else {
-    responce(res).badRequest('Missing required body fields')
-  }
-}
-
-async function validateSameEmailDoesntExist(req: express.Request, res: express.Response, next: express.NextFunction) {
-  await getUserFromReq(req) ? responce(res).badRequest('User email already exists') : next();
-}
-
-function validateCurrentUserOwnParamId(req: express.Request, res: express.Response, next: express.NextFunction) {
-  let user: any = req.user;
-  user && String(user._id) === String(req.params['id']) ? next() : responce(res).unAuthorized();
-}
-function validateBodyEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction) {
-  (req.user && req.body.email === req.user.email) ? next() : responce(res).unAuthorized();
-}
-
-function validateHasQueryEmailBelongToCurrentUser(req: any, res: express.Response, next: express.NextFunction) {
-  (req.user && req.query.email === req.user.email) ? next() : responce(res).forbidden('not authorized, require valid email');
-}
-
-async function userExist(req: express.Request, res: express.Response, next: express.NextFunction) {
-  await getUserFromReq(req) ? next() : responce(res).forbidden('User does not exist : ' + req.body.email);
-}
 
 function isAuthenticated(req: any, res: express.Response, next: express.NextFunction) {
-  req.user ? next() : responce(res).unAuthorized();
+  req.user ? next() : responces.unAuthorized(res);
 }
 
 function isInRole(roleName: string) {
   return async (req: any, res: express.Response, next: express.NextFunction) => {
     let user =req.user;
     if (!user) {
-      responce(res).forbidden('require authentication');
+      responces.forbidden(res);
       return;
     }
 
@@ -64,13 +23,13 @@ function isInRole(roleName: string) {
       next()
       return;
     } else {
-      responce(res).forbidden(`Require ${roleName} Role!`)
+      responces.forbidden(res)
       return;
     }
   }
 }
 
-const isAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => isInRole('Administrator')(req, res, next);
+const isAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => isInRole(envs.admin_role())(req, res, next);
 
 function isJson(req: express.Request, res: express.Response, next: express.NextFunction) {
 
@@ -86,22 +45,32 @@ function isJson(req: express.Request, res: express.Response, next: express.NextF
 
     fs.readFile(req.file.path, 'utf8', (err: any, data: any) => {
       if (err) {
-        responce(res).error(err);
+        responces.error(res,err);
       } else {
         toJsonNext(data);
       }
     });
   } else {
 
-    responce(res).badRequest('content must be valid application/json');
+    responces.badRequest(res);
   }
 }
-//}
+
+async function authorize(req:any, res:any, next:any) {
+  return passport.authenticate('jwt', function(err:any, user:any, info:any, status:any) {
+    //console.log(`error ==> ${err}\n, user ==> ${user}\n, info : ==> ${info} \n, status : ${status}`);
+    if(user){
+      req.user = user;
+     console.info('user id jwt ......', user)
+     // all clear
+     return next();
+    }else if (err || info) { return responces.error(res,(err ?? info))}
+     else { return responces.error(res,new Error('unknown error'),400) }
+     
+   })(req, res, next);
+ };
 //export default new Middlewares();
-const Middlewares: IMiddlewares = {
-  uploadSchema, authenticate, getUserFromReq, checkLoginUserFields, validateSameEmailDoesntExist,
-  validateCurrentUserOwnParamId, validateBodyEmailBelongToCurrentUser, validateHasQueryEmailBelongToCurrentUser,
-  userExist, isAuthenticated, isAdmin, isInRole, isJson
+export const Middlewares: IMiddlewares = {
+ authorize, uploadSchema, isAuthenticated, isAdmin, isInRole, isJson
 }
 
-export default Middlewares;
