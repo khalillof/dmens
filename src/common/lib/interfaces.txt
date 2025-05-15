@@ -3,18 +3,24 @@ import { Model, SortOrder , HydratedDocument, Schema, ClientSession} from 'mongo
 
 export type IDefaultActions = 'list'|'get'|'post'|'put'|'delete'|'search'|'count'|'metadata'|'route'|'viewdata'|'routedata'| 'deleteRoute';
 
+type MakeRequired<T> = {
+  [K in keyof T]-?: T[K];
+};
+
+export interface IPager {
+  limit?: number
+  orderby?: string
+  sort?: SortOrder
+}
 export interface IAction{
     action: IDefaultActions
     admin: boolean
 }
 
-export interface IRequestFilter{
+export interface IRequestFilter extends MakeRequired<IPager>{
   filter: Record<string, any>
   page: number
   total: boolean
-  pagesize: number
-  orderby: string
-  sortorder: SortOrder
 }
 
 export interface IModelForm {
@@ -91,7 +97,7 @@ export interface IEndPoint{
   host:string
   routes:IEndPointRoute[]
 }
-export interface IConfigParameters {
+export interface IConfigParameters extends IPager {
   name: string
   routeName?: string
   paramId?: string
@@ -103,10 +109,6 @@ export interface IConfigParameters {
   schemaObj: object
   schemaOptions?: Record<string, any>
   recaptcha?:object
-  pagesize?: number
-  orderby?: string
-  sortorder?: SortOrder
-
   authorize?:Record<string,boolean>
   endPoints?:IEndPoint[]
   
@@ -115,13 +117,10 @@ export interface IConfigParameters {
 };
 
   
-export interface IRouteData {
+export interface IRouteData extends MakeRequired<IPager> {
   name: string
   routeName: string
   paramId: string
-  pagesize: number
-  orderby: string
-  sortorder: SortOrder
   authorize:Map<string,boolean>
 }
 

@@ -56,24 +56,25 @@ export class DefaultController implements IController {
       return responces.data(res, data)
     }
   }
+  
   buildQuery(query: Record<string, any>): IRequestFilter {
     let con = this.config;
     if (query) {
       let queries: Record<string, any> = sanitizeFilter(query);
-      let { page, pagesize, orderby, sortorder, total } = queries;
-      pagesize ??= con.pagesize;
+      let { page, limit, orderby, sort, total } = queries;
+      limit ??= con.limit;
       page ??= 1;
       orderby ??= con.orderby;
-      sortorder ??= con.sortorder;
+      sort ??= con.sort;
       total ??= false;
 
       // clean filter
-      removeItemsFromObject(queries, ['page', 'size', 'sortorder', 'orderby', 'total']);
+      removeItemsFromObject(queries, ['page', 'limit', 'sort', 'orderby', 'total']);
 
-      return { filter: queries, page, pagesize, orderby, sortorder, total };
+      return { filter: queries, page, limit, orderby, sort, total };
     } else {
-      let { pagesize, orderby, sortorder } = con;
-      return { filter: {}, pagesize, page: 1, orderby, sortorder, total: false }
+      let { limit, orderby, sort } = con;
+      return { filter: {}, limit, page: 1, orderby, sort, total: false }
     }
   }
 

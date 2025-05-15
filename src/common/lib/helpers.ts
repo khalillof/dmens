@@ -2,8 +2,8 @@
 
 import { DefaultController } from '../../controllers/index.js';
 import express from 'express';
-import { IDefaultRoutesConfig, IMethod} from "./interfaces.js";
-import _ from "passport-local-mongoose";
+import { IDefaultRoutesConfig, IMethod} from "../../common/index.js";
+//import _ from "passport-local-mongoose";
 
 declare global {
   interface Array<T> {
