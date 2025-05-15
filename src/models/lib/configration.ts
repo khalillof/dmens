@@ -35,11 +35,11 @@ export const mongooseTypeMappings = {
 }
 // model static methos =======================
 export async function toList(this: IModel, query: IRequestFilter) {
-  let { filter, pagesize: size, page, orderby, sortorder } = query;
+  let { filter, limit, page, orderby, sort} = query;
   return await this.find(filter)
-    .skip((page - 1) * size)
-    .limit(size)
-    .sort({ [orderby]: sortorder }) // sort, use 1 for asc and -1 for dec
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({ [orderby]: sort }) // sort, use 1 for asc and -1 for dec
     .exec();
 }
 
@@ -202,7 +202,7 @@ export const configSchema = new Schema<IConfigration, IModel>({
     "type": [endPointSchema],
     default: []
   },
-  pagesize: {
+  limit: {
     "type": Number,
     "default": 5,
     min: 1,
@@ -212,7 +212,7 @@ export const configSchema = new Schema<IConfigration, IModel>({
     "type": String,
     default: "createdAt",
   },
-  sortorder: {
+  sort: {
     "type": String,
     enum: ['asc', 'desc', 'ascending', 'descending', '1', '-1', -1, 1],
     default: 'asc',
@@ -257,9 +257,9 @@ export const configSchema = new Schema<IConfigration, IModel>({
 
 configSchema.method('getRouteData', function getRouteData(): IRouteData {
 
-  let { name, routeName, paramId, pagesize, sortorder, orderby, authorize } = this;
+  let { name, routeName, paramId, limit, sort, orderby, authorize } = this;
 
-  return { name, routeName, paramId, pagesize, sortorder, orderby, authorize }
+  return { name, routeName, paramId, limit, sort, orderby, authorize }
 });
 configSchema.method('getViewData', async function getViewData() {
 
