@@ -7,7 +7,7 @@ export async function ConfigRoutesCallback(this: IDefaultRoutesConfig) {
     await this.defaultRoutes();
 
     // ------ /configs/:name/viewData
-    for await (let action of ['metadata', 'routes', 'viewdata', 'routedata']) {
+    for await (let action of ['metadata', 'routes', 'viewdata']) {
         await this.addRoute('get', ':modelName/' + action, action);
     }
 
@@ -17,7 +17,7 @@ export async function ConfigRoutesCallback(this: IDefaultRoutesConfig) {
     
     await this.addRoute('post', ':modelName/routes/defult', 'enableRoutes');
     await this.addRoute('delete', ':modelName/routes/default', 'disableRoutes');
-    ["viewsdata", "routesdata"].forEach(async (action) => await this.addRoute('get', 'data/'+action, action));
+    ["viewsdata"].forEach(async (action) => await this.addRoute('get', 'data/'+action, action));
 
     this.router.param("modelName", (req: Request, res: Response, next: NextFunction, name: string) => {
         if(mongoose.models[name]){

@@ -5,177 +5,181 @@ import seeds from '../seeds.json' with { type: "json" } ;
 import {posts} from './posts.js'
 import {  init_models} from '../../models/index.js';
 
-/////////////////
-const dbOptions = {
-  //rejectUnauthorized: true,
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  //retryWrites: false
-};
 
-export async function dbInit() {
-    try {
+export async function dbInit(): Promise<void> {
+  try {
+    envs.logLine(`📡 Connecting to MongoDB: ${envs.databaseUrl()}`);
+    await mongoose.connect(envs.databaseUrl());
+    console.log('✅ Successfully connected to MongoDB');
 
-      envs.logLine('db connction string :' + envs.databaseUrl());
+    envs.logLine('🔧 Initializing models...');
+    await init_models();
 
-      await mongoose.connect(envs.databaseUrl())
-      console.log("Successfully Connected to db!");
+    const registeredModels = Object.keys(mongoose.models);
+    envs.logLine(`📦 Models registered: ${registeredModels.join(', ')}`);
+    envs.logLine(`🧠 AppData size: ${appData.size}`);
 
-      // Create Configration - Account - default directory  db models and routes
-    await  init_models()
+    if (envs.isDevelopment){
+    envs.logLine('🌱 Starting database seeding...');
+    const seeder = new ClientSeedDatabase();
+    await seeder.init();
 
-     envs.logLine(`Numbers of models on the database are : ${appData.size}`);
-
-    } catch (err: any) {
-      console.error(err);
-      process.exit(1);
-    }
+    envs.logLine('🎉Database Seeding complete....');
+  }
+  
+  } catch (err: any) {
+    console.error('❌ Error during DB init:', err);
+    process.exit(1);
+  }
 }
 
 export class ClientSeedDatabase {
+  private accountsCache: mongoose.Types.ObjectId[] = [];
 
-    async init(dev=envs.isDevelopment) {
-        envs.logLine('started database seeding ..!');
-       if(dev){
-        await this.addAccounts();
-        await this.addCateories();
-        await this.addContacts();
-        await this.addmessages();
-        await this.addPosts();
-        await this.addComments(); 
-       }else{
-        await this.addAccounts();
-       }
-        envs.logLine('finished database seeding ..!');
-    }
-    accountsCache: any[] = [];
+  async init(): Promise<void> {
+
+    await this.addAccounts();
+    await this.addCategories(),
+    await this.addContacts(),
+    await this.addMessages()
+    await this.addPosts();
+    await this.addComments();
+    
+    envs.logLine('Finished database seeding!');
+  }
 
 
-    async addAccounts() {
-        this.saver('account', seeds.accounts)
-    }
+  private async addAccounts(): Promise<void> {
+    const result = await this.saver('account', seeds.accounts);
+    this.accountsCache = result.map((doc: any) => doc._id);
+  }
 
-    async addContacts() {
-        return await this.saver('contact', seeds.contacts)
-    }
-    async addCateories() {
-        return await this.saver('category', seeds.categories);
-    }
+  private async addContacts(): Promise<void> {
+    await this.saver('contact', seeds.contacts);
+  }
 
-    async addPosts() {
+  private async addCategories(): Promise<void> {
+    await this.saver('category', seeds.categories);
+  }
 
-        const [authors_Ids, catIds] = await Promise.all([this.getUsersIDs(), this.getIDs('category')])
-        let ppps = posts;
-        if (authors_Ids && catIds) {
-            // loop over userids
-            this.loopOverSequence(authors_Ids.length, ppps.length, (IDindex: number, itemIndex: number) => {
-                ppps[itemIndex].author = authors_Ids![IDindex];
-                ppps[itemIndex].publisheDate = new Date()
-            })
-            // loop over category ids
-            this.loopOverSequence(catIds.length, ppps.length, (IDindex: number, itemIndex: number) => {
-                ppps[itemIndex].category = catIds![IDindex];
-            })
-        } else {
-            console.log('post seed did not succeed no authors ids or categoty ids')
-        }
-        await this.saver('post', ppps)
+  private async addMessages(): Promise<void> {
+    const authorsIds = await this.getUsersIDs();
+    const messages = structuredClone(seeds.messages);
 
-    }
+    this.loopOverSequence(authorsIds.length, messages.length, (i, j) => {
+      messages[j].recipient = authorsIds[i] as any;
+      messages[j].sender = authorsIds[i] as any;
+    });
 
-    async addComments() {
-        const [authors_ids, posts_ids] = await Promise.all([this.getUsersIDs(), this.getIDs('post')])
+    await this.saver('message', messages);
+  }
 
-        let comments = seeds.comments
-        if (authors_ids && posts_ids) {
-            // loop over autherIds
-            this.loopOverSequence(authors_ids.length, comments.length, (IDindex: number, itemIndex: number) => {
-                comments[itemIndex].user = authors_ids![IDindex];
-            })
-            // loop over post ids
-            this.loopOverSequence(posts_ids.length, comments.length, (IDindex: number, itemIndex: number) => {
-                comments[itemIndex].modelid = posts_ids[IDindex]
-            })
+  private async addPosts(): Promise<void> {
+    const authorIds = await this.getUsersIDs();
+    const categoryIds = await this.getIDs('category');
 
-
-        } else {
-            console.log('comments seed did not succeed no authors or posts')
-        }
-
-        await this.saver('comment', comments);
+    if (!authorIds.length || !categoryIds.length) {
+      console.warn('Post seed skipped: missing authors or categories');
+      return;
     }
 
-    addmessages() {
-        return new Promise(async (resolve) => {
-            let authors_ids = await this.getUsersIDs();
+    const postData = structuredClone(posts);
 
-            let mms = seeds.messages;
-            this.loopOverSequence(authors_ids.length, seeds.messages.length, (IDindex: number, itemIndex: number) => {
+    this.loopOverSequence(authorIds.length, postData.length, (i, j) => {
+      postData[j].author = authorIds[i] as any;
+      postData[j].publisheDate = new Date();
+    });
 
-                mms[itemIndex].recipient = authors_ids![IDindex];
-                mms[itemIndex].sender = authors_ids![IDindex];
-                //return ms
-            })
-            resolve(await this.saver('message', mms))
-        })
+    this.loopOverSequence(categoryIds.length, postData.length, (i, j) => {
+      postData[j].category  = categoryIds[i] as any;
+    });
+
+    await this.saver('post', postData);
+  }
+
+  private async addComments(): Promise<void> {
+    const authorIds = await this.getUsersIDs();
+    const  postIds = await this.getIDs('post');
+
+    if (!authorIds.length || !postIds.length) {
+      console.warn('Comment seed skipped: missing authors or posts');
+      return;
     }
 
+    const comments = structuredClone(seeds.comments);
 
-    countDb(dbName: string, callback: asyncCallback) {
-        return new Promise(async (resolve) => {
-            let Db = mongoose.models[dbName]!;
-            Db.estimatedDocumentCount().then( async (count: number) => {
-                if (count === 0) {
-                    callback && resolve(await callback(Db))
-                } else if(count > 0) {
-                    resolve(console.log(dbName + ' : already on database'))
-                }
-            }).catch((err:any)=> resolve(console.log(err.stack)));
-        })
-    }
-    async getUsersIDs() {
-        return this.accountsCache.length ? this.accountsCache.map((d: any) => d._id) : await this.getIDs('account');
-    }
+    this.loopOverSequence(authorIds.length, comments.length, (i, j) => {
+      comments[j].user = authorIds[i] as any;
+    });
 
-    async getIDs(name: string, filter?: {}) {
-        return (await mongoose.models[name]?.find(filter!)!).map((md: any) => md._id);
-    }
+    this.loopOverSequence(postIds.length, comments.length, (i, j) => {
+      comments[j].modelid = postIds[i] as any;
+    });
 
-    async saver(dbName: string, objArr: any[]) {
-        await this.countDb(dbName, async (db:any) => {
-            await Promise.all(objArr.map(async (obj: any) => await new db(obj).save()))
-            console.log('finished seeding ' + dbName)        
-        })
-    }
+    await this.saver('comment', comments);
+  }
 
-    logger(err: any, obj: any) {
-        err ? console.log("seed  error :", err) : console.log(`added item to the collection`);
-    }
+  private async getUsersIDs(): Promise<mongoose.Types.ObjectId[]> {
+    return this.accountsCache.length
+      ? this.accountsCache
+      : await this.getIDs('account');
+  }
 
-    randomObject(objs: any[]) {
-        let len = objs.length
-        if (len === 0)
-            return objs[0]
+  private async getIDs(modelName: string, filter: Record<string, any> = {}): Promise<mongoose.Types.ObjectId[]> {
+    const model = mongoose.models[modelName];
+    if (!model) return [];
+    const docs = await model.find(filter).select('_id').lean();
+    return docs.map((doc: any) => doc._id);
+  }
 
-        let i = Math.floor(Math.random() * len) + 1;
-        return objs[i]
+  private async saver(modelName: string, dataArray: Record<string, any>[]): Promise<Document[]> {
+    const model = mongoose.models[modelName];
+    if (!model) {
+      console.error(`Model ${modelName} not found.`);
+      return [];
     }
 
-    // infinate loop over sequence of IDs to be maped to length of items length
-    loopOverSequence(IdsLen: number, itemsLen: number, callback: Function) {
-        let index = 0;
-        let itemsIndex = 0;
+    try {
+      const count = await model.countDocuments();
+      if (count > 0) {
+        console.log(`${modelName}: already seeded`);
+        return [];
+      }
 
-        if (!IdsLen || !itemsLen || IdsLen === 0 || itemsLen === 0)
-            return;
+      const results = await Promise.allSettled(
+        dataArray.map(data => new model(data).save())
+      );
 
-        while (itemsIndex < itemsLen) {
-            callback(index, itemsIndex)
-            index++
-            itemsIndex++
+      const successful = results
+        .filter(r => r.status === 'fulfilled')
+        .map(r => (r as PromiseFulfilledResult<Document>).value);
 
-            if (index >= IdsLen)
-                index = 0
-        }
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length) {
+        console.error(`${failed.length} ${modelName} items failed to seed`);
+      }
+
+      console.log(`Finished seeding ${modelName}`);
+      return successful;
+    } catch (err) {
+      console.error(`Error seeding ${modelName}:`, err);
+      return [];
     }
+  }
+
+  private loopOverSequence(idLen: number, itemLen: number, callback: (idIndex: number, itemIndex: number) => void): void {
+    if (!idLen || !itemLen) return;
+
+    let i = 0;
+    for (let j = 0; j < itemLen; j++) {
+      callback(i, j);
+      i = (i + 1) % idLen;
+    }
+  }
+
+  private randomObject<T>(arr: T[]): T | null {
+    if (!arr.length) return null;
+    const i = Math.floor(Math.random() * arr.length);
+    return arr[i];
+  }
 }

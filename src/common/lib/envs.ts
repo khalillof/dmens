@@ -59,9 +59,9 @@ export const envs = {
     jwtSecret:()=> getOr('JWT_SECRET'),
     jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
     jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
-    issuer:  ()=> getOr('ISSUER'),
-    jwks_uri:()=> getOr('JWKS_URI', `${envs.issuer()}jwks`),
-    audience: ()=> getOr('AUDIENCE'), //'yoursite.net'
+    issuers :()=> getOr('ISSUERS', [])?.split(',').map((e:string) => e.trim()),
+    audiences:()=>  getOr('AUDIENCES', [])?.split(',').map((e:string) => e.trim()), //['your-client-id'],
+    jwks_uri:()=> getOr('JWKS_URI', `${envs.issuers()[0]}jwks`),
     schemaDir: ()=> getOr('SCHEMA_DIR',getAbsolutePath('models/schema')),
     getSchemaUploadPath: (name:string | any)=> path.join(envs.schemaDir(),`${name}.${Date.now()}.json`),
     imagesUploadDir: ()=> getOr('IMAGES_UPLOAD_DIR',getAbsolutePath('public/images')),

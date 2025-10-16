@@ -1,7 +1,7 @@
 import { IRequestVerpsAsync, IRequestVerps } from "./types.js";
 
 export interface IMiddlewares {
-  authorize: IRequestVerpsAsync;
+  //authorize: IRequestVerpsAsync;
   uploadSchema: IRequestVerps;
   isAuthenticated: IRequestVerps;
   isJson: IRequestVerps;

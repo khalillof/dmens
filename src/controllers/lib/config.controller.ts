@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DefaultController } from './default.controller.js';
 import { appData, responces, IConfigration, IConfigParameters, IConfigController, IMethod, appMethods, appActions } from '../../common/index.js';
-import { createMangedInstance, createRouteInstance } from '../../models/index.js';
+import { createMangedInstance, createRouteInstance, getMetaData } from '../../models/index.js';
 import mongoose from 'mongoose';
 
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
@@ -41,23 +41,27 @@ export class ConfigController extends DefaultController implements IConfigContro
     async viewdata(req: Request, res: Response, next: NextFunction) {
         let name = req.params['modelName'];
 
-        if (name) {
-            let vd = (await this.db.findOne({ name }))?.getViewData()
-            return responces.data(res, vd);
+        if (name && name !== 'config') {
+            let view_data : any = (await this.db.findOne({ name }))?.getViewData();
+             view_data['metaData']  = await appData.get(name)?.controller.db.getMetaData();
+
+            return responces.data(res, view_data);
+        }else if(name && name === 'config'){
+            
+            return responces.badRequest(res);
         }
 
         return responces.notFound(res);
     }
-
-    async routedata(req: Request, res: Response, next: NextFunction) {
-        let name = req.params['modelName'];
-
-        if (name) {
-            let vd = (await this.db.findOne({ name }))?.getRouteData()
-            return responces.data(res, vd);
-        }
-
-        return responces.notFound(res);
+     // /http://localhost:8000/api/configs/data/viewsdata?isArchieved=false&limit=6
+    //http://localhost:8000/api/configs/data/viewsdata?isArchieved=false&tags=tuban&limit=2
+    async viewsdata(req: Request, res: Response, next: NextFunction) {
+        let query = this.buildQuery!(req.query === null ? { isArchieved: false } : req.query);
+          
+        let items = await this.db.toList(query);
+        let result = await Promise.all(items.map(async item =>  await item.getViewData()));
+        //console.log(data)
+        return responces.data(res, result)
     }
     async getRoutesPathMethods(req: Request, res: Response, next: NextFunction) {
         let name = req.params['modelName'];
@@ -165,19 +169,7 @@ export class ConfigController extends DefaultController implements IConfigContro
          return responces.success(res)
     }
 
-    async viewsdata(req: Request, res: Response, next: NextFunction) {
-        let vdata: any = [];
-        vdata = (await this.db.find(req.query ?? { isArchieved: false })).map((c) => c.getViewData());
-        //console.log(data)
-        return responces.data(res, vdata)
-    }
     // http://localhost:8000/api/configs/routesdata?archieve=false&tags=tuban
-    async routesdata(req: Request, res: Response, next: NextFunction) {
-        let rdata: any = [];
-        rdata = (await this.db.find(req.query ?? { isArchieved: false })).map((c) => c.getRouteData());
-        //console.log(data)
-        return responces.data(res, rdata)
-    }
 
     override  async create(req: Request, res: Response, next: NextFunction) {
         let conf: IConfigParameters = req.body;
@@ -212,7 +204,7 @@ export class ConfigController extends DefaultController implements IConfigContro
        return responces.notFound(res);
     }
 
-    override  async delete(req: Request, res: Response, next: NextFunction) {
+    override  async delete(req: any, res: Response, next: NextFunction) {
         let _id = req.params[this.config.paramId!];
         let exist:IConfigration = await this.db.exists({_id}) as any;
         if(_id && exist ){

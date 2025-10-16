@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import { Middlewares } from '../../middlewares/index.js';
 import { responces, IActiveRoutes, IController, IDefaultRoutesConfig, IMethod, IRouteCallback, appData, IConfigration, IRouteManager, appMethods } from '../../common/index.js';
 import { ConfigController, DefaultController } from '../../controllers/index.js';
-//import { appRouter } from '../../index.js'
 import { Request, Response, NextFunction, IRouter , Router} from "express";
 import { corsWithOptions } from "./cors.config.js";
 import { RouteManager } from "./routeManager.js";
+import {oidcJwtMiddleware} from "../../services/lib/auth.js"
 
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig {
@@ -110,7 +110,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
           let { method, paramId, authorize, admin, path } = route;
           path = paramId ? name + '/:' + paramId : name;
 
-          let middlewares = authorize ? [Middlewares.authorize] : []
+          let middlewares = authorize ? [oidcJwtMiddleware()] : []
           admin && middlewares.push(Middlewares.isAdmin);
           middlewares.push(this.actions("endPoint", [host, route]));
 
@@ -121,7 +121,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   }
   async setMiddlewars(action: string, middlewares: string[] = []): Promise<any> {
     let mdl: any = Middlewares;
-
+        mdl.authorize = oidcJwtMiddleware();
     // check if require auth
     if(this.config.authorize.has(action)){
       middlewares.push('authorize');

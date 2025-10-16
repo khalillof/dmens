@@ -1,26 +1,9 @@
 import { Model, SortOrder } from 'mongoose';
 import { Response } from 'express';
 import { IMongooseTypes } from './types.js';
+import { IPager } from './config.js';
 
-export interface IPager {
-  limit?: number;
-  orderby?: string;
-  sort?: SortOrder;
-}
 
-export interface IRouteData extends Required<IPager> {
-  name: string
-  routeName: string
-  paramId: string
-  authorize:Map<string,boolean>
-}
-export interface IViewData {
-  queryKey?: string
- // metaData: IMetaData
-  tags:string[]
-  textSearch?: string[]
-  modelTemplates?: Record<string,string>
-}
 export interface IPropertyInfo {
   name: string
   schemaType: IMongooseTypes
@@ -66,13 +49,6 @@ export interface IActiveRoutes {
   put: string[];
   delete: string[];
   options: string[];
-}
-
-// Common sort/pagination options
-export interface IPager {
-  limit?: number;
-  orderby?: string;
-  sort?: SortOrder;
 }
 
 // Required request filter based on pager
