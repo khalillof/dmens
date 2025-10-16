@@ -5,13 +5,11 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import compression from 'compression';
-import express, { Router } from 'express';
-import session from 'express-session';
+import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import passport from 'passport';
-import { PassportStrategies } from './models/index.js';
-import { dbInit, ClientSeedDatabase, } from './services/index.js';
+//import { PassportStrategies } from './models/index.js';
+import { dbInit} from './services/index.js';
 import { corsWithOptions} from './routes/index.js';
 import { httpServer } from './bin/www.js';
 
@@ -40,7 +38,8 @@ app.use(compression());
   // request looger using a predefined format string
   app.use(morgan(envs.isDevelopment ? 'dev' : 'combined')) // dev|common|combined|short|tiny
 
-
+/*
+// require express-sesion library
   app.use(session({
     secret: envs.secretKey(),
     resave: false,
@@ -51,24 +50,14 @@ app.use(compression());
       httpOnly: true,
     }
   }));
-
+*/
   app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" }
   }));
 
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  // strategy jwt
-  passport.use(await PassportStrategies.getAuthStrategy());
-  //==============================
-
   // create database models
   await dbInit();
-
-  // seed database
-  await new ClientSeedDatabase().init();
 
 })()
   .then(async () => {

@@ -1,5 +1,19 @@
-import { IPager ,IRouteData} from "./common.js";
+import { SortOrder } from "mongoose";
 import { IEndPoint } from "./endpoint.js";
+
+export interface IPager {
+  limit?: number;
+  orderby?: string;
+  sort?: SortOrder;
+}
+
+export interface IRouteData extends Required<IPager> {
+  name: string
+  routeName: string
+  paramId: string
+  disableRoutes: boolean;
+  authorize:Map<string,boolean>
+}
 
 
 export interface IConfigParameters extends IPager {
@@ -17,12 +31,11 @@ export interface IConfigParameters extends IPager {
   authorize?: Record<string, boolean>;
   endPoints?: IEndPoint[];
   textSearch?: string[];
-  modelTemplates?: Record<string, string>;
+  templates?: Record<string, string>;
 }
 
 export interface IConfigration extends IRouteData {
   _id: string;
-  disableRoutes: boolean;
   isArchieved: boolean;
   endPoints: IEndPoint[];
   schemaObj: Record<string, any>;
@@ -31,8 +44,8 @@ export interface IConfigration extends IRouteData {
   tags: string[];
   disabledActions: string[];
   queryKey?: string;
-  textSearch?: string[];
-  modelTemplates?: Map<string, string>;
+  textSearch: string[];
+  templates: Map<string, string>;
   createdAt: Date;
   updatedAt: Date;
   __v: number;

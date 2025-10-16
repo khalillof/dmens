@@ -2,7 +2,6 @@ import express from 'express';
 import { envs, responces , IMiddlewares} from '../../common/index.js';
 import { uploadSchema } from '../../routes/index.js';
 import fs from 'fs';
-import passport from 'passport';
 
 
 function isAuthenticated(req: any, res: express.Response, next: express.NextFunction) {
@@ -55,7 +54,7 @@ function isJson(req: express.Request, res: express.Response, next: express.NextF
     responces.badRequest(res);
   }
 }
-
+/*
 async function authorize(req:any, res:any, next:any) {
   return passport.authenticate('jwt', function(err:any, user:any, info:any, status:any) {
     //console.log(`error ==> ${err}\n, user ==> ${user}\n, info : ==> ${info} \n, status : ${status}`);
@@ -69,8 +68,9 @@ async function authorize(req:any, res:any, next:any) {
      
    })(req, res, next);
  };
+ */
 //export default new Middlewares();
 export const Middlewares: IMiddlewares = {
- authorize, uploadSchema, isAuthenticated, isAdmin, isInRole, isJson
+ uploadSchema, isAuthenticated, isAdmin, isInRole, isJson
 }
 

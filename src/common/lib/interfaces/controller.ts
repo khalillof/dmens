@@ -24,13 +24,9 @@ export interface IController {
 export interface IConfigController extends IController {
   metadata: IRequestVerpsAsync;
   viewdata: IRequestVerpsAsync;
-  routedata: IRequestVerpsAsync;
   routes: IRequestVerpsAsync;
-  routesdata: IRequestVerpsAsync;
-
   addRoute: IRequestVerpsAsync;
   removeRoute: IRequestVerpsAsync;
-
   enableRoutes: IRequestVerpsAsync;
   disableRoutes: IRequestVerpsAsync;
 }

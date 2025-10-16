@@ -162,13 +162,13 @@ export class DefaultController implements IController {
        return responces.notFound(res);
   }
 
-  async delete(req: Request, res: Response, next: NextFunction) {
+  async delete(req: any, res: Response, next: NextFunction) {
     let item = await this.db.findByIdAndDelete(req.params[this.config.paramId]);
     console.warn(`item deleted by user: \n ${req.user} \nItem deleted :\n${item}`)
     responces.success(res)
   }
 
-  async test(req: Request, res: Response, next: NextFunction) {
+  async test(req: any, res: Response, next: NextFunction) {
     console.log('this test method =======================>>>')
     responces.data(res, req.user)
   }

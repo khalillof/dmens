@@ -1,6 +1,7 @@
 "use strict";
 import { SchemaTypes, Schema, model} from 'mongoose';
-import {pluralize, IEndPoint, IEndPointRoute, IConfigration, IConfigParameters, IMetaData, IModel, IRequestFilter, IRouteData, appActions, IExecWithSessionCallback, ICleanExecWithSessionCallback } from '../../common/index.js';
+import {pluralize, IEndPoint, IEndPointRoute, IConfigration, IConfigParameters, IMetaData, IModel, 
+  IRequestFilter, IRouteData, appActions, IExecWithSessionCallback, ICleanExecWithSessionCallback } from '../../common/index.js';
 import { ConfigRoutesCallback, DefaultRoutesConfig } from '../../routes/index.js';
 
 // https://www.slingacademy.com/article/sorting-results-in-mongoose-by-date/
@@ -91,7 +92,7 @@ export async function getMetaData(this: IModel, _schema?: Schema): Promise<IMeta
     } else {
       delete options['type'];
 
-      properties[path] = { instance, options: { ...options } };
+      properties[path] = { instance, options };
     }
   });
 
@@ -246,26 +247,22 @@ export const configSchema = new Schema<IConfigration, IModel>({
     enum: appActions,
     default: []
   },
-  modelTemplates: {
-    "type": SchemaTypes.Map,
-    of: String
+  templates: {
+     "type": Map,
+      of: String,
+    default: {}
+
   },
 
 }, { timestamps: true, strict: true, strictQuery: true }).index({ name: 'text' });
 
 
-
-configSchema.method('getRouteData', function getRouteData(): IRouteData {
-
-  let { name, routeName, paramId, limit, sort, orderby, authorize } = this;
-
-  return { name, routeName, paramId, limit, sort, orderby, authorize }
-});
 configSchema.method('getViewData', async function getViewData() {
+  let { name,routeName,paramId,disableRoutes,authorize,limit,orderby,sort,tags,
+    disabledActions,queryKey,textSearch,templates,createdAt,updatedAt } = this;
 
-  let { queryKey, textSearch, tags, modelTemplates } = this;
-
-  return { queryKey, tags, textSearch, modelTemplates };
+  return { name,routeName,paramId,disableRoutes,authorize,limit,orderby,sort,tags,
+    disabledActions,queryKey,textSearch,templates,createdAt,updatedAt };
 });
 
 configSchema.statics = { toList, getMetaData, execWithSessionAsync };

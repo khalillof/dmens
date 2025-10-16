@@ -1,0 +1,40 @@
+
+
+http://localhost:8000/api/contacts
+
+GET https://example.com/comments/1 HTTP/1.1
+
+###
+
+GET https://example.com/topics/1 HTTP/1.1
+
+###
+GET http://localhost:8000/api/contacts HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQV0trMi0zU01nb0dRRTBHSVJPeTNxbDM1YWwwMVJ0UWszb2RrMGVCZjRJIn0.eyJleHAiOjE3NjA2MzM0OTQsImlhdCI6MTc2MDYzMzE5NCwianRpIjoib25ydHJ0OmVkOWFhNWNmLWRiNjMtZTFlYy1iODNhLTBmNDE4OWE4NTA3ZSIsImlzcyI6Imh0dHBzOi8vYXV0aC50dWJhbi5tZS9yZWFsbXMvYXV0aCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImNhZjk5NmJiMWM3MDQ3Y2RiZjc0ZjJkYzE3ZDg1NjU3Iiwic2lkIjoiYjNjZjQ3OGEtMDdmOC00Mjg3LTlkYmMtNmU2MjQzODk4MTAzIiwic2NvcGUiOiJvcGVuaWQgZG1lbnMucmVhZCByb2xlcyJ9.o8FJTAZsun-84BqTPI5c2_6dm6XDlha0vOV78m6_JeB-z5DbbXscCXJDCFR-antJgSl0RAvvRytTWVJO1SW2qq5sJTsmlkiIkaz8yIeeLifM1rkt1k994OxfbjfHteNZxlQ6YSL9IE_mxF59uYq2gDZUPmY1nRbyQN0Nq9_IkRFA6wHtta1kOVnuq7x34AGi1xofKiIMw8j6pyXPhwVyzvJo73nayFdOuVZmMPv3ilWoyCedsHef37tVY9GSS6dGPdU4CA8K_bEHaUx4sxrcAC1LyNOhv4Nm-eqQKSJmTNXPgChNP2JndQ-KVb5zCTxwveu4UewjOcWoK9ZWWfFxBQ
+
+###
+POST https://api.tuban.me/api/contacts HTTP/1.1
+Content-Type: application/json
+Authorization: Barear eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQV0trMi0zU01nb0dRRTBHSVJPeTNxbDM1YWwwMVJ0UWszb2RrMGVCZjRJIn0.eyJleHAiOjE3NjA2MzI2NjEsImlhdCI6MTc2MDYzMjM2MSwianRpIjoib25ydGFjOmQxYzMxNWNmLTk5NWItNjA5ZC05MDVhLTk0YWE0ZWFhNGI3MiIsImlzcyI6Imh0dHBzOi8vYXV0aC50dWJhbi5tZS9yZWFsbXMvYXV0aCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImNhZjk5NmJiMWM3MDQ3Y2RiZjc0ZjJkYzE3ZDg1NjU3Iiwic2lkIjoiYjNjZjQ3OGEtMDdmOC00Mjg3LTlkYmMtNmU2MjQzODk4MTAzIiwic2NvcGUiOiJvcGVuaWQgZG1lbnMucmVhZCByb2xlcyJ9.X5s_7UzejH_-rq9HBOumSk3VTD56gYXDkldtLNE5iz-l4PXliW1RQZ7ILkb1zfGbe_lByngyBXhLsDngn71-_C6Om1B63I6Z7i1cBE8CY8pQ-tDY2CS_PmMYhzurZlyx8OJHeIVHC72V9lrgFVopbHH99mVIfBrxi1j0fQ6Lq0MNmsDkdb_zJL47uvv70VUKc1dBka74PHKjTfLxtCMsXESimG4A8cIHZSKkvnFNOUEFuB1GntGZLyAGjdTzWyW2qV92q7kVPjeWe-_3dRhwQatRnZfpGY6KPc9jVyufgFYx4ozoiKG7MRRG8V4Wdy1SScDMBLvrsL__BrXSawyz8w
+
+//{
+//    "name": "sample",
+ //   "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+//}
+###
+//Query Strings
+//You can always write query strings in the request line, like:
+
+GET https://example.com/comments?page=2&pageSize=10
+
+
+// requeswt body
+POST https://example.com/comments HTTP/1.1
+Content-Type: application/xml
+Authorization: token xxx
+
+<request>
+    <name>sample</name>
+    <time>Wed, 21 Oct 2015 18:27:50 GMT</time>
+</request>

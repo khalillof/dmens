@@ -68,8 +68,10 @@ export async function createFromJsonFile(filePath: string): Promise<any> {
 export async function createFromDirectory(directory: string = envs.schemaDir()) {
 
   if (fs.existsSync(directory)) {
+    
     return await Promise.all(fs.readdirSync(directory).map(async (fileName: string) => {
       let _file = path.join(directory, fileName);
+      
       if (isJsonFile(_file)) {
         return await createFromJsonFile(_file);
       }
@@ -81,6 +83,7 @@ export async function createFromDirectory(directory: string = envs.schemaDir()) 
     return null;
   }
 }
+
 /*
 export async function createConfigInstance(config: IConfigParameters, cleanJob?: ICleanExecWithSessionCallback): Promise<IConfigration> {
 
