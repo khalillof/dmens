@@ -40,7 +40,7 @@ export const envs = {
     getAbsolutePath,
     port:()=> getOr('PORT',3000),
     admin_role : ()=> getOr("ADMIN_ROLE","admin"),
-    accessRoles:()=>  getOr('Access_Roles', [envs.admin_role()])?.split(',').map((e:string) => e.trim()),
+    accessRoles:()=>  getOr('Access_Roles', [getOr("ADMIN_ROLE","admin")])?.split(',').map((e:string) => e.trim()),
     admin_email:()=> getOr('ADMIN_EMAIL', ''),
     admin_userName: ()=> getOr('ADMIN_USERNAME',''),
     admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
