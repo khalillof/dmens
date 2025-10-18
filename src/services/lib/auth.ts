@@ -9,14 +9,15 @@ interface IauthConfig {
   localPublicKeys?: string[]; // PEM-encoded public keys
   expectedIssuers: string[];
   expectedAudiences: string[];
-  requiredRoles?: string[]; // Optional RBAC
+  accessRoles?: string[]; // Optional RBAC
 }
 
 
-const authConfig: IauthConfig = {
+var authConfig: IauthConfig = {
   jwksUri: envs.jwks_uri() as string,
   expectedIssuers: envs.issuers(),
-  expectedAudiences: envs.audiences() // ['your-client-id'],
+  expectedAudiences: envs.audiences(), // ['your-client-id'],
+  accessRoles: envs.accessRoles()
   //localPublicKeys: [process.env.LOCAL_PUBLIC_KEY_PEM!],
 };
 
@@ -36,20 +37,20 @@ function validateClaims(payload: any) {
 }
 
 function validateRoles(payload: any) {
-  if (!authConfig.requiredRoles || authConfig.requiredRoles.length === 0) return;
+  if (!authConfig.accessRoles || authConfig.accessRoles.length === 0) return;
 
   const userRoles: string[] = payload.roles || [];
-  const hasRole = authConfig.requiredRoles?.some(role => userRoles.includes(role));
+  const hasRole = authConfig.accessRoles?.some(role => userRoles.includes(role));
   if (!hasRole) throw new Error('Insufficient role');
 }
 
-export function oidcJwtMiddleware() {
+export function oidcJwtMiddleware(requireAdminRole?:boolean) {
   const { jwks, localKeys } = createVerifiers();
 
   return async (req: any, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized or Missing Authorization header Bearer ' });
+      return res.status(401).json({ error: 'Unauthorized - Missing Authorization header Bearer ' });
     }
 
     const token = authHeader.split(' ')[1];
@@ -61,7 +62,10 @@ export function oidcJwtMiddleware() {
       });
 
       validateClaims(payload);
+      
+      if(requireAdminRole)
       validateRoles(payload);
+
       req.user = payload;
       return next();
     } catch (jwksErr:any) {
@@ -80,7 +84,7 @@ export function oidcJwtMiddleware() {
         }
       }
 
-      return res.status(403).json({ error: 'Token verification failed or insufficient role' });
+      return res.status(403).json({ error: 'Token verification failed or insufficient access role' });
     }
   };
 }

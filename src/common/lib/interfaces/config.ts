@@ -12,7 +12,7 @@ export interface IRouteData extends Required<IPager> {
   routeName: string
   paramId: string
   disableRoutes: boolean;
-  authorize:Map<string,boolean>
+  authorize:Map<string,boolean> 
 }
 
 

@@ -14,6 +14,7 @@ dist-ts/.env
 dist-ts/test.env
 dist/.env
 dist/test.env
+rest-client.http
 .env
 test.env
 build
