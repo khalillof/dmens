@@ -33,14 +33,14 @@ if(fs.existsSync(envPath)){
 }
 const getOr = (key:string, or:any=undefined)=> env[key] ??  or ;
 const getAbsolutePath =(p:string)=> path.join(baseDir,p);
-
+const getArray = (key:string, or:string[]=[])=> getOr(key, or)?.split(',').map((e:string) => e.trim()) as string[]; 
 export const envs = {
     isDevelopment,
     baseDir,
     getAbsolutePath,
     port:()=> getOr('PORT',3000),
     admin_role : ()=> getOr("ADMIN_ROLE","admin"),
-    accessRoles:()=>  getOr('Access_Roles', [getOr("ADMIN_ROLE","admin")])?.split(',').map((e:string) => e.trim()),
+    accessRoles:()=>  getArray('ACCESS_ROLES', ["admin"]),
     admin_email:()=> getOr('ADMIN_EMAIL', ''),
     admin_userName: ()=> getOr('ADMIN_USERNAME',''),
     admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
@@ -60,13 +60,13 @@ export const envs = {
     jwtSecret:()=> getOr('JWT_SECRET'),
     jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
     jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
-    issuers :()=> getOr('ISSUERS', [])?.split(',').map((e:string) => e.trim()),
-    audiences:()=>  getOr('AUDIENCES', [])?.split(',').map((e:string) => e.trim()), //['your-client-id'],
+    issuers :()=> getArray('ISSUERS'),
+    audiences:()=>  getArray('AUDIENCES'), //['your-client-id'],
     jwks_uri:()=> getOr('JWKS_URI', `${envs.issuers()[0]}jwks`),
     schemaDir: ()=> getOr('SCHEMA_DIR',getAbsolutePath('models/schema')),
     getSchemaUploadPath: (name:string | any)=> path.join(envs.schemaDir(),`${name}.${Date.now()}.json`),
     imagesUploadDir: ()=> getOr('IMAGES_UPLOAD_DIR',getAbsolutePath('public/images')),
-    allow_origins:()=>  getOr('CORES_DMAINS', [])?.split(',').map((e:string) => e.trim()),
+    allow_origins:()=>  getArray('CORES_DMAINS'),
     static_url:()=>  getOr('STATIC_URL',undefined),
     databaseUrl:()=> getOr('DATABASE_URL'),// will throw error if connection string not provided
 
