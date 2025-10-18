@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import { Middlewares } from '../../middlewares/index.js';
 import { responces, IActiveRoutes, IController, IDefaultRoutesConfig, IMethod, IRouteCallback, appData, IConfigration, IRouteManager, appMethods } from '../../common/index.js';
 import { ConfigController, DefaultController } from '../../controllers/index.js';
-import { Request, Response, NextFunction, IRouter , Router} from "express";
+import { Request, Response, NextFunction, IRouter, Router } from "express";
 import { corsWithOptions } from "./cors.config.js";
 import { RouteManager } from "./routeManager.js";
-import {oidcJwtMiddleware} from "../../services/lib/auth.js"
+import { oidcJwtMiddleware } from "../../services/lib/auth.js"
 
 
 export class DefaultRoutesConfig implements IDefaultRoutesConfig {
@@ -15,7 +15,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   baseRoute: string
   paramId: string
   activeRoutes: IActiveRoutes = { get: [], post: [], put: [], delete: [], options: [] }
-  routeManager : IRouteManager
+  routeManager: IRouteManager
 
   constructor(config: IConfigration, callback?: IRouteCallback) {
     let { name, routeName, paramId } = config;
@@ -25,7 +25,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     this.baseRoute = '/' + routeName
     this.paramId = ":" + paramId;
     this.router = Router({ mergeParams: true, strict: true });
-    
+
     if (typeof callback === 'function') {
       callback.call(this)
     } else {
@@ -37,7 +37,7 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   }
 
 
-  async addRoute(method: IMethod, path?: string, action?: string, middlewares?: string[] ) {
+  async addRoute(method: IMethod, path?: string, action?: string, middlewares?: string[]) {
 
     if (!method) {
       throw new Error('method is required to add route');
@@ -45,13 +45,13 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     path = this.addRoutePath(method, path);
     // check if action is undefind assigned to method
     action ??= method;
-    
+
     let cont: any = this.controller;
     // check action 
     if (!cont[action!]) {
       throw new Error(`Route name -(${this.baseRoute}) -- action --( ${action} ) not found`)
     }
-    if(this.config.disabledActions.isFound(action)){
+    if (this.config.disabledActions.isFound(action)) {
       throw new Error(`baseRoute : ${this.baseRoute} - path :${path} - action -${action}- is on disabled list of actions`)
     }
 
@@ -81,22 +81,22 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   }
 
   addOptions(path?: string) {
-    this.router.options(this.addRoutePath('options', path),corsWithOptions);
+    this.router.options(this.addRoutePath('options', path), corsWithOptions);
   }
 
 
   async defaultRoutes() {
 
-    await this.addRoute("get",undefined, 'list' );
-    await this.addRoute("get", this.paramId );
-    await this.addRoute("post",undefined,"create" );
+    await this.addRoute("get", undefined, 'list');
+    await this.addRoute("get", this.paramId);
+    await this.addRoute("post", undefined, "create");
     await this.addRoute("put", this.paramId, "update");
     await this.addRoute("delete", this.paramId);
 
-    await this.addRoute("get", "count" , "count");
-    await this.addRoute("get", "search" , "search");
+    await this.addRoute("get", "count", "count");
+    await this.addRoute("get", "search", "search");
 
-    this.setParam( this.config.paramId);
+    this.setParam(this.config.paramId);
     this.addOptions();
     this.addOptions(this.paramId);
 
@@ -121,17 +121,20 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
   }
   async setMiddlewars(action: string, middlewares: string[] = []): Promise<any> {
     let mdl: any = Middlewares;
-        mdl.authorize = oidcJwtMiddleware();
+
     // check if require auth
-    if(this.config.authorize.has(action)){
+    if (this.config.authorize.has(action)) {
       middlewares.push('authorize');
       // check if require admin role
-     if (this.config.authorize.get(action)) {
-      middlewares.push('isAdmin');
+      if (this.config.authorize.get(action)) {
+        // middlewares.push('isAdmin');
+        mdl.authorize = oidcJwtMiddleware(true);
+      } else {
+        mdl.authorize = oidcJwtMiddleware();
+      }
     }
-  }
 
-   // remove disabled actions then remove diplicates
+    // remove disabled actions then remove diplicates
     middlewares = middlewares.removeDiplicates();
 
     // console.log(this.baseRoute + ": ",action, middlewares);
