@@ -32,18 +32,24 @@ function validateClaims(payload: any) {
   const { iss, aud, exp } = payload;
 
   if (!authConfig.expectedIssuers.includes(iss)) throw new Error('Invalid issuer');
+  if (typeof exp !== 'number' || exp * 1000 < Date.now()) throw new Error('Token expired');
 
-  if (Array.isArray(aud)) {
-
-    const hasAud = authConfig.expectedAudiences?.some(a => aud.includes(a));
-    if (!hasAud) throw new Error('Invalid audience');
-  } else if (typeof aud === "string") {
-    if (!authConfig.expectedAudiences.includes(aud)) throw new Error('Invalid audience');
-  } else {
+    if( !aud) {
     throw new Error('missing required propery audience');
   }
+  
+  if (Array.isArray(aud) && !(authConfig.expectedAudiences?.some(a => aud.includes(a)))) {
 
-  if (typeof exp !== 'number' || exp * 1000 < Date.now()) throw new Error('Token expired');
+    throw new Error('Invalid audience:' + aud);
+
+  }
+  
+  if (typeof aud === "string" && !(authConfig.expectedAudiences.includes(aud))) {
+    throw new Error('Invalid audience:' + aud);
+
+  }
+
+
 }
 
 function validateRoles(payload: any) {
