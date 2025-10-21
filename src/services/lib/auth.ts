@@ -32,7 +32,17 @@ function validateClaims(payload: any) {
   const { iss, aud, exp } = payload;
 
   if (!authConfig.expectedIssuers.includes(iss)) throw new Error('Invalid issuer');
-  if (!authConfig.expectedAudiences.includes(aud)) throw new Error('Invalid audience');
+
+  if (Array.isArray(aud)) {
+
+    const hasAud = authConfig.expectedAudiences?.some(a => aud.includes(a));
+    if (!hasAud) throw new Error('Invalid audience');
+  } else if (typeof aud === "string") {
+    if (!authConfig.expectedAudiences.includes(aud)) throw new Error('Invalid audience');
+  } else {
+    throw new Error('missing required propery audience');
+  }
+
   if (typeof exp !== 'number' || exp * 1000 < Date.now()) throw new Error('Token expired');
 }
 
@@ -44,7 +54,7 @@ function validateRoles(payload: any) {
   if (!hasRole) throw new Error('Insufficient role');
 }
 
-export function oidcJwtMiddleware(requireAdminRole?:boolean) {
+export function oidcJwtMiddleware(requireAdminRole?: boolean) {
   const { jwks, localKeys } = createVerifiers();
 
   return async (req: any, res: Response, next: NextFunction) => {
@@ -54,7 +64,7 @@ export function oidcJwtMiddleware(requireAdminRole?:boolean) {
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     try {
       const { payload } = await jwtVerify(token, jwks, {
         issuer: authConfig.expectedIssuers,
@@ -62,13 +72,13 @@ export function oidcJwtMiddleware(requireAdminRole?:boolean) {
       });
 
       validateClaims(payload);
-      
-      if(requireAdminRole)
-      validateRoles(payload);
+
+      if (requireAdminRole)
+        validateRoles(payload);
 
       req.user = payload;
       return next();
-    } catch (jwksErr:any) {
+    } catch (jwksErr: any) {
       console.warn('JWKS verification failed:', jwksErr.message);
 
       for (const keyPromise of localKeys) {
