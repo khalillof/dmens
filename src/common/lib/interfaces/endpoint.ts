@@ -5,7 +5,7 @@ export interface IEndPointRoute {
   path?: string;
   passAuth?: boolean;
   authorize?: boolean;
-  admin?: boolean;
+  accessRoles?: string[];
   headers?: Record<string, string>;
 }
 

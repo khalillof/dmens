@@ -107,11 +107,13 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     if (this.config.endPoints?.length) {
       for await (let { host, name, routes } of this.config.endPoints) {
         for await (let route of routes) {
-          let { method, paramId, authorize, admin, path } = route;
+          let { method, paramId, authorize, accessRoles, path } = route;
           path = paramId ? name + '/:' + paramId : name;
 
-          let middlewares = authorize ? [oidcJwtMiddleware()] : []
-          admin && middlewares.push(Middlewares.isAdmin);
+          let middlewares = authorize ? [oidcJwtMiddleware(accessRoles)] : []
+
+         // admin && middlewares.push(Middlewares.isAdmin);
+
           middlewares.push(this.actions("endPoint", [host, route]));
 
           this.router[method](this.addRoutePath(method, path), middlewares);
@@ -125,13 +127,10 @@ export class DefaultRoutesConfig implements IDefaultRoutesConfig {
     // check if require auth
     if (this.config.authorize.has(action)) {
       middlewares.push('authorize');
-      // check if require admin role
-      if (this.config.authorize.get(action)) {
-        // middlewares.push('isAdmin');
-        mdl.authorize = oidcJwtMiddleware(true);
-      } else {
-        mdl.authorize = oidcJwtMiddleware();
-      }
+      // pass required access roles
+      let accessRoles = this.config.authorize.get(action) ? this.config.accessRoles : undefined;
+      mdl.authorize = oidcJwtMiddleware(accessRoles);
+      
     }
 
     // remove disabled actions then remove diplicates
