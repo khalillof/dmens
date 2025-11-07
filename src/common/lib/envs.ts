@@ -40,26 +40,14 @@ export const envs = {
     getAbsolutePath,
     port:()=> getOr('PORT',3000),
     admin_role : ()=> getOr("ADMIN_ROLE","admin"),
-    accessRoles:()=>  getArray('ACCESS_ROLES', ["admin"]),
+    accessRolesObjectPath:()=>  getOr('ACCESS_ROLES_OBJECT_PATH', "roles"),
     admin_email:()=> getOr('ADMIN_EMAIL', ''),
     admin_userName: ()=> getOr('ADMIN_USERNAME',''),
     admin_password: ()=> getOr('ADMIN_PASSWORD', ''),
     getSecret:getOr,
-    authStrategy:()=> {
-    let authStr =  getOr('AUTH_STRAtEGY', 'jwt').toLowerCase();
-
-    if("jwt az oidc local".indexOf(authStr) !== -1){
-      return authStr === 'az' ? 'oauth-bearer' :  authStr;     
-    }else{
-      throw new Error( `>>> ${authStr} : >>>  auth strategy does not exist`)
-    }
-    
-      },
     useCore: ()=> getOr('USE_CORES',true),
     secretKey: ()=>  getOr('SECRET_KEY'),
     jwtSecret:()=> getOr('JWT_SECRET'),
-    jwtExpiration:()=> Number(getOr('JWT_EXPIRATION','3600')),// 1 hour
-    jwtRefreshExpiration: ()=> Number(getOr('JWT_REFRESH_EXPIRATION','86400')),// 24 hour
     issuers :()=> getArray('ISSUERS'),
     audiences:()=>  getArray('AUDIENCES'), //['your-client-id'],
     jwks_uri:()=> getOr('JWKS_URI', `${envs.issuers()[0]}jwks`),

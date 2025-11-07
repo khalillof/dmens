@@ -1,6 +1,6 @@
 // auth.ts
 
-import { createRemoteJWKSet, jwtVerify, importSPKI } from 'jose';
+import { createRemoteJWKSet, jwtVerify, importSPKI, decodeJwt } from 'jose';
 import { Request, Response, NextFunction } from 'express';
 import { envs } from "../../common/index.js";
 
@@ -9,7 +9,7 @@ interface IauthConfig {
   localPublicKeys?: string[]; // PEM-encoded public keys
   expectedIssuers: string[];
   expectedAudiences: string[];
-  accessRoles?: string[]; // Optional RBAC
+
 }
 
 
@@ -17,10 +17,12 @@ var authConfig: IauthConfig = {
   jwksUri: envs.jwks_uri() as string,
   expectedIssuers: envs.issuers(),
   expectedAudiences: envs.audiences(), // ['your-client-id'],
-  accessRoles: envs.accessRoles()
   //localPublicKeys: [process.env.LOCAL_PUBLIC_KEY_PEM!],
 };
 
+function getNestedObject(obj:Record<string,any>, path:string){
+  return path.split('.').reduce((acc,key)=> acc?.[key],obj)
+}
 
 function createVerifiers() {
   const jwks = createRemoteJWKSet(new URL(authConfig.jwksUri));
@@ -29,38 +31,33 @@ function createVerifiers() {
 }
 
 function validateClaims(payload: any) {
+
   const { iss, aud, exp } = payload;
 
   if (!authConfig.expectedIssuers.includes(iss)) throw new Error('Invalid issuer');
   if (typeof exp !== 'number' || exp * 1000 < Date.now()) throw new Error('Token expired');
 
-    if( !aud) {
+  if (!aud) {
     throw new Error('missing required propery audience');
   }
-  
-  if (Array.isArray(aud) && !(authConfig.expectedAudiences?.some(a => aud.includes(a)))) {
+
+  // check if type of aud is array or string and it does have match for audience property
+  if ((Array.isArray(aud) && !authConfig.expectedAudiences?.some(a => aud.includes(a))) || (typeof aud === "string" && !authConfig.expectedAudiences.includes(aud))) {
 
     throw new Error('Invalid audience:' + aud);
 
   }
-  
-  if (typeof aud === "string" && !(authConfig.expectedAudiences.includes(aud))) {
-    throw new Error('Invalid audience:' + aud);
-
-  }
-
 
 }
 
-function validateRoles(payload: any) {
-  if (!authConfig.accessRoles || authConfig.accessRoles.length === 0) return;
+function validateRoles(payload: Record<string,any>, accessRoles?:string[]) {
+  if (accessRoles?.length === 0) return;
 
-  const userRoles: string[] = payload.roles || [];
-  const hasRole = authConfig.accessRoles?.some(role => userRoles.includes(role));
+  const hasRole = accessRoles?.some(role => (getNestedObject(payload,envs.accessRolesObjectPath()) as string[] || []).includes(role));
   if (!hasRole) throw new Error('Insufficient role');
 }
 
-export function oidcJwtMiddleware(requireAdminRole?: boolean) {
+export function oidcJwtMiddleware(accessRoles?: string[]) {
   const { jwks, localKeys } = createVerifiers();
 
   return async (req: any, res: Response, next: NextFunction) => {
@@ -72,17 +69,22 @@ export function oidcJwtMiddleware(requireAdminRole?: boolean) {
     const token = authHeader.split(' ')[1];
 
     try {
+      // decode token
+      console.log(decodeJwt(token));
+
+      
       const { payload } = await jwtVerify(token, jwks, {
         issuer: authConfig.expectedIssuers,
-        audience: authConfig.expectedAudiences,
+    audience: authConfig.expectedAudiences,
       });
 
-      validateClaims(payload);
+    validateClaims(payload);
 
-      if (requireAdminRole)
-        validateRoles(payload);
+      if (accessRoles?.length)
+        validateRoles(payload, accessRoles);
 
       req.user = payload;
+
       return next();
     } catch (jwksErr: any) {
       console.warn('JWKS verification failed:', jwksErr.message);

@@ -110,7 +110,10 @@ const endPointRouteSchema = new Schema<IEndPointRoute>({
   path: { "type": String, default: '', trim: true },
   paramId: { "type": String },
   authorize: { "type": Boolean, default: false },
-  admin: { "type": Boolean, default: false },
+  accessRoles: {
+    "type": [String],
+    default: ["admin"]
+  },
   passAuth: { "type": Boolean, default: false },
   headers: {
     "type": Map,
@@ -179,6 +182,10 @@ export const configSchema = new Schema<IConfigration, IModel>({
     "type": Boolean,
     default: false
   },
+  accessRoles: {
+    "type": [String],
+    default: ["admin"]
+  },
   queryKey: {
     "type": String
   },
@@ -233,7 +240,7 @@ export const configSchema = new Schema<IConfigration, IModel>({
         }
         return result;
       },
-      message: (props) => `one of action key is not valid action!`
+      message: (props) => `one of action key is not valid action! ${props?.reason?.message}`
     }
   },
   textSearch: {
@@ -274,6 +281,7 @@ const configTemplateProps: IConfigParameters = {
   //disableRoutes: false,
   queryKey: "name",
   tags: [],
+  accessRoles:["admin"],
   schemaOptions: { timestamps: true, strict: true },
   schemaObj: {},
   endPoints: [{

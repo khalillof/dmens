@@ -12,7 +12,8 @@ export interface IRouteData extends Required<IPager> {
   routeName: string
   paramId: string
   disableRoutes: boolean;
-  authorize:Map<string,boolean> 
+  accessRoles?: string[];
+  authorize:Map<string,boolean> // ationName, requireRBAC
 }
 
 
@@ -21,6 +22,7 @@ export interface IConfigParameters extends IPager {
   routeName?: string;
   paramId?: string;
   tags?: string[];
+  accessRoles?: string[];
   disabledActions?: string[];
   queryKey?: string;
   disableRoutes?: boolean;
